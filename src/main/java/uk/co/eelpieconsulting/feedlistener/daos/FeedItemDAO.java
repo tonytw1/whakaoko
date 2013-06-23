@@ -3,7 +3,6 @@ package uk.co.eelpieconsulting.feedlistener.daos;
 import java.util.Date;
 import java.util.Map;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import uk.co.eelpieconsulting.feedlistener.model.FeedItem;
@@ -27,7 +26,6 @@ public class FeedItemDAO {
 	
 	final Ordering<FeedItem> dateOrdering = Ordering.natural().onResultOf(dateDescending);
 	
-	@Autowired
 	public FeedItemDAO() {
 		this.feedItems = Maps.newHashMap();
 	}
