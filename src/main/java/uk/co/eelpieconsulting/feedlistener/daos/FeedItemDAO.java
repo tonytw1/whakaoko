@@ -1,21 +1,25 @@
 package uk.co.eelpieconsulting.feedlistener.daos;
 
 import java.util.Date;
-import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
+import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 import uk.co.eelpieconsulting.feedlistener.model.FeedItem;
 
 import com.google.common.base.Function;
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Maps;
 import com.google.common.collect.Ordering;
 
 @Component
 public class FeedItemDAO {
 	
-	private Map<String, FeedItem> feedItems;
+	private static Logger log = Logger.getLogger(FeedItemDAO.class);
+	
+	private ConcurrentHashMap<String, FeedItem> feedItems;
 	
 	final Function<FeedItem, Date> dateDescending = new Function<FeedItem, Date>() {
 		@Override
@@ -26,12 +30,14 @@ public class FeedItemDAO {
 	
 	final Ordering<FeedItem> dateOrdering = Ordering.natural().onResultOf(dateDescending);
 	
-	public FeedItemDAO() {
-		this.feedItems = Maps.newHashMap();
+	@Autowired
+	public FeedItemDAO(@Qualifier("feedItemsMap") ConcurrentHashMap<String, FeedItem> feedItems) {
+		this.feedItems = feedItems;
 	}
 	
 	public void add(FeedItem feedItem) {
 		if (!feedItems.containsKey(feedItem.getId())) {
+			log.info("Added; " + feedItem);
 			feedItems.put(feedItem.getId(), feedItem);
 		}
 	}

@@ -4,24 +4,23 @@ import java.io.Serializable;
 import java.util.Date;
 
 import uk.co.eelpieconsulting.common.geo.model.LatLong;
+import uk.co.eelpieconsulting.common.views.rss.RssFeedable;
 
-public class FeedItem implements Serializable {
+public class FeedItem implements Serializable, RssFeedable {
 	
 	private static final long serialVersionUID = 1L;
 
 	private final String title;
 	private final String url;
 	private final String body;
-	private final String link;
 	private final Date date;
 	private final LatLong latLong;
 	private final String imageUrl;
 
-	public FeedItem(String title, String url, String body, String link, Date date, LatLong latLong, String imageUrl) {
+	public FeedItem(String title, String url, String body, Date date, LatLong latLong, String imageUrl) {
 		this.title = title;
 		this.url = url;
 		this.body = body;
-		this.link = link;
 		this.date = date;
 		this.latLong = latLong;
 		this.imageUrl = imageUrl;
@@ -46,11 +45,7 @@ public class FeedItem implements Serializable {
 	public String getBody() {
 		return body;
 	}
-
-	public String getLink() {
-		return link;
-	}
-
+	
 	public Date getDate() {
 		return date;
 	}
@@ -68,10 +63,25 @@ public class FeedItem implements Serializable {
 	}
 
 	@Override
+	public String getDescription() {
+		return body;
+	}
+
+	@Override
+	public String getHeadline() {
+		return title;
+	}
+
+	@Override
+	public String getWebUrl() {
+		return url;
+	}
+	
+	@Override
 	public String toString() {
 		return "FeedItem [body=" + body + ", date=" + date + ", imageUrl="
-				+ imageUrl + ", latLong=" + latLong + ", link=" + link
-				+ ", title=" + title + ", uri=" + url + "]";
+				+ imageUrl + ", latLong=" + latLong + ", title=" + title
+				+ ", url=" + url + "]";
 	}
 	
 }

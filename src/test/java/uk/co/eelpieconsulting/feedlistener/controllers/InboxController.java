@@ -21,8 +21,15 @@ public class InboxController {
 	}
 	
 	@RequestMapping("/inbox")
-	public ModelAndView subscriptions() {
+	public ModelAndView inbox() {
 		final ModelAndView mv = new ModelAndView(viewFactory.getJsonView());
+		mv.addObject("data", feedItemDAO.getAll());
+		return mv;
+	}
+	
+	@RequestMapping("/inbox/rss")
+	public ModelAndView inboxRss() {
+		final ModelAndView mv = new ModelAndView(viewFactory.getRssView("Inbox", "http://localhost:9090/inbox", "Inbox items"));
 		mv.addObject("data", feedItemDAO.getAll());
 		return mv;
 	}

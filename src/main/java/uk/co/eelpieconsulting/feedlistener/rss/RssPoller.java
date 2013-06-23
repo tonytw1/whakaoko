@@ -4,6 +4,8 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.task.TaskExecutor;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import uk.co.eelpieconsulting.feedlistener.daos.FeedItemDAO;
@@ -19,19 +21,40 @@ public class RssPoller {
 	private final SubscriptionsDAO subscriptionsDAO;
 	private final FeedFetcher feedFetcher;
 	private final FeedItemDAO feedItemDAO;
+	private final TaskExecutor taskExecutor;
 	
 	@Autowired
-	public RssPoller(SubscriptionsDAO subscriptionsDAO, FeedFetcher feedFetcher, FeedItemDAO feedItemDAO) {
+	public RssPoller(SubscriptionsDAO subscriptionsDAO, FeedFetcher feedFetcher, FeedItemDAO feedItemDAO, TaskExecutor taskExecutor) {
 		this.subscriptionsDAO = subscriptionsDAO;
 		this.feedFetcher = feedFetcher;
 		this.feedItemDAO = feedItemDAO;
+		this.taskExecutor = taskExecutor;
 	}
 	
+	@Scheduled(fixedRate=300000)
 	public void run() {
-		log.info("Polling subscription");
+		log.info("Polling subscriptions");
 		List<RssSubscription> subscriptions = subscriptionsDAO.getSubscriptions();
 		for (RssSubscription subscription : subscriptions) {
-			log.info("Polling RSS feed: " + subscription.getUrl());
+			taskExecutor.execute(new ProcessFeedTask(feedFetcher, feedItemDAO, subscription));
+		}
+		log.info("Done.");
+	}
+	
+	private class ProcessFeedTask implements Runnable {
+		
+		private final FeedFetcher feedFetcher;
+		private final FeedItemDAO feedItemDAO;
+		private final RssSubscription subscription;
+				
+		public ProcessFeedTask(FeedFetcher feedFetcher, FeedItemDAO feedItemDAO, RssSubscription subscription) {
+			this.feedFetcher = feedFetcher;
+			this.feedItemDAO = feedItemDAO;
+			this.subscription = subscription;
+		}
+
+		public void run() {
+			log.info("Processing feed: " + subscription);
 			final FetchedFeed fetchedFeed = feedFetcher.fetchFeed(subscription.getUrl());
 			if (fetchedFeed != null) {
 				log.info("Fetched feed: " + fetchedFeed.getFeedName());
@@ -41,8 +64,7 @@ public class RssPoller {
 			} else {
 				log.warn("Failed to fetch feed: " + subscription);
 			}
-		}
-		log.info("Done.");
+		}		
 	}
-
+	
 }

@@ -40,7 +40,7 @@ public class FeedFetcher {
         	final LatLong latLong = extractLocationFrom(syndEntry);        	
 			final String imageUrl = extractImageFrom(syndEntry);			
         	final String body = syndEntry.getDescription() != null ? syndEntry.getDescription().getValue() : null;
-			feedItems.add(new FeedItem(syndEntry.getTitle(), syndEntry.getUri(), body, syndEntry.getLink(), syndEntry.getPublishedDate(), latLong, imageUrl));
+			feedItems.add(new FeedItem(syndEntry.getTitle(), syndEntry.getUri(), body, syndEntry.getPublishedDate(), latLong, imageUrl));
         }
         
         return new FetchedFeed(syndfeed.getTitle(), feedItems);
@@ -106,7 +106,7 @@ public class FeedFetcher {
 		if (selectedMediaContent == null) {
 			return true;
 		}		
-		return mediaContent.getWidth() > selectedMediaContent.getWidth();		
+		return mediaContent.getWidth() != null && mediaContent.getWidth() > selectedMediaContent.getWidth();		
 	}
 	
 }
