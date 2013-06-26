@@ -21,14 +21,14 @@ public class FeedItemDAO {
 	
 	private ConcurrentHashMap<String, FeedItem> feedItems;
 	
-	final Function<FeedItem, Date> dateDescending = new Function<FeedItem, Date>() {
+	private final Function<FeedItem, Date> dateDescending = new Function<FeedItem, Date>() {
 		@Override
 		public Date apply(FeedItem from) {
 			return from.getDate();
 		}
 	};
 	
-	final Ordering<FeedItem> dateOrdering = Ordering.natural().onResultOf(dateDescending);
+	private final Ordering<FeedItem> dateDescendingOrdering = Ordering.natural().reverse().onResultOf(dateDescending);
 	
 	@Autowired
 	public FeedItemDAO(@Qualifier("feedItemsMap") ConcurrentHashMap<String, FeedItem> feedItems) {
@@ -43,7 +43,7 @@ public class FeedItemDAO {
 	}
 	
 	public ImmutableList<FeedItem> getAll() {
-		return dateOrdering.immutableSortedCopy(feedItems.values()).reverse();		
+		return dateDescendingOrdering.immutableSortedCopy(feedItems.values());		
 	}
 	
 }
