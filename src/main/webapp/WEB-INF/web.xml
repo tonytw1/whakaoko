@@ -1,5 +1,5 @@
 <web-app>
-	<display-name>rss-to-n0tice</display-name>
+	<display-name>whakaoko</display-name>
 
 	<filter>
 		<filter-name>charsetFilter</filter-name>
@@ -21,13 +21,13 @@
 	</listener>
 
 	<servlet>
-		<servlet-name>feedlistener</servlet-name>
+		<servlet-name>whakaoko</servlet-name>
 		<servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
 		<load-on-startup>1</load-on-startup>
 	</servlet>
 	
 	<servlet-mapping>
-		<servlet-name>feedlistener</servlet-name>
+		<servlet-name>whakaoko</servlet-name>
 		<url-pattern>/*</url-pattern>
 	</servlet-mapping>
 	
