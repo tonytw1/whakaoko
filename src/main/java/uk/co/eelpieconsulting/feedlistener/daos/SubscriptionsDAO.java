@@ -15,8 +15,7 @@ public class SubscriptionsDAO {
 	private List<RssSubscription> subscriptions;
 
 	public SubscriptionsDAO() {
-		subscriptions = Lists.newArrayList();
-		add(new RssSubscription("http://wellington.gen.nz"));
+		subscriptions = Lists.newArrayList();	
 	}
 	
 	public void add(RssSubscription subscription) {
