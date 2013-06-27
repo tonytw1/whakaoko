@@ -1,6 +1,6 @@
 package uk.co.eelpieconsulting.feedlistener.model;
 
-public class RssSubscription {
+public class RssSubscription extends Subscription {
 	
 	private final String url;
 
@@ -16,6 +16,11 @@ public class RssSubscription {
 	@Override
 	public String toString() {
 		return "RssSubscription [url=" + url + "]";
+	}
+
+	@Override
+	public String getId() {
+		return "feeds/" + url;
 	}
 	
 }

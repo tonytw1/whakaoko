@@ -12,6 +12,7 @@ import uk.co.eelpieconsulting.feedlistener.daos.FeedItemDAO;
 import uk.co.eelpieconsulting.feedlistener.daos.SubscriptionsDAO;
 import uk.co.eelpieconsulting.feedlistener.model.FeedItem;
 import uk.co.eelpieconsulting.feedlistener.model.RssSubscription;
+import uk.co.eelpieconsulting.feedlistener.model.Subscription;
 
 @Component
 public class RssPoller {
@@ -34,9 +35,11 @@ public class RssPoller {
 	@Scheduled(fixedRate=300000)
 	public void run() {
 		log.info("Polling subscriptions");
-		List<RssSubscription> subscriptions = subscriptionsDAO.getSubscriptions();
-		for (RssSubscription subscription : subscriptions) {
-			taskExecutor.execute(new ProcessFeedTask(feedFetcher, feedItemDAO, subscription));
+		List<Subscription> subscriptions = subscriptionsDAO.getSubscriptions();
+		for (Subscription subscription : subscriptions) {
+			if (subscription.getId().startsWith("feeds/")) {
+				taskExecutor.execute(new ProcessFeedTask(feedFetcher, feedItemDAO, (RssSubscription) subscription));
+			}
 		}
 		log.info("Done.");
 	}

@@ -1,5 +1,7 @@
 package uk.co.eelpieconsulting.feedlistener.twitter;
 
+import java.util.List;
+
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -12,27 +14,36 @@ import twitter4j.Status;
 import twitter4j.StatusDeletionNotice;
 import twitter4j.StatusListener;
 import twitter4j.TwitterStream;
+import twitter4j.api.TweetsResources;
 import uk.co.eelpieconsulting.common.geo.model.LatLong;
 import uk.co.eelpieconsulting.feedlistener.daos.FeedItemDAO;
+import uk.co.eelpieconsulting.feedlistener.daos.SubscriptionsDAO;
 import uk.co.eelpieconsulting.feedlistener.model.FeedItem;
+import uk.co.eelpieconsulting.feedlistener.model.Subscription;
+import uk.co.eelpieconsulting.feedlistener.model.TwitterTagSubscription;
 
 import com.google.common.base.Strings;
+import com.google.common.collect.FluentIterable;
+import com.google.common.collect.Lists;
 
 @Component
 public class TwitterListener {
 	
 	private static Logger log = Logger.getLogger(TwitterListener.class);
 	
+	private final SubscriptionsDAO subscriptionsDAO;
 	private FeedItemDAO feedItemDAO;
 	
 	String consumerKey = "";
 	String consumerSecret = "";
+	private TwitterStream twitterStream;
 
 	String accessToken = "";
 	String accessSecret = "";
 		
 	@Autowired
-	public TwitterListener(FeedItemDAO feedItemDAO) {
+	public TwitterListener(SubscriptionsDAO subscriptionsDAO, FeedItemDAO feedItemDAO) {
+		this.subscriptionsDAO = subscriptionsDAO;
 		this.feedItemDAO = feedItemDAO;
 		connect();
 	}
@@ -104,12 +115,25 @@ public class TwitterListener {
 				return null;
 			}			
 		};
-
-		TwitterStream twitterStream = new TwitterApiFactory().getStreamingApi(consumerKey, consumerSecret, accessToken, accessSecret);
+		
+		if (twitterStream != null) {
+			twitterStream.cleanUp();
+		}
+		
+		twitterStream = new TwitterApiFactory().getStreamingApi(consumerKey, consumerSecret, accessToken, accessSecret);
 		twitterStream.addListener(listener);
 
-		String[] london = { "twickenham" };
-		twitterStream.filter(new FilterQuery().track(london));		    
+		final List<String> tagsList = Lists.newArrayList();
+		for (Subscription subscription : subscriptionsDAO.getSubscriptions()) {
+			if (subscription.getId().startsWith("twitter/")) {
+				tagsList.add( ((TwitterTagSubscription) subscription).getTag());
+			}
+		}
+		
+		if (!tagsList.isEmpty()) {
+			final String[] tags = tagsList.toArray(new String[tagsList.size()]);
+			twitterStream.filter(new FilterQuery().track(tags));
+		}
 	}
 	
 }

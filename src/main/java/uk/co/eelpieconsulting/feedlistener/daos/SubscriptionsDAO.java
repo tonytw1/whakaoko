@@ -4,7 +4,7 @@ import java.util.List;
 
 import org.springframework.stereotype.Component;
 
-import uk.co.eelpieconsulting.feedlistener.model.RssSubscription;
+import uk.co.eelpieconsulting.feedlistener.model.Subscription;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
@@ -12,17 +12,17 @@ import com.google.common.collect.Lists;
 @Component
 public class SubscriptionsDAO {
 
-	private List<RssSubscription> subscriptions;
+	private List<Subscription> subscriptions;
 
 	public SubscriptionsDAO() {
 		subscriptions = Lists.newArrayList();	
 	}
 	
-	public void add(RssSubscription subscription) {
+	public void add(Subscription subscription) {
 		subscriptions.add(subscription);
 	}
 	
-	public List<RssSubscription> getSubscriptions() {
+	public List<Subscription> getSubscriptions() {
 		return ImmutableList.copyOf(subscriptions);
 	}
 	
