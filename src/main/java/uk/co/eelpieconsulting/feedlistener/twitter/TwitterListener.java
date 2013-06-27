@@ -93,14 +93,11 @@ public class TwitterListener {
 			}
 
 			private String extractImageUrl(Status status) {
-				log.info(status.getMediaEntities().length);
 				if (status.getMediaEntities().length > 0) {
 					final MediaEntity mediaEntity = status.getMediaEntities()[0];
-					log.info(mediaEntity);
 					String type = mediaEntity.getType();
 					String url = mediaEntity.getMediaURL();
 					if (!Strings.isNullOrEmpty(type) && type.equals("photo") && !Strings.isNullOrEmpty(url)) {
-						log.info("Using image url: " + url);
 						return url;
 					}
 				}
