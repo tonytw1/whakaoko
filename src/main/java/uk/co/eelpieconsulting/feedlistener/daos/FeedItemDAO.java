@@ -1,6 +1,7 @@
 package uk.co.eelpieconsulting.feedlistener.daos;
 
 import java.util.Date;
+import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.log4j.Logger;
@@ -42,8 +43,14 @@ public class FeedItemDAO {
 		}
 	}
 	
+	public void addAll(List<FeedItem> feedItems) {
+		for (FeedItem feedItem : feedItems) {
+			add(feedItem);
+		}		
+	}
+	
 	public ImmutableList<FeedItem> getAll() {
 		return dateDescendingOrdering.immutableSortedCopy(feedItems.values());		
 	}
-	
+
 }
