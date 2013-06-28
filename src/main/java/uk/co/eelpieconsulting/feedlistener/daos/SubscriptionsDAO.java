@@ -18,7 +18,12 @@ public class SubscriptionsDAO {
 		subscriptions = Lists.newArrayList();	
 	}
 	
-	public void add(Subscription subscription) {
+	public synchronized void add(Subscription subscription) {
+		for (Subscription existingSubscription : subscriptions) {
+			if (existingSubscription.getId().equals(subscription.getId())) {
+				return;
+			}
+		}
 		subscriptions.add(subscription);
 	}
 	
