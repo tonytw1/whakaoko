@@ -11,3 +11,17 @@
 #else
 	<p>No current subscriptions.</p>
 #end
+
+
+<h5>Inbox</h5>
+#if($inbox && !$inbox.isEmpty()) 
+	<ul>
+ 	#foreach($inboxItem in $inbox)
+ 		<li><a href="$inboxItem.url">$!inboxItem.title</a>
+ 		<br/>$inboxItem.date
+ 		</li>
+ 	#end
+ 	</ul>
+#else
+	<p>Inbox currently empty.</p>
+#end
