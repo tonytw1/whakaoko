@@ -11,7 +11,6 @@ import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.log4j.Logger;
-import org.joda.time.DateTime;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -33,15 +32,14 @@ public class InstagramApi {
 	private static final String INSTAGRAM_API_ACCESS_TOKEN = "https://api.instagram.com/oauth/access_token";
 	private static final String INSTAGRAM_API_V1_SUBSCRIPTIONS = "https://api.instagram.com/v1/subscriptions/";
 	
-	private static final String LINK = "link";
-	private static final String CREATED_TIME = "created_time";
-	private static final String TEXT = "text";
-	private static final String URL = "url";
-	private static final String STANDARD_RESOLUTION = "standard_resolution";
-	private static final String CAPTION = "caption";
 	private static final String DATA = "data";
-	private static final String IMAGES = "images";
 	
+	private final InstagramFeedItemMapper mapper;
+	
+	public InstagramApi() {
+		this.mapper = new InstagramFeedItemMapper();
+	}
+
 	public void createTagSubscription(String tag, String clientId, String clientSecret, String callbackUrl) throws HttpNotFoundException, HttpBadRequestException, HttpForbiddenException, HttpFetchException, UnsupportedEncodingException {
 		final String verifyToken =  UUID.randomUUID().toString();
 		
@@ -74,8 +72,9 @@ public class InstagramApi {
 	}
 	
 	public List<FeedItem> getRecentMediaForTag(String tag, String accessToken) throws HttpNotFoundException, HttpBadRequestException, HttpForbiddenException, HttpFetchException, JSONException {	
-		final HttpFetcher httpFetcher = new HttpFetcher();
+		final HttpFetcher httpFetcher = new HttpFetcher();		
 		final String response = httpFetcher.get("https://api.instagram.com/v1/tags/" + tag + "/media/recent" + "?access_token=" + accessToken);
+		System.out.println(response);
 		return parseFeedItems(response);
 	}
 	
@@ -109,24 +108,7 @@ public class InstagramApi {
 		final JSONArray data = responseJson.getJSONArray(DATA);
 		for (int i = 0; i < data.length(); i++) {
 			JSONObject imageJson = data.getJSONObject(i);			
-			String imageUrl = null;
-			if (imageJson.has(IMAGES)) {
-				JSONObject imagesJson = imageJson.getJSONObject(IMAGES);
-				imageUrl = imagesJson.getJSONObject(STANDARD_RESOLUTION).getString(URL);
-			}
-			
-			String caption = null;
-			if (imageJson.has(CAPTION) && !imageJson.isNull(CAPTION)) {
-				JSONObject captionJson = imageJson.getJSONObject(CAPTION);
-				caption = captionJson.getString(TEXT);
-			}
-			
-			DateTime createdTime = new DateTime(imageJson.getLong(CREATED_TIME) * 1000);
-			
-			final String url = imageJson.getString(LINK);
-			
-			FeedItem feedItem = new FeedItem(caption, url, null, createdTime.toDate(), null, imageUrl);
-			feedItems.add(feedItem);
+			feedItems.add(mapper.createFeedItemFrom(imageJson));
 		}
 		return feedItems;
 	}
