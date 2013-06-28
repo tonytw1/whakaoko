@@ -26,10 +26,7 @@ public class InstagramOauthController {
 	
 	private static final String INSTAGRAM_OAUTH_CALLBACK = "/instagram/oauth";
 	
-	@Value("#{config['instagram.client.id']}")
 	private final String clientId;
-	
-	@Value("#{config['instagram.client.secret']}")
 	private final String clientSecret;
 
 	private final InstagramApi instagramApi;
