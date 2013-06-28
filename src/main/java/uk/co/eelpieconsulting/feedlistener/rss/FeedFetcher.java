@@ -2,6 +2,7 @@ package uk.co.eelpieconsulting.feedlistener.rss;
 
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
@@ -40,7 +41,9 @@ public class FeedFetcher {
         	final LatLong latLong = extractLocationFrom(syndEntry);        	
 			final String imageUrl = extractImageFrom(syndEntry);			
         	final String body = syndEntry.getDescription() != null ? syndEntry.getDescription().getValue() : null;
-			feedItems.add(new FeedItem(syndEntry.getTitle(), syndEntry.getLink(), body, syndEntry.getPublishedDate(), latLong, imageUrl));
+			final Date date = syndEntry.getPublishedDate() != null ? syndEntry.getPublishedDate() : syndEntry.getUpdatedDate();
+						
+			feedItems.add(new FeedItem(syndEntry.getTitle(), syndEntry.getLink(), body, date, latLong, imageUrl));
         }
         
         return new FetchedFeed(syndfeed.getTitle(), feedItems);
