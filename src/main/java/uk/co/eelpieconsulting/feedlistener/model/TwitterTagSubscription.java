@@ -8,7 +8,7 @@ public class TwitterTagSubscription extends Subscription {
 	}
 
 	public TwitterTagSubscription(String tag) {
-		this.tag = tag;
+		this.setTag(tag);
 	}
 	
 	public String getTag() {
@@ -17,6 +17,7 @@ public class TwitterTagSubscription extends Subscription {
 	
 	public void setTag(String tag) {
 		this.tag = tag;
+		this.setName(generateName(tag));
 	}
 	
 	@Override
@@ -29,5 +30,9 @@ public class TwitterTagSubscription extends Subscription {
 		return "TwitterTagSubscription [tag=" + tag + "]";
 	}
 
+
+	private String generateName(String tag) {
+		return "Twitter - " + tag;
+	}
 	
 }

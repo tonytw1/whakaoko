@@ -8,7 +8,7 @@ public class InstagramTagSubscription extends Subscription {
 	}
 
 	public InstagramTagSubscription(String tag) {
-		this.tag = tag;
+		this.setTag(tag);
 	}
 	
 	public String getTag() {
@@ -17,6 +17,7 @@ public class InstagramTagSubscription extends Subscription {
 
 	public void setTag(String tag) {
 		this.tag = tag;
+		this.setName("Instagram - " + tag);
 	}
 
 	@Override
