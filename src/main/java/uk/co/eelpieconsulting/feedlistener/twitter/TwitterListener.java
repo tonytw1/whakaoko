@@ -1,9 +1,10 @@
 package uk.co.eelpieconsulting.feedlistener.twitter;
 
-import java.util.List;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import twitter4j.FilterQuery;
@@ -14,7 +15,6 @@ import twitter4j.Status;
 import twitter4j.StatusDeletionNotice;
 import twitter4j.StatusListener;
 import twitter4j.TwitterStream;
-import twitter4j.api.TweetsResources;
 import uk.co.eelpieconsulting.common.geo.model.LatLong;
 import uk.co.eelpieconsulting.feedlistener.daos.FeedItemDAO;
 import uk.co.eelpieconsulting.feedlistener.daos.SubscriptionsDAO;
@@ -23,8 +23,7 @@ import uk.co.eelpieconsulting.feedlistener.model.Subscription;
 import uk.co.eelpieconsulting.feedlistener.model.TwitterTagSubscription;
 
 import com.google.common.base.Strings;
-import com.google.common.collect.FluentIterable;
-import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 
 @Component
 public class TwitterListener {
@@ -34,17 +33,25 @@ public class TwitterListener {
 	private final SubscriptionsDAO subscriptionsDAO;
 	private FeedItemDAO feedItemDAO;
 	
-	String consumerKey = "";
-	String consumerSecret = "";
-	private TwitterStream twitterStream;
+	private final String consumerKey;	
+	private final String consumerSecret;
+	private final String accessToken;
+	private final String accessSecret;
 
-	String accessToken = "";
-	String accessSecret = "";
-		
+	private TwitterStream twitterStream;
+	
 	@Autowired
-	public TwitterListener(SubscriptionsDAO subscriptionsDAO, FeedItemDAO feedItemDAO) {
+	public TwitterListener(SubscriptionsDAO subscriptionsDAO, FeedItemDAO feedItemDAO,
+			@Value("#{config['twitter.consumer.key']}") String consumerKey,	
+			@Value("#{config['twitter.consumer.secret']}") String consumerSecret,
+			@Value("#{config['twitter.access.token']}") String accessToken,
+			@Value("#{config['twitter.access.secret']}") String accessSecret) {
 		this.subscriptionsDAO = subscriptionsDAO;
 		this.feedItemDAO = feedItemDAO;
+		this.consumerKey = consumerKey;
+		this.consumerSecret = consumerSecret;
+		this.accessToken = accessToken;
+		this.accessSecret = accessSecret;		
 		connect();
 	}
 	
@@ -123,7 +130,7 @@ public class TwitterListener {
 		twitterStream = new TwitterApiFactory().getStreamingApi(consumerKey, consumerSecret, accessToken, accessSecret);
 		twitterStream.addListener(listener);
 
-		final List<String> tagsList = Lists.newArrayList();
+		final Set<String> tagsList = Sets.newHashSet();
 		for (Subscription subscription : subscriptionsDAO.getSubscriptions()) {
 			if (subscription.getId().startsWith("twitter/")) {
 				tagsList.add( ((TwitterTagSubscription) subscription).getTag());

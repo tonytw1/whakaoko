@@ -8,6 +8,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.log4j.Logger;
 import org.json.JSONException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -29,16 +30,18 @@ public class InstagramCallbackController {
 	
 	private static Logger log = Logger.getLogger(InstagramCallbackController.class);
 	
-	private static final String ACCESS_TOKEN = "";
-
 	private final InstagramApi instagramApi;
 	private final InstagramSubscriptionCallbackParser instagramSubscriptionCallbackParser;
 	private final FeedItemDAO feedItemDAO;
 	
+	private final String accessToken;
+	
 	@Autowired
-	public InstagramCallbackController(InstagramSubscriptionCallbackParser instagramSubscriptionCallbackParser, FeedItemDAO feedItemDAO) {
+	public InstagramCallbackController(InstagramSubscriptionCallbackParser instagramSubscriptionCallbackParser, FeedItemDAO feedItemDAO,
+			@Value("#{config['instagram.access.token']}") String accessToken) {
 		this.instagramSubscriptionCallbackParser = instagramSubscriptionCallbackParser;
 		this.feedItemDAO = feedItemDAO;
+		this.accessToken = accessToken;
 		this.instagramApi = new InstagramApi();
 	}
 
@@ -64,12 +67,11 @@ public class InstagramCallbackController {
 			if (subscription.getObject().equals("tag")) {
 				final String tag = subscription.getObjectId();
 				log.info("Fetching recent media for changed tag: " + tag);
-				List<FeedItem> recentMediaForTag = instagramApi.getRecentMediaForTag(tag, ACCESS_TOKEN);
+				List<FeedItem> recentMediaForTag = instagramApi.getRecentMediaForTag(tag, accessToken);
 				log.info("Adding recent media: " + recentMediaForTag);
 				feedItemDAO.addAll(recentMediaForTag);
 			}
 		}
-		
 		return null;
 	}
 	

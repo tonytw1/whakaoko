@@ -14,7 +14,7 @@
 
     <bean id="feedItemsMap" class="java.util.concurrent.ConcurrentHashMap" />    
 	
-	<util:properties id="config" location="classpath:feedlistener.properties" />
+	<util:properties id="config" location="classpath:whakaoko.properties" />
             
 	<bean id="taskExecutor"
 		class="org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor">
