@@ -16,6 +16,11 @@
 			<id>local-dependencies</id>
 			<url>file:${basedir}/lib/repository</url>
 		</repository>
+		<repository>
+			<id>morphia.googlecode.com</id>
+			<name>Morphia Repo at Google Code</name>
+			<url>http://morphia.googlecode.com/svn/mavenrepo</url>
+		</repository>		
 	</repositories>
         
 	<build>
@@ -136,8 +141,20 @@
 			<groupId>org.twitter4j</groupId>
 			<artifactId>twitter4j-stream</artifactId>
 			<version>[3.0,)</version>
-		</dependency>            
-						
+		</dependency>
+
+		<dependency>
+			<groupId>org.mongodb</groupId>
+			<artifactId>mongo-java-driver</artifactId>
+			<version>2.11.1</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.google.code.morphia</groupId>
+			<artifactId>morphia</artifactId>
+			<version>0.98</version>
+		</dependency>
+	
 		<dependency>
 			<groupId>javax.servlet</groupId>
 			<artifactId>servlet-api</artifactId>

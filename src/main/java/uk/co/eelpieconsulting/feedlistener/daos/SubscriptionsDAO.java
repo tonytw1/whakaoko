@@ -1,34 +1,48 @@
 package uk.co.eelpieconsulting.feedlistener.daos;
 
+import java.net.UnknownHostException;
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import uk.co.eelpieconsulting.feedlistener.model.Subscription;
 
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Lists;
+import com.mongodb.MongoException;
 
 @Component
 public class SubscriptionsDAO {
 
-	private List<Subscription> subscriptions;
+	private final DataStoreFactory dataStoreFactory;
 
-	public SubscriptionsDAO() {
-		subscriptions = Lists.newArrayList();	
+	@Autowired
+	public SubscriptionsDAO(DataStoreFactory dataStoreFactory) {
+		this.dataStoreFactory = dataStoreFactory;
 	}
 	
 	public synchronized void add(Subscription subscription) {
-		for (Subscription existingSubscription : subscriptions) {
+		for (Subscription existingSubscription : getSubscriptions()) {
 			if (existingSubscription.getId().equals(subscription.getId())) {
 				return;
 			}
+		}		
+		try {
+			dataStoreFactory.getDatastore().save(subscription);
+		} catch (UnknownHostException e) {
+			throw new RuntimeException(e);
+		} catch (MongoException e) {
+			throw new RuntimeException(e);
 		}
-		subscriptions.add(subscription);
 	}
 	
 	public List<Subscription> getSubscriptions() {
-		return ImmutableList.copyOf(subscriptions);
+		try {
+			return dataStoreFactory.getDatastore().find(Subscription.class).asList();
+		} catch (UnknownHostException e) {
+			throw new RuntimeException(e);
+		} catch (MongoException e) {
+			throw new RuntimeException(e);
+		}
 	}
 	
 }

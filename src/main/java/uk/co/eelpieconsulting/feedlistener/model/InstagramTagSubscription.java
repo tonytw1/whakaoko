@@ -2,16 +2,23 @@ package uk.co.eelpieconsulting.feedlistener.model;
 
 public class InstagramTagSubscription extends Subscription {
 
-	private final String tag;
+	private String tag;
+	
+	public InstagramTagSubscription() {
+	}
 
 	public InstagramTagSubscription(String tag) {
 		this.tag = tag;
 	}
-
+	
 	public String getTag() {
 		return tag;
 	}
-	
+
+	public void setTag(String tag) {
+		this.tag = tag;
+	}
+
 	@Override
 	public String getId() {
 		return "instagram/tags/" + tag;
@@ -21,6 +28,5 @@ public class InstagramTagSubscription extends Subscription {
 	public String toString() {
 		return "InstagramTagSubscription [tag=" + tag + "]";
 	}
-
 	
 }

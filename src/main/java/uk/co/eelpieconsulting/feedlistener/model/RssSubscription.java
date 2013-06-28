@@ -2,15 +2,21 @@ package uk.co.eelpieconsulting.feedlistener.model;
 
 public class RssSubscription extends Subscription {
 	
-	private final String url;
-
-	public RssSubscription(String url) {
-		super();
-		this.url = url;
+	private String url;
+	
+	public RssSubscription() {
 	}
 
+	public RssSubscription(String url) {
+		this.url = url;
+	}
+	
 	public String getUrl() {
 		return url;
+	}
+
+	public void setUrl(String url) {
+		this.url = url;
 	}
 
 	@Override

@@ -2,14 +2,21 @@ package uk.co.eelpieconsulting.feedlistener.model;
 
 public class TwitterTagSubscription extends Subscription {
 
-	private final String tag;
+	private String tag;
+	
+	public TwitterTagSubscription() {
+	}
 
 	public TwitterTagSubscription(String tag) {
 		this.tag = tag;
 	}
-
+	
 	public String getTag() {
 		return tag;
+	}
+	
+	public void setTag(String tag) {
+		this.tag = tag;
 	}
 	
 	@Override
