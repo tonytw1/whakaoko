@@ -38,7 +38,7 @@ public class RssPoller {
 		List<Subscription> subscriptions = subscriptionsDAO.getSubscriptions();
 		for (Subscription subscription : subscriptions) {
 			if (subscription.getId().startsWith("feeds/")) {
-				taskExecutor.execute(new ProcessFeedTask(feedFetcher, feedItemDAO, (RssSubscription) subscription));
+				taskExecutor.execute(new ProcessFeedTask(feedFetcher, feedItemDAO, subscriptionsDAO, (RssSubscription) subscription));
 			}
 		}
 		log.info("Done.");
@@ -49,17 +49,22 @@ public class RssPoller {
 		private final FeedFetcher feedFetcher;
 		private final FeedItemDAO feedItemDAO;
 		private final RssSubscription subscription;
+		private final SubscriptionsDAO subscriptionsDAO;
 				
-		public ProcessFeedTask(FeedFetcher feedFetcher, FeedItemDAO feedItemDAO, RssSubscription subscription) {
+		public ProcessFeedTask(FeedFetcher feedFetcher, FeedItemDAO feedItemDAO, SubscriptionsDAO subscriptionsDAO, RssSubscription subscription) {
 			this.feedFetcher = feedFetcher;
 			this.feedItemDAO = feedItemDAO;
 			this.subscription = subscription;
+			this.subscriptionsDAO = subscriptionsDAO;
 		}
 
 		public void run() {
 			log.info("Processing feed: " + subscription);
-			final FetchedFeed fetchedFeed = feedFetcher.fetchFeed(subscription.getUrl());
+			final FetchedFeed fetchedFeed = feedFetcher.fetchFeed(subscription.getUrl());			
 			if (fetchedFeed != null) {
+				subscription.setName(fetchedFeed.getFeedName());
+				subscriptionsDAO.save(subscription);
+				
 				log.info("Fetched feed: " + fetchedFeed.getFeedName());
 				for (FeedItem feedItem : fetchedFeed.getFeedItems()) {
 					feedItemDAO.add(feedItem);
