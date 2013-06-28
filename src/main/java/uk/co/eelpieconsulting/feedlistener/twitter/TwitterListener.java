@@ -60,7 +60,7 @@ public class TwitterListener {
 			
 			public void onStatus(Status status) {
 				final FeedItem tweetFeedItem = tweetToFeedItem(status);
-				log.info("Received: " + tweetFeedItem);
+				log.info("Received: " + tweetFeedItem.getHeadline());
 				feedItemDAO.add(tweetFeedItem);
 			}
 			

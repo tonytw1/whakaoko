@@ -42,7 +42,7 @@ public class InstagramCallbackController {
 		this.instagramSubscriptionCallbackParser = instagramSubscriptionCallbackParser;
 		this.feedItemDAO = feedItemDAO;
 		this.accessToken = accessToken;
-		this.instagramApi = new InstagramApi();
+		this.instagramApi = new InstagramApi();		
 	}
 
 	@RequestMapping(value="/instagram/callback", method=RequestMethod.GET)

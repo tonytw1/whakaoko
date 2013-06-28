@@ -38,7 +38,7 @@ public class FeedItemDAO {
 	
 	public void add(FeedItem feedItem) {
 		if (!feedItems.containsKey(feedItem.getId())) {
-			log.info("Added; " + feedItem);
+			log.info("Added: " + feedItem.getHeadline());
 			feedItems.put(feedItem.getId(), feedItem);
 		}
 	}
