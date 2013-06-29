@@ -64,6 +64,13 @@ public class SubscriptionsController {
 		final Subscription subscription = subscriptionsDAO.getById(id);
 		if (subscription != null) {
 			subscriptionsDAO.delete(subscription);
+			
+			if (subscription.getId().startsWith("twitter")) {
+				twitterListener.connect();
+			}
+			if (subscription.getId().startsWith("instagram")) {
+				instagramSubscriptionManager.requestUnsubscribeFromTag(((InstagramTagSubscription) subscription).getTag());
+			}
 		}
 		final ModelAndView mv = new ModelAndView(new RedirectView(urlBuilder.getBaseUrl()));
 		return mv;

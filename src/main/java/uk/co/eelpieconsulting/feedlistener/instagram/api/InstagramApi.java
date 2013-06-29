@@ -71,6 +71,10 @@ public class InstagramApi {
 		httpFetcher.delete(delete);	
 	}
 	
+	public void deleteSubscription(String tag) {
+		// TODO Auto-generated method stub	
+	}
+	
 	public List<FeedItem> getRecentMediaForTag(String tag, String accessToken) throws HttpNotFoundException, HttpBadRequestException, HttpForbiddenException, HttpFetchException, JSONException {	
 		final HttpFetcher httpFetcher = new HttpFetcher();		
 		final String response = httpFetcher.get("https://api.instagram.com/v1/tags/" + tag + "/media/recent" + "?access_token=" + accessToken);

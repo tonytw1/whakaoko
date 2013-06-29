@@ -66,5 +66,9 @@ public class InstagramSubscriptionManager {
 	public void requestInstagramTagSubscription(String tag) throws HttpNotFoundException, HttpBadRequestException, HttpForbiddenException, HttpFetchException, UnsupportedEncodingException {
 		instagramApi.createTagSubscription(tag, clientId, clientSecret, urlBuilder.getInstagramCallbackUrl());
 	}
+
+	public void requestUnsubscribeFromTag(String tag) {
+		instagramApi.deleteSubscription(tag);		
+	}
 	
 }
