@@ -11,7 +11,7 @@
 #else
 	<p>No current subscriptions.</p>
 #end
-
+<p><a href="/subscriptions/new">Add subscription</a></p>
 
 <h5>Inbox ($inboxSize)</h5> 
 #if($inbox && !$inbox.isEmpty()) 

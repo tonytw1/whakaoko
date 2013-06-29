@@ -17,6 +17,7 @@ import uk.co.eelpieconsulting.common.http.HttpBadRequestException;
 import uk.co.eelpieconsulting.common.http.HttpFetchException;
 import uk.co.eelpieconsulting.common.http.HttpForbiddenException;
 import uk.co.eelpieconsulting.common.http.HttpNotFoundException;
+import uk.co.eelpieconsulting.feedlistener.UrlBuilder;
 import uk.co.eelpieconsulting.feedlistener.instagram.api.InstagramApi;
 
 @Controller
@@ -26,15 +27,18 @@ public class InstagramOauthController {
 	
 	private static final String INSTAGRAM_OAUTH_CALLBACK = "/instagram/oauth";
 	
+	private final UrlBuilder urlBuilder;
+
 	private final String clientId;
 	private final String clientSecret;
 
 	private final InstagramApi instagramApi;
 	
 	@Autowired
-	public InstagramOauthController(
+	public InstagramOauthController(UrlBuilder urlBuilder,
 			@Value("#{config['instagram.client.id']}") String clientId,	
 			@Value("#{config['instagram.client.secret']}") String clientSecret) {
+		this.urlBuilder = urlBuilder;
 		this.clientId = clientId;
 		this.clientSecret = clientSecret;
 		this.instagramApi = new InstagramApi();
@@ -69,7 +73,7 @@ public class InstagramOauthController {
 	}
 
 	private String authorizeRedirectReturnUrl() {
-		return "http://genil.eelpieconsulting.co.uk" + INSTAGRAM_OAUTH_CALLBACK;
+		return urlBuilder.getBaseUrl() + INSTAGRAM_OAUTH_CALLBACK;
 	}
 	
 }

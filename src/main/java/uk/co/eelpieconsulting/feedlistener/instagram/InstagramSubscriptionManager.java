@@ -13,6 +13,7 @@ import uk.co.eelpieconsulting.common.http.HttpBadRequestException;
 import uk.co.eelpieconsulting.common.http.HttpFetchException;
 import uk.co.eelpieconsulting.common.http.HttpForbiddenException;
 import uk.co.eelpieconsulting.common.http.HttpNotFoundException;
+import uk.co.eelpieconsulting.feedlistener.UrlBuilder;
 import uk.co.eelpieconsulting.feedlistener.daos.SubscriptionsDAO;
 import uk.co.eelpieconsulting.feedlistener.instagram.api.InstagramApi;
 import uk.co.eelpieconsulting.feedlistener.model.InstagramTagSubscription;
@@ -24,16 +25,19 @@ public class InstagramSubscriptionManager {
 	private static Logger log = Logger.getLogger(InstagramSubscriptionManager.class);
 	
 	private final SubscriptionsDAO subscriptionsDAO;
+	private final UrlBuilder urlBuilder;
+
 	private final InstagramApi instagramApi;
 	
 	private final String clientId;
 	private final String clientSecret;
 	
 	@Autowired
-	public InstagramSubscriptionManager(SubscriptionsDAO subscriptionsDAO,
+	public InstagramSubscriptionManager(SubscriptionsDAO subscriptionsDAO, UrlBuilder urlBuilder,
 			@Value("#{config['instagram.client.id']}") String clientId,
 			@Value("#{config['instagram.client.secret']}") String clientSecret) throws HttpNotFoundException, HttpBadRequestException, HttpForbiddenException, HttpFetchException, UnsupportedEncodingException {
 		this.subscriptionsDAO = subscriptionsDAO;
+		this.urlBuilder = urlBuilder;
 		this.clientId = clientId;
 		this.clientSecret = clientSecret;		
 		this.instagramApi = new InstagramApi();		
@@ -60,7 +64,7 @@ public class InstagramSubscriptionManager {
 	}
 	
 	public void requestInstagramTagSubscription(String tag) throws HttpNotFoundException, HttpBadRequestException, HttpForbiddenException, HttpFetchException, UnsupportedEncodingException {
-		instagramApi.createTagSubscription(tag, clientId, clientSecret, "http://genil.eelpieconsulting.co.uk/instagram/callback");
+		instagramApi.createTagSubscription(tag, clientId, clientSecret, urlBuilder.getInstagramCallbackUrl());
 	}
 	
 }

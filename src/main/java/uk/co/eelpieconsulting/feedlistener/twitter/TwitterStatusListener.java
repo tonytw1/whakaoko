@@ -2,6 +2,7 @@ package uk.co.eelpieconsulting.feedlistener.twitter;
 
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import twitter4j.StallWarning;
 import twitter4j.Status;
@@ -10,6 +11,7 @@ import twitter4j.StatusListener;
 import uk.co.eelpieconsulting.feedlistener.daos.FeedItemDAO;
 import uk.co.eelpieconsulting.feedlistener.model.FeedItem;
 
+@Component
 public class TwitterStatusListener implements StatusListener {
 	
 	private static Logger log = Logger.getLogger(TwitterListener.class);

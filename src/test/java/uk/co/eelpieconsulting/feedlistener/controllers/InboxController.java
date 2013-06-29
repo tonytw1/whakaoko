@@ -6,17 +6,20 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 
 import uk.co.eelpieconsulting.common.views.ViewFactory;
+import uk.co.eelpieconsulting.feedlistener.UrlBuilder;
 import uk.co.eelpieconsulting.feedlistener.daos.FeedItemDAO;
 
 @Controller
 public class InboxController {
 	
 	private final FeedItemDAO feedItemDAO;
+	private final UrlBuilder urlBuilder;
 	private final ViewFactory viewFactory;
 	
 	@Autowired
-	public InboxController(FeedItemDAO feedItemDAO, ViewFactory viewFactory) {
+	public InboxController(FeedItemDAO feedItemDAO, UrlBuilder urlBuilder, ViewFactory viewFactory) {
 		this.feedItemDAO = feedItemDAO;
+		this.urlBuilder = urlBuilder;
 		this.viewFactory = viewFactory;
 	}
 	
@@ -29,7 +32,7 @@ public class InboxController {
 	
 	@RequestMapping("/inbox/rss")
 	public ModelAndView inboxRss() {
-		final ModelAndView mv = new ModelAndView(viewFactory.getRssView("Inbox", "http://localhost:9090/inbox", "Inbox items"));	// TODO url builder
+		final ModelAndView mv = new ModelAndView(viewFactory.getRssView("Inbox", urlBuilder.getBaseUrl(), "Inbox items"));
 		mv.addObject("data", feedItemDAO.getAll());
 		return mv;
 	}
