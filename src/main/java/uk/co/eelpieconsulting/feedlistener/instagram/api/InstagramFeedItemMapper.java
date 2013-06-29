@@ -5,6 +5,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import uk.co.eelpieconsulting.common.geo.model.LatLong;
+import uk.co.eelpieconsulting.common.geo.model.Place;
 import uk.co.eelpieconsulting.feedlistener.model.FeedItem;
 
 public class InstagramFeedItemMapper {
@@ -34,13 +35,15 @@ public class InstagramFeedItemMapper {
 		DateTime createdTime = new DateTime(imageJson.getLong(CREATED_TIME) * 1000);
 
 		final String url = imageJson.getString(LINK);
-		
-		LatLong latLong = null;
+
+		Place place = null;
 		if (imageJson.has(LOCATION) && !imageJson.isNull(LOCATION)) {
 			final JSONObject locationJson = imageJson.getJSONObject(LOCATION);
-			latLong = new LatLong(locationJson.getDouble("latitude"), locationJson.getDouble("longitude"));	// TODO preserve name and id if available.
+			LatLong latLong = new LatLong(locationJson.getDouble("latitude"), locationJson.getDouble("longitude"));	// TODO preserve name and id if available.
+			place = new Place(null, latLong, null);
 		}
-		return new FeedItem(caption, url, null, createdTime.toDate(), latLong, imageUrl);
+		
+		return new FeedItem(caption, url, null, createdTime.toDate(), place, imageUrl);
 	}
 
 

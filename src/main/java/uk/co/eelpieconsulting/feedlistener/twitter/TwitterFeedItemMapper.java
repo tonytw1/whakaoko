@@ -8,15 +8,16 @@ import twitter4j.GeoLocation;
 import twitter4j.MediaEntity;
 import twitter4j.Status;
 import uk.co.eelpieconsulting.common.geo.model.LatLong;
+import uk.co.eelpieconsulting.common.geo.model.Place;
 import uk.co.eelpieconsulting.feedlistener.model.FeedItem;
 
 @Component
 public class TwitterFeedItemMapper {
 
 	public FeedItem createFeedItemFrom(Status status) {
-		final LatLong latLong = extractLocationFrom(status);				
+		final Place place = extractLocationFrom(status);				
 		final String mediaUrl = extractImageUrl(status);
-		return new FeedItem(extractHeadingFrom(status), extractUrlFrom(status), null, status.getCreatedAt(), latLong, mediaUrl);
+		return new FeedItem(extractHeadingFrom(status), extractUrlFrom(status), null, status.getCreatedAt(), place, mediaUrl);
 	}
 	
 	private String extractHeadingFrom(Status status) {
@@ -27,15 +28,16 @@ public class TwitterFeedItemMapper {
 		return "https://twitter.com/" + status.getUser().getScreenName() + "/status/" + Long.toString(status.getId());
 	}
 
-	private LatLong extractLocationFrom(Status status) {
-		LatLong latLong = null;
+	private Place extractLocationFrom(Status status) {
+		Place place = null;
 		if (status.getGeoLocation() != null) {
 			final GeoLocation geoLocation = status.getGeoLocation();
-			latLong = new LatLong(geoLocation.getLatitude(), geoLocation.getLongitude());
+			LatLong latLong = new LatLong(geoLocation.getLatitude(), geoLocation.getLongitude());
+			place = new Place(null, latLong, null);	// TODO capture twitter location ids
 		}
-		return latLong;
+		return place;
 	}
-
+	
 	private String extractImageUrl(Status status) {
 		if (status.getMediaEntities().length > 0) {
 			final MediaEntity mediaEntity = status.getMediaEntities()[0];

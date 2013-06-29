@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.Date;
 
 import uk.co.eelpieconsulting.common.geo.model.LatLong;
+import uk.co.eelpieconsulting.common.geo.model.Place;
 import uk.co.eelpieconsulting.common.views.rss.RssFeedable;
 
 public class FeedItem implements Serializable, RssFeedable {
@@ -14,15 +15,15 @@ public class FeedItem implements Serializable, RssFeedable {
 	private final String url;
 	private final String body;
 	private final Date date;
-	private final LatLong latLong;
+	private final Place place;
 	private final String imageUrl;
-
-	public FeedItem(String title, String url, String body, Date date, LatLong latLong, String imageUrl) {
+	
+	public FeedItem(String title, String url, String body, Date date, Place place, String imageUrl) {
 		this.title = title;
 		this.url = url;
 		this.body = body;
 		this.date = date;
-		this.latLong = latLong;
+		this.place = place;
 		this.imageUrl = imageUrl;
 	}
 	
@@ -50,8 +51,12 @@ public class FeedItem implements Serializable, RssFeedable {
 		return date;
 	}
 	
+	public Place getPlace() {
+		return place;
+	}
+	
 	public LatLong getLatLong() {
-		return latLong;
+		return place != null ? place.getLatLong() : null;
 	}
 
 	public String getImageUrl() {
@@ -59,7 +64,7 @@ public class FeedItem implements Serializable, RssFeedable {
 	}
 	
 	public boolean isGeoTagged() {
-		return latLong != null;
+		return place != null;
 	}
 
 	@Override
@@ -76,12 +81,12 @@ public class FeedItem implements Serializable, RssFeedable {
 	public String getWebUrl() {
 		return url;
 	}
-	
+
 	@Override
 	public String toString() {
 		return "FeedItem [body=" + body + ", date=" + date + ", imageUrl="
-				+ imageUrl + ", latLong=" + latLong + ", title=" + title
-				+ ", url=" + url + "]";
+				+ imageUrl + ", place=" + place + ", title=" + title + ", url="
+				+ url + "]";
 	}
 	
 }

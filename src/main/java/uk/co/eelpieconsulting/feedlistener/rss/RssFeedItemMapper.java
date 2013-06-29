@@ -6,6 +6,7 @@ import org.apache.log4j.Logger;
 import org.springframework.stereotype.Component;
 
 import uk.co.eelpieconsulting.common.geo.model.LatLong;
+import uk.co.eelpieconsulting.common.geo.model.Place;
 import uk.co.eelpieconsulting.feedlistener.model.FeedItem;
 
 import com.sun.syndication.feed.module.georss.GeoRSSModule;
@@ -21,20 +22,20 @@ public class RssFeedItemMapper {
 	private static Logger log = Logger.getLogger(RssFeedItemMapper.class);
 	
 	public FeedItem createFeedItemFrom(final SyndEntry syndEntry) {
-		final LatLong latLong = extractLocationFrom(syndEntry);        	
+		final Place place = extractLocationFrom(syndEntry);        	
 		final String imageUrl = extractImageFrom(syndEntry);			
 		final String body = syndEntry.getDescription() != null ? syndEntry.getDescription().getValue() : null;
 		final Date date = syndEntry.getPublishedDate() != null ? syndEntry.getPublishedDate() : syndEntry.getUpdatedDate();						
-		final FeedItem feedItem = new FeedItem(syndEntry.getTitle(), syndEntry.getLink().trim(), body, date, latLong, imageUrl);
+		final FeedItem feedItem = new FeedItem(syndEntry.getTitle(), syndEntry.getLink().trim(), body, date, place, imageUrl);
 		return feedItem;
 	}
 	
-	private LatLong extractLocationFrom(SyndEntry syndEntry) {
+	private Place extractLocationFrom(SyndEntry syndEntry) {
 		final GeoRSSModule geoModule = (GeoRSSModule) GeoRSSUtils.getGeoRSS(syndEntry);
 		if (geoModule != null && geoModule.getPosition() != null) {
 			final LatLong latLong = new LatLong(geoModule.getPosition().getLatitude(), geoModule.getPosition().getLongitude());
 			log.debug("Rss item '" + syndEntry.getTitle() + "' has position information: " + latLong);
-			return latLong;
+			return new Place(null, latLong, null);
 		}
 		return null;
 	}
