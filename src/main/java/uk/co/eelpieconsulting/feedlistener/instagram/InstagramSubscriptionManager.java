@@ -52,7 +52,7 @@ public class InstagramSubscriptionManager {
 		log.info("Resubscribing to instagram");
 		final List<Subscription> subscriptions = subscriptionsDAO.getSubscriptions();
 		for (Subscription subscription : subscriptions) {
-			if (subscription.getId().startsWith("instagram/")) {
+			if (subscription.getId().startsWith("instagram")) {
 				requestInstagramTagSubscription(((InstagramTagSubscription) subscription).getTag());
 			}
 		}

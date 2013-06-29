@@ -1,5 +1,7 @@
 package uk.co.eelpieconsulting.feedlistener.model;
 
+import org.apache.commons.codec.digest.DigestUtils;
+
 public class TwitterTagSubscription extends Subscription {
 
 	private String tag;
@@ -22,7 +24,7 @@ public class TwitterTagSubscription extends Subscription {
 	
 	@Override
 	public String getId() {
-		return "twitter/tags/" + tag;
+		return "twitter-" + DigestUtils.md5Hex("tag" + tag);
 	}
 
 	@Override

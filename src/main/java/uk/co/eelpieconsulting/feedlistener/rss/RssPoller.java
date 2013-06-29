@@ -37,7 +37,7 @@ public class RssPoller {
 		log.info("Polling subscriptions");
 		List<Subscription> subscriptions = subscriptionsDAO.getSubscriptions();
 		for (Subscription subscription : subscriptions) {
-			if (subscription.getId().startsWith("feeds/")) {
+			if (subscription.getId().startsWith("feed")) {
 				taskExecutor.execute(new ProcessFeedTask(feedFetcher, feedItemDAO, subscriptionsDAO, (RssSubscription) subscription));
 			}
 		}

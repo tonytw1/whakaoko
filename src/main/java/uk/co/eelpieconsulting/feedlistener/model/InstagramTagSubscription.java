@@ -1,5 +1,7 @@
 package uk.co.eelpieconsulting.feedlistener.model;
 
+import org.apache.commons.codec.digest.DigestUtils;
+
 public class InstagramTagSubscription extends Subscription {
 
 	private String tag;
@@ -22,9 +24,9 @@ public class InstagramTagSubscription extends Subscription {
 
 	@Override
 	public String getId() {
-		return "instagram/tags/" + tag;
+		return "instagram-" + DigestUtils.md5Hex("tag" + tag);
 	}
-
+	
 	@Override
 	public String toString() {
 		return "InstagramTagSubscription [tag=" + tag + "]";

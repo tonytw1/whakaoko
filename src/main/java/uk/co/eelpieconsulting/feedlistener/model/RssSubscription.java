@@ -1,5 +1,7 @@
 package uk.co.eelpieconsulting.feedlistener.model;
 
+import org.apache.commons.codec.digest.DigestUtils;
+
 public class RssSubscription extends Subscription {
 	
 	private String url;
@@ -26,7 +28,7 @@ public class RssSubscription extends Subscription {
 
 	@Override
 	public String getId() {
-		return "feeds/" + url;
+		return "feed-" + DigestUtils.md5Hex(url);
 	}
 	
 }
