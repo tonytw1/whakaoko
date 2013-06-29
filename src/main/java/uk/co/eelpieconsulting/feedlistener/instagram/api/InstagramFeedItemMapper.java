@@ -1,5 +1,6 @@
 package uk.co.eelpieconsulting.feedlistener.instagram.api;
 
+import org.apache.log4j.Logger;
 import org.joda.time.DateTime;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -9,6 +10,12 @@ import uk.co.eelpieconsulting.common.geo.model.Place;
 import uk.co.eelpieconsulting.feedlistener.model.FeedItem;
 
 public class InstagramFeedItemMapper {
+	
+	private static final String LONGITUDE = "longitude";
+
+	private static final String LATITUDE = "latitude";
+
+	private static Logger log = Logger.getLogger(InstagramFeedItemMapper.class);
 	
 	private static final String LOCATION = "location";
 	private static final String LINK = "link";
@@ -39,8 +46,13 @@ public class InstagramFeedItemMapper {
 		Place place = null;
 		if (imageJson.has(LOCATION) && !imageJson.isNull(LOCATION)) {
 			final JSONObject locationJson = imageJson.getJSONObject(LOCATION);
-			LatLong latLong = new LatLong(locationJson.getDouble("latitude"), locationJson.getDouble("longitude"));	// TODO preserve name and id if available.
-			place = new Place(null, latLong, null);
+			log.info(locationJson.toString());
+			if (locationJson.has(LATITUDE) && locationJson.has(LONGITUDE)) {
+				LatLong latLong = new LatLong(locationJson.getDouble(LATITUDE), locationJson.getDouble(LONGITUDE));	// TODO preserve name and id if available.
+				place = new Place(null, latLong, null);
+			} else {
+				log.warn("Location has no lat long: " + locationJson.toString());
+			}
 		}
 		
 		return new FeedItem(caption, url, null, createdTime.toDate(), place, imageUrl);

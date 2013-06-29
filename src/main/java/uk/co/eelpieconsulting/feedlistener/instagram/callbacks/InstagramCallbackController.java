@@ -68,7 +68,6 @@ public class InstagramCallbackController {
 				final String tag = subscription.getObjectId();
 				log.info("Fetching recent media for changed tag: " + tag);
 				List<FeedItem> recentMediaForTag = instagramApi.getRecentMediaForTag(tag, accessToken);
-				log.info("Adding recent media: " + recentMediaForTag);
 				feedItemDAO.addAll(recentMediaForTag);
 			}
 		}
