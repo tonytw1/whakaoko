@@ -13,7 +13,7 @@
 #end
 
 
-<h5>Inbox</h5>
+<h5>Inbox ($inboxSize)</h5> 
 #if($inbox && !$inbox.isEmpty()) 
 	<ul>
  	#foreach($inboxItem in $inbox)
