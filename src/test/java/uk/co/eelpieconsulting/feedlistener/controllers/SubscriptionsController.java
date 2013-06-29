@@ -16,7 +16,6 @@ import uk.co.eelpieconsulting.common.http.HttpNotFoundException;
 import uk.co.eelpieconsulting.common.views.ViewFactory;
 import uk.co.eelpieconsulting.feedlistener.daos.SubscriptionsDAO;
 import uk.co.eelpieconsulting.feedlistener.instagram.InstagramSubscriptionManager;
-import uk.co.eelpieconsulting.feedlistener.instagram.api.InstagramApi;
 import uk.co.eelpieconsulting.feedlistener.model.InstagramTagSubscription;
 import uk.co.eelpieconsulting.feedlistener.model.RssSubscription;
 import uk.co.eelpieconsulting.feedlistener.model.TwitterTagSubscription;
@@ -42,7 +41,14 @@ public class SubscriptionsController {
 		this.viewFactory = viewFactory;
 	}
 	
-	@RequestMapping(value="/subscriptions", method=RequestMethod.GET)
+	@RequestMapping(value="/subscriptions/new", method=RequestMethod.GET)
+	public ModelAndView newSubscriptionForm() {
+		final ModelAndView mv = new ModelAndView("newSubscription");
+		return mv;		
+	}
+	
+	
+	@RequestMapping(value="/subscriptions/json", method=RequestMethod.GET)
 	public ModelAndView subscriptions() {
 		final ModelAndView mv = new ModelAndView(viewFactory.getJsonView());
 		mv.addObject("data", subscriptionsDAO.getSubscriptions());

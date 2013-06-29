@@ -6,7 +6,6 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import uk.co.eelpieconsulting.feedlistener.model.RssSubscription;
 import uk.co.eelpieconsulting.feedlistener.model.Subscription;
 
 import com.mongodb.MongoException;

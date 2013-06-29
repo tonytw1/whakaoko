@@ -11,16 +11,16 @@ import uk.co.eelpieconsulting.feedlistener.daos.FeedItemDAO;
 @Controller
 public class InboxController {
 	
-	private FeedItemDAO feedItemDAO;
-	private ViewFactory viewFactory;
-
+	private final FeedItemDAO feedItemDAO;
+	private final ViewFactory viewFactory;
+	
 	@Autowired
 	public InboxController(FeedItemDAO feedItemDAO, ViewFactory viewFactory) {
 		this.feedItemDAO = feedItemDAO;
 		this.viewFactory = viewFactory;
 	}
 	
-	@RequestMapping("/inbox")
+	@RequestMapping("/inbox/json")
 	public ModelAndView inbox() {
 		final ModelAndView mv = new ModelAndView(viewFactory.getJsonView());
 		mv.addObject("data", feedItemDAO.getAll());
@@ -29,7 +29,7 @@ public class InboxController {
 	
 	@RequestMapping("/inbox/rss")
 	public ModelAndView inboxRss() {
-		final ModelAndView mv = new ModelAndView(viewFactory.getRssView("Inbox", "http://localhost:9090/inbox", "Inbox items"));
+		final ModelAndView mv = new ModelAndView(viewFactory.getRssView("Inbox", "http://localhost:9090/inbox", "Inbox items"));	// TODO url builder
 		mv.addObject("data", feedItemDAO.getAll());
 		return mv;
 	}

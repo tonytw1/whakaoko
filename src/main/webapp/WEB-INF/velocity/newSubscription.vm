@@ -1,0 +1,17 @@
+<form action="/subscriptions/feeds" method="POST">
+	Feed: <input name="url" />
+	<input type="submit" />
+</form>
+<hr/>
+
+<form action="/subscriptions/twitter/tags" method="POST">
+	Twitter tag: <input name="tag" />
+	<input type="submit" />
+</form>
+<hr/>
+
+<form action="/subscriptions/instagram/tags" method="POST">
+	Instagram tag: <input name="tag" />
+	<input type="submit" />
+</form>
+<hr/>
