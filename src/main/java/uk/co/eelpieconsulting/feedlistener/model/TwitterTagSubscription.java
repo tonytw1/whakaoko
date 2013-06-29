@@ -10,6 +10,7 @@ public class TwitterTagSubscription extends Subscription {
 	}
 
 	public TwitterTagSubscription(String tag) {
+		this.setId("twitter-" + DigestUtils.md5Hex("tag" + tag));
 		this.setTag(tag);
 	}
 	
@@ -20,11 +21,6 @@ public class TwitterTagSubscription extends Subscription {
 	public void setTag(String tag) {
 		this.tag = tag;
 		this.setName(generateName(tag));
-	}
-	
-	@Override
-	public String getId() {
-		return "twitter-" + DigestUtils.md5Hex("tag" + tag);
 	}
 
 	@Override

@@ -13,9 +13,15 @@ public abstract class Subscription {
     @Id
     ObjectId objectId;
     
-    private String name;
+    private String id, name;
     
-	public abstract String getId();
+	public final String getId() {
+		return id;
+	}
+
+	public final void setId(String id) {
+		this.id = id;
+	}
 
 	public String getName() {
 		return name;

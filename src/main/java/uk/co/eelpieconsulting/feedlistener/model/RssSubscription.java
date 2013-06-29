@@ -10,6 +10,7 @@ public class RssSubscription extends Subscription {
 	}
 
 	public RssSubscription(String url) {
+		this.setId("feed-" + DigestUtils.md5Hex(url));
 		this.url = url;
 	}
 	
@@ -24,11 +25,6 @@ public class RssSubscription extends Subscription {
 	@Override
 	public String toString() {
 		return "RssSubscription [url=" + url + "]";
-	}
-
-	@Override
-	public String getId() {
-		return "feed-" + DigestUtils.md5Hex(url);
 	}
 	
 }

@@ -1,53 +1,80 @@
 package uk.co.eelpieconsulting.feedlistener.controllers;
 
 import java.io.UnsupportedEncodingException;
+import java.net.UnknownHostException;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.view.RedirectView;
+
+import com.mongodb.MongoException;
+import com.sun.corba.se.impl.legacy.connection.USLPort;
 
 import uk.co.eelpieconsulting.common.http.HttpBadRequestException;
 import uk.co.eelpieconsulting.common.http.HttpFetchException;
 import uk.co.eelpieconsulting.common.http.HttpForbiddenException;
 import uk.co.eelpieconsulting.common.http.HttpNotFoundException;
 import uk.co.eelpieconsulting.common.views.ViewFactory;
+import uk.co.eelpieconsulting.feedlistener.UrlBuilder;
 import uk.co.eelpieconsulting.feedlistener.daos.SubscriptionsDAO;
 import uk.co.eelpieconsulting.feedlistener.instagram.InstagramSubscriptionManager;
 import uk.co.eelpieconsulting.feedlistener.model.InstagramTagSubscription;
 import uk.co.eelpieconsulting.feedlistener.model.RssSubscription;
+import uk.co.eelpieconsulting.feedlistener.model.Subscription;
 import uk.co.eelpieconsulting.feedlistener.model.TwitterTagSubscription;
 import uk.co.eelpieconsulting.feedlistener.rss.RssPoller;
 import uk.co.eelpieconsulting.feedlistener.twitter.TwitterListener;
 
 @Controller
 public class SubscriptionsController {
-
+	
 	private SubscriptionsDAO subscriptionsDAO;
 	private final RssPoller rssPoller;
 	private final TwitterListener twitterListener;
-	private ViewFactory viewFactory;
 	private final InstagramSubscriptionManager instagramSubscriptionManager;
+	private final UrlBuilder urlBuilder;
+	private ViewFactory viewFactory;
 
 	@Autowired
-	public SubscriptionsController(SubscriptionsDAO subscriptionsDAO, RssPoller rssPoller, TwitterListener twitterListener,
-			InstagramSubscriptionManager instagramSubscriptionManager, ViewFactory viewFactory) {
+	public SubscriptionsController(SubscriptionsDAO subscriptionsDAO, RssPoller rssPoller, TwitterListener twitterListener, 
+			InstagramSubscriptionManager instagramSubscriptionManager, UrlBuilder urlBuilder,
+			ViewFactory viewFactory) {
 		this.subscriptionsDAO = subscriptionsDAO;
 		this.rssPoller = rssPoller;
 		this.twitterListener = twitterListener;
 		this.instagramSubscriptionManager = instagramSubscriptionManager;
+		this.urlBuilder = urlBuilder;
 		this.viewFactory = viewFactory;
 	}
 	
+	@RequestMapping(value="/subscriptions/{id}", method=RequestMethod.GET)
+	public ModelAndView subscription(@PathVariable String id) {
+		final ModelAndView mv = new ModelAndView("subscription");
+		mv.addObject("subscription", subscriptionsDAO.getById(id));
+		return mv;
+	}
+
+	@RequestMapping(value="/subscriptions/{id}/delete")
+	public ModelAndView deleteSubscription(@PathVariable String id) throws UnknownHostException, MongoException {
+		final Subscription subscription = subscriptionsDAO.getById(id);
+		if (subscription != null) {
+			subscriptionsDAO.delete(subscription);
+		}
+		final ModelAndView mv = new ModelAndView(new RedirectView(urlBuilder.getBaseUrl()));
+		return mv;
+	}
+
 	@RequestMapping(value="/subscriptions/new", method=RequestMethod.GET)
 	public ModelAndView newSubscriptionForm() {
 		final ModelAndView mv = new ModelAndView("newSubscription");
 		return mv;		
 	}
-	
-	
+
 	@RequestMapping(value="/subscriptions/json", method=RequestMethod.GET)
 	public ModelAndView subscriptions() {
 		final ModelAndView mv = new ModelAndView(viewFactory.getJsonView());

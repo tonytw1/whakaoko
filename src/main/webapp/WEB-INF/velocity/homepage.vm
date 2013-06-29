@@ -5,7 +5,7 @@
 #if($subscriptions && !$subscriptions.isEmpty()) 
 	<ul>
  	#foreach($subscription in $subscriptions) 
- 		<li>$!subscription.name</li>
+ 		<li><a href="/subscriptions/$subscription.id">$!subscription.name</a></li>
  	#end
  	</ul>
 #else

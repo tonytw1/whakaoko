@@ -10,6 +10,7 @@ public class InstagramTagSubscription extends Subscription {
 	}
 
 	public InstagramTagSubscription(String tag) {
+		this.setId("instagram-" + DigestUtils.md5Hex("tag" + tag));
 		this.setTag(tag);
 	}
 	
@@ -20,11 +21,6 @@ public class InstagramTagSubscription extends Subscription {
 	public void setTag(String tag) {
 		this.tag = tag;
 		this.setName("Instagram - " + tag);
-	}
-
-	@Override
-	public String getId() {
-		return "instagram-" + DigestUtils.md5Hex("tag" + tag);
 	}
 	
 	@Override
