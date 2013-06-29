@@ -30,7 +30,7 @@ public class InstagramApi {
 	
 	private static final String INSTAGRAM_API_AUTHORIZE = "https://api.instagram.com/oauth/authorize/";
 	private static final String INSTAGRAM_API_ACCESS_TOKEN = "https://api.instagram.com/oauth/access_token";
-	private static final String INSTAGRAM_API_V1_SUBSCRIPTIONS = "https://api.instagram.com/v1/subscriptions/";
+	private static final String INSTAGRAM_API_V1_SUBSCRIPTIONS = "https://api.instagram.com/v1/subscriptions";
 	
 	private static final String DATA = "data";
 	
@@ -40,7 +40,7 @@ public class InstagramApi {
 		this.mapper = new InstagramFeedItemMapper();
 	}
 
-	public void createTagSubscription(String tag, String clientId, String clientSecret, String callbackUrl) throws HttpNotFoundException, HttpBadRequestException, HttpForbiddenException, HttpFetchException, UnsupportedEncodingException {
+	public long createTagSubscription(String tag, String clientId, String clientSecret, String callbackUrl) throws HttpNotFoundException, HttpBadRequestException, HttpForbiddenException, HttpFetchException, UnsupportedEncodingException, JSONException {
 		final String verifyToken =  UUID.randomUUID().toString();
 		
 		final HttpPost post = new HttpPost(INSTAGRAM_API_V1_SUBSCRIPTIONS);
@@ -58,27 +58,32 @@ public class InstagramApi {
 		final HttpFetcher httpFetcher = new HttpFetcher();
 		final String response = httpFetcher.post(post);
 		log.info(response);
+		
+		//{"meta":{"code":200},"data":{"object":"tag","object_id":"london","aspect":"media","callback_url":"http:\/\/genil.eelpieconsulting.co.uk\/instagram\/callback","type":"subscription","id":"3479728"}}
+		JSONObject responseJSON = new JSONObject(response);
+		return responseJSON.getJSONObject("data").getLong("id");		
 	}
 	
 	public String getSubscriptions(String clientId, String clientSecret) throws HttpNotFoundException, HttpBadRequestException, HttpForbiddenException, HttpFetchException {
 		HttpFetcher httpFetcher = new HttpFetcher();
-		return httpFetcher.get("https://api.instagram.com/v1/subscriptions" + "?client_secret=" + clientSecret + "&client_id=" + clientId);
+		return httpFetcher.get(INSTAGRAM_API_V1_SUBSCRIPTIONS + "?client_secret=" + clientSecret + "&client_id=" + clientId);
 	}
 
 	public void deleteAllSubscriptions(String clientId, String clientSecret) throws HttpNotFoundException, HttpBadRequestException, HttpForbiddenException, HttpFetchException {		
 		final HttpFetcher httpFetcher = new HttpFetcher();
 		HttpDelete delete = new HttpDelete(INSTAGRAM_API_V1_SUBSCRIPTIONS + "?client_secret=" + clientSecret + "&object=all&client_id=" + clientId);
-		httpFetcher.delete(delete);	
+		log.info("Delete all response: " + httpFetcher.delete(delete));
 	}
 	
-	public void deleteSubscription(String tag) {
-		// TODO Auto-generated method stub	
+	public void deleteSubscription(long id, String clientId, String clientSecret) throws HttpNotFoundException, HttpBadRequestException, HttpForbiddenException, HttpFetchException {
+		final HttpFetcher httpFetcher = new HttpFetcher();
+		HttpDelete delete = new HttpDelete(INSTAGRAM_API_V1_SUBSCRIPTIONS + "?client_secret=" + clientSecret + "&id=" + Long.toString(id) + "&client_id=" + clientId);
+		log.info("Delete subscription response; " + httpFetcher.delete(delete));
 	}
 	
 	public List<FeedItem> getRecentMediaForTag(String tag, String accessToken) throws HttpNotFoundException, HttpBadRequestException, HttpForbiddenException, HttpFetchException, JSONException {	
 		final HttpFetcher httpFetcher = new HttpFetcher();		
 		final String response = httpFetcher.get("https://api.instagram.com/v1/tags/" + tag + "/media/recent" + "?access_token=" + accessToken);
-		System.out.println(response);
 		return parseFeedItems(response);
 	}
 	

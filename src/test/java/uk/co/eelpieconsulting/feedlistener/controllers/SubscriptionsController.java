@@ -3,6 +3,7 @@ package uk.co.eelpieconsulting.feedlistener.controllers;
 import java.io.UnsupportedEncodingException;
 import java.net.UnknownHostException;
 
+import org.json.JSONException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -11,9 +12,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.view.RedirectView;
-
-import com.mongodb.MongoException;
-import com.sun.corba.se.impl.legacy.connection.USLPort;
 
 import uk.co.eelpieconsulting.common.http.HttpBadRequestException;
 import uk.co.eelpieconsulting.common.http.HttpFetchException;
@@ -29,6 +27,8 @@ import uk.co.eelpieconsulting.feedlistener.model.Subscription;
 import uk.co.eelpieconsulting.feedlistener.model.TwitterTagSubscription;
 import uk.co.eelpieconsulting.feedlistener.rss.RssPoller;
 import uk.co.eelpieconsulting.feedlistener.twitter.TwitterListener;
+
+import com.mongodb.MongoException;
 
 @Controller
 public class SubscriptionsController {
@@ -60,7 +60,7 @@ public class SubscriptionsController {
 	}
 
 	@RequestMapping(value="/subscriptions/{id}/delete")
-	public ModelAndView deleteSubscription(@PathVariable String id) throws UnknownHostException, MongoException {
+	public ModelAndView deleteSubscription(@PathVariable String id) throws UnknownHostException, MongoException, HttpNotFoundException, HttpBadRequestException, HttpForbiddenException, HttpFetchException {
 		final Subscription subscription = subscriptionsDAO.getById(id);
 		if (subscription != null) {
 			subscriptionsDAO.delete(subscription);
@@ -69,7 +69,7 @@ public class SubscriptionsController {
 				twitterListener.connect();
 			}
 			if (subscription.getId().startsWith("instagram")) {
-				instagramSubscriptionManager.requestUnsubscribeFromTag(((InstagramTagSubscription) subscription).getTag());
+				instagramSubscriptionManager.requestUnsubscribeFrom(((InstagramTagSubscription) subscription).getSubscriptionId());
 			}
 		}
 		final ModelAndView mv = new ModelAndView(new RedirectView(urlBuilder.getBaseUrl()));
@@ -94,8 +94,7 @@ public class SubscriptionsController {
 		subscriptionsDAO.add(new RssSubscription(url));
 		rssPoller.run();
 		
-		final ModelAndView mv = new ModelAndView(viewFactory.getJsonView());
-		mv.addObject("data", subscriptionsDAO.getSubscriptions());
+		final ModelAndView mv = new ModelAndView(new RedirectView(urlBuilder.getBaseUrl()));
 		return mv;
 	}
 	
@@ -104,18 +103,16 @@ public class SubscriptionsController {
 		subscriptionsDAO.add(new TwitterTagSubscription(tag));
 		twitterListener.connect();
 		
-		final ModelAndView mv = new ModelAndView(viewFactory.getJsonView());
-		mv.addObject("data", subscriptionsDAO.getSubscriptions());
+		final ModelAndView mv = new ModelAndView(new RedirectView(urlBuilder.getBaseUrl()));
 		return mv;
 	}
 	
 	@RequestMapping(value="/subscriptions/instagram/tags", method=RequestMethod.POST)
-	public ModelAndView addInstagramTagSubscription(@RequestParam String tag) throws HttpNotFoundException, HttpBadRequestException, HttpForbiddenException, UnsupportedEncodingException, HttpFetchException {
-		instagramSubscriptionManager.requestInstagramTagSubscription(tag);
-		subscriptionsDAO.add(new InstagramTagSubscription(tag));
+	public ModelAndView addInstagramTagSubscription(@RequestParam String tag) throws HttpNotFoundException, HttpBadRequestException, HttpForbiddenException, UnsupportedEncodingException, HttpFetchException, JSONException {
+		final long subscriptionId = instagramSubscriptionManager.requestInstagramTagSubscription(tag);
+		subscriptionsDAO.add(new InstagramTagSubscription(tag, subscriptionId));
 		
-		final ModelAndView mv = new ModelAndView(viewFactory.getJsonView());
-		mv.addObject("data", subscriptionsDAO.getSubscriptions());
+		final ModelAndView mv = new ModelAndView(new RedirectView(urlBuilder.getBaseUrl()));
 		return mv;
 	}
 

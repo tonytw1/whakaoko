@@ -4,6 +4,7 @@ import java.io.UnsupportedEncodingException;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.json.JSONException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -46,7 +47,7 @@ public class InstagramSubscriptionManager {
 	@Scheduled(fixedDelay=60000 * 60 * 24)	// TODO ideally, only once at startup
 	public void resetSubscriptions() throws HttpNotFoundException,
 			HttpBadRequestException, HttpForbiddenException,
-			HttpFetchException, UnsupportedEncodingException {
+			HttpFetchException, UnsupportedEncodingException, JSONException {
 		requestUnsubscribeAll(clientId, clientSecret);
 		
 		log.info("Resubscribing to instagram");
@@ -63,12 +64,15 @@ public class InstagramSubscriptionManager {
 		instagramApi.deleteAllSubscriptions(clientId, clientSecret);
 	}
 	
-	public void requestInstagramTagSubscription(String tag) throws HttpNotFoundException, HttpBadRequestException, HttpForbiddenException, HttpFetchException, UnsupportedEncodingException {
-		instagramApi.createTagSubscription(tag, clientId, clientSecret, urlBuilder.getInstagramCallbackUrl());
+	public long requestInstagramTagSubscription(String tag) throws HttpNotFoundException, HttpBadRequestException, HttpForbiddenException, HttpFetchException, UnsupportedEncodingException, JSONException {
+		final long subscriptionId = instagramApi.createTagSubscription(tag, clientId, clientSecret, urlBuilder.getInstagramCallbackUrl());
+		log.info("Subscribed to instagram tag '" + tag + "' with id: " + subscriptionId);
+		return subscriptionId;
 	}
 
-	public void requestUnsubscribeFromTag(String tag) {
-		instagramApi.deleteSubscription(tag);		
+	public void requestUnsubscribeFrom(long id) throws HttpNotFoundException, HttpBadRequestException, HttpForbiddenException, HttpFetchException {
+		log.info("Unsubscribing from instagram: " + id);
+		instagramApi.deleteSubscription(id, clientId, clientSecret);		
 	}
 	
 }
