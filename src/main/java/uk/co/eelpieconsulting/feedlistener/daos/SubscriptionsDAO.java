@@ -12,6 +12,7 @@ import uk.co.eelpieconsulting.feedlistener.model.Subscription;
 import uk.co.eelpieconsulting.feedlistener.rss.RssPoller;
 
 import com.google.code.morphia.Datastore;
+import com.google.common.collect.Lists;
 import com.mongodb.MongoException;
 
 @Component
@@ -73,6 +74,16 @@ public class SubscriptionsDAO {
 
 	public InstagramSubscription getByInstagramId(Long subscriptionId) throws UnknownHostException, MongoException {
 		return dataStoreFactory.getDatastore().find(InstagramSubscription.class, "subscriptionId", subscriptionId).get();
+	}
+
+	public List<Subscription> getTwitterSubscriptions() {
+		List<Subscription> subscriptions = Lists.newArrayList();
+		for (Subscription subscription : getSubscriptions()) {
+			if (subscription.getId().startsWith("twitter")) {
+				subscriptions.add(subscription);
+			}
+		}
+		return subscriptions;
 	}
 	
 }

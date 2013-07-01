@@ -51,10 +51,8 @@ public class TwitterListener {
 		twitterStream.addListener(twitterListener);
 		
 		final Set<String> tagsList = Sets.newHashSet();
-		for (Subscription subscription : subscriptionsDAO.getSubscriptions()) {
-			if (subscription.getId().startsWith("twitter")) {
-				tagsList.add(((TwitterTagSubscription) subscription).getTag());
-			}
+		for (Subscription subscription : subscriptionsDAO.getTwitterSubscriptions()) {
+			tagsList.add(((TwitterTagSubscription) subscription).getTag());			
 		}
 		
 		if (!tagsList.isEmpty()) {
