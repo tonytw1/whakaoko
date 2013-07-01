@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import uk.co.eelpieconsulting.common.geo.model.LatLong;
 import uk.co.eelpieconsulting.common.http.HttpBadRequestException;
 import uk.co.eelpieconsulting.common.http.HttpFetchException;
 import uk.co.eelpieconsulting.common.http.HttpForbiddenException;
@@ -17,6 +18,8 @@ import uk.co.eelpieconsulting.common.http.HttpNotFoundException;
 import uk.co.eelpieconsulting.feedlistener.UrlBuilder;
 import uk.co.eelpieconsulting.feedlistener.daos.SubscriptionsDAO;
 import uk.co.eelpieconsulting.feedlistener.instagram.api.InstagramApi;
+import uk.co.eelpieconsulting.feedlistener.model.InstagramGeographySubscription;
+import uk.co.eelpieconsulting.feedlistener.model.InstagramSubscription;
 import uk.co.eelpieconsulting.feedlistener.model.InstagramTagSubscription;
 import uk.co.eelpieconsulting.feedlistener.model.Subscription;
 
@@ -54,7 +57,16 @@ public class InstagramSubscriptionManager {
 		final List<Subscription> subscriptions = subscriptionsDAO.getSubscriptions();
 		for (Subscription subscription : subscriptions) {
 			if (subscription.getId().startsWith("instagram")) {
-				requestInstagramTagSubscription(((InstagramTagSubscription) subscription).getTag());
+				if (subscription instanceof InstagramTagSubscription) {
+					requestInstagramTagSubscription(((InstagramTagSubscription) subscription).getTag());
+				}
+				if (subscription instanceof InstagramGeographySubscription) {
+					InstagramGeographySubscription instagramGeographySubscription = requestInstagramGeographySubscription(((InstagramGeographySubscription) subscription).getLatLong(), ((InstagramGeographySubscription) subscription).getRadius());
+					((InstagramSubscription) subscription).setSubscriptionId(instagramGeographySubscription.getSubscriptionId());
+					((InstagramGeographySubscription) subscription).setGeoId(instagramGeographySubscription.getGeoId());
+					subscriptionsDAO.save(subscription);
+				}
+
 			}
 		}
 	}
@@ -68,6 +80,12 @@ public class InstagramSubscriptionManager {
 		final long subscriptionId = instagramApi.createTagSubscription(tag, clientId, clientSecret, urlBuilder.getInstagramCallbackUrl());
 		log.info("Subscribed to instagram tag '" + tag + "' with id: " + subscriptionId);
 		return subscriptionId;
+	}
+
+	public InstagramGeographySubscription requestInstagramGeographySubscription(LatLong latLong, int radius) throws UnsupportedEncodingException, HttpNotFoundException, HttpBadRequestException, HttpForbiddenException, HttpFetchException, JSONException {
+		InstagramGeographySubscription subscription = instagramApi.createGeographySubscription(latLong, radius, clientId, clientSecret, urlBuilder.getInstagramCallbackUrl());
+		log.info("Subscribed to instagram geography: " + subscription);
+		return subscription;
 	}
 
 	public void requestUnsubscribeFrom(long id) throws HttpNotFoundException, HttpBadRequestException, HttpForbiddenException, HttpFetchException {

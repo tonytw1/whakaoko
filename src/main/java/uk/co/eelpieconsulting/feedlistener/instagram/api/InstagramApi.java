@@ -15,12 +15,14 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import uk.co.eelpieconsulting.common.geo.model.LatLong;
 import uk.co.eelpieconsulting.common.http.HttpBadRequestException;
 import uk.co.eelpieconsulting.common.http.HttpFetchException;
 import uk.co.eelpieconsulting.common.http.HttpFetcher;
 import uk.co.eelpieconsulting.common.http.HttpForbiddenException;
 import uk.co.eelpieconsulting.common.http.HttpNotFoundException;
 import uk.co.eelpieconsulting.feedlistener.model.FeedItem;
+import uk.co.eelpieconsulting.feedlistener.model.InstagramGeographySubscription;
 
 import com.google.common.collect.Lists;
 
@@ -40,28 +42,42 @@ public class InstagramApi {
 		this.mapper = new InstagramFeedItemMapper();
 	}
 
-	public long createTagSubscription(String tag, String clientId, String clientSecret, String callbackUrl) throws HttpNotFoundException, HttpBadRequestException, HttpForbiddenException, HttpFetchException, UnsupportedEncodingException, JSONException {
-		final String verifyToken =  UUID.randomUUID().toString();
-		
-		final HttpPost post = new HttpPost(INSTAGRAM_API_V1_SUBSCRIPTIONS);
-		final List<NameValuePair> nameValuePairs = Lists.newArrayList();
-		nameValuePairs.add(new BasicNameValuePair("client_id", clientId));
-		nameValuePairs.add(new BasicNameValuePair("client_secret", clientSecret));
-		nameValuePairs.add(new BasicNameValuePair("aspect", "media"));
+	public long createTagSubscription(String tag, String clientId, String clientSecret, String callbackUrl) throws HttpNotFoundException, HttpBadRequestException, HttpForbiddenException, HttpFetchException, UnsupportedEncodingException, JSONException {		
+		final List<NameValuePair> nameValuePairs = commonSubscriptionFields( clientId, clientSecret, callbackUrl);		
 		nameValuePairs.add(new BasicNameValuePair("object", "tag"));
 		nameValuePairs.add(new BasicNameValuePair("object_id", tag));
-		nameValuePairs.add(new BasicNameValuePair("callback_url", callbackUrl));
-		nameValuePairs.add(new BasicNameValuePair("verify_token", verifyToken));
+		
+		final HttpPost post = new HttpPost(INSTAGRAM_API_V1_SUBSCRIPTIONS);
 		HttpEntity entity = new UrlEncodedFormEntity(nameValuePairs);
 		post.setEntity(entity);
-
+		
 		final HttpFetcher httpFetcher = new HttpFetcher();
 		final String response = httpFetcher.post(post);
 		log.info(response);
 		
 		//{"meta":{"code":200},"data":{"object":"tag","object_id":"london","aspect":"media","callback_url":"http:\/\/genil.eelpieconsulting.co.uk\/instagram\/callback","type":"subscription","id":"3479728"}}
-		JSONObject responseJSON = new JSONObject(response);
+		JSONObject responseJSON = new JSONObject(response);	// TODO push to seperate class
 		return responseJSON.getJSONObject("data").getLong("id");		
+	}
+
+	public InstagramGeographySubscription createGeographySubscription(LatLong latLong, int radius, String clientId, String clientSecret, String callbackUrl) throws UnsupportedEncodingException, HttpNotFoundException, HttpBadRequestException, HttpForbiddenException, HttpFetchException, JSONException {		
+		final List<NameValuePair> nameValuePairs = commonSubscriptionFields(clientId, clientSecret, callbackUrl);		
+		nameValuePairs.add(new BasicNameValuePair("object", "geography"));
+		nameValuePairs.add(new BasicNameValuePair("lat", Double.toString(latLong.getLatitude())));
+		nameValuePairs.add(new BasicNameValuePair("lng", Double.toString(latLong.getLongitude())));
+		nameValuePairs.add(new BasicNameValuePair("radius", Integer.toString(radius)));
+		
+		final HttpPost post = new HttpPost(INSTAGRAM_API_V1_SUBSCRIPTIONS);
+		HttpEntity entity = new UrlEncodedFormEntity(nameValuePairs);
+		post.setEntity(entity);
+		
+		final HttpFetcher httpFetcher = new HttpFetcher();
+		final String response = httpFetcher.post(post);
+		log.info(response);
+		
+		JSONObject responseJSON = new JSONObject(response);
+		
+		return new InstagramGeographySubscription(latLong, radius, responseJSON.getJSONObject("data").getLong("id"), responseJSON.getJSONObject("data").getLong("object_id"));		
 	}
 	
 	public String getSubscriptions(String clientId, String clientSecret) throws HttpNotFoundException, HttpBadRequestException, HttpForbiddenException, HttpFetchException {
@@ -87,11 +103,17 @@ public class InstagramApi {
 		return parseFeedItems(response);
 	}
 	
+	public List<FeedItem> getRecentMediaForGeography(long geoId, String clientId) throws HttpNotFoundException, HttpBadRequestException, HttpForbiddenException, HttpFetchException, JSONException {
+		final HttpFetcher httpFetcher = new HttpFetcher();
+		final String response = httpFetcher.get("https://api.instagram.com/v1/geographies/" + geoId + "/media/recent" + "?client_id=" + clientId);
+		return parseFeedItems(response);			
+	}
+	
 	public String getAuthorizeRedirectUrl(String clientId, String redirectUrl) {
 		return INSTAGRAM_API_AUTHORIZE + "?client_id=" + clientId + "&redirect_uri=" + redirectUrl + "&response_type=code";
 	}
 	
-	public String getAccessToken(String clientId, String clientSecret,  String code, String redirectUrl) throws HttpNotFoundException, HttpBadRequestException, HttpForbiddenException, HttpFetchException, JSONException, UnsupportedEncodingException {
+	public String getAccessToken(String clientId, String clientSecret,  String code, String redirectUrl) throws HttpNotFoundException, HttpForbiddenException, HttpFetchException, JSONException, UnsupportedEncodingException {
 		final HttpPost post = new HttpPost(INSTAGRAM_API_ACCESS_TOKEN);
 		final List<NameValuePair> nameValuePairs = Lists.newArrayList();
 		nameValuePairs.add(new BasicNameValuePair("client_id", clientId));
@@ -103,23 +125,43 @@ public class InstagramApi {
 		post.setEntity(entity);
 		
 		final HttpFetcher httpFetcher = new HttpFetcher();
-		final String response = httpFetcher.post(post);
-		log.info("Got access token response: " + response);
 		
-		JSONObject responseJson = new JSONObject(response);
-		return responseJson.getString("access_token");	
+		try {
+			final String response = httpFetcher.post(post);
+	
+			log.info("Got access token response: " + response);
+			
+			JSONObject responseJson = new JSONObject(response);
+			return responseJson.getString("access_token");
+		} catch (HttpBadRequestException e) {
+			log.error(e.getResponseBody());
+			throw new RuntimeException(e);
+		}
 	}
-
+	
 	private List<FeedItem> parseFeedItems(String recentMediaForTag) throws JSONException {
 		final List<FeedItem> feedItems = Lists.newArrayList();
 		final JSONObject responseJson = new JSONObject(recentMediaForTag);		
 		
 		final JSONArray data = responseJson.getJSONArray(DATA);
+		log.info("Recent media response contains items: " + data.length());
 		for (int i = 0; i < data.length(); i++) {
 			JSONObject imageJson = data.getJSONObject(i);			
 			feedItems.add(mapper.createFeedItemFrom(imageJson));
 		}
 		return feedItems;
+	}
+	
+	private List<NameValuePair> commonSubscriptionFields(String clientId, String clientSecret, String callbackUrl) {
+		final String verifyToken =  UUID.randomUUID().toString();
+		
+		final List<NameValuePair> nameValuePairs = Lists.newArrayList();
+		nameValuePairs.add(new BasicNameValuePair("client_id", clientId));
+		nameValuePairs.add(new BasicNameValuePair("client_secret", clientSecret));
+		nameValuePairs.add(new BasicNameValuePair("aspect", "media"));
+		nameValuePairs.add(new BasicNameValuePair("callback_url", callbackUrl));
+		nameValuePairs.add(new BasicNameValuePair("verify_token", verifyToken));
+		return nameValuePairs;
 	}
 	
 }

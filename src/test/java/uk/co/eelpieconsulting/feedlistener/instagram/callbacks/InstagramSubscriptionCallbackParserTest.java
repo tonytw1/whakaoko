@@ -7,8 +7,6 @@ import java.util.List;
 import org.apache.commons.io.IOUtils;
 import org.junit.Test;
 
-import uk.co.eelpieconsulting.feedlistener.instagram.InstagramSubscripton;
-
 public class InstagramSubscriptionCallbackParserTest {
 
 	@Test
@@ -16,11 +14,11 @@ public class InstagramSubscriptionCallbackParserTest {
 		final InstagramSubscriptionCallbackParser parser = new InstagramSubscriptionCallbackParser();
 		final String json = IOUtils.toString(this.getClass().getClassLoader().getResourceAsStream("instagramSubscriptionCallback.json"));		
 
-		final List<InstagramSubscripton> subscriptions = parser.parse(json);
+		final List<Long> subscriptions = parser.parse(json);
 		
 		assertEquals(1, subscriptions.size());
-		assertEquals("tag", subscriptions.get(0).getObject());
-		assertEquals("nofilter", subscriptions.get(0).getObjectId());
+		final long subscrptionId = subscriptions.get(0);
+		assertEquals(3459542, subscrptionId);
 	}
 
 }

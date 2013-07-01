@@ -3,6 +3,7 @@ package uk.co.eelpieconsulting.feedlistener.daos;
 import java.net.UnknownHostException;
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -13,7 +14,9 @@ import com.mongodb.MongoException;
 
 @Component
 public class FeedItemDAO {
-		
+	
+	private static Logger log = Logger.getLogger(FeedItemDAO.class);
+	
 	private final DataStoreFactory dataStoreFactory;
 	
 	@Autowired
@@ -22,11 +25,16 @@ public class FeedItemDAO {
 	}
 	
 	public void add(FeedItem feedItem) throws UnknownHostException, MongoException {
-		dataStoreFactory.getDatastore().save(feedItem);		
+		if (dataStoreFactory.getDatastore().find(FeedItem.class, "url", feedItem.getUrl()).asList().isEmpty()) {	// TODO
+			log.info("Added: " + feedItem.getTitle());
+			dataStoreFactory.getDatastore().save(feedItem);
+		}
 	}
 	
 	public void addAll(List<FeedItem> feedItems) throws UnknownHostException, MongoException {
-		dataStoreFactory.getDatastore().save(feedItems);			
+		for (FeedItem feedItem : feedItems) {
+			add(feedItem);
+		}
 	}
 	
 	public List<FeedItem> getAll() throws UnknownHostException, MongoException {

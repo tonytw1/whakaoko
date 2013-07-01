@@ -21,9 +21,12 @@ import uk.co.eelpieconsulting.common.http.HttpFetchException;
 import uk.co.eelpieconsulting.common.http.HttpForbiddenException;
 import uk.co.eelpieconsulting.common.http.HttpNotFoundException;
 import uk.co.eelpieconsulting.feedlistener.daos.FeedItemDAO;
-import uk.co.eelpieconsulting.feedlistener.instagram.InstagramSubscripton;
+import uk.co.eelpieconsulting.feedlistener.daos.SubscriptionsDAO;
 import uk.co.eelpieconsulting.feedlistener.instagram.api.InstagramApi;
 import uk.co.eelpieconsulting.feedlistener.model.FeedItem;
+import uk.co.eelpieconsulting.feedlistener.model.InstagramGeographySubscription;
+import uk.co.eelpieconsulting.feedlistener.model.InstagramSubscription;
+import uk.co.eelpieconsulting.feedlistener.model.InstagramTagSubscription;
 
 @Controller
 public class InstagramCallbackController {
@@ -32,16 +35,22 @@ public class InstagramCallbackController {
 	
 	private final InstagramApi instagramApi;
 	private final InstagramSubscriptionCallbackParser instagramSubscriptionCallbackParser;
+	private final SubscriptionsDAO subscriptionsDAO;
 	private final FeedItemDAO feedItemDAO;
 	
 	private final String accessToken;
+	private final String clientId;
 	
 	@Autowired
 	public InstagramCallbackController(InstagramSubscriptionCallbackParser instagramSubscriptionCallbackParser, FeedItemDAO feedItemDAO,
-			@Value("#{config['instagram.access.token']}") String accessToken) {
+			SubscriptionsDAO subscriptionsDAO,
+			@Value("#{config['instagram.access.token']}") String accessToken,
+			@Value("#{config['instagram.client.id']}") String clientId) {
 		this.instagramSubscriptionCallbackParser = instagramSubscriptionCallbackParser;
 		this.feedItemDAO = feedItemDAO;
+		this.subscriptionsDAO = subscriptionsDAO;
 		this.accessToken = accessToken;
+		this.clientId = clientId;
 		this.instagramApi = new InstagramApi();		
 	}
 
@@ -61,13 +70,24 @@ public class InstagramCallbackController {
 	public ModelAndView dataCallback(@RequestBody String body) throws IOException, JSONException, HttpNotFoundException, HttpBadRequestException, HttpForbiddenException, HttpFetchException {		
 		log.info("Received subscription callback post: " + body);
 		
-		List<InstagramSubscripton> subscriptions = instagramSubscriptionCallbackParser.parse(body);
-		log.info("Updated subscriptions  in this callback: " + subscriptions);
-		for (InstagramSubscripton subscription : subscriptions) {
-			if (subscription.getObject().equals("tag")) {
-				final String tag = subscription.getObjectId();
+		List<Long> updatedSubscriptions = instagramSubscriptionCallbackParser.parse(body);
+		log.info("Updated subscriptions in this callback: " + updatedSubscriptions);
+		for (Long subscriptionId : updatedSubscriptions) {
+			
+			final InstagramSubscription subscription = subscriptionsDAO.getByInstagramId(subscriptionId);
+			log.info(subscriptionId + ": " + subscription);
+			
+			if (subscription != null && subscription instanceof InstagramTagSubscription) {
+				final String tag = ((InstagramTagSubscription) subscription).getTag();
 				log.info("Fetching recent media for changed tag: " + tag);
 				List<FeedItem> recentMediaForTag = instagramApi.getRecentMediaForTag(tag, accessToken);
+				feedItemDAO.addAll(recentMediaForTag);
+			}
+			
+			if (subscription != null && subscription instanceof InstagramGeographySubscription) {
+				log.info("Fetching recent media for changed geography: " + subscription.toString());								
+				final long geoId = ((InstagramGeographySubscription) subscription).getGeoId();
+				List<FeedItem> recentMediaForTag = instagramApi.getRecentMediaForGeography(geoId, clientId);
 				feedItemDAO.addAll(recentMediaForTag);
 			}
 		}

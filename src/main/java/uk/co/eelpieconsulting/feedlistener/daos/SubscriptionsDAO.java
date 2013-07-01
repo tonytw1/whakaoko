@@ -7,6 +7,7 @@ import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import uk.co.eelpieconsulting.feedlistener.model.InstagramSubscription;
 import uk.co.eelpieconsulting.feedlistener.model.Subscription;
 import uk.co.eelpieconsulting.feedlistener.rss.RssPoller;
 
@@ -68,6 +69,10 @@ public class SubscriptionsDAO {
 		log.info("Deleting subscription: " + subscription);
 		final Datastore datastore = dataStoreFactory.getDatastore();
 		datastore.delete(datastore.createQuery(Subscription.class).filter("id", subscription.getId()));
+	}
+
+	public InstagramSubscription getByInstagramId(Long subscriptionId) throws UnknownHostException, MongoException {
+		return dataStoreFactory.getDatastore().find(InstagramSubscription.class, "subscriptionId", subscriptionId).get();
 	}
 	
 }

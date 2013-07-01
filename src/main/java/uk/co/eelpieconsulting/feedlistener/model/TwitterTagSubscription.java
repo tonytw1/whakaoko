@@ -27,8 +27,7 @@ public class TwitterTagSubscription extends Subscription {
 	public String toString() {
 		return "TwitterTagSubscription [tag=" + tag + "]";
 	}
-
-
+	
 	private String generateName(String tag) {
 		return "Twitter - " + tag;
 	}
