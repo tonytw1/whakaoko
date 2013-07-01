@@ -11,8 +11,6 @@ import org.springframework.web.servlet.ModelAndView;
 import uk.co.eelpieconsulting.feedlistener.daos.FeedItemDAO;
 import uk.co.eelpieconsulting.feedlistener.daos.SubscriptionsDAO;
 
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
 import com.mongodb.MongoException;
 
 @Controller
@@ -33,7 +31,7 @@ public class HomepageController {
 		mv.addObject("subscriptions", subscriptionsDAO.getSubscriptions());
 		
 		mv.addObject("inboxSize", feedItemDAO.getAllCount());
-		mv.addObject("inbox", Lists.newArrayList(Iterables.limit(feedItemDAO.getAll(), 10)));
+		mv.addObject("inbox", feedItemDAO.getInbox(20));
 		return mv;
 	}
 }

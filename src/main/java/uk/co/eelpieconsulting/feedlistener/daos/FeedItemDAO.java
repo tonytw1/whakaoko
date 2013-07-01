@@ -37,10 +37,6 @@ public class FeedItemDAO {
 		}
 	}
 	
-	public List<FeedItem> getAll() throws UnknownHostException, MongoException {
-		return inboxQuery().asList();
-	}
-	
 	public List<FeedItem> getInbox(int limit) throws UnknownHostException, MongoException {
 		return inboxQuery().limit(limit).asList();
 	}

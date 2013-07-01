@@ -30,14 +30,14 @@ public class InboxController {
 	@RequestMapping("/inbox/json")
 	public ModelAndView inbox() throws UnknownHostException, MongoException {
 		final ModelAndView mv = new ModelAndView(viewFactory.getJsonView());
-		mv.addObject("data", feedItemDAO.getAll());
+		mv.addObject("data", feedItemDAO.getInbox(20));
 		return mv;
 	}
 	
 	@RequestMapping("/inbox/rss")
 	public ModelAndView inboxRss() throws UnknownHostException, MongoException {
 		final ModelAndView mv = new ModelAndView(viewFactory.getRssView("Inbox", urlBuilder.getBaseUrl(), "Inbox items"));
-		mv.addObject("data", feedItemDAO.getAll());
+		mv.addObject("data", feedItemDAO.getInbox(20));
 		return mv;
 	}
 
