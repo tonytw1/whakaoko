@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.Date;
 
 import org.bson.types.ObjectId;
+import org.codehaus.jackson.annotate.JsonIgnore;
 
 import com.google.code.morphia.annotations.Entity;
 import com.google.code.morphia.annotations.Id;
@@ -67,6 +68,7 @@ public class FeedItem implements Serializable, RssFeedable {
 		return place;
 	}
 	
+	@JsonIgnore
 	public LatLong getLatLong() {
 		return place != null ? place.getLatLong() : null;
 	}
