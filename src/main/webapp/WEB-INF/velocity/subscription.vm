@@ -6,3 +6,15 @@
 <p>$subscription</p>
 
 <p><a href="/subscriptions/$subscription.id/delete">Delete</a></p>
+
+#if($feedItems && !$feedItems.isEmpty()) 
+	<ul>
+ 	#foreach($feedItem in $feedItems)
+ 		<li><a href="$feedItem.url">$!feedItem.title</a>
+ 		<br/>$feedItem.date
+ 		</li>
+ 	#end
+ 	</ul>
+#else
+	<p>No items from this subscription.</p>
+#end

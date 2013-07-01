@@ -21,9 +21,9 @@ import uk.co.eelpieconsulting.common.http.HttpForbiddenException;
 import uk.co.eelpieconsulting.common.http.HttpNotFoundException;
 import uk.co.eelpieconsulting.common.views.ViewFactory;
 import uk.co.eelpieconsulting.feedlistener.UrlBuilder;
+import uk.co.eelpieconsulting.feedlistener.daos.FeedItemDAO;
 import uk.co.eelpieconsulting.feedlistener.daos.SubscriptionsDAO;
 import uk.co.eelpieconsulting.feedlistener.instagram.InstagramSubscriptionManager;
-import uk.co.eelpieconsulting.feedlistener.instagram.api.InstagramApi;
 import uk.co.eelpieconsulting.feedlistener.model.InstagramGeographySubscription;
 import uk.co.eelpieconsulting.feedlistener.model.InstagramSubscription;
 import uk.co.eelpieconsulting.feedlistener.model.RssSubscription;
@@ -44,27 +44,33 @@ public class SubscriptionsController {
 	private final TwitterListener twitterListener;
 	private final InstagramSubscriptionManager instagramSubscriptionManager;
 	private final UrlBuilder urlBuilder;
-	private ViewFactory viewFactory;
-
+	private final FeedItemDAO feedItemDAO;
+	private final ViewFactory viewFactory;
+	
 	@Autowired
 	public SubscriptionsController(SubscriptionsDAO subscriptionsDAO, RssPoller rssPoller, TwitterListener twitterListener, 
 			InstagramSubscriptionManager instagramSubscriptionManager, UrlBuilder urlBuilder,
+			FeedItemDAO feedItemDAO,
 			ViewFactory viewFactory) {
 		this.subscriptionsDAO = subscriptionsDAO;
 		this.rssPoller = rssPoller;
 		this.twitterListener = twitterListener;
 		this.instagramSubscriptionManager = instagramSubscriptionManager;
 		this.urlBuilder = urlBuilder;
+		this.feedItemDAO = feedItemDAO;
 		this.viewFactory = viewFactory;
 	}
 	
 	@RequestMapping(value="/subscriptions/{id}", method=RequestMethod.GET)
-	public ModelAndView subscription(@PathVariable String id) {
+	public ModelAndView subscription(@PathVariable String id) throws UnknownHostException, MongoException {
+		final Subscription subscription = subscriptionsDAO.getById(id);
+
 		final ModelAndView mv = new ModelAndView("subscription");
-		mv.addObject("subscription", subscriptionsDAO.getById(id));
+		mv.addObject("subscription", subscription);
+		mv.addObject("feedItems", feedItemDAO.getSubscriptionFeedItems(subscription.getId()));
 		return mv;
 	}
-
+	
 	@RequestMapping(value="/subscriptions/{id}/delete")
 	public ModelAndView deleteSubscription(@PathVariable String id) throws UnknownHostException, MongoException, HttpNotFoundException, HttpBadRequestException, HttpForbiddenException, HttpFetchException {
 		final Subscription subscription = subscriptionsDAO.getById(id);
@@ -81,13 +87,13 @@ public class SubscriptionsController {
 		final ModelAndView mv = new ModelAndView(new RedirectView(urlBuilder.getBaseUrl()));
 		return mv;
 	}
-
+	
 	@RequestMapping(value="/subscriptions/new", method=RequestMethod.GET)
 	public ModelAndView newSubscriptionForm() {
 		final ModelAndView mv = new ModelAndView("newSubscription");
 		return mv;		
 	}
-
+	
 	@RequestMapping(value="/subscriptions/json", method=RequestMethod.GET)
 	public ModelAndView subscriptions() {
 		final ModelAndView mv = new ModelAndView(viewFactory.getJsonView());
@@ -131,9 +137,7 @@ public class SubscriptionsController {
 		final InstagramGeographySubscription instagramGeographySubscription = instagramSubscriptionManager.requestInstagramGeographySubscription(latLong, radius);
 		log.info("Saving subscription: " + instagramGeographySubscription);
 		subscriptionsDAO.add(instagramGeographySubscription);
-		
-		new InstagramApi().getRecentMediaForGeography(instagramGeographySubscription.getGeoId(), "d6e2db6c2a95440c84782a41cfaee2be");	// TODO
-		
+
 		final ModelAndView mv = new ModelAndView(new RedirectView(urlBuilder.getBaseUrl()));
 		return mv;
 	}

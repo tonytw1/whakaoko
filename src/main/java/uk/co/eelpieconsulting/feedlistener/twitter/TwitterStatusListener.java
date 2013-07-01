@@ -33,6 +33,7 @@ public class TwitterStatusListener implements StatusListener {
 		final FeedItem tweetFeedItem = tweetToFeedItem(status);
 		log.info("Received: " + tweetFeedItem.getHeadline());
 		try {
+			// TODO map to a subscription
 			feedItemDAO.add(tweetFeedItem);
 		} catch (UnknownHostException e) {
 			log.error(e);
@@ -56,7 +57,6 @@ public class TwitterStatusListener implements StatusListener {
 	@Override
 	public void onScrubGeo(long arg0, long arg1) {
 		// TODO Auto-generated method stub
-
 	}
 
 	@Override

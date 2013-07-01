@@ -80,15 +80,21 @@ public class InstagramCallbackController {
 			if (subscription != null && subscription instanceof InstagramTagSubscription) {
 				final String tag = ((InstagramTagSubscription) subscription).getTag();
 				log.info("Fetching recent media for changed tag: " + tag);
-				List<FeedItem> recentMediaForTag = instagramApi.getRecentMediaForTag(tag, accessToken);
-				feedItemDAO.addAll(recentMediaForTag);
+				List<FeedItem> recentMedia = instagramApi.getRecentMediaForTag(tag, accessToken);				
+				for (FeedItem feedItem : recentMedia) {
+					feedItem.setSubscriptionId(subscription.getId());
+				}				
+				feedItemDAO.addAll(recentMedia);
 			}
 			
 			if (subscription != null && subscription instanceof InstagramGeographySubscription) {
 				log.info("Fetching recent media for changed geography: " + subscription.toString());								
 				final long geoId = ((InstagramGeographySubscription) subscription).getGeoId();
-				List<FeedItem> recentMediaForTag = instagramApi.getRecentMediaForGeography(geoId, clientId);
-				feedItemDAO.addAll(recentMediaForTag);
+				List<FeedItem> recentMedia = instagramApi.getRecentMediaForGeography(geoId, clientId);
+				for (FeedItem feedItem : recentMedia) {
+					feedItem.setSubscriptionId(subscription.getId());
+				}
+				feedItemDAO.addAll(recentMedia);
 			}
 		}
 		return null;

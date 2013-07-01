@@ -26,7 +26,7 @@ public class FeedItemDAO {
 	
 	public void add(FeedItem feedItem) throws UnknownHostException, MongoException {
 		if (dataStoreFactory.getDatastore().find(FeedItem.class, "url", feedItem.getUrl()).asList().isEmpty()) {	// TODO
-			log.info("Added: " + feedItem.getTitle());
+			log.info("Added: " + feedItem.getSubscriptionId() + ", " + feedItem.getTitle());
 			dataStoreFactory.getDatastore().save(feedItem);
 		}
 	}
@@ -39,6 +39,10 @@ public class FeedItemDAO {
 	
 	public List<FeedItem> getInbox(int limit) throws UnknownHostException, MongoException {
 		return inboxQuery().limit(limit).asList();
+	}
+	
+	public  List<FeedItem> getSubscriptionFeedItems(String subscriptionId) throws UnknownHostException, MongoException {
+		return dataStoreFactory.getDatastore().find(FeedItem.class, "subscriptionId", subscriptionId).order("-date").asList();
 	}
 	
 	public long getAllCount() throws UnknownHostException, MongoException {

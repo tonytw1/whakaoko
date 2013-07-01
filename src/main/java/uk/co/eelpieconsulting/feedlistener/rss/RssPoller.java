@@ -71,7 +71,9 @@ public class RssPoller {
 				log.info("Fetched feed: " + fetchedFeed.getFeedName());
 				for (FeedItem feedItem : fetchedFeed.getFeedItems()) {
 					try {
+						feedItem.setSubscriptionId(subscription.getId());
 						feedItemDAO.add(feedItem);
+						
 					} catch (UnknownHostException e) {
 						log.error(e);
 					} catch (MongoException e) {

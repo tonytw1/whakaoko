@@ -27,6 +27,7 @@ public class FeedItem implements Serializable, RssFeedable {
 	private Date date;
 	private Place place;
 	private String imageUrl;
+	private String subscriptionId;
 	
 	public FeedItem() {
 	}
@@ -96,11 +97,20 @@ public class FeedItem implements Serializable, RssFeedable {
 		return url;
 	}
 
+	public String getSubscriptionId() {
+		return subscriptionId;
+	}
+	
+	public void setSubscriptionId(String subscriptionId) {
+		this.subscriptionId = subscriptionId;		
+	}
+	
 	@Override
 	public String toString() {
 		return "FeedItem [body=" + body + ", date=" + date + ", imageUrl="
-				+ imageUrl + ", place=" + place + ", title=" + title + ", url="
-				+ url + "]";
+				+ imageUrl + ", objectId=" + objectId + ", place=" + place
+				+ ", subscriptionId=" + subscriptionId + ", title=" + title
+				+ ", url=" + url + "]";
 	}
 	
 }
