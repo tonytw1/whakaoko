@@ -1,8 +1,12 @@
 package uk.co.eelpieconsulting.feedlistener.twitter;
 
+import java.net.UnknownHostException;
+
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import com.mongodb.MongoException;
 
 import twitter4j.StallWarning;
 import twitter4j.Status;
@@ -28,7 +32,13 @@ public class TwitterStatusListener implements StatusListener {
 	public void onStatus(Status status) {
 		final FeedItem tweetFeedItem = tweetToFeedItem(status);
 		log.info("Received: " + tweetFeedItem.getHeadline());
-		feedItemDAO.add(tweetFeedItem);
+		try {
+			feedItemDAO.add(tweetFeedItem);
+		} catch (UnknownHostException e) {
+			log.error(e);
+		} catch (MongoException e) {
+			log.error(e);
+		}
 	}
 	
 	public void onDeletionNotice(StatusDeletionNotice statusDeletionNotice) {

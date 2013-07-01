@@ -1,5 +1,6 @@
 package uk.co.eelpieconsulting.feedlistener.rss;
 
+import java.net.UnknownHostException;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -7,6 +8,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+
+import com.mongodb.MongoException;
 
 import uk.co.eelpieconsulting.feedlistener.daos.FeedItemDAO;
 import uk.co.eelpieconsulting.feedlistener.daos.SubscriptionsDAO;
@@ -67,7 +70,13 @@ public class RssPoller {
 				
 				log.info("Fetched feed: " + fetchedFeed.getFeedName());
 				for (FeedItem feedItem : fetchedFeed.getFeedItems()) {
-					feedItemDAO.add(feedItem);
+					try {
+						feedItemDAO.add(feedItem);
+					} catch (UnknownHostException e) {
+						log.error(e);
+					} catch (MongoException e) {
+						log.error(e);
+					}
 				}
 			} else {
 				log.warn("Failed to fetch feed: " + subscription);
