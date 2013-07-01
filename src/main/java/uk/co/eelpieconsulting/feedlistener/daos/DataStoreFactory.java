@@ -18,6 +18,8 @@ public class DataStoreFactory {
     
     @Value("#{config['mongo.database']}")
     private String mongoDatabase;
+
+	private Datastore dataStore;
         
 	public DataStoreFactory() {
 	}
@@ -27,12 +29,26 @@ public class DataStoreFactory {
 		this.mongoDatabase = mongoDatabase;
 	}
 	
-	public Datastore getDatastore() throws UnknownHostException, MongoException {	
+	public Datastore getDatastore() throws UnknownHostException, MongoException {
+		if (dataStore != null) {
+			return dataStore;
+		}
+		
+		return connect();
+	}
+
+	private synchronized Datastore connect() throws UnknownHostException {
+		if (dataStore != null) {
+			return dataStore;
+		}
+		
 		final Morphia morphia = new Morphia();		
 		final Mongo m = new Mongo(mongoHost);
-		final Datastore dataStore = morphia.createDatastore(m, mongoDatabase);
-		dataStore.ensureIndexes();
-		return dataStore;
+		Datastore newDataStore = morphia.createDatastore(m, mongoDatabase);
+		newDataStore.ensureIndexes();
+		
+		this.dataStore = newDataStore;
+		return this.dataStore;
 	}
 	
 }
