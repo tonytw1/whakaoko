@@ -23,6 +23,7 @@ import uk.co.eelpieconsulting.common.http.HttpForbiddenException;
 import uk.co.eelpieconsulting.common.http.HttpNotFoundException;
 import uk.co.eelpieconsulting.feedlistener.model.FeedItem;
 import uk.co.eelpieconsulting.feedlistener.model.InstagramGeographySubscription;
+import uk.co.eelpieconsulting.feedlistener.model.InstagramTagSubscription;
 
 import com.google.common.collect.Lists;
 
@@ -37,12 +38,14 @@ public class InstagramApi {
 	private static final String DATA = "data";
 	
 	private final InstagramFeedItemMapper mapper;
+	private final HttpFetcher httpFetcher;
 	
 	public InstagramApi() {
 		this.mapper = new InstagramFeedItemMapper();
+		this.httpFetcher = new HttpFetcher();
 	}
 
-	public long createTagSubscription(String tag, String clientId, String clientSecret, String callbackUrl) throws HttpNotFoundException, HttpBadRequestException, HttpForbiddenException, HttpFetchException, UnsupportedEncodingException, JSONException {		
+	public InstagramTagSubscription createTagSubscription(String tag, String clientId, String clientSecret, String callbackUrl) throws HttpNotFoundException, HttpBadRequestException, HttpForbiddenException, HttpFetchException, UnsupportedEncodingException, JSONException {		
 		final List<NameValuePair> nameValuePairs = commonSubscriptionFields( clientId, clientSecret, callbackUrl);		
 		nameValuePairs.add(new BasicNameValuePair("object", "tag"));
 		nameValuePairs.add(new BasicNameValuePair("object_id", tag));
@@ -51,13 +54,11 @@ public class InstagramApi {
 		HttpEntity entity = new UrlEncodedFormEntity(nameValuePairs);
 		post.setEntity(entity);
 		
-		final HttpFetcher httpFetcher = new HttpFetcher();
-		final String response = httpFetcher.post(post);
-		log.info(response);
-		
-		//{"meta":{"code":200},"data":{"object":"tag","object_id":"london","aspect":"media","callback_url":"http:\/\/genil.eelpieconsulting.co.uk\/instagram\/callback","type":"subscription","id":"3479728"}}
-		JSONObject responseJSON = new JSONObject(response);	// TODO push to seperate class
-		return responseJSON.getJSONObject("data").getLong("id");		
+		final String response = httpFetcher.post(post);		
+		final JSONObject responseJSON = new JSONObject(response);
+		return new InstagramTagSubscription(
+				responseJSON.getJSONObject("data").getString("object"),
+				responseJSON.getJSONObject("data").getLong("id"));
 	}
 
 	public InstagramGeographySubscription createGeographySubscription(LatLong latLong, int radius, String clientId, String clientSecret, String callbackUrl) throws UnsupportedEncodingException, HttpNotFoundException, HttpBadRequestException, HttpForbiddenException, HttpFetchException, JSONException {		
@@ -71,7 +72,6 @@ public class InstagramApi {
 		HttpEntity entity = new UrlEncodedFormEntity(nameValuePairs);
 		post.setEntity(entity);
 		
-		final HttpFetcher httpFetcher = new HttpFetcher();
 		final String response = httpFetcher.post(post);
 		log.info(response);
 		
@@ -81,30 +81,25 @@ public class InstagramApi {
 	}
 	
 	public String getSubscriptions(String clientId, String clientSecret) throws HttpNotFoundException, HttpBadRequestException, HttpForbiddenException, HttpFetchException {
-		HttpFetcher httpFetcher = new HttpFetcher();
 		return httpFetcher.get(INSTAGRAM_API_V1_SUBSCRIPTIONS + "?client_secret=" + clientSecret + "&client_id=" + clientId);
 	}
 
 	public void deleteAllSubscriptions(String clientId, String clientSecret) throws HttpNotFoundException, HttpBadRequestException, HttpForbiddenException, HttpFetchException {		
-		final HttpFetcher httpFetcher = new HttpFetcher();
 		HttpDelete delete = new HttpDelete(INSTAGRAM_API_V1_SUBSCRIPTIONS + "?client_secret=" + clientSecret + "&object=all&client_id=" + clientId);
 		log.info("Delete all response: " + httpFetcher.delete(delete));
 	}
 	
 	public void deleteSubscription(long id, String clientId, String clientSecret) throws HttpNotFoundException, HttpBadRequestException, HttpForbiddenException, HttpFetchException {
-		final HttpFetcher httpFetcher = new HttpFetcher();
 		HttpDelete delete = new HttpDelete(INSTAGRAM_API_V1_SUBSCRIPTIONS + "?client_secret=" + clientSecret + "&id=" + Long.toString(id) + "&client_id=" + clientId);
 		log.info("Delete subscription response; " + httpFetcher.delete(delete));
 	}
 	
 	public List<FeedItem> getRecentMediaForTag(String tag, String accessToken) throws HttpNotFoundException, HttpBadRequestException, HttpForbiddenException, HttpFetchException, JSONException {	
-		final HttpFetcher httpFetcher = new HttpFetcher();		
 		final String response = httpFetcher.get("https://api.instagram.com/v1/tags/" + tag + "/media/recent" + "?access_token=" + accessToken);
 		return parseFeedItems(response);
 	}
 	
 	public List<FeedItem> getRecentMediaForGeography(long geoId, String clientId) throws HttpNotFoundException, HttpBadRequestException, HttpForbiddenException, HttpFetchException, JSONException {
-		final HttpFetcher httpFetcher = new HttpFetcher();
 		final String response = httpFetcher.get("https://api.instagram.com/v1/geographies/" + geoId + "/media/recent" + "?client_id=" + clientId);
 		return parseFeedItems(response);			
 	}
@@ -123,9 +118,7 @@ public class InstagramApi {
 		nameValuePairs.add(new BasicNameValuePair("code", code));
 		HttpEntity entity = new UrlEncodedFormEntity(nameValuePairs);
 		post.setEntity(entity);
-		
-		final HttpFetcher httpFetcher = new HttpFetcher();
-		
+				
 		try {
 			final String response = httpFetcher.post(post);
 	

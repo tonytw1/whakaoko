@@ -26,7 +26,6 @@ import uk.co.eelpieconsulting.feedlistener.instagram.InstagramSubscriptionManage
 import uk.co.eelpieconsulting.feedlistener.instagram.api.InstagramApi;
 import uk.co.eelpieconsulting.feedlistener.model.InstagramGeographySubscription;
 import uk.co.eelpieconsulting.feedlistener.model.InstagramSubscription;
-import uk.co.eelpieconsulting.feedlistener.model.InstagramTagSubscription;
 import uk.co.eelpieconsulting.feedlistener.model.RssSubscription;
 import uk.co.eelpieconsulting.feedlistener.model.Subscription;
 import uk.co.eelpieconsulting.feedlistener.model.TwitterTagSubscription;
@@ -116,13 +115,12 @@ public class SubscriptionsController {
 	
 	@RequestMapping(value="/subscriptions/instagram/tags", method=RequestMethod.POST)
 	public ModelAndView addInstagramTagSubscription(@RequestParam String tag) throws HttpNotFoundException, HttpBadRequestException, HttpForbiddenException, UnsupportedEncodingException, HttpFetchException, JSONException {
-		final long subscriptionId = instagramSubscriptionManager.requestInstagramTagSubscription(tag);
-		subscriptionsDAO.add(new InstagramTagSubscription(tag, subscriptionId));
+		final InstagramSubscription subscription = instagramSubscriptionManager.requestInstagramTagSubscription(tag);
+		subscriptionsDAO.add(subscription);
 		
 		final ModelAndView mv = new ModelAndView(new RedirectView(urlBuilder.getBaseUrl()));
 		return mv;
 	}
-	
 	
 	@RequestMapping(value="/subscriptions/instagram/geography", method=RequestMethod.POST)
 	public ModelAndView addInstagramTagSubscription(@RequestParam double latitude,

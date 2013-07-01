@@ -76,10 +76,10 @@ public class InstagramSubscriptionManager {
 		instagramApi.deleteAllSubscriptions(clientId, clientSecret);
 	}
 	
-	public long requestInstagramTagSubscription(String tag) throws HttpNotFoundException, HttpBadRequestException, HttpForbiddenException, HttpFetchException, UnsupportedEncodingException, JSONException {
-		final long subscriptionId = instagramApi.createTagSubscription(tag, clientId, clientSecret, urlBuilder.getInstagramCallbackUrl());
-		log.info("Subscribed to instagram tag '" + tag + "' with id: " + subscriptionId);
-		return subscriptionId;
+	public InstagramTagSubscription requestInstagramTagSubscription(String tag) throws HttpNotFoundException, HttpBadRequestException, HttpForbiddenException, HttpFetchException, UnsupportedEncodingException, JSONException {
+		final InstagramTagSubscription subscription = instagramApi.createTagSubscription(tag, clientId, clientSecret, urlBuilder.getInstagramCallbackUrl());
+		log.info("Subscribed to instagram tag '" + tag + ": " + subscription);
+		return subscription;
 	}
 
 	public InstagramGeographySubscription requestInstagramGeographySubscription(LatLong latLong, int radius) throws UnsupportedEncodingException, HttpNotFoundException, HttpBadRequestException, HttpForbiddenException, HttpFetchException, JSONException {
