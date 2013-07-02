@@ -57,7 +57,7 @@ public class InstagramApi {
 		final String response = httpFetcher.post(post);		
 		final JSONObject responseJSON = new JSONObject(response);
 		return new InstagramTagSubscription(
-				responseJSON.getJSONObject("data").getString("object"),
+				responseJSON.getJSONObject("data").getString("object_id"),
 				responseJSON.getJSONObject("data").getLong("id"));
 	}
 
