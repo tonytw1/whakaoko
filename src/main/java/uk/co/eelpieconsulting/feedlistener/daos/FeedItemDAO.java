@@ -15,6 +15,8 @@ import com.mongodb.MongoException;
 @Component
 public class FeedItemDAO {
 	
+	private static final String DATE_DESCENDING = "-date";
+
 	private static Logger log = Logger.getLogger(FeedItemDAO.class);
 	
 	private final DataStoreFactory dataStoreFactory;
@@ -42,15 +44,23 @@ public class FeedItemDAO {
 	}
 	
 	public  List<FeedItem> getSubscriptionFeedItems(String subscriptionId) throws UnknownHostException, MongoException {
-		return dataStoreFactory.getDatastore().find(FeedItem.class, "subscriptionId", subscriptionId).order("-date").asList();
+		return subscriptionFeedItemsQuery(subscriptionId).asList();
 	}
-	
+
 	public long getAllCount() throws UnknownHostException, MongoException {
 		return dataStoreFactory.getDatastore().find(FeedItem.class).countAll();
 	}
 	
+	public long getSubscriptionFeedItemsCount(String subscriptionId) throws UnknownHostException {
+		return subscriptionFeedItemsQuery(subscriptionId).countAll();
+	}
+	
 	private Query<FeedItem> inboxQuery() throws UnknownHostException {
-		return dataStoreFactory.getDatastore().find(FeedItem.class).order("-date");
+		return dataStoreFactory.getDatastore().find(FeedItem.class).order(DATE_DESCENDING);
+	}
+
+	private Query<FeedItem> subscriptionFeedItemsQuery(String subscriptionId) throws UnknownHostException {
+		return dataStoreFactory.getDatastore().find(FeedItem.class, "subscriptionId", subscriptionId).order(DATE_DESCENDING);
 	}
 	
 }

@@ -67,6 +67,7 @@ public class SubscriptionsController {
 
 		final ModelAndView mv = new ModelAndView("subscription");
 		mv.addObject("subscription", subscription);
+		mv.addObject("subscriptionSize", feedItemDAO.getSubscriptionFeedItemsCount(subscription.getId()));
 		mv.addObject("feedItems", feedItemDAO.getSubscriptionFeedItems(subscription.getId()));
 		return mv;
 	}
