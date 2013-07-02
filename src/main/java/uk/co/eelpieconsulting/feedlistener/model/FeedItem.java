@@ -8,6 +8,7 @@ import org.codehaus.jackson.annotate.JsonIgnore;
 
 import com.google.code.morphia.annotations.Entity;
 import com.google.code.morphia.annotations.Id;
+import com.google.code.morphia.annotations.Indexed;
 
 import uk.co.eelpieconsulting.common.geo.model.LatLong;
 import uk.co.eelpieconsulting.common.geo.model.Place;
@@ -22,11 +23,15 @@ public class FeedItem implements Serializable, RssFeedable {
 	ObjectId objectId;
 
 	private String title;
+	
+	@Indexed
 	private String url;
 	private String body;
 	private Date date;
 	private Place place;
 	private String imageUrl;
+	
+	@Indexed
 	private String subscriptionId;
 	
 	public FeedItem() {
