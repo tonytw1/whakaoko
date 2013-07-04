@@ -1,5 +1,7 @@
 package uk.co.eelpieconsulting.feedlistener.model;
 
+import java.util.Date;
+
 import org.bson.types.ObjectId;
 import org.codehaus.jackson.annotate.JsonPropertyOrder;
 
@@ -15,6 +17,8 @@ public abstract class Subscription {
     
     private String id, name;
     
+    private Date lastRead, latestItemDate;
+    
 	public final String getId() {
 		return id;
 	}
@@ -29,6 +33,27 @@ public abstract class Subscription {
 
 	public void setName(String name) {
 		this.name = name;
+	}
+
+	public Date getLastRead() {
+		return lastRead;
+	}
+
+	public void setLastRead(Date lastRead) {
+		this.lastRead = lastRead;
+	}
+
+	public Date getLatestItemDate() {
+		return latestItemDate;
+	}
+
+	public void setLatestItemDate(Date latestItemDate) {
+		this.latestItemDate = latestItemDate;
+	}
+
+	@Override
+	public String toString() {
+		return "Subscription [id=" + id + ", lastRead=" + lastRead + ", latestItemDate=" + latestItemDate + ", name=" + name + "]";
 	}
 	
 }

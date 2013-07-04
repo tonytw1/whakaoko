@@ -5,7 +5,11 @@
 #if($subscriptions && !$subscriptions.isEmpty()) 
 	<ul>
  	#foreach($subscription in $subscriptions) 
- 		<li><a href="/subscriptions/$subscription.id">$!subscription.name</a> #if($subscriptionCounts.get($subscription.id) > 0) ($subscriptionCounts.get($subscription.id))#end</li>
+ 		<li><a href="/subscriptions/$subscription.id">$!subscription.name</a> 
+ 		#if($subscriptionCounts.get($subscription.id) > 0) ($subscriptionCounts.get($subscription.id))#end
+ 		<br/>
+ 		$!subscription.latestItemDate
+ 		</li>
  	#end
  	</ul>
 #else

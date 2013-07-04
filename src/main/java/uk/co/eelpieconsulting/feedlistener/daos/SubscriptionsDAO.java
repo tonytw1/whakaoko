@@ -48,7 +48,10 @@ public class SubscriptionsDAO {
 	
 	public List<Subscription> getSubscriptions() {
 		try {
-			return dataStoreFactory.getDatastore().find(Subscription.class).asList();
+			return dataStoreFactory.getDatastore().find(Subscription.class).
+				order("-latestItemDate").
+				asList();
+			
 		} catch (UnknownHostException e) {
 			throw new RuntimeException(e);
 		} catch (MongoException e) {

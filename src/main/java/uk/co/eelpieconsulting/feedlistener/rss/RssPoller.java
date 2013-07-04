@@ -1,9 +1,11 @@
 package uk.co.eelpieconsulting.feedlistener.rss;
 
 import java.net.UnknownHostException;
+import java.util.Date;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -66,13 +68,21 @@ public class RssPoller {
 			final FetchedFeed fetchedFeed = feedFetcher.fetchFeed(subscription.getUrl());			
 			if (fetchedFeed != null) {
 				subscription.setName(fetchedFeed.getFeedName());
+				subscription.setLastRead(DateTime.now().toDate());
 				subscriptionsDAO.save(subscription);
-				
+
 				log.info("Fetched feed: " + fetchedFeed.getFeedName());
+				
+				Date latestItemDate = null;
 				for (FeedItem feedItem : fetchedFeed.getFeedItems()) {
 					try {
 						feedItem.setSubscriptionId(subscription.getId());
 						feedItemDAO.add(feedItem);
+						
+						final Date feedItemDate = feedItem.getDate();
+						if (feedItemDate != null && (latestItemDate == null || feedItemDate.after(latestItemDate))) {
+							latestItemDate =  feedItemDate;
+						}
 						
 					} catch (UnknownHostException e) {
 						log.error(e);
@@ -80,6 +90,10 @@ public class RssPoller {
 						log.error(e);
 					}
 				}
+				
+				subscription.setLatestItemDate(latestItemDate);						
+				subscriptionsDAO.save(subscription);
+
 			} else {
 				log.warn("Failed to fetch feed: " + subscription);
 			}
