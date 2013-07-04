@@ -1,6 +1,7 @@
 package uk.co.eelpieconsulting.feedlistener.instagram.callbacks;
 
 import java.io.IOException;
+import java.util.Date;
 import java.util.List;
 
 import javax.servlet.http.HttpServletResponse;
@@ -75,27 +76,51 @@ public class InstagramCallbackController {
 		for (Long subscriptionId : updatedSubscriptions) {
 			
 			final InstagramSubscription subscription = subscriptionsDAO.getByInstagramId(subscriptionId);
-			log.info(subscriptionId + ": " + subscription);
 			
 			if (subscription != null && subscription instanceof InstagramTagSubscription) {
 				final String tag = ((InstagramTagSubscription) subscription).getTag();
 				log.info("Fetching recent media for changed tag: " + tag);
-				List<FeedItem> recentMedia = instagramApi.getRecentMediaForTag(tag, accessToken);				
+				List<FeedItem> recentMedia = instagramApi.getRecentMediaForTag(tag, accessToken);
+								
+				Date latestItemDate = null;
 				for (FeedItem feedItem : recentMedia) {
 					feedItem.setSubscriptionId(subscription.getId());
-				}				
+					
+					final Date feedItemDate = feedItem.getDate();
+					if (feedItemDate != null && (latestItemDate == null || feedItemDate.after(latestItemDate))) {
+						latestItemDate =  feedItemDate;
+					}
+					
+				}
+				
 				feedItemDAO.addAll(recentMedia);
+				
+				subscription.setLatestItemDate(latestItemDate);						
+				subscriptionsDAO.save(subscription);
 			}
 			
+			// TOD duplication
 			if (subscription != null && subscription instanceof InstagramGeographySubscription) {
 				log.info("Fetching recent media for changed geography: " + subscription.toString());								
 				final long geoId = ((InstagramGeographySubscription) subscription).getGeoId();
 				List<FeedItem> recentMedia = instagramApi.getRecentMediaForGeography(geoId, clientId);
+				
+				Date latestItemDate = null;
 				for (FeedItem feedItem : recentMedia) {
 					feedItem.setSubscriptionId(subscription.getId());
+					
+					final Date feedItemDate = feedItem.getDate();
+					if (feedItemDate != null && (latestItemDate == null || feedItemDate.after(latestItemDate))) {
+						latestItemDate =  feedItemDate;
+					}
 				}
+				
 				feedItemDAO.addAll(recentMedia);
+				
+				subscription.setLatestItemDate(latestItemDate);						
+				subscriptionsDAO.save(subscription);
 			}
+			
 		}
 		return null;
 	}

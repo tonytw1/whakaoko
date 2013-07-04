@@ -43,6 +43,8 @@ public class TwitterStatusListener implements StatusListener {
 		for (Subscription subscription : twitterSubscriptions) {
 			if (status.getText().toLowerCase().contains(((TwitterTagSubscription) subscription).getTag().toLowerCase())) {
 				tweetFeedItem.setSubscriptionId(subscription.getId());
+				subscription.setLatestItemDate(status.getCreatedAt());
+				subscriptionsDAO.save(subscription);
 			}
 		}
 		
