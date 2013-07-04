@@ -5,6 +5,8 @@
 
 <p>$subscription</p>
 
+<a href="/subscriptions/$subscription.id/rss">RSS</a>
+
 <p><a href="/subscriptions/$subscription.id/delete">Delete</a></p>
 
 #if($feedItems && !$feedItems.isEmpty()) 

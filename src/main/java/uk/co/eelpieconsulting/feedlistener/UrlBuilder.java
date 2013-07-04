@@ -17,4 +17,8 @@ public class UrlBuilder {
 		return getBaseUrl() + "/instagram/callback";
 	}
 
+	public String getSubscriptionUrl(String subscriptionId) {
+		return getBaseUrl() + "/subscriptions/" + subscriptionId;
+	}
+
 }

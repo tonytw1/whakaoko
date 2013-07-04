@@ -72,6 +72,26 @@ public class SubscriptionsController {
 		return mv;
 	}
 	
+	@RequestMapping(value="/subscriptions/{id}/rss", method=RequestMethod.GET)	
+	public ModelAndView subscriptionRss(@PathVariable String id) throws UnknownHostException, MongoException {
+		final Subscription subscription = subscriptionsDAO.getById(id);
+		
+		final ModelAndView mv = new ModelAndView(viewFactory.getRssView(subscription.getName() + " items", 
+				urlBuilder.getSubscriptionUrl(subscription.getId()), 
+				subscription.getName() + " items"));
+		mv.addObject("data", feedItemDAO.getSubscriptionFeedItems(subscription.getId()));
+		return mv;
+	}
+	
+	@RequestMapping(value="/subscriptions/{id}/json", method=RequestMethod.GET)	
+	public ModelAndView subscriptionJson(@PathVariable String id) throws UnknownHostException, MongoException {
+		final Subscription subscription = subscriptionsDAO.getById(id);
+		
+		final ModelAndView mv = new ModelAndView(viewFactory.getJsonView());
+		mv.addObject("data", feedItemDAO.getSubscriptionFeedItems(subscription.getId()));
+		return mv;
+	}
+	
 	@RequestMapping(value="/subscriptions/{id}/delete")
 	public ModelAndView deleteSubscription(@PathVariable String id) throws UnknownHostException, MongoException, HttpNotFoundException, HttpBadRequestException, HttpForbiddenException, HttpFetchException {
 		final Subscription subscription = subscriptionsDAO.getById(id);
