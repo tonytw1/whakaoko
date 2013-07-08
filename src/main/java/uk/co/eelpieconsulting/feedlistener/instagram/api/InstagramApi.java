@@ -54,11 +54,17 @@ public class InstagramApi {
 		HttpEntity entity = new UrlEncodedFormEntity(nameValuePairs);
 		post.setEntity(entity);
 		
-		final String response = httpFetcher.post(post);		
-		final JSONObject responseJSON = new JSONObject(response);
-		return new InstagramTagSubscription(
+		try {
+			final String response = httpFetcher.post(post);		
+			final JSONObject responseJSON = new JSONObject(response);
+			return new InstagramTagSubscription(
 				responseJSON.getJSONObject("data").getString("object_id"),
 				responseJSON.getJSONObject("data").getLong("id"));
+		
+		} catch (HttpBadRequestException e) {
+			log.error("HTTP Bad request: " + e.getResponseBody());
+			throw new RuntimeException(e);
+		}
 	}
 
 	public InstagramGeographySubscription createGeographySubscription(LatLong latLong, int radius, String clientId, String clientSecret, String callbackUrl) throws UnsupportedEncodingException, HttpNotFoundException, HttpBadRequestException, HttpForbiddenException, HttpFetchException, JSONException {		
@@ -72,12 +78,18 @@ public class InstagramApi {
 		HttpEntity entity = new UrlEncodedFormEntity(nameValuePairs);
 		post.setEntity(entity);
 		
-		final String response = httpFetcher.post(post);
-		log.info(response);
+		try {
+			final String response = httpFetcher.post(post);
+			log.info(response);
 		
-		JSONObject responseJSON = new JSONObject(response);
+			JSONObject responseJSON = new JSONObject(response);
 		
-		return new InstagramGeographySubscription(latLong, radius, responseJSON.getJSONObject("data").getLong("id"), responseJSON.getJSONObject("data").getLong("object_id"));		
+			return new InstagramGeographySubscription(latLong, radius, responseJSON.getJSONObject("data").getLong("id"), responseJSON.getJSONObject("data").getLong("object_id"));
+			
+		} catch (HttpBadRequestException e) {
+			log.error("HTTP Bad request: " + e.getResponseBody());
+			throw new RuntimeException(e);
+		}
 	}
 	
 	public String getSubscriptions(String clientId, String clientSecret) throws HttpNotFoundException, HttpBadRequestException, HttpForbiddenException, HttpFetchException {
@@ -146,6 +158,7 @@ public class InstagramApi {
 	}
 	
 	private List<NameValuePair> commonSubscriptionFields(String clientId, String clientSecret, String callbackUrl) {
+		log.info("Callback url: " + callbackUrl);
 		final String verifyToken =  UUID.randomUUID().toString();
 		
 		final List<NameValuePair> nameValuePairs = Lists.newArrayList();
