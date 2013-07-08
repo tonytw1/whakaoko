@@ -1,6 +1,10 @@
 <p><h4>whakaoko</h4>
 (verb) to listen to.</p>
 
+<table>
+<tr valign="top">
+<td>
+
 <h5>Subscriptions</h5>
 #if($subscriptions && !$subscriptions.isEmpty()) 
 	<ul>
@@ -17,8 +21,17 @@
 #end
 <p><a href="/subscriptions/new">Add subscription</a></p>
 
+</td>
+<td>
+
 <h5>Inbox ($inboxSize)</h5>
+
+<div align="right">
 <a href="/inbox/rss">RSS</a>
+</div>
+
+
+
 #if($inbox && !$inbox.isEmpty()) 
 	<ul>
  	#foreach($feedItem in $inbox)
@@ -28,3 +41,7 @@
 #else
 	<p>Inbox currently empty.</p>
 #end
+
+</td>
+</tr>
+</table>
