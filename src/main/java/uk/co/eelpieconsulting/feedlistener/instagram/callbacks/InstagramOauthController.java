@@ -5,7 +5,6 @@ import java.io.IOException;
 import org.apache.log4j.Logger;
 import org.json.JSONException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -18,6 +17,7 @@ import uk.co.eelpieconsulting.common.http.HttpFetchException;
 import uk.co.eelpieconsulting.common.http.HttpForbiddenException;
 import uk.co.eelpieconsulting.common.http.HttpNotFoundException;
 import uk.co.eelpieconsulting.feedlistener.UrlBuilder;
+import uk.co.eelpieconsulting.feedlistener.credentials.CredentialService;
 import uk.co.eelpieconsulting.feedlistener.instagram.api.InstagramApi;
 
 @Controller
@@ -28,19 +28,13 @@ public class InstagramOauthController {
 	private static final String INSTAGRAM_OAUTH_CALLBACK = "/instagram/oauth";
 	
 	private final UrlBuilder urlBuilder;
-
-	private final String clientId;
-	private final String clientSecret;
-
 	private final InstagramApi instagramApi;
+	private final CredentialService credentialService;
 	
 	@Autowired
-	public InstagramOauthController(UrlBuilder urlBuilder,
-			@Value("#{config['instagram.client.id']}") String clientId,	
-			@Value("#{config['instagram.client.secret']}") String clientSecret) {
+	public InstagramOauthController(UrlBuilder urlBuilder, CredentialService credentialService) {
 		this.urlBuilder = urlBuilder;
-		this.clientId = clientId;
-		this.clientSecret = clientSecret;
+		this.credentialService = credentialService;
 		this.instagramApi = new InstagramApi();
 	}
 	
@@ -59,7 +53,7 @@ public class InstagramOauthController {
 		final String authorizeRedirectUrl = authorizeRedirectReturnUrl();
 		log.info(authorizeRedirectUrl);
 		try {
-			final String accessToken = instagramApi.getAccessToken(clientId, clientSecret, code, authorizeRedirectUrl);
+			final String accessToken = instagramApi.getAccessToken(credentialService.getInstagramClientId(), credentialService.getInstagramClientSecret(), code, authorizeRedirectUrl);
 			log.info("Got access token: " + accessToken);
 			
 		} catch (HttpBadRequestException e) {
@@ -69,7 +63,7 @@ public class InstagramOauthController {
 	}
 	
 	private String authorizeRedirectUrl() {
-		return instagramApi.getAuthorizeRedirectUrl(clientId, authorizeRedirectReturnUrl());
+		return instagramApi.getAuthorizeRedirectUrl(credentialService.getInstagramClientId(), authorizeRedirectReturnUrl());
 	}
 
 	private String authorizeRedirectReturnUrl() {

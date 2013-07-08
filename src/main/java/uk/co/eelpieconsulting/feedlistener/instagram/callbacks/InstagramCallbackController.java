@@ -9,7 +9,6 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.log4j.Logger;
 import org.json.JSONException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -21,6 +20,7 @@ import uk.co.eelpieconsulting.common.http.HttpBadRequestException;
 import uk.co.eelpieconsulting.common.http.HttpFetchException;
 import uk.co.eelpieconsulting.common.http.HttpForbiddenException;
 import uk.co.eelpieconsulting.common.http.HttpNotFoundException;
+import uk.co.eelpieconsulting.feedlistener.credentials.CredentialService;
 import uk.co.eelpieconsulting.feedlistener.daos.FeedItemDAO;
 import uk.co.eelpieconsulting.feedlistener.daos.SubscriptionsDAO;
 import uk.co.eelpieconsulting.feedlistener.instagram.api.InstagramApi;
@@ -38,20 +38,15 @@ public class InstagramCallbackController {
 	private final InstagramSubscriptionCallbackParser instagramSubscriptionCallbackParser;
 	private final SubscriptionsDAO subscriptionsDAO;
 	private final FeedItemDAO feedItemDAO;
-	
-	private final String accessToken;
-	private final String clientId;
+	private final CredentialService credentialService;
 	
 	@Autowired
 	public InstagramCallbackController(InstagramSubscriptionCallbackParser instagramSubscriptionCallbackParser, FeedItemDAO feedItemDAO,
-			SubscriptionsDAO subscriptionsDAO,
-			@Value("#{config['instagram.access.token']}") String accessToken,
-			@Value("#{config['instagram.client.id']}") String clientId) {
+			SubscriptionsDAO subscriptionsDAO, CredentialService credentialService) {
 		this.instagramSubscriptionCallbackParser = instagramSubscriptionCallbackParser;
 		this.feedItemDAO = feedItemDAO;
 		this.subscriptionsDAO = subscriptionsDAO;
-		this.accessToken = accessToken;
-		this.clientId = clientId;
+		this.credentialService = credentialService;
 		this.instagramApi = new InstagramApi();		
 	}
 
@@ -80,7 +75,7 @@ public class InstagramCallbackController {
 			if (subscription != null && subscription instanceof InstagramTagSubscription) {
 				final String tag = ((InstagramTagSubscription) subscription).getTag();
 				log.info("Fetching recent media for changed tag: " + tag);
-				List<FeedItem> recentMedia = instagramApi.getRecentMediaForTag(tag, accessToken);
+				List<FeedItem> recentMedia = instagramApi.getRecentMediaForTag(tag, credentialService.getInstagramAccessToken());
 								
 				Date latestItemDate = null;
 				for (FeedItem feedItem : recentMedia) {
@@ -103,7 +98,7 @@ public class InstagramCallbackController {
 			if (subscription != null && subscription instanceof InstagramGeographySubscription) {
 				log.info("Fetching recent media for changed geography: " + subscription.toString());								
 				final long geoId = ((InstagramGeographySubscription) subscription).getGeoId();
-				List<FeedItem> recentMedia = instagramApi.getRecentMediaForGeography(geoId, clientId);
+				List<FeedItem> recentMedia = instagramApi.getRecentMediaForGeography(geoId, credentialService.getInstagramClientId());
 				
 				Date latestItemDate = null;
 				for (FeedItem feedItem : recentMedia) {
