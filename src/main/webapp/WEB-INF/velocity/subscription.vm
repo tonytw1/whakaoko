@@ -12,9 +12,7 @@
 #if($feedItems && !$feedItems.isEmpty()) 
 	<ul>
  	#foreach($feedItem in $feedItems)
- 		<li><a href="$feedItem.url">$!feedItem.title</a>
- 		<br/>$feedItem.date
- 		</li>
+ 		#parse('includes/feeditem.vm') 		
  	#end
  	</ul>
 #else

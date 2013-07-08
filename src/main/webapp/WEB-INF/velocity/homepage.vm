@@ -21,10 +21,8 @@
 <a href="/inbox/rss">RSS</a>
 #if($inbox && !$inbox.isEmpty()) 
 	<ul>
- 	#foreach($inboxItem in $inbox)
- 		<li><a href="$inboxItem.url">$!inboxItem.title</a>
- 		<br/>$inboxItem.date
- 		</li>
+ 	#foreach($feedItem in $inbox)
+ 		#parse('includes/feeditem.vm')
  	#end
  	</ul>
 #else
