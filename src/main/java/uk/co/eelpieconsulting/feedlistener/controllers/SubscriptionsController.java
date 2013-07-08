@@ -37,6 +37,8 @@ import com.mongodb.MongoException;
 @Controller
 public class SubscriptionsController {
 	
+	private static final int MAX_FEED_ITEMS = 20;
+
 	private static Logger log = Logger.getLogger(SubscriptionsController.class);
 	
 	private SubscriptionsDAO subscriptionsDAO;
@@ -68,7 +70,7 @@ public class SubscriptionsController {
 		final ModelAndView mv = new ModelAndView("subscription");
 		mv.addObject("subscription", subscription);
 		mv.addObject("subscriptionSize", feedItemDAO.getSubscriptionFeedItemsCount(subscription.getId()));
-		mv.addObject("feedItems", feedItemDAO.getSubscriptionFeedItems(subscription.getId()));
+		mv.addObject("feedItems", feedItemDAO.getSubscriptionFeedItems(subscription.getId(), MAX_FEED_ITEMS));
 		return mv;
 	}
 	
@@ -79,7 +81,7 @@ public class SubscriptionsController {
 		final ModelAndView mv = new ModelAndView(viewFactory.getRssView(subscription.getName() + " items", 
 				urlBuilder.getSubscriptionUrl(subscription.getId()), 
 				subscription.getName() + " items"));
-		mv.addObject("data", feedItemDAO.getSubscriptionFeedItems(subscription.getId()));
+		mv.addObject("data", feedItemDAO.getSubscriptionFeedItems(subscription.getId(), MAX_FEED_ITEMS));
 		return mv;
 	}
 	
@@ -88,7 +90,7 @@ public class SubscriptionsController {
 		final Subscription subscription = subscriptionsDAO.getById(id);
 		
 		final ModelAndView mv = new ModelAndView(viewFactory.getJsonView());
-		mv.addObject("data", feedItemDAO.getSubscriptionFeedItems(subscription.getId()));
+		mv.addObject("data", feedItemDAO.getSubscriptionFeedItems(subscription.getId(), MAX_FEED_ITEMS));
 		return mv;
 	}
 	

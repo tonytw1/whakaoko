@@ -43,8 +43,8 @@ public class FeedItemDAO {
 		return inboxQuery().limit(limit).asList();
 	}
 	
-	public  List<FeedItem> getSubscriptionFeedItems(String subscriptionId) throws UnknownHostException, MongoException {
-		return subscriptionFeedItemsQuery(subscriptionId).asList();
+	public  List<FeedItem> getSubscriptionFeedItems(String subscriptionId, int limit) throws UnknownHostException, MongoException {
+		return subscriptionFeedItemsQuery(subscriptionId).limit(limit).asList();
 	}
 
 	public long getAllCount() throws UnknownHostException, MongoException {
