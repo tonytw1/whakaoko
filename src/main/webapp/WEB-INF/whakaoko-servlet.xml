@@ -40,6 +40,8 @@
 		<property name="resourceLoaderPath" value="/WEB-INF/velocity" />
 	</bean>
 	
+	<bean id="dateFormatter" class="uk.co.eelpieconsulting.common.dates.DateFormatter" />
+		
 	<bean id="viewResolver" class="org.springframework.web.servlet.view.velocity.VelocityViewResolver">
 		<property name="cache" value="true" />
 		<property name="prefix" value="" />
@@ -49,7 +51,8 @@
 		</property>
 		<property name="toolboxConfigLocation" value="/WEB-INF/velocity/toolbox.xml" />
 		<property name="attributesMap">
-			<map>				
+			<map>
+				<entry key="dateFormatter" value-ref="dateFormatter" />						
 			</map>
 		</property>
 	</bean>

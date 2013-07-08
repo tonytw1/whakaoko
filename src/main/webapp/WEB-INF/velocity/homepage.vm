@@ -11,8 +11,10 @@
  	#foreach($subscription in $subscriptions) 
  		<li><a href="/subscriptions/$subscription.id">$!subscription.name</a> 
  		#if($subscriptionCounts.get($subscription.id) > 0) ($subscriptionCounts.get($subscription.id))#end
- 		<br/>
- 		$!subscription.latestItemDate
+ 		#if($subscription.latestItemDate)
+	 		<br/>
+	 		<span title="$subscription.latestItemDate">$dateFormatter.timeSince($subscription.latestItemDate)
+		#end 		
  		</li>
  	#end
  	</ul>

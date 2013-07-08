@@ -1,6 +1,6 @@
 <li>
 <a href="$feedItem.url">$!feedItem.title</a>
 	#if($feedItem.imageUrl) <br/><img src="$feedItem.imageUrl"> #end
-	<br/>$feedItem.date
+	<br/><span title="$feedItem.date">$dateFormatter.timeSince($feedItem.date)</span>
 	<br/>$!feedItem.body
 </li>
