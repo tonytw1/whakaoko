@@ -47,7 +47,7 @@ public class InstagramSubscriptionManager {
 		this.instagramApi = new InstagramApi();		
 	}
 
-	@Scheduled(fixedDelay=60000 * 60 * 24)	// TODO ideally, only once at startup
+	//@Scheduled(fixedDelay=60000 * 60 * 24)	// TODO ideally, only once at startup
 	public void resetSubscriptions() throws HttpNotFoundException,
 			HttpBadRequestException, HttpForbiddenException,
 			HttpFetchException, UnsupportedEncodingException, JSONException {
