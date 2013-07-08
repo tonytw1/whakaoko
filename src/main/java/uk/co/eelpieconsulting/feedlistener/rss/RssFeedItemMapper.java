@@ -2,6 +2,7 @@ package uk.co.eelpieconsulting.feedlistener.rss;
 
 import java.util.Date;
 
+import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.log4j.Logger;
 import org.springframework.stereotype.Component;
 
@@ -9,6 +10,7 @@ import uk.co.eelpieconsulting.common.geo.model.LatLong;
 import uk.co.eelpieconsulting.common.geo.model.Place;
 import uk.co.eelpieconsulting.feedlistener.model.FeedItem;
 
+import com.google.common.base.Strings;
 import com.sun.syndication.feed.module.georss.GeoRSSModule;
 import com.sun.syndication.feed.module.georss.GeoRSSUtils;
 import com.sun.syndication.feed.module.mediarss.MediaEntryModuleImpl;
@@ -23,8 +25,13 @@ public class RssFeedItemMapper {
 	
 	public FeedItem createFeedItemFrom(final SyndEntry syndEntry) {
 		final Place place = extractLocationFrom(syndEntry);        	
-		final String imageUrl = extractImageFrom(syndEntry);			
-		final String body = syndEntry.getDescription() != null ? syndEntry.getDescription().getValue() : null;
+		final String imageUrl = extractImageFrom(syndEntry);
+		
+		String body = syndEntry.getDescription() != null ? syndEntry.getDescription().getValue() : null;
+		if (!Strings.isNullOrEmpty(body)) {
+			body = StringEscapeUtils.unescapeHtml(body);
+		}
+		
 		final Date date = syndEntry.getPublishedDate() != null ? syndEntry.getPublishedDate() : syndEntry.getUpdatedDate();						
 		final FeedItem feedItem = new FeedItem(syndEntry.getTitle(), syndEntry.getLink().trim(), body, date, place, imageUrl);
 		return feedItem;
