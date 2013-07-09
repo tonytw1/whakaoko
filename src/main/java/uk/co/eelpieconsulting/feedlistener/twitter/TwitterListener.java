@@ -2,11 +2,13 @@ package uk.co.eelpieconsulting.feedlistener.twitter;
 
 import java.util.Set;
 
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import twitter4j.FilterQuery;
 import twitter4j.TwitterStream;
+import uk.co.eelpieconsulting.feedlistener.CredentialsRequiredException;
 import uk.co.eelpieconsulting.feedlistener.credentials.CredentialService;
 import uk.co.eelpieconsulting.feedlistener.daos.SubscriptionsDAO;
 import uk.co.eelpieconsulting.feedlistener.model.Subscription;
@@ -16,29 +18,44 @@ import com.google.common.collect.Sets;
 
 @Component
 public class TwitterListener {
-		
+	
+	private static Logger log = Logger.getLogger(TwitterListener.class);
+	
 	private final SubscriptionsDAO subscriptionsDAO;
 	private final TwitterStatusListener twitterListener;
 	private final CredentialService credentialService;
+	private final TwitterApiFactory twitterApiFactory;
+	
 	private TwitterStream twitterStream;
 	
 	@Autowired
-	public TwitterListener(SubscriptionsDAO subscriptionsDAO, TwitterStatusListener twitterListener, CredentialService credentialService) {
+	public TwitterListener(SubscriptionsDAO subscriptionsDAO, TwitterStatusListener twitterListener, CredentialService credentialService, TwitterApiFactory twitterApiFactory) {
 		this.subscriptionsDAO = subscriptionsDAO;
 		this.twitterListener = twitterListener;
-		this.credentialService = credentialService;	
-		connect();
+		this.credentialService = credentialService;
+		this.twitterApiFactory = twitterApiFactory;
+		
+		try {
+			connect();
+		} catch (CredentialsRequiredException e) {
+			log.warn("No twitter credentials available; not connecting on start up");
+		}
 	}
 	
-	public void connect() {		
+	public void connect() throws CredentialsRequiredException {
 		if (twitterStream != null) {
 			twitterStream.cleanUp();
 		}
 		
-		twitterStream = new TwitterApiFactory().getStreamingApi(credentialService.getTwitterConsumerKey(), 
-				credentialService.getTwitterConsumerSecret(), 
+		if (!credentialService.hasTwitterAccessToken()) {
+			log.warn("No twitter credentials available; not connecting");
+			throw new CredentialsRequiredException();
+		}
+		
+		twitterStream = twitterApiFactory.getStreamingApi(
 				credentialService.getTwitterAccessToken(), 
 				credentialService.getTwitterAccessSecret());
+		
 		twitterStream.addListener(twitterListener);
 		
 		final Set<String> tagsList = Sets.newHashSet();

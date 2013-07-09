@@ -3,6 +3,7 @@ package uk.co.eelpieconsulting.feedlistener.controllers;
 import java.io.UnsupportedEncodingException;
 import java.net.UnknownHostException;
 
+import org.apache.commons.httpclient.auth.CredentialsNotAvailableException;
 import org.apache.log4j.Logger;
 import org.json.JSONException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,7 +21,9 @@ import uk.co.eelpieconsulting.common.http.HttpFetchException;
 import uk.co.eelpieconsulting.common.http.HttpForbiddenException;
 import uk.co.eelpieconsulting.common.http.HttpNotFoundException;
 import uk.co.eelpieconsulting.common.views.ViewFactory;
+import uk.co.eelpieconsulting.feedlistener.CredentialsRequiredException;
 import uk.co.eelpieconsulting.feedlistener.UrlBuilder;
+import uk.co.eelpieconsulting.feedlistener.credentials.CredentialService;
 import uk.co.eelpieconsulting.feedlistener.daos.FeedItemDAO;
 import uk.co.eelpieconsulting.feedlistener.daos.SubscriptionsDAO;
 import uk.co.eelpieconsulting.feedlistener.instagram.InstagramSubscriptionManager;
@@ -47,12 +50,14 @@ public class SubscriptionsController {
 	private final InstagramSubscriptionManager instagramSubscriptionManager;
 	private final UrlBuilder urlBuilder;
 	private final FeedItemDAO feedItemDAO;
+	private final CredentialService credentialService;
 	private final ViewFactory viewFactory;
 	
 	@Autowired
 	public SubscriptionsController(SubscriptionsDAO subscriptionsDAO, RssPoller rssPoller, TwitterListener twitterListener, 
 			InstagramSubscriptionManager instagramSubscriptionManager, UrlBuilder urlBuilder,
 			FeedItemDAO feedItemDAO,
+			CredentialService credentialService,
 			ViewFactory viewFactory) {
 		this.subscriptionsDAO = subscriptionsDAO;
 		this.rssPoller = rssPoller;
@@ -60,6 +65,7 @@ public class SubscriptionsController {
 		this.instagramSubscriptionManager = instagramSubscriptionManager;
 		this.urlBuilder = urlBuilder;
 		this.feedItemDAO = feedItemDAO;
+		this.credentialService = credentialService;
 		this.viewFactory = viewFactory;
 	}
 	
@@ -135,6 +141,10 @@ public class SubscriptionsController {
 	
 	@RequestMapping(value="/subscriptions/twitter/tags", method=RequestMethod.POST)
 	public ModelAndView addTwitterTagSubscription(@RequestParam String tag) {		
+		if (!credentialService.hasTwitterAccessToken()) {
+			throw new CredentialsRequiredException();
+		}
+		
 		subscriptionsDAO.add(new TwitterTagSubscription(tag));
 		twitterListener.connect();
 		
@@ -143,7 +153,7 @@ public class SubscriptionsController {
 	}
 	
 	@RequestMapping(value="/subscriptions/instagram/tags", method=RequestMethod.POST)
-	public ModelAndView addInstagramTagSubscription(@RequestParam String tag) throws HttpNotFoundException, HttpBadRequestException, HttpForbiddenException, UnsupportedEncodingException, HttpFetchException, JSONException {
+	public ModelAndView addInstagramTagSubscription(@RequestParam String tag) throws HttpNotFoundException, HttpBadRequestException, HttpForbiddenException, UnsupportedEncodingException, HttpFetchException, JSONException, CredentialsNotAvailableException {
 		final InstagramSubscription subscription = instagramSubscriptionManager.requestInstagramTagSubscription(tag);
 		subscriptionsDAO.add(subscription);
 		
@@ -154,7 +164,7 @@ public class SubscriptionsController {
 	@RequestMapping(value="/subscriptions/instagram/geography", method=RequestMethod.POST)
 	public ModelAndView addInstagramTagSubscription(@RequestParam double latitude,
 			@RequestParam double longitude, 
-			@RequestParam int radius) throws HttpNotFoundException, HttpBadRequestException, HttpForbiddenException, UnsupportedEncodingException, HttpFetchException, JSONException {
+			@RequestParam int radius) throws HttpNotFoundException, HttpBadRequestException, HttpForbiddenException, UnsupportedEncodingException, HttpFetchException, JSONException, CredentialsNotAvailableException {
 		final LatLong latLong = new LatLong(latitude, longitude);
 		
 		final InstagramGeographySubscription instagramGeographySubscription = instagramSubscriptionManager.requestInstagramGeographySubscription(latLong, radius);

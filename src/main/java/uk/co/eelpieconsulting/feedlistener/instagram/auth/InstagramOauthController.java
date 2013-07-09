@@ -1,4 +1,4 @@
-package uk.co.eelpieconsulting.feedlistener.instagram.callbacks;
+package uk.co.eelpieconsulting.feedlistener.instagram.auth;
 
 import java.io.IOException;
 
@@ -54,7 +54,9 @@ public class InstagramOauthController {
 		log.info(authorizeRedirectUrl);
 		try {
 			final String accessToken = instagramApi.getAccessToken(credentialService.getInstagramClientId(), credentialService.getInstagramClientSecret(), code, authorizeRedirectUrl);
-			log.info("Got access token: " + accessToken);
+			
+			log.info("Got instagram access token: " + accessToken);
+			credentialService.setInstagramAccessToken(accessToken);
 			
 		} catch (HttpBadRequestException e) {
 			log.error(e.getResponseBody());
