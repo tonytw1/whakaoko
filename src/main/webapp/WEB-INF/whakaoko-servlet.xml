@@ -52,6 +52,7 @@
 		<property name="toolboxConfigLocation" value="/WEB-INF/velocity/toolbox.xml" />
 		<property name="attributesMap">
 			<map>
+				<entry key="urlBuilder" value-ref="urlBuilder" />			
 				<entry key="dateFormatter" value-ref="dateFormatter" />						
 			</map>
 		</property>
