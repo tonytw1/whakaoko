@@ -59,7 +59,8 @@ public class ChannelsController {
 	}
 	
 	@RequestMapping(value="/channels/{id}", method=RequestMethod.GET)
-	public ModelAndView channel(@PathVariable String id) throws UnknownHostException, MongoException {
+	public ModelAndView channel(@PathVariable String id,
+			@RequestParam(required=false) Integer page) throws UnknownHostException, MongoException {
 		final Channel channel = channelsDAO.getById(id);
 
 		final ModelAndView mv = new ModelAndView("channel");
@@ -70,7 +71,12 @@ public class ChannelsController {
 		
 		if (!subscriptionsForChannel.isEmpty()) {
 			mv.addObject("inboxSize", feedItemDAO.getChannelFeedItemsCount(channel.getId()));
-			mv.addObject("inbox", feedItemDAO.getChannelFeedItems(channel.getId(), 20));
+			
+			if (page != null) {
+				mv.addObject("inbox", feedItemDAO.getChannelFeedItems(channel.getId(), 20, page));
+			} else {
+				mv.addObject("inbox", feedItemDAO.getChannelFeedItems(channel.getId(), 20));
+			}
 			
 			final Map<String, Long> subscriptionCounts = Maps.newHashMap();
 			for (Subscription subscription : subscriptionsForChannel) {

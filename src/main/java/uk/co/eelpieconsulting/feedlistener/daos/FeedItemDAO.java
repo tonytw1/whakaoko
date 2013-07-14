@@ -66,7 +66,11 @@ public class FeedItemDAO {
 	public List<FeedItem> getChannelFeedItems(String channelId, int limit) throws UnknownHostException, MongoException {		
 		return channelFeedItemsQuery(channelId).limit(limit).asList();
 	}
-
+	
+	public List<FeedItem> getChannelFeedItems(String channelId, int limit, Integer page) throws UnknownHostException, MongoException {
+		return channelFeedItemsQuery(channelId).limit(limit).offset(page * limit).asList();
+	}
+	
 	private Query<FeedItem> channelFeedItemsQuery(String channelId) throws UnknownHostException {
 		final List<String> channelSubscriptions = Lists.newArrayList();
 		for (Subscription subscription : subscriptionsDAO.getSubscriptionsForChannel(channelId)) {
