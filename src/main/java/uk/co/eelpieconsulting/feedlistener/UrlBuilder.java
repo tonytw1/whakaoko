@@ -25,4 +25,8 @@ public class UrlBuilder {
 		return getBaseUrl() + "/channels";
 	}
 
+	public String getChannelUrl(String channelId) {
+		return getChannelsUrl() + "/" + channelId;
+	}
+	
 }

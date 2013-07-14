@@ -1,6 +1,10 @@
 <p><h4>whakaoko</h4>
 (verb) to listen to.</p>
 
+<table>
+<tr valign="top">
+<td>
+
 <h5>Channel / $channel.name</h5>
 
 #if($subscriptions && !$subscriptions.isEmpty()) 
@@ -19,3 +23,26 @@
 	<p>No current subscriptions.</p>
 #end
 <p><a href="/subscriptions/new">Add subscription</a></p>
+
+</td>
+<td>
+
+<h5>Inbox #if($inboxSize) ($inboxSize)#end</h5>
+
+<div align="right">
+<a href="$urlBuilder.getChannelUrl($channel.id)/rss">RSS</a>
+</div>
+
+#if($inbox && !$inbox.isEmpty()) 
+	<ul>
+ 	#foreach($feedItem in $inbox)
+ 		#parse('includes/feeditem.vm')
+ 	#end
+ 	</ul>
+#else
+	<p>Inbox currently empty.</p>
+#end
+
+</td>
+</tr>
+</table>

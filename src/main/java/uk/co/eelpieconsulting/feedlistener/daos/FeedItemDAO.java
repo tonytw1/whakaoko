@@ -8,8 +8,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import uk.co.eelpieconsulting.feedlistener.model.FeedItem;
+import uk.co.eelpieconsulting.feedlistener.model.Subscription;
 
 import com.google.code.morphia.query.Query;
+import com.google.common.collect.Lists;
 import com.mongodb.MongoException;
 
 @Component
@@ -20,10 +22,12 @@ public class FeedItemDAO {
 	private static Logger log = Logger.getLogger(FeedItemDAO.class);
 	
 	private final DataStoreFactory dataStoreFactory;
+	private final SubscriptionsDAO subscriptionsDAO;
 	
 	@Autowired
-	public FeedItemDAO(DataStoreFactory dataStoreFactory) {
+	public FeedItemDAO(DataStoreFactory dataStoreFactory, SubscriptionsDAO subscriptionsDAO) {
 		this.dataStoreFactory = dataStoreFactory;
+		this.subscriptionsDAO = subscriptionsDAO;
 	}
 	
 	public void add(FeedItem feedItem) throws UnknownHostException, MongoException {
@@ -53,6 +57,22 @@ public class FeedItemDAO {
 	
 	public long getSubscriptionFeedItemsCount(String subscriptionId) throws UnknownHostException {
 		return subscriptionFeedItemsQuery(subscriptionId).countAll();
+	}
+	
+	public long getChannelFeedItemsCount(String channelId) throws UnknownHostException, MongoException {
+		return channelFeedItemsQuery(channelId).countAll();
+	}
+	
+	public List<FeedItem> getChannelFeedItems(String channelId, int limit) throws UnknownHostException, MongoException {		
+		return channelFeedItemsQuery(channelId).limit(limit).asList();
+	}
+
+	private Query<FeedItem> channelFeedItemsQuery(String channelId) throws UnknownHostException {
+		final List<String> channelSubscriptions = Lists.newArrayList();
+		for (Subscription subscription : subscriptionsDAO.getSubscriptionsForChannel(channelId)) {
+			channelSubscriptions.add(subscription.getId());
+		}		
+		return dataStoreFactory.getDatastore().find(FeedItem.class).field("subscriptionId").hasAnyOf(channelSubscriptions).order(DATE_DESCENDING);
 	}
 	
 	private Query<FeedItem> inboxQuery() throws UnknownHostException {

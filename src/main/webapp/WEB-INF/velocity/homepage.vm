@@ -1,49 +1,16 @@
 <p><h4>whakaoko</h4>
 (verb) to listen to.</p>
 
-<table>
-<tr valign="top">
-<td>
+<h5>Channels</h5>
 
-<h5>Subscriptions</h5>
-#if($subscriptions && !$subscriptions.isEmpty()) 
+#if($channels && !$channels.isEmpty()) 
 	<ul>
- 	#foreach($subscription in $subscriptions) 
- 		<li><a href="/subscriptions/$subscription.id">$!subscription.name</a> 
- 		#if($subscriptionCounts.get($subscription.id) > 0) ($subscriptionCounts.get($subscription.id))#end
- 		#if($subscription.latestItemDate)
-	 		<br/>
-	 		<span title="$subscription.latestItemDate">$dateFormatter.timeSince($subscription.latestItemDate)
-		#end 		
+ 	#foreach($channel in $channels) 
+ 		<li><a href="/channels/$channel.id">$!channel.name</a>
  		</li>
  	#end
  	</ul>
 #else
-	<p>No current subscriptions.</p>
+	<p>No channels.</p>
 #end
-<p><a href="/subscriptions/new">Add subscription</a></p>
-
-</td>
-<td>
-
-<h5>Inbox ($inboxSize)</h5>
-
-<div align="right">
-<a href="/inbox/rss">RSS</a>
-</div>
-
-
-
-#if($inbox && !$inbox.isEmpty()) 
-	<ul>
- 	#foreach($feedItem in $inbox)
- 		#parse('includes/feeditem.vm')
- 	#end
- 	</ul>
-#else
-	<p>Inbox currently empty.</p>
-#end
-
-</td>
-</tr>
-</table>
+<p><a href="/channels/new">Add channel</a></p>

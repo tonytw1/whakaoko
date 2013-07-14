@@ -18,7 +18,9 @@ import com.mongodb.MongoException;
 public class SubscriptionsDAO {
 	
 	private static Logger log = Logger.getLogger(SubscriptionsDAO.class);
-
+	
+	private static final String LATEST_ITEM_DATE = "-latestItemDate";
+	
 	private final DataStoreFactory dataStoreFactory;
 
 	@Autowired
@@ -45,7 +47,7 @@ public class SubscriptionsDAO {
 	public List<Subscription> getSubscriptions() {
 		try {
 			return dataStoreFactory.getDatastore().find(Subscription.class).
-				order("-latestItemDate").
+				order(LATEST_ITEM_DATE).
 				asList();
 			
 		} catch (UnknownHostException e) {
@@ -86,7 +88,9 @@ public class SubscriptionsDAO {
 	}
 	
 	public List<Subscription> getSubscriptionsForChannel(String channelID) throws UnknownHostException, MongoException {
-		return dataStoreFactory.getDatastore().find(Subscription.class, "channelId", channelID).asList();
+		return dataStoreFactory.getDatastore().find(Subscription.class, "channelId", channelID).
+			order(LATEST_ITEM_DATE).
+			asList();
 	}
 	
 	private boolean subscriptionExists(Subscription subscription) {
