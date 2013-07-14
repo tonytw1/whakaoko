@@ -1,0 +1,15 @@
+<p><h4>whakaoko</h4>
+(verb) to listen to.</p>
+
+<h5>Channel</h5>
+#if($channels && !$channels.isEmpty()) 
+	<ul>
+ 	#foreach($channel in $channels) 
+ 		<li><a href="/channels/$channel.id">$!channel.name</a>
+ 		</li>
+ 	#end
+ 	</ul>
+#else
+	<p>No channels.</p>
+#end
+<p><a href="/channels/new">Add channel</a></p>

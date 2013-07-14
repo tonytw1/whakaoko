@@ -9,7 +9,6 @@ import org.springframework.stereotype.Component;
 
 import uk.co.eelpieconsulting.feedlistener.model.InstagramSubscription;
 import uk.co.eelpieconsulting.feedlistener.model.Subscription;
-import uk.co.eelpieconsulting.feedlistener.rss.RssPoller;
 
 import com.google.code.morphia.Datastore;
 import com.google.common.collect.Lists;
@@ -18,7 +17,7 @@ import com.mongodb.MongoException;
 @Component
 public class SubscriptionsDAO {
 	
-	private static Logger log = Logger.getLogger(RssPoller.class);
+	private static Logger log = Logger.getLogger(SubscriptionsDAO.class);
 
 	private final DataStoreFactory dataStoreFactory;
 
@@ -28,14 +27,11 @@ public class SubscriptionsDAO {
 	}
 	
 	public synchronized void add(Subscription subscription) {
-		for (Subscription existingSubscription : getSubscriptions()) {
-			if (existingSubscription.getId().equals(subscription.getId())) {
-				return;
-			}
-		}		
-		save(subscription);
+		if (!subscriptionExists(subscription)) {
+			save(subscription);
+		}
 	}
-
+	
 	public void save(Subscription subscription) {
 		try {
 			dataStoreFactory.getDatastore().save(subscription);
@@ -76,17 +72,30 @@ public class SubscriptionsDAO {
 	}
 
 	public InstagramSubscription getByInstagramId(Long subscriptionId) throws UnknownHostException, MongoException {
-		return dataStoreFactory.getDatastore().find(InstagramSubscription.class, "subscriptionId", subscriptionId).get();
+		return dataStoreFactory.getDatastore().find(InstagramSubscription.class, "subscriptionId", subscriptionId).get();	// TODO subscriptionId is not a very clear field name
 	}
 
 	public List<Subscription> getTwitterSubscriptions() {
-		List<Subscription> subscriptions = Lists.newArrayList();
+		final List<Subscription> subscriptions = Lists.newArrayList();
 		for (Subscription subscription : getSubscriptions()) {
 			if (subscription.getId().startsWith("twitter")) {
 				subscriptions.add(subscription);
 			}
 		}
 		return subscriptions;
+	}
+	
+	public List<Subscription> getSubscriptionsForChannel(String channelID) throws UnknownHostException, MongoException {
+		return dataStoreFactory.getDatastore().find(Subscription.class, "channelId", channelID).asList();
+	}
+	
+	private boolean subscriptionExists(Subscription subscription) {
+		for (Subscription existingSubscription : getSubscriptions()) {
+			if (existingSubscription.getId().equals(subscription.getId())) {
+				return true;
+			}
+		}		
+		return false;
 	}
 	
 }

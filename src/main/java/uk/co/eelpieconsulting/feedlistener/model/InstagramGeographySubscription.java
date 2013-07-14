@@ -13,7 +13,7 @@ public class InstagramGeographySubscription extends InstagramSubscription {
 	public InstagramGeographySubscription() {
 	}
 
-	public InstagramGeographySubscription(LatLong latLong, int radius, long subscriptionId, long geoId) {
+	public InstagramGeographySubscription(LatLong latLong, int radius, long subscriptionId, long geoId, String channelId) {
 		this.latLong = latLong;
 		this.radius = radius;
 		this.subscriptionId = subscriptionId;
@@ -21,6 +21,7 @@ public class InstagramGeographySubscription extends InstagramSubscription {
 		this.setId("instagram-" + DigestUtils.md5Hex("geography" + geoId));
 		
 		setName(generateName());
+		setChannelId(channelId);
 	}
 	
 	public LatLong getLatLong() {

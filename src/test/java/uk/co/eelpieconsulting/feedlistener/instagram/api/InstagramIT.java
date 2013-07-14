@@ -28,7 +28,7 @@ public class InstagramIT {
 	@Test
 	public void canSubscribe() throws Exception {
 		try {
-			api.createTagSubscription("twickenham", CLIENT_ID, CLIENT_SECRET, "http://localhost/instagram/callback");
+			api.createTagSubscription("twickenham", CLIENT_ID, CLIENT_SECRET, "http://localhost/instagram/callback", "a-channel";
 			
 		} catch (HttpBadRequestException e) {
 			System.out.println(e.getResponseBody());

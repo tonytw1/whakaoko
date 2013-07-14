@@ -24,6 +24,7 @@ import uk.co.eelpieconsulting.common.views.ViewFactory;
 import uk.co.eelpieconsulting.feedlistener.CredentialsRequiredException;
 import uk.co.eelpieconsulting.feedlistener.UrlBuilder;
 import uk.co.eelpieconsulting.feedlistener.credentials.CredentialService;
+import uk.co.eelpieconsulting.feedlistener.daos.ChannelsDAO;
 import uk.co.eelpieconsulting.feedlistener.daos.FeedItemDAO;
 import uk.co.eelpieconsulting.feedlistener.daos.SubscriptionsDAO;
 import uk.co.eelpieconsulting.feedlistener.instagram.InstagramSubscriptionManager;
@@ -52,12 +53,15 @@ public class SubscriptionsController {
 	private final FeedItemDAO feedItemDAO;
 	private final CredentialService credentialService;
 	private final ViewFactory viewFactory;
+
+	private final ChannelsDAO channelsDAO;
 	
 	@Autowired
 	public SubscriptionsController(SubscriptionsDAO subscriptionsDAO, RssPoller rssPoller, TwitterListener twitterListener, 
 			InstagramSubscriptionManager instagramSubscriptionManager, UrlBuilder urlBuilder,
 			FeedItemDAO feedItemDAO,
 			CredentialService credentialService,
+			ChannelsDAO channelsDAO,
 			ViewFactory viewFactory) {
 		this.subscriptionsDAO = subscriptionsDAO;
 		this.rssPoller = rssPoller;
@@ -66,6 +70,7 @@ public class SubscriptionsController {
 		this.urlBuilder = urlBuilder;
 		this.feedItemDAO = feedItemDAO;
 		this.credentialService = credentialService;
+		this.channelsDAO = channelsDAO;
 		this.viewFactory = viewFactory;
 	}
 	
@@ -120,7 +125,8 @@ public class SubscriptionsController {
 	@RequestMapping(value="/subscriptions/new", method=RequestMethod.GET)
 	public ModelAndView newSubscriptionForm() {
 		final ModelAndView mv = new ModelAndView("newSubscription");
-		return mv;		
+		mv.addObject("channels", channelsDAO.getChannels());
+		return mv;
 	}
 	
 	@RequestMapping(value="/subscriptions/json", method=RequestMethod.GET)
@@ -131,8 +137,9 @@ public class SubscriptionsController {
 	}
 	
 	@RequestMapping(value="/subscriptions/feeds", method=RequestMethod.POST)
-	public ModelAndView addFeedSubscription(@RequestParam String url) {		
-		subscriptionsDAO.add(new RssSubscription(url));
+	public ModelAndView addFeedSubscription(@RequestParam String url, @RequestParam String channel) {
+		// TODO validate channel id
+		subscriptionsDAO.add(new RssSubscription(url, channel));
 		rssPoller.run();
 		
 		final ModelAndView mv = new ModelAndView(new RedirectView(urlBuilder.getBaseUrl()));
@@ -140,7 +147,7 @@ public class SubscriptionsController {
 	}
 	
 	@RequestMapping(value="/subscriptions/twitter/tags", method=RequestMethod.POST)
-	public ModelAndView addTwitterTagSubscription(@RequestParam String tag) {		
+	public ModelAndView addTwitterTagSubscription(@RequestParam String tag, @RequestParam String channel) {		
 		if (!credentialService.hasTwitterAccessToken()) {
 			throw new CredentialsRequiredException();
 		}
@@ -153,8 +160,8 @@ public class SubscriptionsController {
 	}
 	
 	@RequestMapping(value="/subscriptions/instagram/tags", method=RequestMethod.POST)
-	public ModelAndView addInstagramTagSubscription(@RequestParam String tag) throws HttpNotFoundException, HttpBadRequestException, HttpForbiddenException, UnsupportedEncodingException, HttpFetchException, JSONException, CredentialsNotAvailableException {
-		final InstagramSubscription subscription = instagramSubscriptionManager.requestInstagramTagSubscription(tag);
+	public ModelAndView addInstagramTagSubscription(@RequestParam String tag, @RequestParam String channel) throws HttpNotFoundException, HttpBadRequestException, HttpForbiddenException, UnsupportedEncodingException, HttpFetchException, JSONException, CredentialsNotAvailableException {
+		final InstagramSubscription subscription = instagramSubscriptionManager.requestInstagramTagSubscription(tag, channel);
 		subscriptionsDAO.add(subscription);
 		
 		final ModelAndView mv = new ModelAndView(new RedirectView(urlBuilder.getBaseUrl()));
@@ -164,10 +171,11 @@ public class SubscriptionsController {
 	@RequestMapping(value="/subscriptions/instagram/geography", method=RequestMethod.POST)
 	public ModelAndView addInstagramTagSubscription(@RequestParam double latitude,
 			@RequestParam double longitude, 
-			@RequestParam int radius) throws HttpNotFoundException, HttpBadRequestException, HttpForbiddenException, UnsupportedEncodingException, HttpFetchException, JSONException, CredentialsNotAvailableException {
+			@RequestParam int radius,
+			@RequestParam String channel) throws HttpNotFoundException, HttpBadRequestException, HttpForbiddenException, UnsupportedEncodingException, HttpFetchException, JSONException, CredentialsNotAvailableException {
 		final LatLong latLong = new LatLong(latitude, longitude);
 		
-		final InstagramGeographySubscription instagramGeographySubscription = instagramSubscriptionManager.requestInstagramGeographySubscription(latLong, radius);
+		final InstagramGeographySubscription instagramGeographySubscription = instagramSubscriptionManager.requestInstagramGeographySubscription(latLong, radius, channel);
 		log.info("Saving subscription: " + instagramGeographySubscription);
 		subscriptionsDAO.add(instagramGeographySubscription);
 

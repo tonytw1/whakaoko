@@ -1,17 +1,41 @@
 <form action="/subscriptions/feeds" method="POST">
 	Feed: <input name="url" />
+	
+	Channel: 
+	<select name="channel">
+	#foreach($channel in $channels) 
+		<option value="$channel.id">$channel.name</option>
+	#end
+	</select>
+	
 	<input type="submit" />
 </form>
 <hr/>
 
 <form action="/subscriptions/twitter/tags" method="POST">
 	Twitter tag: <input name="tag" />
+	
+	Channel: 
+	<select name="channel">
+	#foreach($channel in $channels) 
+		<option value="$channel.id">$channel.name</option>
+	#end
+	</select>
+		
 	<input type="submit" />
 </form>
 <hr/>
 
 <form action="/subscriptions/instagram/tags" method="POST">
 	Instagram tag: <input name="tag" />
+	
+	Channel: 
+	<select name="channel">
+	#foreach($channel in $channels) 
+		<option value="$channel.id">$channel.name</option>
+	#end
+	</select>
+	
 	<input type="submit" />
 </form>
 <hr/>
@@ -21,6 +45,14 @@
 	Latitude: <input name="latitude" />
 	Longitude: <input name="longitude" />
 	Radius:	<input name="radius" />
+	
+	Channel: 
+	<select name="channel">
+	#foreach($channel in $channels) 
+		<option value="$channel.id">$channel.name</option>
+	#end
+	</select>
+	
 	<input type="submit" />
 </form>
 <hr/>

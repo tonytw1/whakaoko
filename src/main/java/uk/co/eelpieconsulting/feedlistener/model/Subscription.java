@@ -7,9 +7,10 @@ import org.codehaus.jackson.annotate.JsonPropertyOrder;
 
 import com.google.code.morphia.annotations.Entity;
 import com.google.code.morphia.annotations.Id;
+import com.google.code.morphia.annotations.Indexed;
 
 @Entity("subscriptions")
-@JsonPropertyOrder({"id", "name", "url"})
+@JsonPropertyOrder({"id", "name", "channel", "url"})
 public abstract class Subscription {
 	
     @Id
@@ -19,6 +20,9 @@ public abstract class Subscription {
     
     private Date lastRead, latestItemDate;
     
+    @Indexed
+    private String channelId;
+        
 	public final String getId() {
 		return id;
 	}
@@ -50,10 +54,20 @@ public abstract class Subscription {
 	public void setLatestItemDate(Date latestItemDate) {
 		this.latestItemDate = latestItemDate;
 	}
+	
+	public String getChannelId() {
+		return channelId;
+	}
+
+	public void setChannelId(String channelId) {
+		this.channelId = channelId;
+	}
 
 	@Override
 	public String toString() {
-		return "Subscription [id=" + id + ", lastRead=" + lastRead + ", latestItemDate=" + latestItemDate + ", name=" + name + "]";
+		return "Subscription [channelId=" + channelId + ", id=" + id
+				+ ", lastRead=" + lastRead + ", latestItemDate="
+				+ latestItemDate + ", name=" + name + "]";
 	}
 	
 }

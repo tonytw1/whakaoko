@@ -9,11 +9,12 @@ public class InstagramTagSubscription extends InstagramSubscription {
 	public InstagramTagSubscription() {
 	}
 
-	public InstagramTagSubscription(String tag, long subscriptionId) {
+	public InstagramTagSubscription(String tag, long subscriptionId, String channelId) {
 		this.setId("instagram-" + DigestUtils.md5Hex("tag" + tag));
 		this.tag = tag;
 		this.subscriptionId = subscriptionId;
 		this.setName("Instagram - " + tag);
+		this.setChannelId(channelId);
 	}
 	
 	public String getTag() {

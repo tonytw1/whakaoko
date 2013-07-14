@@ -21,4 +21,8 @@ public class UrlBuilder {
 		return getBaseUrl() + "/subscriptions/" + subscriptionId;
 	}
 
+	public String getChannelsUrl() {
+		return getBaseUrl() + "/channels";
+	}
+
 }
