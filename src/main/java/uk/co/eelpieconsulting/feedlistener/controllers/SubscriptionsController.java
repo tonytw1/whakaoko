@@ -21,9 +21,7 @@ import uk.co.eelpieconsulting.common.http.HttpFetchException;
 import uk.co.eelpieconsulting.common.http.HttpForbiddenException;
 import uk.co.eelpieconsulting.common.http.HttpNotFoundException;
 import uk.co.eelpieconsulting.common.views.ViewFactory;
-import uk.co.eelpieconsulting.feedlistener.CredentialsRequiredException;
 import uk.co.eelpieconsulting.feedlistener.UrlBuilder;
-import uk.co.eelpieconsulting.feedlistener.credentials.CredentialService;
 import uk.co.eelpieconsulting.feedlistener.daos.ChannelsDAO;
 import uk.co.eelpieconsulting.feedlistener.daos.FeedItemDAO;
 import uk.co.eelpieconsulting.feedlistener.daos.SubscriptionsDAO;
@@ -32,9 +30,9 @@ import uk.co.eelpieconsulting.feedlistener.model.InstagramGeographySubscription;
 import uk.co.eelpieconsulting.feedlistener.model.InstagramSubscription;
 import uk.co.eelpieconsulting.feedlistener.model.RssSubscription;
 import uk.co.eelpieconsulting.feedlistener.model.Subscription;
-import uk.co.eelpieconsulting.feedlistener.model.TwitterTagSubscription;
 import uk.co.eelpieconsulting.feedlistener.rss.RssPoller;
 import uk.co.eelpieconsulting.feedlistener.twitter.TwitterListener;
+import uk.co.eelpieconsulting.feedlistener.twitter.TwitterSubscriptionManager;
 
 import com.mongodb.MongoException;
 
@@ -51,7 +49,7 @@ public class SubscriptionsController {
 	private final InstagramSubscriptionManager instagramSubscriptionManager;
 	private final UrlBuilder urlBuilder;
 	private final FeedItemDAO feedItemDAO;
-	private final CredentialService credentialService;
+	private final TwitterSubscriptionManager twitterSubscriptionManager;
 	private final ViewFactory viewFactory;
 
 	private final ChannelsDAO channelsDAO;
@@ -60,8 +58,8 @@ public class SubscriptionsController {
 	public SubscriptionsController(SubscriptionsDAO subscriptionsDAO, RssPoller rssPoller, TwitterListener twitterListener, 
 			InstagramSubscriptionManager instagramSubscriptionManager, UrlBuilder urlBuilder,
 			FeedItemDAO feedItemDAO,
-			CredentialService credentialService,
 			ChannelsDAO channelsDAO,
+			TwitterSubscriptionManager twitterSubscriptionManager,
 			ViewFactory viewFactory) {
 		this.subscriptionsDAO = subscriptionsDAO;
 		this.rssPoller = rssPoller;
@@ -69,8 +67,8 @@ public class SubscriptionsController {
 		this.instagramSubscriptionManager = instagramSubscriptionManager;
 		this.urlBuilder = urlBuilder;
 		this.feedItemDAO = feedItemDAO;
-		this.credentialService = credentialService;
 		this.channelsDAO = channelsDAO;
+		this.twitterSubscriptionManager = twitterSubscriptionManager;
 		this.viewFactory = viewFactory;
 	}
 	
@@ -148,12 +146,7 @@ public class SubscriptionsController {
 	
 	@RequestMapping(value="/subscriptions/twitter/tags", method=RequestMethod.POST)
 	public ModelAndView addTwitterTagSubscription(@RequestParam String tag, @RequestParam String channel) {		
-		if (!credentialService.hasTwitterAccessToken()) {
-			throw new CredentialsRequiredException();
-		}
-		
-		subscriptionsDAO.add(new TwitterTagSubscription(tag));
-		twitterListener.connect();
+		twitterSubscriptionManager.requestTagSubscription(tag, channel);
 		
 		final ModelAndView mv = new ModelAndView(new RedirectView(urlBuilder.getBaseUrl()));
 		return mv;

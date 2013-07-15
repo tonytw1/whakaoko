@@ -17,6 +17,7 @@ import twitter4j.auth.AccessToken;
 import twitter4j.auth.RequestToken;
 import uk.co.eelpieconsulting.feedlistener.credentials.CredentialService;
 import uk.co.eelpieconsulting.feedlistener.twitter.TwitterApiFactory;
+import uk.co.eelpieconsulting.feedlistener.twitter.TwitterSubscriptionManager;
 
 import com.google.common.collect.Maps;
 
@@ -27,13 +28,15 @@ public class TwitterOauthController {
 		
 	private final CredentialService credentialService;
 	private final TwitterApiFactory twitterApiFactory;
+	private final TwitterSubscriptionManager twitterSubscriptionManager;
 	
 	private final Map<String, RequestToken> requestTokens;
 	
 	@Autowired
-	public TwitterOauthController(CredentialService credentialService, TwitterApiFactory twitterApiFactory) {
+	public TwitterOauthController(CredentialService credentialService, TwitterApiFactory twitterApiFactory, TwitterSubscriptionManager twitterSubscriptionManager) {
 		this.credentialService = credentialService;
 		this.twitterApiFactory = twitterApiFactory;
+		this.twitterSubscriptionManager = twitterSubscriptionManager;
 		requestTokens = Maps.newConcurrentMap();
 	}
 	
@@ -69,6 +72,8 @@ public class TwitterOauthController {
 		credentialService.setTwitterAccessToken(accessToken.getToken());
 		credentialService.setTwitterAccessSecret(accessToken.getTokenSecret());
 
+		twitterSubscriptionManager.reconnect();
+		
 		return null;
 	}
 	
