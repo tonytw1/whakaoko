@@ -14,6 +14,7 @@ import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.view.RedirectView;
 
 import uk.co.eelpieconsulting.common.views.ViewFactory;
+import uk.co.eelpieconsulting.feedlistener.IdBuilder;
 import uk.co.eelpieconsulting.feedlistener.UrlBuilder;
 import uk.co.eelpieconsulting.feedlistener.daos.ChannelsDAO;
 import uk.co.eelpieconsulting.feedlistener.daos.FeedItemDAO;
@@ -33,14 +34,17 @@ public class ChannelsController {
 	private final SubscriptionsDAO subscriptionsDAO;
 	private final UrlBuilder urlBuilder;
 	private final FeedItemDAO feedItemDAO;
+	private final IdBuilder idBuilder;
 	private final ViewFactory viewFactory;
 	
 	@Autowired
-	public ChannelsController(ChannelsDAO channelsDAO, SubscriptionsDAO subscriptionsDAO, UrlBuilder urlBuilder, FeedItemDAO feedItemDAO, ViewFactory viewFactory) {
+	public ChannelsController(ChannelsDAO channelsDAO, SubscriptionsDAO subscriptionsDAO, UrlBuilder urlBuilder, 
+			FeedItemDAO feedItemDAO, IdBuilder idBuilder, ViewFactory viewFactory) {
 		this.channelsDAO = channelsDAO;
 		this.subscriptionsDAO = subscriptionsDAO;
 		this.urlBuilder = urlBuilder;
 		this.feedItemDAO = feedItemDAO;
+		this.idBuilder = idBuilder;
 		this.viewFactory = viewFactory;
 	}
 	
@@ -88,22 +92,37 @@ public class ChannelsController {
 	}
 	
 	@RequestMapping(value="/channels/{id}/rss", method=RequestMethod.GET)
-	public ModelAndView channelRss(@PathVariable String id) throws UnknownHostException, MongoException {
+	public ModelAndView channelRss(@PathVariable String id,
+			@RequestParam(required=false) Integer page) throws UnknownHostException, MongoException {
 		final Channel channel = channelsDAO.getById(id);
 		
 		final ModelAndView mv = new ModelAndView(viewFactory.getRssView(channel.getName() + " items", 
 				urlBuilder.getChannelUrl(channel.getId()), 
 				channel.getName() + " items"));
+				
+		if (page != null) {
+			mv.addObject("data", feedItemDAO.getChannelFeedItems(channel.getId(), MAX_FEED_ITEMS, page));
+		} else {
+			mv.addObject("data", feedItemDAO.getChannelFeedItems(channel.getId(), MAX_FEED_ITEMS));
+		}
+		
 		mv.addObject("data", feedItemDAO.getChannelFeedItems(channel.getId(), MAX_FEED_ITEMS));
 		return mv;
 	}
 	
 	@RequestMapping(value="/channels/{id}/json", method=RequestMethod.GET)
-	public ModelAndView channelJson(@PathVariable String id) throws UnknownHostException, MongoException {
+	public ModelAndView channelJson(@PathVariable String id,
+			@RequestParam(required=false) Integer page) throws UnknownHostException, MongoException {
 		final Channel channel = channelsDAO.getById(id);
 		
 		final ModelAndView mv = new ModelAndView(viewFactory.getJsonView());
-		mv.addObject("data", feedItemDAO.getChannelFeedItems(channel.getId(), MAX_FEED_ITEMS));
+		
+		if (page != null) {
+			mv.addObject("data", feedItemDAO.getChannelFeedItems(channel.getId(), MAX_FEED_ITEMS, page));
+		} else {
+			mv.addObject("data", feedItemDAO.getChannelFeedItems(channel.getId(), MAX_FEED_ITEMS));
+		}
+				
 		return mv;
 	}
 	
@@ -114,8 +133,8 @@ public class ChannelsController {
 	}
 	
 	@RequestMapping(value="/channels", method=RequestMethod.POST)
-	public ModelAndView addChannel(@RequestParam String name) {
-		channelsDAO.add(new Channel(name, name));	// TODO proper ids.
+	public ModelAndView addChannel(@RequestParam String name) {		
+		channelsDAO.add(new Channel(idBuilder.makeIdFor(name), name));
 		
 		final ModelAndView mv = new ModelAndView(new RedirectView(urlBuilder.getChannelsUrl()));
 		return mv;
