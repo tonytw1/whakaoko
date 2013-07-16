@@ -26,6 +26,8 @@ import com.sun.syndication.feed.module.mediarss.types.MediaContent;
 import com.sun.syndication.feed.synd.SyndContentImpl;
 import com.sun.syndication.feed.synd.SyndEntry;
 
+import uk.co.eelpieconsulting.common.html.*;
+
 @Component
 public class RssFeedItemMapper {
 	
@@ -34,8 +36,7 @@ public class RssFeedItemMapper {
 	public FeedItem createFeedItemFrom(final SyndEntry syndEntry) {
 		final Place place = extractLocationFrom(syndEntry);        	
 		final String imageUrl = extractImageFrom(syndEntry);		
-		final String body = StringEscapeUtils.unescapeHtml(extractBody(syndEntry));
-		
+		final String body = new HtmlCleaner().stripHtml(StringEscapeUtils.unescapeHtml(extractBody(syndEntry)));		
 		final Date date = syndEntry.getPublishedDate() != null ? syndEntry.getPublishedDate() : syndEntry.getUpdatedDate();						
 		final FeedItem feedItem = new FeedItem(syndEntry.getTitle(), syndEntry.getLink().trim(), body, date, place, imageUrl);
 		return feedItem;
