@@ -11,12 +11,20 @@ import uk.co.eelpieconsulting.common.geo.model.Place;
 import uk.co.eelpieconsulting.feedlistener.model.FeedItem;
 
 import com.google.common.base.Strings;
+import com.sun.org.apache.xerces.internal.impl.dv.xs.YearDV;
 import com.sun.syndication.feed.module.georss.GeoRSSModule;
 import com.sun.syndication.feed.module.georss.GeoRSSUtils;
 import com.sun.syndication.feed.module.mediarss.MediaEntryModuleImpl;
 import com.sun.syndication.feed.module.mediarss.MediaModule;
 import com.sun.syndication.feed.module.mediarss.types.MediaContent;
 import com.sun.syndication.feed.synd.SyndEntry;
+
+import org.htmlparser.NodeFilter;
+import org.htmlparser.Parser;
+import org.htmlparser.Tag;
+import org.htmlparser.filters.TagNameFilter;
+import org.htmlparser.util.NodeList;
+import org.htmlparser.util.ParserException;
 
 @Component
 public class RssFeedItemMapper {
@@ -27,7 +35,7 @@ public class RssFeedItemMapper {
 		final Place place = extractLocationFrom(syndEntry);        	
 		final String imageUrl = extractImageFrom(syndEntry);
 		
-		String body = syndEntry.getDescription() != null ? syndEntry.getDescription().getValue() : null;
+		String body = getItemBody(syndEntry);
 		if (!Strings.isNullOrEmpty(body)) {
 			body = StringEscapeUtils.unescapeHtml(body);
 		}
@@ -49,26 +57,46 @@ public class RssFeedItemMapper {
 	
 	private String extractImageFrom(SyndEntry item) {
 		final MediaEntryModuleImpl mediaModule = (MediaEntryModuleImpl) item.getModule(MediaModule.URI);
-		if (mediaModule == null) {
+		if (mediaModule != null) {
 			log.debug("No media module found for item: " + item.getTitle());
-			return null;
-		}
 		
-		final MediaContent[] mediaContents = mediaModule.getMediaContents();
-		if (mediaContents.length > 0) {			
-			MediaContent selectedMediaContent = null;
-			for (int i = 0; i < mediaContents.length; i++) {
-				MediaContent mediaContent = mediaContents[i];
-				final boolean isImage = isImage(mediaContent);
-				if (isImage && isBetterThanCurrentlySelected(mediaContent, selectedMediaContent)) {
-					selectedMediaContent = mediaContent;
+			final MediaContent[] mediaContents = mediaModule.getMediaContents();
+			if (mediaContents.length > 0) {			
+				MediaContent selectedMediaContent = null;
+				for (int i = 0; i < mediaContents.length; i++) {
+					MediaContent mediaContent = mediaContents[i];
+					final boolean isImage = isImage(mediaContent);
+					if (isImage && isBetterThanCurrentlySelected(mediaContent, selectedMediaContent)) {
+						selectedMediaContent = mediaContent;
+					}
+				}
+				
+				if (selectedMediaContent != null) {
+					log.debug("Took image reference from MediaContent: " + selectedMediaContent.getReference().toString());
+					return selectedMediaContent.getReference().toString();
 				}
 			}
-			
-			if (selectedMediaContent != null) {
-				log.debug("Took image reference from MediaContent: " + selectedMediaContent.getReference().toString());
-				return selectedMediaContent.getReference().toString();
-			}
+		}
+		
+		// Look got img srcs in html content
+		final String itemBody = getItemBody(item);
+		if (!Strings.isNullOrEmpty(itemBody)) {
+			Parser parser = new Parser();
+			try {
+				parser.setInputHTML(itemBody);
+				NodeFilter tagNameFilter = new TagNameFilter("img");
+				NodeList imageNodes = parser.extractAllNodesThatMatch(tagNameFilter);
+				log.info("Found images: " + imageNodes.size());
+				if (imageNodes.size() > 0) {
+					final Tag imageTag = (Tag) imageNodes.elementAt(0);
+					final String imageSrc = imageTag.getAttribute("src");
+					log.info("Found first image: " + imageTag.toHtml() + ", " + imageSrc);
+					return imageSrc;
+				}
+								
+			} catch (ParserException e) {
+				log.warn("Failed to parse item body for images", e);
+			}			
 		}
 		
 		log.debug("No suitable media element image seen");
@@ -86,6 +114,10 @@ public class RssFeedItemMapper {
 			return true;
 		}		
 		return mediaContent.getWidth() != null && mediaContent.getWidth() > selectedMediaContent.getWidth();		
+	}
+	
+	private String getItemBody(final SyndEntry syndEntry) {
+		return syndEntry.getDescription() != null ? syndEntry.getDescription().getValue() : null;
 	}
 
 }
