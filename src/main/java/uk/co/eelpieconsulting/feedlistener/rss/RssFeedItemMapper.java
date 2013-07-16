@@ -5,6 +5,12 @@ import java.util.List;
 
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.log4j.Logger;
+import org.htmlparser.NodeFilter;
+import org.htmlparser.Parser;
+import org.htmlparser.Tag;
+import org.htmlparser.filters.TagNameFilter;
+import org.htmlparser.util.NodeList;
+import org.htmlparser.util.ParserException;
 import org.springframework.stereotype.Component;
 
 import uk.co.eelpieconsulting.common.geo.model.LatLong;
@@ -12,7 +18,6 @@ import uk.co.eelpieconsulting.common.geo.model.Place;
 import uk.co.eelpieconsulting.feedlistener.model.FeedItem;
 
 import com.google.common.base.Strings;
-import com.sun.org.apache.xerces.internal.impl.dv.xs.YearDV;
 import com.sun.syndication.feed.module.georss.GeoRSSModule;
 import com.sun.syndication.feed.module.georss.GeoRSSUtils;
 import com.sun.syndication.feed.module.mediarss.MediaEntryModuleImpl;
@@ -21,13 +26,6 @@ import com.sun.syndication.feed.module.mediarss.types.MediaContent;
 import com.sun.syndication.feed.synd.SyndContentImpl;
 import com.sun.syndication.feed.synd.SyndEntry;
 
-import org.htmlparser.NodeFilter;
-import org.htmlparser.Parser;
-import org.htmlparser.Tag;
-import org.htmlparser.filters.TagNameFilter;
-import org.htmlparser.util.NodeList;
-import org.htmlparser.util.ParserException;
-
 @Component
 public class RssFeedItemMapper {
 	
@@ -35,9 +33,8 @@ public class RssFeedItemMapper {
 	
 	public FeedItem createFeedItemFrom(final SyndEntry syndEntry) {
 		final Place place = extractLocationFrom(syndEntry);        	
-		final String imageUrl = extractImageFrom(syndEntry);
-		
-		String body = extractBody(syndEntry);
+		final String imageUrl = extractImageFrom(syndEntry);		
+		final String body = StringEscapeUtils.unescapeHtml(extractBody(syndEntry));
 		
 		final Date date = syndEntry.getPublishedDate() != null ? syndEntry.getPublishedDate() : syndEntry.getUpdatedDate();						
 		final FeedItem feedItem = new FeedItem(syndEntry.getTitle(), syndEntry.getLink().trim(), body, date, place, imageUrl);
@@ -48,16 +45,14 @@ public class RssFeedItemMapper {
 	private String extractBody(final SyndEntry syndEntry) {
 		String body = getItemDescription(syndEntry);
 		if (!Strings.isNullOrEmpty(body)) {
-			body = StringEscapeUtils.unescapeHtml(body);
 			return body;
 		}
 		
 		log.info("No description tag found; looking for contents");
-		List<SyndContentImpl> contents = syndEntry.getContents();
-		log.info("Found contents: " + contents.size());
+		final List<SyndContentImpl> contents = syndEntry.getContents();
 		if (!contents.isEmpty()) {
-			log.info(contents.get(0).getType());
-			return StringEscapeUtils.unescapeHtml(contents.get(0).getValue());
+			final String contentBody = contents.get(0).getValue();
+			return contentBody;
 		}
 		
 		return null;		
@@ -97,7 +92,7 @@ public class RssFeedItemMapper {
 		}
 		
 		// Look got img srcs in html content
-		final String itemBody = getItemDescription(item);
+		final String itemBody = extractBody(item);
 		if (!Strings.isNullOrEmpty(itemBody)) {
 			Parser parser = new Parser();
 			try {
