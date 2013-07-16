@@ -1,6 +1,7 @@
 package uk.co.eelpieconsulting.feedlistener.rss;
 
 import java.util.Date;
+import java.util.List;
 
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.log4j.Logger;
@@ -17,6 +18,7 @@ import com.sun.syndication.feed.module.georss.GeoRSSUtils;
 import com.sun.syndication.feed.module.mediarss.MediaEntryModuleImpl;
 import com.sun.syndication.feed.module.mediarss.MediaModule;
 import com.sun.syndication.feed.module.mediarss.types.MediaContent;
+import com.sun.syndication.feed.synd.SyndContentImpl;
 import com.sun.syndication.feed.synd.SyndEntry;
 
 import org.htmlparser.NodeFilter;
@@ -35,14 +37,30 @@ public class RssFeedItemMapper {
 		final Place place = extractLocationFrom(syndEntry);        	
 		final String imageUrl = extractImageFrom(syndEntry);
 		
-		String body = getItemBody(syndEntry);
-		if (!Strings.isNullOrEmpty(body)) {
-			body = StringEscapeUtils.unescapeHtml(body);
-		}
+		String body = extractBody(syndEntry);
 		
 		final Date date = syndEntry.getPublishedDate() != null ? syndEntry.getPublishedDate() : syndEntry.getUpdatedDate();						
 		final FeedItem feedItem = new FeedItem(syndEntry.getTitle(), syndEntry.getLink().trim(), body, date, place, imageUrl);
 		return feedItem;
+	}
+
+	@SuppressWarnings("unchecked")
+	private String extractBody(final SyndEntry syndEntry) {
+		String body = getItemDescription(syndEntry);
+		if (!Strings.isNullOrEmpty(body)) {
+			body = StringEscapeUtils.unescapeHtml(body);
+			return body;
+		}
+		
+		log.info("No description tag found; looking for contents");
+		List<SyndContentImpl> contents = syndEntry.getContents();
+		log.info("Found contents: " + contents.size());
+		if (!contents.isEmpty()) {
+			log.info(contents.get(0).getType());
+			return StringEscapeUtils.unescapeHtml(contents.get(0).getValue());
+		}
+		
+		return null;		
 	}
 	
 	private Place extractLocationFrom(SyndEntry syndEntry) {
@@ -79,7 +97,7 @@ public class RssFeedItemMapper {
 		}
 		
 		// Look got img srcs in html content
-		final String itemBody = getItemBody(item);
+		final String itemBody = getItemDescription(item);
 		if (!Strings.isNullOrEmpty(itemBody)) {
 			Parser parser = new Parser();
 			try {
@@ -116,7 +134,7 @@ public class RssFeedItemMapper {
 		return mediaContent.getWidth() != null && mediaContent.getWidth() > selectedMediaContent.getWidth();		
 	}
 	
-	private String getItemBody(final SyndEntry syndEntry) {
+	private String getItemDescription(final SyndEntry syndEntry) {
 		return syndEntry.getDescription() != null ? syndEntry.getDescription().getValue() : null;
 	}
 
