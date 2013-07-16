@@ -1,6 +1,6 @@
 package uk.co.eelpieconsulting.feedlistener.rss;
 
-import java.net.URL;
+import java.io.ByteArrayInputStream;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -8,12 +8,14 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.xml.sax.InputSource;
 
+import uk.co.eelpieconsulting.common.http.HttpFetcher;
 import uk.co.eelpieconsulting.feedlistener.model.FeedItem;
 
 import com.sun.syndication.feed.synd.SyndEntry;
 import com.sun.syndication.feed.synd.SyndFeed;
-import com.sun.syndication.fetcher.impl.HttpURLFeedFetcher;
+import com.sun.syndication.io.SyndFeedInput;
 
 @Component
 public class FeedFetcher {
@@ -47,10 +49,14 @@ public class FeedFetcher {
 	
 	private SyndFeed loadSyndFeedWithFeedFetcher(String feedUrl) {
 		log.info("Loading SyndFeed from url: " + feedUrl);
-		try {
-			HttpURLFeedFetcher fetcher = new HttpURLFeedFetcher();	// TODO thread safe for reuse?
-			SyndFeed feed = fetcher.retrieveFeed(new URL(feedUrl));
-			return feed;			
+		try {			
+			HttpFetcher httpFetcher = new HttpFetcher();
+			final byte[] bytes = httpFetcher.getBytes(feedUrl);
+			final String content = new String(bytes, "UTF-8").trim();	// TODO detect encoding?
+			
+			final SyndFeedInput feedInput = new SyndFeedInput();
+			return feedInput.build(new InputSource(new ByteArrayInputStream(content.getBytes())));
+			
 		} catch (Exception e) {
 			log.warn("Error while fetching feed: " + e.getMessage());
 		}

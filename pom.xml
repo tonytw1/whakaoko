@@ -109,14 +109,7 @@
 			<type>jar</type>
 			<scope>compile</scope>
 		</dependency>
-		<dependency>
-			<groupId>net.java.dev.rome</groupId>
-			<artifactId>rome-fetcher</artifactId>
-			<version>1.0.0</version>
-			<type>jar</type>
-			<scope>compile</scope>
-		</dependency>
-		
+				
 		<dependency>
 			<groupId>rome</groupId>
 			<artifactId>media-rss</artifactId>
