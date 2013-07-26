@@ -37,7 +37,7 @@ public class RssPoller {
 		this.taskExecutor = taskExecutor;
 	}
 	
-	@Scheduled(fixedRate=300000)
+	@Scheduled(fixedRate=3600000)
 	public void run() {
 		log.info("Polling subscriptions");
 		List<Subscription> subscriptions = subscriptionsDAO.getSubscriptions();
