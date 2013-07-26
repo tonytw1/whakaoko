@@ -138,7 +138,8 @@ public class SubscriptionsController {
 	public ModelAndView addFeedSubscription(@RequestParam String url, @RequestParam String channel) {
 		// TODO validate channel id
 		subscriptionsDAO.add(new RssSubscription(url, channel));
-		rssPoller.run();
+
+		rssPoller.run();	// TODO be abit more graceful about only triggering an immediate read of this feed.
 		
 		final ModelAndView mv = new ModelAndView(new RedirectView(urlBuilder.getBaseUrl()));
 		return mv;
