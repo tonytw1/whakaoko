@@ -84,7 +84,7 @@ public class ChannelsController {
 			
 			final Map<String, Long> subscriptionCounts = Maps.newHashMap();
 			for (Subscription subscription : subscriptionsForChannel) {
-				subscriptionCounts.put(subscription.getId(), feedItemDAO.getSubscriptionFeedItemsCount(subscription.getId()));
+				subscriptionCounts.put(subscription.getId(), feedItemDAO.getSubscriptionFeedItemsCount(subscription.getId()));	// TODO slow on channels with many subscriptions - cache or index?
 			}
 			mv.addObject("subscriptionCounts", subscriptionCounts);
 		}
