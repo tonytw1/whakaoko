@@ -73,33 +73,37 @@ public class SubscriptionsController {
 	}
 	
 	@RequestMapping(value="/subscriptions/{id}", method=RequestMethod.GET)
-	public ModelAndView subscription(@PathVariable String id) throws UnknownHostException, MongoException {
+	public ModelAndView subscription(@PathVariable String id,
+			@RequestParam(required=false) Integer page) throws UnknownHostException, MongoException {
 		final Subscription subscription = subscriptionsDAO.getById(id);
 
 		final ModelAndView mv = new ModelAndView("subscription");
 		mv.addObject("subscription", subscription);
 		mv.addObject("subscriptionSize", feedItemDAO.getSubscriptionFeedItemsCount(subscription.getId()));
-		mv.addObject("feedItems", feedItemDAO.getSubscriptionFeedItems(subscription.getId(), MAX_FEED_ITEMS));
+		populateFeedItems(subscription, page, mv, "feedItems");		
 		return mv;
 	}
-	
+
 	@RequestMapping(value="/subscriptions/{id}/rss", method=RequestMethod.GET)	
-	public ModelAndView subscriptionRss(@PathVariable String id) throws UnknownHostException, MongoException {
+	public ModelAndView subscriptionRss(@PathVariable String id,
+			@RequestParam(required=false) Integer page) throws UnknownHostException, MongoException {
 		final Subscription subscription = subscriptionsDAO.getById(id);
 		
 		final ModelAndView mv = new ModelAndView(viewFactory.getRssView(subscription.getName() + " items", 
 				urlBuilder.getSubscriptionUrl(subscription.getId()), 
 				subscription.getName() + " items"));
-		mv.addObject("data", feedItemDAO.getSubscriptionFeedItems(subscription.getId(), MAX_FEED_ITEMS));
+		
+		populateFeedItems(subscription, page, mv, "data");		
 		return mv;
 	}
 	
 	@RequestMapping(value="/subscriptions/{id}/json", method=RequestMethod.GET)	
-	public ModelAndView subscriptionJson(@PathVariable String id) throws UnknownHostException, MongoException {
+	public ModelAndView subscriptionJson(@PathVariable String id,
+			@RequestParam(required=false) Integer page) throws UnknownHostException, MongoException {
 		final Subscription subscription = subscriptionsDAO.getById(id);
 		
 		final ModelAndView mv = new ModelAndView(viewFactory.getJsonView());
-		mv.addObject("data", feedItemDAO.getSubscriptionFeedItems(subscription.getId(), MAX_FEED_ITEMS));
+		populateFeedItems(subscription, page, mv, "data");		
 		return mv;
 	}
 	
@@ -175,6 +179,14 @@ public class SubscriptionsController {
 
 		final ModelAndView mv = new ModelAndView(new RedirectView(urlBuilder.getBaseUrl()));
 		return mv;
+	}
+
+	private void populateFeedItems(final Subscription subscription, final Integer page, final ModelAndView mv, String field) throws UnknownHostException {
+		if (page != null) {
+			mv.addObject(field, feedItemDAO.getSubscriptionFeedItems(subscription.getId(), MAX_FEED_ITEMS, page));
+		} else {
+			mv.addObject(field, feedItemDAO.getSubscriptionFeedItems(subscription.getId(), MAX_FEED_ITEMS));
+		}
 	}
 
 }
