@@ -43,16 +43,12 @@ public class FeedItemDAO {
 		}
 	}
 	
-	public List<FeedItem> getInbox(int limit) throws UnknownHostException, MongoException {
-		return inboxQuery().limit(limit).asList();
-	}
-	
 	public List<FeedItem> getSubscriptionFeedItems(String subscriptionId, int limit) throws UnknownHostException, MongoException {
 		return subscriptionFeedItemsQuery(subscriptionId).limit(limit).asList();
 	}
 	
-	public List<FeedItem> getSubscriptionFeedItems(String subscriptionId, int limit, Integer page) throws UnknownHostException, MongoException {
-		return subscriptionFeedItemsQuery(subscriptionId).limit(limit).offset(page * limit).asList();
+	public List<FeedItem> getSubscriptionFeedItems(String subscriptionId, int pageSize, int page) throws UnknownHostException, MongoException {
+		return subscriptionFeedItemsQuery(subscriptionId).limit(pageSize).offset(calculatePageOffset(pageSize, page)).asList();
 	}
 	
 	public long getAllCount() throws UnknownHostException, MongoException {
@@ -67,12 +63,12 @@ public class FeedItemDAO {
 		return channelFeedItemsQuery(channelId).countAll();
 	}
 	
-	public List<FeedItem> getChannelFeedItems(String channelId, int limit) throws UnknownHostException, MongoException {		
-		return channelFeedItemsQuery(channelId).limit(limit).asList();
+	public List<FeedItem> getChannelFeedItems(String channelId, int pageSize) throws UnknownHostException, MongoException {		
+		return channelFeedItemsQuery(channelId).limit(pageSize).asList();
 	}
 	
-	public List<FeedItem> getChannelFeedItems(String channelId, int limit, Integer page) throws UnknownHostException, MongoException {
-		return channelFeedItemsQuery(channelId).limit(limit).offset(page * limit).asList();
+	public List<FeedItem> getChannelFeedItems(String channelId, int pageSize, int page) throws UnknownHostException, MongoException {
+		return channelFeedItemsQuery(channelId).limit(pageSize).offset(calculatePageOffset(pageSize, page)).asList();
 	}
 	
 	private Query<FeedItem> channelFeedItemsQuery(String channelId) throws UnknownHostException {
@@ -83,12 +79,15 @@ public class FeedItemDAO {
 		return dataStoreFactory.getDatastore().find(FeedItem.class).field("subscriptionId").hasAnyOf(channelSubscriptions).order(DATE_DESCENDING);
 	}
 	
-	private Query<FeedItem> inboxQuery() throws UnknownHostException {
-		return dataStoreFactory.getDatastore().find(FeedItem.class).order(DATE_DESCENDING);
-	}
-
 	private Query<FeedItem> subscriptionFeedItemsQuery(String subscriptionId) throws UnknownHostException {
 		return dataStoreFactory.getDatastore().find(FeedItem.class, "subscriptionId", subscriptionId).order(DATE_DESCENDING);
+	}
+	
+	private int calculatePageOffset(int pageSize, int page) {
+		if (page > 0) {
+			return (page-1) * pageSize;
+		}
+		return 0;		
 	}
 	
 }
