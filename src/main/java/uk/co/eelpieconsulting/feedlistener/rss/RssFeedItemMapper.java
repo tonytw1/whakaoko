@@ -100,7 +100,7 @@ public class RssFeedItemMapper {
 				parser.setInputHTML(itemBody);
 				NodeFilter tagNameFilter = new TagNameFilter("img");
 				NodeList imageNodes = parser.extractAllNodesThatMatch(tagNameFilter);
-				log.info("Found images: " + imageNodes.size());
+				log.debug("Found images: " + imageNodes.size());
 				if (imageNodes.size() > 0) {
 					final Tag imageTag = (Tag) imageNodes.elementAt(0);
 					final String imageSrc = imageTag.getAttribute("src");
