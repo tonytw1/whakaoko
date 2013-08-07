@@ -31,6 +31,7 @@ import uk.co.eelpieconsulting.feedlistener.model.InstagramSubscription;
 import uk.co.eelpieconsulting.feedlistener.model.RssSubscription;
 import uk.co.eelpieconsulting.feedlistener.model.Subscription;
 import uk.co.eelpieconsulting.feedlistener.rss.RssPoller;
+import uk.co.eelpieconsulting.feedlistener.rss.RssSubscriptionManager;
 import uk.co.eelpieconsulting.feedlistener.twitter.TwitterListener;
 import uk.co.eelpieconsulting.feedlistener.twitter.TwitterSubscriptionManager;
 
@@ -50,9 +51,9 @@ public class SubscriptionsController {
 	private final UrlBuilder urlBuilder;
 	private final FeedItemDAO feedItemDAO;
 	private final TwitterSubscriptionManager twitterSubscriptionManager;
-	private final ViewFactory viewFactory;
-
 	private final ChannelsDAO channelsDAO;
+	private final RssSubscriptionManager rssSubscriptionManager;
+	private final ViewFactory viewFactory;
 	
 	@Autowired
 	public SubscriptionsController(SubscriptionsDAO subscriptionsDAO, RssPoller rssPoller, TwitterListener twitterListener, 
@@ -60,6 +61,7 @@ public class SubscriptionsController {
 			FeedItemDAO feedItemDAO,
 			ChannelsDAO channelsDAO,
 			TwitterSubscriptionManager twitterSubscriptionManager,
+			RssSubscriptionManager rssSubscriptionManager,
 			ViewFactory viewFactory) {
 		this.subscriptionsDAO = subscriptionsDAO;
 		this.rssPoller = rssPoller;
@@ -69,6 +71,7 @@ public class SubscriptionsController {
 		this.feedItemDAO = feedItemDAO;
 		this.channelsDAO = channelsDAO;
 		this.twitterSubscriptionManager = twitterSubscriptionManager;
+		this.rssSubscriptionManager = rssSubscriptionManager;
 		this.viewFactory = viewFactory;
 	}
 	
@@ -140,10 +143,9 @@ public class SubscriptionsController {
 	
 	@RequestMapping(value="/subscriptions/feeds", method=RequestMethod.POST)
 	public ModelAndView addFeedSubscription(@RequestParam String url, @RequestParam String channel) {
-		// TODO validate channel id
-		subscriptionsDAO.add(new RssSubscription(url, channel));
-
-		rssPoller.run();	// TODO be abit more graceful about only triggering an immediate read of this feed.
+		final RssSubscription subscription = rssSubscriptionManager.requestFeedSubscription(url, channel);
+		subscriptionsDAO.add(subscription);
+		rssPoller.run(subscription);
 		
 		final ModelAndView mv = new ModelAndView(new RedirectView(urlBuilder.getBaseUrl()));
 		return mv;

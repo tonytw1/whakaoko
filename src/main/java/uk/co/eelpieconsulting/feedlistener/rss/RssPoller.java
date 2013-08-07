@@ -46,7 +46,13 @@ public class RssPoller {
 				taskExecutor.execute(new ProcessFeedTask(feedFetcher, feedItemDAO, subscriptionsDAO, (RssSubscription) subscription));
 			}
 		}
-		log.info("Done.");
+		log.info("Done");
+	}
+	
+	public void run(Subscription subscription) {
+		log.info("Polling single subscription: " + subscription.getId());
+		taskExecutor.execute(new ProcessFeedTask(feedFetcher, feedItemDAO, subscriptionsDAO, (RssSubscription) subscription));
+		log.info("Done");		
 	}
 	
 	private class ProcessFeedTask implements Runnable {
