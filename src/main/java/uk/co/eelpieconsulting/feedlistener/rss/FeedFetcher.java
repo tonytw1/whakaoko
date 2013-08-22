@@ -49,11 +49,10 @@ public class FeedFetcher {
 	
 	private SyndFeed loadSyndFeedWithFeedFetcher(String feedUrl) {
 		log.info("Loading SyndFeed from url: " + feedUrl);
-		try {			
-			HttpFetcher httpFetcher = new HttpFetcher();
+		try {
+			final HttpFetcher httpFetcher = new HttpFetcher();
 			final byte[] bytes = httpFetcher.getBytes(feedUrl);
-			final String content = new String(bytes, "UTF-8").trim();	// TODO detect encoding?
-			
+			final String content = new String(bytes, "UTF-8").trim();	// TODO detect encoding?			
 			final SyndFeedInput feedInput = new SyndFeedInput();
 			return feedInput.build(new InputSource(new ByteArrayInputStream(content.getBytes())));
 			
