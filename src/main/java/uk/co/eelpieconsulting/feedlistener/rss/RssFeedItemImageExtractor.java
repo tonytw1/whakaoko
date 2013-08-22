@@ -34,7 +34,7 @@ public class RssFeedItemImageExtractor {
 			log.debug("No media module found for item: " + item.getTitle());
 		
 			final MediaContent[] mediaContents = mediaModule.getMediaContents();
-			if (mediaContents.length > 0) {			
+			if (mediaContents.length > 0) {	
 				MediaContent selectedMediaContent = null;
 				for (int i = 0; i < mediaContents.length; i++) {
 					MediaContent mediaContent = mediaContents[i];
@@ -64,7 +64,7 @@ public class RssFeedItemImageExtractor {
 					final Tag imageTag = (Tag) imageNodes.elementAt(0);
 					final String imageSrc = imageTag.getAttribute("src");
 					if (!isBlackListedUrl(imageSrc)) {
-						log.info("Found first image: " + imageTag.toHtml() + ", " + imageSrc);
+						log.debug("Found first image: " + imageTag.toHtml() + ", " + imageSrc);
 						return imageSrc;
 					}
 				}
@@ -86,12 +86,13 @@ public class RssFeedItemImageExtractor {
 	}
 
 	private boolean isBlackListedUrl(String url) {
-		return url.startsWith("http://stats.wordpress.com");
+		return url.startsWith("http://stats.wordpress.com") && !url.contains("gravatar.com/avatar");
 	}
 	
 	private boolean isImage(MediaContent mediaContent) {
 		final boolean hasTypeJpegAttribute = mediaContent.getType() != null && mediaContent.getType().equals("image/jpeg");
-		final boolean isJpegUrl = mediaContent.getReference() != null && mediaContent.getReference().toString().endsWith("jpg");	 // TODO test cover and .
+		final boolean isJpegUrl = mediaContent.getReference() != null && mediaContent.getReference().toString().contains(".jpg");
+		// TODO Wordpress looks to use medium="image"
 		return mediaContent.getReference() != null && (hasTypeJpegAttribute || isJpegUrl);
 	}
 	
