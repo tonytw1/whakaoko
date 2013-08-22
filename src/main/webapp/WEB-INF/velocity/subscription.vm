@@ -1,7 +1,7 @@
 <p><h4>whakaoko</h4>
 (verb) to listen to.</p>
 
-<h5>$subscription.channelId / $subscription.name #if($subscriptionSize > 0) ($subscriptionSize) #end</h5>
+<h5>$subscription.channelId / #if($subscription.name)$subscription.name#else$subscription.url#end #if($subscriptionSize > 0) ($subscriptionSize) #end</h5>
 
 <p>$subscription</p>
 
