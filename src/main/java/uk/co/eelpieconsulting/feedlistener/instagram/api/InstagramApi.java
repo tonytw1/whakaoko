@@ -58,15 +58,15 @@ public class InstagramApi {
 			final String response = httpFetcher.post(post);		
 			final JSONObject responseJSON = new JSONObject(response);
 			return new InstagramTagSubscription(
-				responseJSON.getJSONObject("data").getString("object_id"),
-				responseJSON.getJSONObject("data").getLong("id"), channelId);
+				responseJSON.getJSONObject(DATA).getString("object_id"),
+				responseJSON.getJSONObject(DATA).getLong("id"), channelId);
 		
 		} catch (HttpBadRequestException e) {
 			log.error("HTTP Bad request: " + e.getResponseBody());
 			throw new RuntimeException(e);
 		}
 	}
-
+	
 	public InstagramGeographySubscription createGeographySubscription(LatLong latLong, int radius, String clientId, String clientSecret, String callbackUrl, String channelId) throws UnsupportedEncodingException, HttpNotFoundException, HttpBadRequestException, HttpForbiddenException, HttpFetchException, JSONException {		
 		final List<NameValuePair> nameValuePairs = commonSubscriptionFields(clientId, clientSecret, callbackUrl);		
 		nameValuePairs.add(new BasicNameValuePair("object", "geography"));
