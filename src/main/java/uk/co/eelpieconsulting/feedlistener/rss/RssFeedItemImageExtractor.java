@@ -39,7 +39,7 @@ public class RssFeedItemImageExtractor {
 				for (int i = 0; i < mediaContents.length; i++) {
 					MediaContent mediaContent = mediaContents[i];
 					final boolean isImage = isImage(mediaContent);
-					if (isImage && isBetterThanCurrentlySelected(mediaContent, selectedMediaContent)) {
+					if (isImage && !isBlackListed(mediaContent) && isBetterThanCurrentlySelected(mediaContent, selectedMediaContent)) {
 						selectedMediaContent = mediaContent;
 					}
 				}
@@ -60,11 +60,13 @@ public class RssFeedItemImageExtractor {
 				NodeFilter tagNameFilter = new TagNameFilter("img");
 				NodeList imageNodes = parser.extractAllNodesThatMatch(tagNameFilter);
 				log.debug("Found images: " + imageNodes.size());
-				if (imageNodes.size() > 0) {
+				for (int i = 0; i < imageNodes.size(); i++) {
 					final Tag imageTag = (Tag) imageNodes.elementAt(0);
 					final String imageSrc = imageTag.getAttribute("src");
-					log.info("Found first image: " + imageTag.toHtml() + ", " + imageSrc);
-					return imageSrc;
+					if (!isBlackListedUrl(imageSrc)) {
+						log.info("Found first image: " + imageTag.toHtml() + ", " + imageSrc);
+						return imageSrc;
+					}
 				}
 								
 			} catch (ParserException e) {
@@ -74,6 +76,17 @@ public class RssFeedItemImageExtractor {
 		
 		log.debug("No suitable media element image seen");
 		return null;
+	}
+	
+	private boolean isBlackListed(MediaContent mediaContent) {
+		if (mediaContent.getReference() != null) {
+			return isBlackListedUrl(mediaContent.getReference().toString());
+		}
+		return false;
+	}
+
+	private boolean isBlackListedUrl(String url) {
+		return url.startsWith("http://stats.wordpress.com");
 	}
 	
 	private boolean isImage(MediaContent mediaContent) {
