@@ -52,9 +52,8 @@ public class FeedFetcher {
 		try {
 			final HttpFetcher httpFetcher = new HttpFetcher();
 			final byte[] bytes = httpFetcher.getBytes(feedUrl);
-			final String content = new String(bytes, "UTF-8").trim();	// TODO detect encoding?			
 			final SyndFeedInput feedInput = new SyndFeedInput();
-			return feedInput.build(new InputSource(new ByteArrayInputStream(content.getBytes())));
+			return feedInput.build(new InputSource(new ByteArrayInputStream(bytes)));
 			
 		} catch (Exception e) {
 			log.warn("Error while fetching feed: " + e.getMessage());
