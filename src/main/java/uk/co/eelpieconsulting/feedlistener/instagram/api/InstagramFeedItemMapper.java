@@ -46,7 +46,6 @@ public class InstagramFeedItemMapper {
 		Place place = null;
 		if (imageJson.has(LOCATION) && !imageJson.isNull(LOCATION)) {
 			final JSONObject locationJson = imageJson.getJSONObject(LOCATION);
-			log.info(locationJson.toString());
 			if (locationJson.has(LATITUDE) && locationJson.has(LONGITUDE)) {
 				LatLong latLong = new LatLong(locationJson.getDouble(LATITUDE), locationJson.getDouble(LONGITUDE));	// TODO preserve name and id if available.
 				place = new Place(null, latLong, null);
