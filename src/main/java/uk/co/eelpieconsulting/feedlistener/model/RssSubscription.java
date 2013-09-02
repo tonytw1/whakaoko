@@ -10,7 +10,7 @@ public class RssSubscription extends Subscription {
 	}
 
 	public RssSubscription(String url, String channelId) {
-		this.setId("feed-" + DigestUtils.md5Hex(url));
+		this.setId(channelId + "-" + "feed-" + DigestUtils.md5Hex(url));
 		this.setChannelId(channelId);
 		this.url = url;
 	}
