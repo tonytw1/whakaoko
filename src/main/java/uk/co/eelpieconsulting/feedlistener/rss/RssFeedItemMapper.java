@@ -10,11 +10,6 @@ import org.springframework.stereotype.Component;
 import uk.co.eelpieconsulting.common.geo.model.LatLong;
 import uk.co.eelpieconsulting.common.geo.model.Place;
 import uk.co.eelpieconsulting.common.html.HtmlCleaner;
-import uk.co.eelpieconsulting.common.shorturls.BitlyUrlResolver;
-import uk.co.eelpieconsulting.common.shorturls.FeedBurnerRedirectResolver;
-import uk.co.eelpieconsulting.common.shorturls.ShortUrlResolverService;
-import uk.co.eelpieconsulting.common.shorturls.TinyUrlResolver;
-import uk.co.eelpieconsulting.common.shorturls.TwitterShortenerUrlResolver;
 import uk.co.eelpieconsulting.feedlistener.model.FeedItem;
 
 import com.sun.syndication.feed.module.georss.GeoRSSModule;
@@ -28,13 +23,13 @@ public class RssFeedItemMapper {
 	
 	private RssFeedItemImageExtractor rssFeedItemImageExtractor;
 	private RssFeedItemBodyExtractor rssFeedItemBodyExtractor;
-	private ShortUrlResolverService shortUrlResolverService;
+	private CachingUrlResolverService cachingUrlResolverService;
 		
 	@Autowired
-	public RssFeedItemMapper(RssFeedItemImageExtractor rssFeedItemImageExtractor, RssFeedItemBodyExtractor rssFeedItemBodyExtractor) {
+	public RssFeedItemMapper(RssFeedItemImageExtractor rssFeedItemImageExtractor, RssFeedItemBodyExtractor rssFeedItemBodyExtractor, CachingUrlResolverService cachingUrlResolverService) {
 		this.rssFeedItemImageExtractor = rssFeedItemImageExtractor;
 		this.rssFeedItemBodyExtractor = rssFeedItemBodyExtractor;
-		this.shortUrlResolverService = new ShortUrlResolverService(new BitlyUrlResolver(), new FeedBurnerRedirectResolver(), new TinyUrlResolver(), new TwitterShortenerUrlResolver());	// TODO factory method from library required
+		this.cachingUrlResolverService = cachingUrlResolverService;
 	}
 	
 	public FeedItem createFeedItemFrom(final SyndEntry syndEntry) {
@@ -48,7 +43,7 @@ public class RssFeedItemMapper {
 
 	private String extractUrl(final SyndEntry syndEntry) {
 		final String url = syndEntry.getLink().trim();
-		return shortUrlResolverService.resolveUrl(url);
+		return cachingUrlResolverService.resolveUrl(url);
 	}
 	
 	private Place extractLocationFrom(SyndEntry syndEntry) {

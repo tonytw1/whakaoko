@@ -69,6 +69,11 @@
 		</dependency>
 		<dependency>
 			<groupId>uk.co.eelpieconsulting.common</groupId>
+			<artifactId>common-caching</artifactId>
+			<version>1.0.2</version>
+		</dependency>
+		<dependency>
+			<groupId>uk.co.eelpieconsulting.common</groupId>
 			<artifactId>common-html</artifactId>
 			<version>1.0.0</version>
 		</dependency>
