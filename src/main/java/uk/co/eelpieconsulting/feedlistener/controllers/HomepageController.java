@@ -22,7 +22,7 @@ public class HomepageController {
 		this.channelsDAO = channelsDAO;
 	}
 	
-	@RequestMapping(value="/", method=RequestMethod.GET)
+	@RequestMapping(value="/ui", method=RequestMethod.GET)
 	public ModelAndView homepage() throws UnknownHostException, MongoException {
 		final ModelAndView mv = new ModelAndView("homepage");
 		mv.addObject("channels", channelsDAO.getChannels());		

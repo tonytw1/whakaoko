@@ -5,6 +5,8 @@
 
 <p>$subscription</p>
 
+<p><span title="$subscription.lastRead">Last read: $dateFormatter.timeSince($subscription.lastRead)</span></p>
+
 <a href="/subscriptions/$subscription.id/rss">RSS</a>
 
 <p><a href="/subscriptions/$subscription.id/delete">Delete</a></p>

@@ -6,7 +6,7 @@
 #if($channels && !$channels.isEmpty()) 
 	<ul>
  	#foreach($channel in $channels) 
- 		<li><a href="/channels/$channel.id">$!channel.name</a>
+ 		<li><a href="$urlBuilder.getChannelUrl($channel.id)">$!channel.name</a>
  		</li>
  	#end
  	</ul>

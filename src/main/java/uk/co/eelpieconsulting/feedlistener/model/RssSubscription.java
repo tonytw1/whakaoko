@@ -25,7 +25,10 @@ public class RssSubscription extends Subscription {
 
 	@Override
 	public String toString() {
-		return "RssSubscription [url=" + url + "]";
+		return "RssSubscription [url=" + url + ", getChannelId()="
+				+ getChannelId() + ", getLastRead()=" + getLastRead()
+				+ ", getLatestItemDate()=" + getLatestItemDate()
+				+ ", getName()=" + getName() + "]";
 	}
 	
 }
