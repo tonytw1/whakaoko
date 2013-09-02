@@ -122,17 +122,22 @@ public class SubscriptionsController {
 	@RequestMapping(value="/subscriptions/{id}/delete")
 	public ModelAndView deleteSubscription(@PathVariable String id) throws UnknownHostException, MongoException, HttpNotFoundException, HttpBadRequestException, HttpForbiddenException, HttpFetchException {
 		final Subscription subscription = subscriptionsDAO.getById(id);
-		if (subscription != null) {
-			subscriptionsDAO.delete(subscription);
-			
-			if (subscription.getId().startsWith("twitter")) {
-				twitterListener.connect();
-			}
-			if (subscription.getId().startsWith("instagram")) {
-				instagramSubscriptionManager.requestUnsubscribeFrom(((InstagramSubscription) subscription).getSubscriptionId());
-			}
+		if (subscription == null) {
+			// TODO 404
+			return null;
 		}
-		final ModelAndView mv = new ModelAndView(new RedirectView(urlBuilder.getBaseUrl()));
+		
+		feedItemDAO.deleteSubscriptionFeedItems(subscription);
+		subscriptionsDAO.delete(subscription);
+						
+		if (subscription.getId().startsWith("twitter")) {
+			twitterListener.connect();
+		}
+		if (subscription.getId().startsWith("instagram")) {
+			instagramSubscriptionManager.requestUnsubscribeFrom(((InstagramSubscription) subscription).getSubscriptionId());
+		}
+		
+		final ModelAndView mv = new ModelAndView(viewFactory.getJsonView()).addObject("data", "ok");
 		return mv;
 	}
 	

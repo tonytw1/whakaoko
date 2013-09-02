@@ -51,6 +51,10 @@ public class FeedItemDAO {
 		return subscriptionFeedItemsQuery(subscriptionId).limit(pageSize).offset(calculatePageOffset(pageSize, page)).asList();
 	}
 	
+	public void deleteSubscriptionFeedItems(Subscription subscription) throws UnknownHostException, MongoException {
+		 dataStoreFactory.getDatastore().delete(subscriptionFeedItemsQuery(subscription.getId()));
+	}
+	
 	public long getAllCount() throws UnknownHostException, MongoException {
 		return dataStoreFactory.getDatastore().find(FeedItem.class).countAll();
 	}
