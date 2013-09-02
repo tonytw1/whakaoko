@@ -30,7 +30,10 @@ public class SubscriptionsDAO {
 	
 	public synchronized void add(Subscription subscription) {
 		if (!subscriptionExists(subscription)) {
+			log.info("Saving subscription");
 			save(subscription);
+		} else {
+			log.info("Not saving duplication subscription");
 		}
 	}
 	
@@ -96,6 +99,7 @@ public class SubscriptionsDAO {
 	private boolean subscriptionExists(Subscription subscription) {
 		for (Subscription existingSubscription : getSubscriptions()) {
 			if (existingSubscription.getId().equals(subscription.getId())) {
+				log.info("Subscription exists: " + subscription);
 				return true;
 			}
 		}		
