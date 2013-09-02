@@ -18,11 +18,11 @@ public class UrlBuilder {
 	}
 
 	public String getSubscriptionUrl(String subscriptionId) {
-		return getBaseUrl() + "/subscriptions/" + subscriptionId;
+		return getBaseUrl() + "/ui/subscriptions/" + subscriptionId;
 	}
 
 	public String getChannelsUrl() {
-		return getBaseUrl() + "/channels";
+		return getBaseUrl() + "/ui/channels";
 	}
 
 	public String getChannelUrl(String channelId) {

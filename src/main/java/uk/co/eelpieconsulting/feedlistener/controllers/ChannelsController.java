@@ -48,21 +48,21 @@ public class ChannelsController {
 		this.viewFactory = viewFactory;
 	}
 	
-	@RequestMapping(value="/channels", method=RequestMethod.GET)
+	@RequestMapping(value="/ui/channels", method=RequestMethod.GET)
 	public ModelAndView channels() {
 		final ModelAndView mv = new ModelAndView("channels");
 		mv.addObject("channels", channelsDAO.getChannels());
 		return mv;
 	}
 
-	@RequestMapping(value="/channels/json", method=RequestMethod.GET)
+	@RequestMapping(value="/channels", method=RequestMethod.GET)
 	public ModelAndView channelsJson() {
 		final ModelAndView mv = new ModelAndView(viewFactory.getJsonView());
 		mv.addObject("data", channelsDAO.getChannels());
 		return mv;
 	}
 	
-	@RequestMapping(value="/channels/{id}", method=RequestMethod.GET)
+	@RequestMapping(value="/ui/channels/{id}", method=RequestMethod.GET)
 	public ModelAndView channel(@PathVariable String id,
 			@RequestParam(required=false) Integer page) throws UnknownHostException, MongoException {
 		final Channel channel = channelsDAO.getById(id);
@@ -91,6 +91,25 @@ public class ChannelsController {
 		return mv;
 	}
 	
+	@RequestMapping(value="/channels/{id}", method=RequestMethod.GET)
+	public ModelAndView channel(@PathVariable String id) throws UnknownHostException, MongoException {
+		final Channel channel = channelsDAO.getById(id);
+		
+		final ModelAndView mv = new ModelAndView(viewFactory.getJsonView());
+		mv.addObject("data", channel);		
+		return mv;
+	}
+	
+	@RequestMapping(value="/channels/{id}/subscriptions", method=RequestMethod.GET)
+	public ModelAndView channelSubscriptions(@PathVariable String id) throws UnknownHostException, MongoException {
+		final Channel channel = channelsDAO.getById(id);
+		final List<Subscription> subscriptionsForChannel = subscriptionsDAO.getSubscriptionsForChannel(channel.getId());
+		
+		final ModelAndView mv = new ModelAndView(viewFactory.getJsonView());
+		mv.addObject("data", subscriptionsForChannel);		
+		return mv;
+	}
+		
 	@RequestMapping(value="/channels/{id}/rss", method=RequestMethod.GET)
 	public ModelAndView channelRss(@PathVariable String id,
 			@RequestParam(required=false) Integer page) throws UnknownHostException, MongoException {
@@ -110,7 +129,7 @@ public class ChannelsController {
 		return mv;
 	}
 	
-	@RequestMapping(value="/channels/{id}/json", method=RequestMethod.GET)
+	@RequestMapping(value="/channels/{id}/items", method=RequestMethod.GET)
 	public ModelAndView channelJson(@PathVariable String id,
 			@RequestParam(required=false) Integer page) throws UnknownHostException, MongoException {
 		final Channel channel = channelsDAO.getById(id);

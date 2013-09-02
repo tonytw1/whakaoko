@@ -28,7 +28,6 @@ import uk.co.eelpieconsulting.feedlistener.daos.SubscriptionsDAO;
 import uk.co.eelpieconsulting.feedlistener.instagram.InstagramSubscriptionManager;
 import uk.co.eelpieconsulting.feedlistener.model.InstagramGeographySubscription;
 import uk.co.eelpieconsulting.feedlistener.model.InstagramSubscription;
-import uk.co.eelpieconsulting.feedlistener.model.RssSubscription;
 import uk.co.eelpieconsulting.feedlistener.model.Subscription;
 import uk.co.eelpieconsulting.feedlistener.rss.RssPoller;
 import uk.co.eelpieconsulting.feedlistener.rss.RssSubscriptionManager;
@@ -75,7 +74,7 @@ public class SubscriptionsController {
 		this.viewFactory = viewFactory;
 	}
 	
-	@RequestMapping(value="/subscriptions/{id}", method=RequestMethod.GET)
+	@RequestMapping(value="/ui/subscriptions/{id}", method=RequestMethod.GET)
 	public ModelAndView subscription(@PathVariable String id,
 			@RequestParam(required=false) Integer page) throws UnknownHostException, MongoException {
 		final Subscription subscription = subscriptionsDAO.getById(id);
@@ -84,6 +83,16 @@ public class SubscriptionsController {
 		mv.addObject("subscription", subscription);
 		mv.addObject("subscriptionSize", feedItemDAO.getSubscriptionFeedItemsCount(subscription.getId()));
 		populateFeedItems(subscription, page, mv, "feedItems");		
+		return mv;
+	}
+	
+	@RequestMapping(value="/subscriptions/{id}/items", method=RequestMethod.GET)
+	public ModelAndView subscriptionItems(@PathVariable String id,
+			@RequestParam(required=false) Integer page) throws UnknownHostException, MongoException {
+		final Subscription subscription = subscriptionsDAO.getById(id);
+		
+		final ModelAndView mv = new ModelAndView(viewFactory.getJsonView());
+		populateFeedItems(subscription, page, mv, "data");		
 		return mv;
 	}
 
@@ -127,14 +136,14 @@ public class SubscriptionsController {
 		return mv;
 	}
 	
-	@RequestMapping(value="/subscriptions/new", method=RequestMethod.GET)
+	@RequestMapping(value="/ui/subscriptions/new", method=RequestMethod.GET)
 	public ModelAndView newSubscriptionForm() {
 		final ModelAndView mv = new ModelAndView("newSubscription");
 		mv.addObject("channels", channelsDAO.getChannels());
 		return mv;
 	}
 	
-	@RequestMapping(value="/subscriptions/json", method=RequestMethod.GET)
+	@RequestMapping(value="/subscriptions", method=RequestMethod.GET)
 	public ModelAndView subscriptions() {
 		final ModelAndView mv = new ModelAndView(viewFactory.getJsonView());
 		mv.addObject("data", subscriptionsDAO.getSubscriptions());
@@ -143,11 +152,14 @@ public class SubscriptionsController {
 	
 	@RequestMapping(value="/subscriptions/feeds", method=RequestMethod.POST)
 	public ModelAndView addFeedSubscription(@RequestParam String url, @RequestParam String channel) {
-		final RssSubscription subscription = rssSubscriptionManager.requestFeedSubscription(url, channel);
+		final Subscription subscription = rssSubscriptionManager.requestFeedSubscription(url, channel);
 		subscriptionsDAO.add(subscription);
+		log.info("Added subscription: " + subscription);
+		
 		rssPoller.run(subscription);
 		
-		final ModelAndView mv = new ModelAndView(new RedirectView(urlBuilder.getBaseUrl()));
+		final ModelAndView mv = new ModelAndView(viewFactory.getJsonView());
+		mv.addObject("data", subscription);
 		return mv;
 	}
 	
