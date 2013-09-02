@@ -10,6 +10,11 @@ import org.springframework.stereotype.Component;
 import uk.co.eelpieconsulting.common.geo.model.LatLong;
 import uk.co.eelpieconsulting.common.geo.model.Place;
 import uk.co.eelpieconsulting.common.html.HtmlCleaner;
+import uk.co.eelpieconsulting.common.shorturls.BitlyUrlResolver;
+import uk.co.eelpieconsulting.common.shorturls.FeedBurnerRedirectResolver;
+import uk.co.eelpieconsulting.common.shorturls.ShortUrlResolverService;
+import uk.co.eelpieconsulting.common.shorturls.TinyUrlResolver;
+import uk.co.eelpieconsulting.common.shorturls.TwitterShortenerUrlResolver;
 import uk.co.eelpieconsulting.feedlistener.model.FeedItem;
 
 import com.sun.syndication.feed.module.georss.GeoRSSModule;
@@ -23,20 +28,27 @@ public class RssFeedItemMapper {
 	
 	private RssFeedItemImageExtractor rssFeedItemImageExtractor;
 	private RssFeedItemBodyExtractor rssFeedItemBodyExtractor;
+	private ShortUrlResolverService shortUrlResolverService;
 		
 	@Autowired
 	public RssFeedItemMapper(RssFeedItemImageExtractor rssFeedItemImageExtractor, RssFeedItemBodyExtractor rssFeedItemBodyExtractor) {
 		this.rssFeedItemImageExtractor = rssFeedItemImageExtractor;
 		this.rssFeedItemBodyExtractor = rssFeedItemBodyExtractor;
+		this.shortUrlResolverService = new ShortUrlResolverService(new BitlyUrlResolver(), new FeedBurnerRedirectResolver(), new TinyUrlResolver(), new TwitterShortenerUrlResolver());	// TODO factory method from library required
 	}
-
+	
 	public FeedItem createFeedItemFrom(final SyndEntry syndEntry) {
 		final Place place = extractLocationFrom(syndEntry);        	
 		final String imageUrl = rssFeedItemImageExtractor.extractImageFrom(syndEntry);		
 		final String body = new HtmlCleaner().stripHtml(StringEscapeUtils.unescapeHtml(rssFeedItemBodyExtractor.extractBody(syndEntry)));		
 		final Date date = syndEntry.getPublishedDate() != null ? syndEntry.getPublishedDate() : syndEntry.getUpdatedDate();						
-		final FeedItem feedItem = new FeedItem(syndEntry.getTitle(), syndEntry.getLink().trim(), body, date, place, imageUrl);
+		final FeedItem feedItem = new FeedItem(syndEntry.getTitle(), extractUrl(syndEntry), body, date, place, imageUrl);
 		return feedItem;
+	}
+
+	private String extractUrl(final SyndEntry syndEntry) {
+		final String url = syndEntry.getLink().trim();
+		return shortUrlResolverService.resolveUrl(url);
 	}
 	
 	private Place extractLocationFrom(SyndEntry syndEntry) {
