@@ -12,6 +12,7 @@ import uk.co.eelpieconsulting.common.geo.model.Place;
 import uk.co.eelpieconsulting.common.html.HtmlCleaner;
 import uk.co.eelpieconsulting.feedlistener.model.FeedItem;
 
+import com.google.common.base.Strings;
 import com.sun.syndication.feed.module.georss.GeoRSSModule;
 import com.sun.syndication.feed.module.georss.GeoRSSUtils;
 import com.sun.syndication.feed.synd.SyndEntry;
@@ -21,15 +22,18 @@ public class RssFeedItemMapper {
 	
 	private static Logger log = Logger.getLogger(RssFeedItemMapper.class);
 	
-	private RssFeedItemImageExtractor rssFeedItemImageExtractor;
-	private RssFeedItemBodyExtractor rssFeedItemBodyExtractor;
-	private CachingUrlResolverService cachingUrlResolverService;
-		
+	private final RssFeedItemImageExtractor rssFeedItemImageExtractor;
+	private final RssFeedItemBodyExtractor rssFeedItemBodyExtractor;
+	private final CachingUrlResolverService cachingUrlResolverService;
+	private final UrlCleaner urlCleaner;
+	
 	@Autowired
-	public RssFeedItemMapper(RssFeedItemImageExtractor rssFeedItemImageExtractor, RssFeedItemBodyExtractor rssFeedItemBodyExtractor, CachingUrlResolverService cachingUrlResolverService) {
+	public RssFeedItemMapper(RssFeedItemImageExtractor rssFeedItemImageExtractor, RssFeedItemBodyExtractor rssFeedItemBodyExtractor, 
+			CachingUrlResolverService cachingUrlResolverService, UrlCleaner urlCleaner) {
 		this.rssFeedItemImageExtractor = rssFeedItemImageExtractor;
 		this.rssFeedItemBodyExtractor = rssFeedItemBodyExtractor;
 		this.cachingUrlResolverService = cachingUrlResolverService;
+		this.urlCleaner = urlCleaner;
 	}
 	
 	public FeedItem createFeedItemFrom(final SyndEntry syndEntry) {
@@ -42,8 +46,13 @@ public class RssFeedItemMapper {
 	}
 
 	private String extractUrl(final SyndEntry syndEntry) {
-		final String url = syndEntry.getLink().trim();
-		return cachingUrlResolverService.resolveUrl(url);
+		final String url = syndEntry.getLink();
+		if (Strings.isNullOrEmpty(url)) {
+			return null;
+		}
+		
+		final String resolvedUrl = cachingUrlResolverService.resolveUrl(url);
+		return urlCleaner.cleanSubmittedItemUrl(resolvedUrl);
 	}
 	
 	private Place extractLocationFrom(SyndEntry syndEntry) {
