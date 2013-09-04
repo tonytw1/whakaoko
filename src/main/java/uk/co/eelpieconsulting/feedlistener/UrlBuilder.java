@@ -3,6 +3,9 @@ package uk.co.eelpieconsulting.feedlistener;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import uk.co.eelpieconsulting.feedlistener.model.Channel;
+import uk.co.eelpieconsulting.feedlistener.model.Subscription;
+
 @Component
 public class UrlBuilder {
 
@@ -17,16 +20,12 @@ public class UrlBuilder {
 		return getBaseUrl() + "/instagram/callback";
 	}
 
-	public String getSubscriptionUrl(String subscriptionId) {
-		return getBaseUrl() + "/ui/subscriptions/" + subscriptionId;
+	public String getSubscriptionUrl(Subscription subscription) {
+		return getBaseUrl() + "/ui/" + subscription.getUsername() + "/subscriptions/" + subscription.getId();
 	}
-
-	public String getChannelsUrl() {
-		return getBaseUrl() + "/ui/channels";
-	}
-
-	public String getChannelUrl(String channelId) {
-		return getChannelsUrl() + "/" + channelId;
+	
+	public String getChannelUrl(Channel channel) {
+		return getBaseUrl() + "/ui/" + channel.getUsername() + "/channels/" + channel.getId();
 	}
 	
 }

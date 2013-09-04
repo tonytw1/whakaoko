@@ -60,9 +60,9 @@ public class SubscriptionsDAO {
 		}
 	}
 
-	public Subscription getById(String id) {
+	public Subscription getById(String username, String id) {
         try {
-			return dataStoreFactory.getDatastore().find(Subscription.class, "id", id).get();
+			return dataStoreFactory.getDatastore().createQuery(Subscription.class).filter("username", username).filter("id", id).get();
 		} catch (UnknownHostException e) {
 			throw new RuntimeException(e);
 		} catch (MongoException e) {

@@ -9,9 +9,10 @@ public class RssSubscription extends Subscription {
 	public RssSubscription() {
 	}
 
-	public RssSubscription(String url, String channelId) {
+	public RssSubscription(String url, String channelId, String username) {
 		this.setId(channelId + "-" + "feed-" + DigestUtils.md5Hex(url));
 		this.setChannelId(channelId);
+		this.setUsername(username);
 		this.url = url;
 	}
 	

@@ -25,6 +25,7 @@ import uk.co.eelpieconsulting.feedlistener.UrlBuilder;
 import uk.co.eelpieconsulting.feedlistener.daos.ChannelsDAO;
 import uk.co.eelpieconsulting.feedlistener.daos.FeedItemDAO;
 import uk.co.eelpieconsulting.feedlistener.daos.SubscriptionsDAO;
+import uk.co.eelpieconsulting.feedlistener.daos.UsersDAO;
 import uk.co.eelpieconsulting.feedlistener.instagram.InstagramSubscriptionManager;
 import uk.co.eelpieconsulting.feedlistener.model.InstagramGeographySubscription;
 import uk.co.eelpieconsulting.feedlistener.model.InstagramSubscription;
@@ -43,7 +44,8 @@ public class SubscriptionsController {
 
 	private static Logger log = Logger.getLogger(SubscriptionsController.class);
 	
-	private SubscriptionsDAO subscriptionsDAO;
+	private final UsersDAO usersDAO;
+	private final SubscriptionsDAO subscriptionsDAO;
 	private final RssPoller rssPoller;
 	private final TwitterListener twitterListener;
 	private final InstagramSubscriptionManager instagramSubscriptionManager;
@@ -55,13 +57,14 @@ public class SubscriptionsController {
 	private final ViewFactory viewFactory;
 	
 	@Autowired
-	public SubscriptionsController(SubscriptionsDAO subscriptionsDAO, RssPoller rssPoller, TwitterListener twitterListener, 
+	public SubscriptionsController(UsersDAO usersDAO, SubscriptionsDAO subscriptionsDAO, RssPoller rssPoller, TwitterListener twitterListener, 
 			InstagramSubscriptionManager instagramSubscriptionManager, UrlBuilder urlBuilder,
 			FeedItemDAO feedItemDAO,
 			ChannelsDAO channelsDAO,
 			TwitterSubscriptionManager twitterSubscriptionManager,
 			RssSubscriptionManager rssSubscriptionManager,
 			ViewFactory viewFactory) {
+		this.usersDAO = usersDAO;
 		this.subscriptionsDAO = subscriptionsDAO;
 		this.rssPoller = rssPoller;
 		this.twitterListener = twitterListener;
@@ -74,11 +77,18 @@ public class SubscriptionsController {
 		this.viewFactory = viewFactory;
 	}
 	
-	@RequestMapping(value="/ui/subscriptions/{id}", method=RequestMethod.GET)
-	public ModelAndView subscription(@PathVariable String id,
+	@RequestMapping(value="/ui/{username}/subscriptions/{id}", method=RequestMethod.GET)
+	public ModelAndView subscription(@PathVariable String username, @PathVariable String id,
 			@RequestParam(required=false) Integer page) throws UnknownHostException, MongoException {
-		final Subscription subscription = subscriptionsDAO.getById(id);
-
+		if (usersDAO.getByUsername(username) == null) {
+			throw new RuntimeException("Invalid user");
+		}
+		
+		final Subscription subscription = subscriptionsDAO.getById(username, id);
+		if (subscription == null) {
+			throw new RuntimeException("Invalid user");
+		}
+		
 		final ModelAndView mv = new ModelAndView("subscription");
 		mv.addObject("subscription", subscription);
 		mv.addObject("subscriptionSize", feedItemDAO.getSubscriptionFeedItemsCount(subscription.getId()));
@@ -86,33 +96,28 @@ public class SubscriptionsController {
 		return mv;
 	}
 	
-	@RequestMapping(value="/subscriptions/{id}/items", method=RequestMethod.GET)
-	public ModelAndView subscriptionItems(@PathVariable String id,
+	@RequestMapping(value="/{username}/subscriptions/{id}/items", method=RequestMethod.GET)
+	public ModelAndView subscriptionItems(@PathVariable String username, @PathVariable String id,
 			@RequestParam(required=false) Integer page) throws UnknownHostException, MongoException {
-		final Subscription subscription = subscriptionsDAO.getById(id);
+		if (usersDAO.getByUsername(username) == null) {
+			throw new RuntimeException("Invalid user");
+		}
+		
+		final Subscription subscription = subscriptionsDAO.getById(username, id);
 		
 		final ModelAndView mv = new ModelAndView(viewFactory.getJsonView());
 		populateFeedItems(subscription, page, mv, "data");		
 		return mv;
 	}
-
-	@RequestMapping(value="/subscriptions/{id}/rss", method=RequestMethod.GET)	
-	public ModelAndView subscriptionRss(@PathVariable String id,
-			@RequestParam(required=false) Integer page) throws UnknownHostException, MongoException {
-		final Subscription subscription = subscriptionsDAO.getById(id);
-		
-		final ModelAndView mv = new ModelAndView(viewFactory.getRssView(subscription.getName() + " items", 
-				urlBuilder.getSubscriptionUrl(subscription.getId()), 
-				subscription.getName() + " items"));
-		
-		populateFeedItems(subscription, page, mv, "data");		
-		return mv;
-	}
 	
 	@RequestMapping(value="/subscriptions/{id}/json", method=RequestMethod.GET)	
-	public ModelAndView subscriptionJson(@PathVariable String id,
+	public ModelAndView subscriptionJson(@PathVariable String username, @PathVariable String id,
 			@RequestParam(required=false) Integer page) throws UnknownHostException, MongoException {
-		final Subscription subscription = subscriptionsDAO.getById(id);
+		if (usersDAO.getByUsername(username) == null) {
+			throw new RuntimeException("Invalid user");
+		}
+		
+		final Subscription subscription = subscriptionsDAO.getById(username, id);
 		
 		final ModelAndView mv = new ModelAndView(viewFactory.getJsonView());
 		populateFeedItems(subscription, page, mv, "data");		
@@ -120,8 +125,12 @@ public class SubscriptionsController {
 	}
 	
 	@RequestMapping(value="/subscriptions/{id}/delete")
-	public ModelAndView deleteSubscription(@PathVariable String id) throws UnknownHostException, MongoException, HttpNotFoundException, HttpBadRequestException, HttpForbiddenException, HttpFetchException {
-		final Subscription subscription = subscriptionsDAO.getById(id);
+	public ModelAndView deleteSubscription(@PathVariable String username, @PathVariable String id) throws UnknownHostException, MongoException, HttpNotFoundException, HttpBadRequestException, HttpForbiddenException, HttpFetchException {
+		if (usersDAO.getByUsername(username) == null) {
+			throw new RuntimeException("Invalid user");
+		}
+		
+		final Subscription subscription = subscriptionsDAO.getById(username, id);
 		if (subscription == null) {
 			// TODO 404
 			return null;
@@ -141,23 +150,35 @@ public class SubscriptionsController {
 		return mv;
 	}
 	
-	@RequestMapping(value="/ui/subscriptions/new", method=RequestMethod.GET)
-	public ModelAndView newSubscriptionForm() {
+	@RequestMapping(value="/ui/{username}/subscriptions/new", method=RequestMethod.GET)
+	public ModelAndView newSubscriptionForm(@PathVariable String username) {
+		if (usersDAO.getByUsername(username) == null) {
+			throw new RuntimeException("Invalid user");
+		}
+		
 		final ModelAndView mv = new ModelAndView("newSubscription");
-		mv.addObject("channels", channelsDAO.getChannels());
+		mv.addObject("channels", channelsDAO.getChannels(username));
 		return mv;
 	}
 	
-	@RequestMapping(value="/subscriptions", method=RequestMethod.GET)
-	public ModelAndView subscriptions() {
+	@RequestMapping(value="/{username}/subscriptions", method=RequestMethod.GET)
+	public ModelAndView subscriptions(@PathVariable String username) {
+		if (usersDAO.getByUsername(username) == null) {
+			throw new RuntimeException("Invalid user");
+		}
+		
 		final ModelAndView mv = new ModelAndView(viewFactory.getJsonView());
 		mv.addObject("data", subscriptionsDAO.getSubscriptions());
 		return mv;
 	}
 	
-	@RequestMapping(value="/subscriptions/feeds", method=RequestMethod.POST)
-	public ModelAndView addFeedSubscription(@RequestParam String url, @RequestParam String channel) {
-		final Subscription subscription = rssSubscriptionManager.requestFeedSubscription(url, channel);
+	@RequestMapping(value="/{username}/subscriptions/feeds", method=RequestMethod.POST)
+	public ModelAndView addFeedSubscription(@PathVariable String username, @RequestParam String url, @RequestParam String channel) {
+		if (usersDAO.getByUsername(username) == null) {
+			throw new RuntimeException("Invalid user");
+		}
+		
+		final Subscription subscription = rssSubscriptionManager.requestFeedSubscription(url, channel, username);
 		subscriptionsDAO.add(subscription);
 		log.info("Added subscription: " + subscription);
 		

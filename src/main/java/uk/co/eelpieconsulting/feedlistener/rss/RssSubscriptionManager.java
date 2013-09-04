@@ -20,10 +20,10 @@ public class RssSubscriptionManager {
 		this.subscriptionsDAO = subscriptionsDAO;
 	}
 	
-	public Subscription requestFeedSubscription(String url, String channel) {
+	public Subscription requestFeedSubscription(String url, String channel, String username) {
 		log.info("Requesting subscription to feed: " + url);
-		final RssSubscription newSubscription = new RssSubscription(url, channel);
-		final Subscription existingSubscription = subscriptionsDAO.getById(newSubscription.getId());
+		final RssSubscription newSubscription = new RssSubscription(url, channel, username);
+		final Subscription existingSubscription = subscriptionsDAO.getById(username, newSubscription.getId());
 		return existingSubscription != null ? existingSubscription : newSubscription;
 	}
 	

@@ -10,7 +10,7 @@
 #if($subscriptions && !$subscriptions.isEmpty()) 
 	<ul>
  	#foreach($subscription in $subscriptions) 
- 		<li><a href="$urlBuilder.getSubscriptionUrl($subscription.id)">#if($subscription.name)$subscription.name#else$subscription.url#end</a> 
+ 		<li><a href="$urlBuilder.getSubscriptionUrl($subscription)">#if($subscription.name)$subscription.name#else$subscription.url#end</a> 
  		#if($subscriptionCounts.get($subscription.id) > 0) ($subscriptionCounts.get($subscription.id))#end
  		#if($subscription.latestItemDate)
 	 		<br/>
@@ -28,10 +28,6 @@
 <td>
 
 <h5>Inbox #if($inboxSize) ($inboxSize)#end</h5>
-
-<div align="right">
-<a href="$urlBuilder.getChannelUrl($channel.id)/rss">RSS</a>
-</div>
 
 #if($inbox && !$inbox.isEmpty()) 
 	<ul>

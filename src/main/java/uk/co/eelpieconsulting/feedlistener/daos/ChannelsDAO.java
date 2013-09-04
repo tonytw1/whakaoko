@@ -23,9 +23,9 @@ public class ChannelsDAO {
 		this.dataStoreFactory = dataStoreFactory;
 	}
 
-	public List<Channel> getChannels() {
+	public List<Channel> getChannels(String username) {
 		try {
-			return dataStoreFactory.getDatastore().find(Channel.class).asList();
+			return dataStoreFactory.getDatastore().find(Channel.class, "username", username).asList();
 			
 		} catch (UnknownHostException e) {
 			throw new RuntimeException(e);
@@ -34,9 +34,9 @@ public class ChannelsDAO {
 		}
 	}
 
-	public Channel getById(String id) {
+	public Channel getById(String username, String id) {
         try {
-			return dataStoreFactory.getDatastore().find(Channel.class, "id", id).get();
+			return dataStoreFactory.getDatastore().createQuery(Channel.class).filter("id", id).filter("username", username).get();
 		} catch (UnknownHostException e) {
 			throw new RuntimeException(e);
 		} catch (MongoException e) {
@@ -44,8 +44,8 @@ public class ChannelsDAO {
 		}
 	}
 	
-	public synchronized void add(Channel channel) {		
-		if (!channelExists(channel)) {
+	public synchronized void add(String username, Channel channel) {		
+		if (!channelExists(username, channel)) {
 			log.info("Adding new channel: " + channel);
 			save(channel);
 		} else {
@@ -63,9 +63,8 @@ public class ChannelsDAO {
 		}
 	}
 	
-	private boolean channelExists(Channel channel) {
-		log.info(getChannels());
-		for (Channel existingChannel : getChannels()) {
+	private boolean channelExists(String username, Channel channel) {
+		for (Channel existingChannel : getChannels(username)) {
 			if (existingChannel.getId().equals(channel.getId())) {
 				return true;
 			}

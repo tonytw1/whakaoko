@@ -16,7 +16,7 @@ public abstract class Subscription {
     @Id
     ObjectId objectId;
     
-    private String id, name;
+    private String id, name, username;
     
     private Date lastRead, latestItemDate;
     
@@ -63,11 +63,20 @@ public abstract class Subscription {
 		this.channelId = channelId;
 	}
 
+	public String getUsername() {
+		return username;
+	}
+
+	public void setUsername(String username) {
+		this.username = username;
+	}
+
 	@Override
 	public String toString() {
 		return "Subscription [channelId=" + channelId + ", id=" + id
 				+ ", lastRead=" + lastRead + ", latestItemDate="
-				+ latestItemDate + ", name=" + name + "]";
+				+ latestItemDate + ", name=" + name + ", username=" + username
+				+ "]";
 	}
 	
 }

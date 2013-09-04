@@ -42,7 +42,7 @@ public class RssPoller {
 		log.info("Polling subscriptions");
 		List<Subscription> subscriptions = subscriptionsDAO.getSubscriptions();
 		for (Subscription subscription : subscriptions) {
-			if (subscription.getId().startsWith("feed")) {
+			if (isRssSubscription(subscription)) {
 				taskExecutor.execute(new ProcessFeedTask(feedFetcher, feedItemDAO, subscriptionsDAO, (RssSubscription) subscription));
 			}
 		}
@@ -104,6 +104,10 @@ public class RssPoller {
 				log.warn("Failed to fetch feed: " + subscription);
 			}
 		}		
+	}
+	
+	private boolean isRssSubscription(Subscription subscription) {
+		return subscription.getId().contains("feed-");	// TODO implement better
 	}
 	
 }
