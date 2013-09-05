@@ -1,0 +1,12 @@
+Package: whakaoko
+Version: %VERSION%
+Depends: tomcat7, apache2, memcached
+Section: whakaoko
+Priority: optional
+Architecture: all
+Essential: no
+Installed-Size: 1024
+Maintainer: Tony McCrae [tony@eelpieconsulting.co.uk]
+Provides: whakaoko
+Description: Whakaoko feed listener
+
