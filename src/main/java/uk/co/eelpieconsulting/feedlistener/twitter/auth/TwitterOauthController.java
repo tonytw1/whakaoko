@@ -40,7 +40,7 @@ public class TwitterOauthController {
 		requestTokens = Maps.newConcurrentMap();
 	}
 	
-	@RequestMapping(value="/twitter/authorize", method=RequestMethod.GET)
+	@RequestMapping(value="/twitter/authorise", method=RequestMethod.GET)
 	public ModelAndView authorize() throws TwitterException {
 		final Twitter twitterApi = twitterApiFactory.getTwitterApi();
 		

@@ -38,7 +38,7 @@ public class InstagramOauthController {
 		this.instagramApi = new InstagramApi();
 	}
 	
-	@RequestMapping(value="/instagram/authorize", method=RequestMethod.GET)
+	@RequestMapping(value="/instagram/authorise", method=RequestMethod.GET)
 	public ModelAndView authorize() {
 		final String authorizeRedirectUrl = authorizeRedirectUrl();
 		log.info("Redirecting user to instagram: " + authorizeRedirectUrl);
