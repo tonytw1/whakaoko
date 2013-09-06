@@ -35,6 +35,7 @@ import uk.co.eelpieconsulting.feedlistener.rss.RssSubscriptionManager;
 import uk.co.eelpieconsulting.feedlistener.twitter.TwitterListener;
 import uk.co.eelpieconsulting.feedlistener.twitter.TwitterSubscriptionManager;
 
+import com.google.common.base.Strings;
 import com.mongodb.MongoException;
 
 @Controller
@@ -98,19 +99,24 @@ public class SubscriptionsController {
 	
 	@RequestMapping(value="/{username}/subscriptions/{id}/items", method=RequestMethod.GET)
 	public ModelAndView subscriptionItems(@PathVariable String username, @PathVariable String id,
-			@RequestParam(required=false) Integer page) throws UnknownHostException, MongoException {
+			@RequestParam(required=false) Integer page,
+			@RequestParam(required=false) String format) throws UnknownHostException, MongoException {
 		if (usersDAO.getByUsername(username) == null) {
 			throw new RuntimeException("Invalid user");
 		}
 		
 		final Subscription subscription = subscriptionsDAO.getById(username, id);
 		
-		final ModelAndView mv = new ModelAndView(viewFactory.getJsonView());
+		ModelAndView mv = new ModelAndView(viewFactory.getJsonView());
+		if (!Strings.isNullOrEmpty(format) && format.equals("rss")) {
+			mv = new ModelAndView(viewFactory.getRssView(subscription.getName(), urlBuilder.getSubscriptionUrl(subscription), ""));
+		}
+		
 		populateFeedItems(subscription, page, mv, "data");		
 		return mv;
 	}
 	
-	@RequestMapping(value="/subscriptions/{id}/json", method=RequestMethod.GET)	
+	@RequestMapping(value="/subscriptions/{id}", method=RequestMethod.GET)	
 	public ModelAndView subscriptionJson(@PathVariable String username, @PathVariable String id,
 			@RequestParam(required=false) Integer page) throws UnknownHostException, MongoException {
 		if (usersDAO.getByUsername(username) == null) {
@@ -124,7 +130,7 @@ public class SubscriptionsController {
 		return mv;
 	}
 	
-	@RequestMapping(value="/subscriptions/{id}/delete")
+	@RequestMapping(value="/subscriptions/{id}/delete")	// TODO should be a HTTP DELETE
 	public ModelAndView deleteSubscription(@PathVariable String username, @PathVariable String id) throws UnknownHostException, MongoException, HttpNotFoundException, HttpBadRequestException, HttpForbiddenException, HttpFetchException {
 		if (usersDAO.getByUsername(username) == null) {
 			throw new RuntimeException("Invalid user");

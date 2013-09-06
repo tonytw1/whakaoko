@@ -15,6 +15,7 @@ import org.springframework.web.servlet.ModelAndView;
 
 import uk.co.eelpieconsulting.common.views.ViewFactory;
 import uk.co.eelpieconsulting.feedlistener.IdBuilder;
+import uk.co.eelpieconsulting.feedlistener.UrlBuilder;
 import uk.co.eelpieconsulting.feedlistener.daos.ChannelsDAO;
 import uk.co.eelpieconsulting.feedlistener.daos.FeedItemDAO;
 import uk.co.eelpieconsulting.feedlistener.daos.SubscriptionsDAO;
@@ -22,6 +23,7 @@ import uk.co.eelpieconsulting.feedlistener.daos.UsersDAO;
 import uk.co.eelpieconsulting.feedlistener.model.Channel;
 import uk.co.eelpieconsulting.feedlistener.model.Subscription;
 
+import com.google.common.base.Strings;
 import com.google.common.collect.Maps;
 import com.mongodb.MongoException;
 
@@ -37,16 +39,18 @@ public class ChannelsController {
 	private final SubscriptionsDAO subscriptionsDAO;
 	private final FeedItemDAO feedItemDAO;
 	private final IdBuilder idBuilder;
+	private final UrlBuilder urlBuilder;
 	private final ViewFactory viewFactory;
 	
 	@Autowired
 	public ChannelsController(UsersDAO usersDAO, ChannelsDAO channelsDAO, SubscriptionsDAO subscriptionsDAO, 
-			FeedItemDAO feedItemDAO, IdBuilder idBuilder, ViewFactory viewFactory) {
+			FeedItemDAO feedItemDAO, IdBuilder idBuilder, UrlBuilder urlBuilder, ViewFactory viewFactory) {
 		this.usersDAO = usersDAO;
 		this.channelsDAO = channelsDAO;
 		this.subscriptionsDAO = subscriptionsDAO;
 		this.feedItemDAO = feedItemDAO;
 		this.idBuilder = idBuilder;
+		this.urlBuilder = urlBuilder;
 		this.viewFactory = viewFactory;
 	}
 	
@@ -120,14 +124,19 @@ public class ChannelsController {
 	
 	@RequestMapping(value="/{username}/channels/{id}/items", method=RequestMethod.GET)
 	public ModelAndView channelJson(@PathVariable String username, @PathVariable String id,
-			@RequestParam(required=false) Integer page) throws UnknownHostException, MongoException {
+			@RequestParam(required=false) Integer page,
+			@RequestParam(required=false) String format
+	) throws UnknownHostException, MongoException {
 		if (usersDAO.getByUsername(username) == null) {
 			throw new RuntimeException("Invalid user");
 		}
 		
 		final Channel channel = channelsDAO.getById(username, id);
 		
-		final ModelAndView mv = new ModelAndView(viewFactory.getJsonView());
+		ModelAndView mv = new ModelAndView(viewFactory.getJsonView());
+		if (!Strings.isNullOrEmpty(format) && format.equals("rss")) {
+			mv = new ModelAndView(viewFactory.getRssView(channel.getName(), urlBuilder.getChannelUrl(channel), ""));
+		}
 		
 		if (page != null) {
 			mv.addObject("data", feedItemDAO.getChannelFeedItems(channel.getId(), MAX_FEED_ITEMS, page));
