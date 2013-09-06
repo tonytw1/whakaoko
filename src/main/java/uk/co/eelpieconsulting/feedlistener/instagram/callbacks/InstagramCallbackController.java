@@ -75,7 +75,7 @@ public class InstagramCallbackController {
 			if (subscription != null && subscription instanceof InstagramTagSubscription) {
 				final String tag = ((InstagramTagSubscription) subscription).getTag();
 				log.info("Fetching recent media for changed tag: " + tag);
-				List<FeedItem> recentMedia = instagramApi.getRecentMediaForTag(tag, credentialService.getInstagramAccessToken());
+				List<FeedItem> recentMedia = instagramApi.getRecentMediaForTag(tag, credentialService.getInstagramAccessTokenForUser("tonytw1"));	// TODO user
 								
 				Date latestItemDate = null;
 				for (FeedItem feedItem : recentMedia) {

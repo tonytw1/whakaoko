@@ -1,29 +1,32 @@
 package uk.co.eelpieconsulting.feedlistener.credentials;
 
+import java.net.UnknownHostException;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+
+import uk.co.eelpieconsulting.feedlistener.daos.UsersDAO;
+import uk.co.eelpieconsulting.feedlistener.model.User;
 
 import com.google.common.base.Strings;
 
 @Component
 public class CredentialService {
+	
+	private final String instagramClientId;
+	private final String instagramClientSecret;
 
-	private String instagramAccessToken;
-	private String instagramClientId;
-	private String instagramClientSecret;
-
-	private String twitterConsumerKey;
-	private String twitterConsumerSecret;
-	private String twitterAccessToken;
-	private String twitterAccessSecret;
+	private final String twitterConsumerKey;
+	private final String twitterConsumerSecret;
+	private final UsersDAO usersDAO;
 	
 	@Autowired
-	public CredentialService(@Value("#{config['instagram.client.id']}") String instagramClientId, 
+	public CredentialService(UsersDAO usersDAO, @Value("#{config['instagram.client.id']}") String instagramClientId, 
 			@Value("#{config['instagram.client.secret']}") String instagramClientSecret,
 			@Value("#{config['twitter.consumer.key']}") String twitterConsumerKey, 
 			@Value("#{config['twitter.consumer.secret']}") String twitterConsumerSecret) {
-		super();
+		this.usersDAO = usersDAO;
 		this.instagramClientId = instagramClientId;
 		this.instagramClientSecret = instagramClientSecret;
 		this.twitterConsumerKey = twitterConsumerKey;
@@ -42,32 +45,42 @@ public class CredentialService {
 	public String getTwitterConsumerSecret() {
 		return twitterConsumerSecret;
 	}
-	public String getTwitterAccessToken() {
-		return twitterAccessToken;
+	
+	public String getTwitterAccessTokenForUser(String username) {
+		return usersDAO.getByUsername(username).getTwitterAccessToken();
+	}	
+	public void setTwitterAccessTokenForUser(String username, String twitterAccessToken) throws UnknownHostException {
+		final User user = usersDAO.getByUsername(username);
+		user.setTwitterAccessToken(twitterAccessToken);
+		usersDAO.save(user);
 	}
-	public void setTwitterAccessToken(String twitterAccessToken) {
-		this.twitterAccessToken = twitterAccessToken;
+	
+	public String getTwitterAccessSecretForUser(String username) {
+		return usersDAO.getByUsername(username).getTwitterAccessToken();
 	}
-	public String getTwitterAccessSecret() {
-		return twitterAccessSecret;
-	}
-	public void setTwitterAccessSecret(String twitterAccessSecret) {
-		this.twitterAccessSecret = twitterAccessSecret;
+	public void setTwitterAccessSecretForUser(String username, String twitterAccessSecret) throws UnknownHostException {
+		final User user = usersDAO.getByUsername(username);
+		user.setTwitterAccessSecret(twitterAccessSecret);
+		usersDAO.save(user);
 	}
 
-	public String getInstagramAccessToken() {
-		return instagramAccessToken;
+	public String getInstagramAccessTokenForUser(String username) {
+		return usersDAO.getByUsername(username).getInstagramAccessToken();
 	}
-	public void setInstagramAccessToken(String accessToken) {
-		this.instagramAccessToken = accessToken;		
-	}
-	
-	public boolean hasTwitterAccessToken() {
-		return !Strings.isNullOrEmpty(twitterAccessToken) && !Strings.isNullOrEmpty(twitterAccessSecret);
+	public void setInstagramAccessTokenForUser(String username, String accessToken) throws UnknownHostException {
+		final User user = usersDAO.getByUsername(username);
+		user.setInstagramAccessToken(accessToken);
+		usersDAO.save(user);		
 	}
 	
-	public boolean hasInstagramAccessToken() {
-		return !Strings.isNullOrEmpty(instagramAccessToken);
+	public boolean hasTwitterAccessToken(String username) {
+		final User user = usersDAO.getByUsername(username);
+		return !Strings.isNullOrEmpty(user.getTwitterAccessToken()) && !Strings.isNullOrEmpty(user.getTwitterAccessSecret());
+	}
+	
+	public boolean hasInstagramAccessToken(String username) {
+		final User user = usersDAO.getByUsername(username);
+		return !Strings.isNullOrEmpty(user.getInstagramAccessToken());
 	}
 	
 }

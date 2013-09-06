@@ -55,8 +55,11 @@ public class UsersDAO {
 			throw new RuntimeException("Username is not available");
 		}
 		
-		final User newUser = new User(username);
-		dataStoreFactory.getDatastore().save(newUser);		
+		save(new User(username));		
+	}
+
+	public void save(final User user) throws UnknownHostException {
+		dataStoreFactory.getDatastore().save(user);
 	}
 	
 }

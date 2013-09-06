@@ -11,6 +11,8 @@ import uk.co.eelpieconsulting.feedlistener.model.TwitterTagSubscription;
 @Component
 public class TwitterSubscriptionManager {
 
+	private static final String USER = "tonytw1";	// TODO multi tenant
+	
 	private final CredentialService credentialService;
 	private final SubscriptionsDAO subscriptionsDAO;
 	private final TwitterListener twitterListener;
@@ -23,7 +25,7 @@ public class TwitterSubscriptionManager {
 	}
 	
 	public void requestTagSubscription(String tag, String channel) throws CredentialsRequiredException {
-		if (!credentialService.hasTwitterAccessToken()) {
+		if (!credentialService.hasTwitterAccessToken(USER)) {
 			throw new CredentialsRequiredException();
 		}
 		

@@ -24,6 +24,8 @@ import uk.co.eelpieconsulting.feedlistener.model.InstagramTagSubscription;
 public class InstagramSubscriptionManager {
 	
 	private static Logger log = Logger.getLogger(InstagramSubscriptionManager.class);
+
+	private static final String USER = "tonytw1";	// TODO needs to be multi tenant
 	
 	private final UrlBuilder urlBuilder;
 	private final CredentialService credentialService;
@@ -37,7 +39,7 @@ public class InstagramSubscriptionManager {
 	}
 	
 	public InstagramTagSubscription requestInstagramTagSubscription(String tag, String channelId) throws HttpNotFoundException, HttpBadRequestException, HttpForbiddenException, HttpFetchException, UnsupportedEncodingException, JSONException, CredentialsNotAvailableException {
-		if (!credentialService.hasInstagramAccessToken()) {
+		if (!credentialService.hasInstagramAccessToken(USER)) {
 			log.info("No instagram credentials available; not requesting subscription");
 			throw new CredentialsRequiredException();
 		}
@@ -48,7 +50,7 @@ public class InstagramSubscriptionManager {
 	}
 
 	public InstagramGeographySubscription requestInstagramGeographySubscription(LatLong latLong, int radius, String channelId) throws UnsupportedEncodingException, HttpNotFoundException, HttpBadRequestException, HttpForbiddenException, HttpFetchException, JSONException, CredentialsNotAvailableException {
-		if (!credentialService.hasInstagramAccessToken()) {
+		if (!credentialService.hasInstagramAccessToken(USER)) {
 			log.info("No instagram credentials available; not requesting subscription");
 			throw new CredentialsRequiredException();
 		}

@@ -56,7 +56,7 @@ public class InstagramOauthController {
 			final String accessToken = instagramApi.getAccessToken(credentialService.getInstagramClientId(), credentialService.getInstagramClientSecret(), code, authorizeRedirectUrl);
 			
 			log.info("Got instagram access token: " + accessToken);
-			credentialService.setInstagramAccessToken(accessToken);
+			credentialService.setInstagramAccessTokenForUser("tonytw1", accessToken);	// TODO username
 			
 		} catch (HttpBadRequestException e) {
 			log.error(e.getResponseBody());

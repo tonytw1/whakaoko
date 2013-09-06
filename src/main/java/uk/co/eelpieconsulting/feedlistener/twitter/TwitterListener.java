@@ -20,6 +20,8 @@ import com.google.common.collect.Sets;
 public class TwitterListener {
 	
 	private static Logger log = Logger.getLogger(TwitterListener.class);
+
+	private static final String USER = "";	// TODO needs to be multitenant
 	
 	private final SubscriptionsDAO subscriptionsDAO;
 	private final TwitterStatusListener twitterListener;
@@ -47,14 +49,14 @@ public class TwitterListener {
 			twitterStream.cleanUp();
 		}
 		
-		if (!credentialService.hasTwitterAccessToken()) {
+		if (!credentialService.hasTwitterAccessToken(USER)) {
 			log.warn("No twitter credentials available; not connecting");
 			throw new CredentialsRequiredException();
 		}
 		
 		twitterStream = twitterApiFactory.getStreamingApi(
-				credentialService.getTwitterAccessToken(), 
-				credentialService.getTwitterAccessSecret());
+				credentialService.getTwitterAccessTokenForUser(USER), 
+				credentialService.getTwitterAccessSecretForUser(USER));
 		
 		twitterStream.addListener(twitterListener);
 		
