@@ -24,6 +24,18 @@ public class UrlBuilder {
 		return getBaseUrl() + "/ui/" + subscription.getUsername() + "/subscriptions/" + subscription.getId();
 	}
 	
+	public String getSubscriptionUrl(String username, String subscriptionId) {
+		return getBaseUrl() + "/ui/" + username + "/subscriptions/" + subscriptionId;
+	}		
+	
+	public String getSubscriptionItemsUrl(String username, String subscriptionId) {
+		return getBaseUrl() + "/" + username + "/subscriptions/" + subscriptionId;
+	}
+	
+	public String getChannelItemsUrl(String username, String channelId) {
+		return getBaseUrl() + "/" + username + "/channels/" + channelId;
+	}
+	
 	public String getChannelUrl(Channel channel) {
 		return getBaseUrl() + "/ui/" + channel.getUsername() + "/channels/" + channel.getId();
 	}

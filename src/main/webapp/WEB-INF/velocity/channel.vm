@@ -22,12 +22,14 @@
 #else
 	<p>No current subscriptions.</p>
 #end
-<p><a href="/subscriptions/new">Add subscription</a></p>
 
 </td>
 <td>
 
 <h5>Inbox #if($inboxSize) ($inboxSize)#end</h5>
+
+<a href="$urlBuilder.getChannelItemsUrl('tonytw1', $channel.id)/items">JSON</a> | 
+<a href="$urlBuilder.getChannelItemsUrl('tonytw1', $channel.id)/items?format=rss">RSS</a>
 
 #if($inbox && !$inbox.isEmpty()) 
 	<ul>

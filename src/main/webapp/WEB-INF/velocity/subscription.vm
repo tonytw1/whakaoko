@@ -3,13 +3,12 @@
 
 <h5>$subscription.channelId / #if($subscription.name)$subscription.name#else$subscription.url#end #if($subscriptionSize > 0) ($subscriptionSize) #end</h5>
 
-<p>$subscription</p>
+#if($subscription.lastRead)
+	<p><span title="$subscription.lastRead">Last read: $dateFormatter.timeSince($subscription.lastRead)</span></p>
+#end
 
-<p><span title="$subscription.lastRead">Last read: $dateFormatter.timeSince($subscription.lastRead)</span></p>
-
-<a href="/subscriptions/$subscription.id/rss">RSS</a>
-
-<p><a href="/subscriptions/$subscription.id/delete">Delete</a></p>
+<a href="$urlBuilder.getSubscriptionItemsUrl('tonytw1', $subscription.id)/items">JSON</a> | 
+<a href="$urlBuilder.getSubscriptionItemsUrl('tonytw1', $subscription.id)/items?format=rss">RSS</a>
 
 #if($feedItems && !$feedItems.isEmpty()) 
 	<ul>

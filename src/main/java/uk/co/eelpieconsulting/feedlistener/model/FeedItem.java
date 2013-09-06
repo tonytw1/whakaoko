@@ -88,16 +88,19 @@ public class FeedItem implements Serializable, RssFeedable {
 	}
 
 	@Override
+	@JsonIgnore
 	public String getDescription() {
 		return body;
 	}
 
 	@Override
+	@JsonIgnore
 	public String getHeadline() {
 		return title;
 	}
 
 	@Override
+	@JsonIgnore
 	public String getWebUrl() {
 		return url;
 	}

@@ -3,7 +3,12 @@
 	#if($feedItem.imageUrl) <br/>
 		<a href="$feedItem.url"><img src="$feedItem.imageUrl" border="0"></a>	
 	#end
-	<br/><span title="$feedItem.date">$dateFormatter.timeSince($feedItem.date)</span>	
-	<br/><a href="$urlBuilder.getSubscriptionUrl($feedItem.subscriptionId)">$feedItem.subscriptionId</a>
+	<br/><span title="$feedItem.date">$dateFormatter.timeSince($feedItem.date)</span>
+	
+	<br/><a href="$urlBuilder.getSubscriptionUrl('tonytw1', $feedItem.subscriptionId)">$feedItem.subscriptionId</a>
 	<br/>$!feedItem.body
+	
+	#if($feedItem.place)
+		<p>$feedItem.place</p>
+	#end
 </li>

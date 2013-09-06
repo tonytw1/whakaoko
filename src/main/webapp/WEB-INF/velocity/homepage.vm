@@ -13,4 +13,3 @@
 #else
 	<p>No channels.</p>
 #end
-<p><a href="/channels/new">Add channel</a></p>
