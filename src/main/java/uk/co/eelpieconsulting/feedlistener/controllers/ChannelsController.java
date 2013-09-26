@@ -32,7 +32,8 @@ public class ChannelsController {
 	
 	private static Logger log = Logger.getLogger(ChannelsController.class);
 	
-	private static final int MAX_FEED_ITEMS = 20;
+	private static final int DEFAULT_PAGE_SIZE = 20;
+	private static final int MAXIMUM_PAGE_SIZE = 100;
 			
 	private final UsersDAO usersDAO;
 	private final ChannelsDAO channelsDAO;
@@ -80,10 +81,11 @@ public class ChannelsController {
 		if (!subscriptionsForChannel.isEmpty()) {
 			mv.addObject("inboxSize", feedItemDAO.getChannelFeedItemsCount(channel.getId()));
 			
+			
 			if (page != null) {
-				mv.addObject("inbox", feedItemDAO.getChannelFeedItems(channel.getId(), 20, page));
+				mv.addObject("inbox", feedItemDAO.getChannelFeedItems(channel.getId(), DEFAULT_PAGE_SIZE, page));
 			} else {
-				mv.addObject("inbox", feedItemDAO.getChannelFeedItems(channel.getId(), 20));
+				mv.addObject("inbox", feedItemDAO.getChannelFeedItems(channel.getId(), DEFAULT_PAGE_SIZE));
 			}
 			
 			final Map<String, Long> subscriptionCounts = Maps.newHashMap();
@@ -125,6 +127,7 @@ public class ChannelsController {
 	@RequestMapping(value="/{username}/channels/{id}/items", method=RequestMethod.GET)
 	public ModelAndView channelJson(@PathVariable String username, @PathVariable String id,
 			@RequestParam(required=false) Integer page,
+			@RequestParam(required=false) Integer pageSize,
 			@RequestParam(required=false) String format
 	) throws UnknownHostException, MongoException {
 		if (usersDAO.getByUsername(username) == null) {
@@ -138,12 +141,13 @@ public class ChannelsController {
 			mv = new ModelAndView(viewFactory.getRssView(channel.getName(), urlBuilder.getChannelUrl(channel), ""));
 		}
 		
-		if (page != null) {
-			mv.addObject("data", feedItemDAO.getChannelFeedItems(channel.getId(), MAX_FEED_ITEMS, page));
-		} else {
-			mv.addObject("data", feedItemDAO.getChannelFeedItems(channel.getId(), MAX_FEED_ITEMS));
+		int pageSizeToUse = pageSize != null ? pageSize : DEFAULT_PAGE_SIZE;
+		int pageToUser = page != null ? pageSize : 1;
+		if (pageSize > MAXIMUM_PAGE_SIZE) {
+			throw new RuntimeException("Too many records requested");	// TODO use correct exception.
 		}
-				
+		
+		mv.addObject("data", feedItemDAO.getChannelFeedItems(channel.getId(), pageSizeToUse, pageToUser));	
 		return mv;
 	}
 	
