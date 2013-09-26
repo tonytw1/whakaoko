@@ -2,7 +2,6 @@ package uk.co.eelpieconsulting.feedlistener.instagram;
 
 import java.io.UnsupportedEncodingException;
 
-import org.apache.commons.httpclient.auth.CredentialsNotAvailableException;
 import org.apache.log4j.Logger;
 import org.json.JSONException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,7 +37,7 @@ public class InstagramSubscriptionManager {
 		this.instagramApi = new InstagramApi();		
 	}
 	
-	public InstagramTagSubscription requestInstagramTagSubscription(String tag, String channelId) throws HttpNotFoundException, HttpBadRequestException, HttpForbiddenException, HttpFetchException, UnsupportedEncodingException, JSONException, CredentialsNotAvailableException {
+	public InstagramTagSubscription requestInstagramTagSubscription(String tag, String channelId) throws HttpNotFoundException, HttpBadRequestException, HttpForbiddenException, HttpFetchException, UnsupportedEncodingException, JSONException {
 		if (!credentialService.hasInstagramAccessToken(USER)) {
 			log.info("No instagram credentials available; not requesting subscription");
 			throw new CredentialsRequiredException();
@@ -49,7 +48,7 @@ public class InstagramSubscriptionManager {
 		return subscription;
 	}
 
-	public InstagramGeographySubscription requestInstagramGeographySubscription(LatLong latLong, int radius, String channelId) throws UnsupportedEncodingException, HttpNotFoundException, HttpBadRequestException, HttpForbiddenException, HttpFetchException, JSONException, CredentialsNotAvailableException {
+	public InstagramGeographySubscription requestInstagramGeographySubscription(LatLong latLong, int radius, String channelId) throws UnsupportedEncodingException, HttpNotFoundException, HttpBadRequestException, HttpForbiddenException, HttpFetchException, JSONException {
 		if (!credentialService.hasInstagramAccessToken(USER)) {
 			log.info("No instagram credentials available; not requesting subscription");
 			throw new CredentialsRequiredException();

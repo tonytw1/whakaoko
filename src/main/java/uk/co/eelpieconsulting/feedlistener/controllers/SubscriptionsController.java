@@ -3,7 +3,6 @@ package uk.co.eelpieconsulting.feedlistener.controllers;
 import java.io.UnsupportedEncodingException;
 import java.net.UnknownHostException;
 
-import org.apache.commons.httpclient.auth.CredentialsNotAvailableException;
 import org.apache.log4j.Logger;
 import org.json.JSONException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -204,7 +203,7 @@ public class SubscriptionsController {
 	}
 	
 	@RequestMapping(value="/subscriptions/instagram/tags", method=RequestMethod.POST)
-	public ModelAndView addInstagramTagSubscription(@RequestParam String tag, @RequestParam String channel) throws HttpNotFoundException, HttpBadRequestException, HttpForbiddenException, UnsupportedEncodingException, HttpFetchException, JSONException, CredentialsNotAvailableException {
+	public ModelAndView addInstagramTagSubscription(@RequestParam String tag, @RequestParam String channel) throws HttpNotFoundException, HttpBadRequestException, HttpForbiddenException, UnsupportedEncodingException, HttpFetchException, JSONException {
 		final InstagramSubscription subscription = instagramSubscriptionManager.requestInstagramTagSubscription(tag, channel);
 		subscriptionsDAO.add(subscription);
 		
@@ -216,7 +215,7 @@ public class SubscriptionsController {
 	public ModelAndView addInstagramTagSubscription(@RequestParam double latitude,
 			@RequestParam double longitude, 
 			@RequestParam int radius,
-			@RequestParam String channel) throws HttpNotFoundException, HttpBadRequestException, HttpForbiddenException, UnsupportedEncodingException, HttpFetchException, JSONException, CredentialsNotAvailableException {
+			@RequestParam String channel) throws HttpNotFoundException, HttpBadRequestException, HttpForbiddenException, UnsupportedEncodingException, HttpFetchException, JSONException {
 		final LatLong latLong = new LatLong(latitude, longitude);
 		
 		final InstagramGeographySubscription instagramGeographySubscription = instagramSubscriptionManager.requestInstagramGeographySubscription(latLong, radius, channel);
