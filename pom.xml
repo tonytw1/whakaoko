@@ -60,7 +60,7 @@
 		<dependency>
 			<groupId>uk.co.eelpieconsulting.common</groupId>
 			<artifactId>common-views</artifactId>
-			<version>1.0.5</version>
+			<version>1.0.7</version>
 		</dependency>	
 		<dependency>
 			<groupId>uk.co.eelpieconsulting.common</groupId>
@@ -84,8 +84,8 @@
 		</dependency>
 		<dependency>
 			<groupId>uk.co.eelpieconsulting.common</groupId>
-			<artifactId>common-geo</artifactId>
-			<version>1.0.3</version>
+			<artifactId>common-geo-model</artifactId>
+			<version>1.0.1</version>
 		</dependency>
 		<dependency>
 			<groupId>uk.co.eelpieconsulting.common</groupId>
