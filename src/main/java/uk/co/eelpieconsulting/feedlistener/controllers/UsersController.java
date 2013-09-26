@@ -2,7 +2,6 @@ package uk.co.eelpieconsulting.feedlistener.controllers;
 
 import java.net.UnknownHostException;
 
-import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -17,9 +16,7 @@ import com.mongodb.MongoException;
 
 @Controller
 public class UsersController {
-	
-	private static Logger log = Logger.getLogger(UsersController.class);
-	
+		
 	private UsersDAO usersDAO;
 	private final ViewFactory viewFactory;
 	
