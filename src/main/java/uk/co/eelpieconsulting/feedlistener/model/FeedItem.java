@@ -86,7 +86,13 @@ public class FeedItem implements Serializable, RssFeedable {
 	public boolean isGeoTagged() {
 		return place != null;
 	}
-
+	
+	@JsonIgnore
+	@Override
+	public String getAuthor() {
+		return subscriptionId;
+	}
+	
 	@Override
 	@JsonIgnore
 	public String getDescription() {
