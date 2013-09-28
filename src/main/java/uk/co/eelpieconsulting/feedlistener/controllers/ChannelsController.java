@@ -143,7 +143,7 @@ public class ChannelsController {
 		
 		int pageSizeToUse = pageSize != null ? pageSize : DEFAULT_PAGE_SIZE;
 		int pageToUser = page != null ? pageSize : 1;
-		if (pageSize > MAXIMUM_PAGE_SIZE) {
+		if (pageSizeToUse > MAXIMUM_PAGE_SIZE) {
 			throw new RuntimeException("Too many records requested");	// TODO use correct exception.
 		}
 		
