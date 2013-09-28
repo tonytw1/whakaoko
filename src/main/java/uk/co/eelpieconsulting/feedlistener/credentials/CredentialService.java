@@ -56,7 +56,7 @@ public class CredentialService {
 	}
 	
 	public String getTwitterAccessSecretForUser(String username) {
-		return usersDAO.getByUsername(username).getTwitterAccessToken();
+		return usersDAO.getByUsername(username).getTwitterAccessSecret();
 	}
 	public void setTwitterAccessSecretForUser(String username, String twitterAccessSecret) throws UnknownHostException {
 		final User user = usersDAO.getByUsername(username);
