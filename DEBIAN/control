@@ -1,6 +1,6 @@
 Package: whakaoko
 Version: %VERSION%
-Depends: tomcat7, apache2, memcached
+Depends: tomcat7, apache2, memcached, mongodb-10gen
 Section: whakaoko
 Priority: optional
 Architecture: all
