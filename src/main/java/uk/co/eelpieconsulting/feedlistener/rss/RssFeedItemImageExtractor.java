@@ -65,7 +65,7 @@ public class RssFeedItemImageExtractor {
 					final String imageSrc = imageTag.getAttribute("src");
 					if (!isBlackListedUrl(imageSrc)) {
 						log.debug("Found first image: " + imageTag.toHtml() + ", " + imageSrc);
-						return imageSrc;
+						return imageSrc;	// TODO needs to confirm that this is a fully qualified url
 					}
 				}
 								
