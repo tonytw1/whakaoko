@@ -100,6 +100,7 @@ public class SubscriptionsController {
 	public ModelAndView subscriptionItems(@PathVariable String username, @PathVariable String id,
 			@RequestParam(required=false) Integer page,
 			@RequestParam(required=false) String format) throws UnknownHostException, MongoException {
+		log.info("Items");
 		if (usersDAO.getByUsername(username) == null) {
 			throw new RuntimeException("Invalid user");
 		}
@@ -194,31 +195,35 @@ public class SubscriptionsController {
 		return mv;
 	}
 	
-	@RequestMapping(value="/subscriptions/twitter/tags", method=RequestMethod.POST)
-	public ModelAndView addTwitterTagSubscription(@RequestParam String tag, @RequestParam String channel) {		
-		twitterSubscriptionManager.requestTagSubscription(tag, channel);
+	@RequestMapping(value="/{username}/subscriptions/twitter/tags", method=RequestMethod.POST)
+	public ModelAndView addTwitterTagSubscription(@PathVariable String username, @RequestParam String tag, @RequestParam String channel) {
+		log.info("Twitter tag: " + tag);
+		twitterSubscriptionManager.requestTagSubscription(tag, channel, username);
 		
 		final ModelAndView mv = new ModelAndView(new RedirectView(urlBuilder.getBaseUrl()));
 		return mv;
 	}
 	
-	@RequestMapping(value="/subscriptions/instagram/tags", method=RequestMethod.POST)
-	public ModelAndView addInstagramTagSubscription(@RequestParam String tag, @RequestParam String channel) throws HttpNotFoundException, HttpBadRequestException, HttpForbiddenException, UnsupportedEncodingException, HttpFetchException, JSONException {
-		final InstagramSubscription subscription = instagramSubscriptionManager.requestInstagramTagSubscription(tag, channel);
+	@RequestMapping(value="/{username}/subscriptions/instagram/tags", method=RequestMethod.POST)
+	public ModelAndView addInstagramTagSubscription(@PathVariable String username, 
+			@RequestParam String tag, @RequestParam String channel) throws HttpNotFoundException, HttpBadRequestException, HttpForbiddenException, UnsupportedEncodingException, HttpFetchException, JSONException {		
+		log.info("Instagram tag");
+		final InstagramSubscription subscription = instagramSubscriptionManager.requestInstagramTagSubscription(tag, channel, username);
 		subscriptionsDAO.add(subscription);
 		
 		final ModelAndView mv = new ModelAndView(new RedirectView(urlBuilder.getBaseUrl()));
 		return mv;
 	}
 	
-	@RequestMapping(value="/subscriptions/instagram/geography", method=RequestMethod.POST)
-	public ModelAndView addInstagramTagSubscription(@RequestParam double latitude,
+	@RequestMapping(value="/{username}/subscriptions/instagram/geography", method=RequestMethod.POST)
+	public ModelAndView addInstagramTagSubscription(@PathVariable String username, 
+			@RequestParam double latitude,
 			@RequestParam double longitude, 
 			@RequestParam int radius,
 			@RequestParam String channel) throws HttpNotFoundException, HttpBadRequestException, HttpForbiddenException, UnsupportedEncodingException, HttpFetchException, JSONException {
 		final LatLong latLong = new LatLong(latitude, longitude);
 		
-		final InstagramGeographySubscription instagramGeographySubscription = instagramSubscriptionManager.requestInstagramGeographySubscription(latLong, radius, channel);
+		final InstagramGeographySubscription instagramGeographySubscription = instagramSubscriptionManager.requestInstagramGeographySubscription(latLong, radius, channel, username);
 		log.info("Saving subscription: " + instagramGeographySubscription);
 		subscriptionsDAO.add(instagramGeographySubscription);
 

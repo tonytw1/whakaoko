@@ -53,10 +53,14 @@ public class TwitterListener {
 			log.warn("No twitter credentials available; not connecting");
 			throw new CredentialsRequiredException();
 		}
+
+		String twitterAccessTokenForUser = credentialService.getTwitterAccessTokenForUser(USER);
+		String twitterAccessSecretForUser = credentialService.getTwitterAccessSecretForUser(USER);
+		log.info("Using twitter access credentials: " + twitterAccessTokenForUser + ", " + twitterAccessSecretForUser);
 		
 		twitterStream = twitterApiFactory.getStreamingApi(
-				credentialService.getTwitterAccessTokenForUser(USER), 
-				credentialService.getTwitterAccessSecretForUser(USER));
+				twitterAccessTokenForUser, 
+				twitterAccessSecretForUser);
 		
 		twitterStream.addListener(twitterListener);
 		

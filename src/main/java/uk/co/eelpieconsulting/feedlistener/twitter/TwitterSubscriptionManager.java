@@ -10,8 +10,6 @@ import uk.co.eelpieconsulting.feedlistener.model.TwitterTagSubscription;
 
 @Component
 public class TwitterSubscriptionManager {
-
-	private static final String USER = "tonytw1";	// TODO multi tenant
 	
 	private final CredentialService credentialService;
 	private final SubscriptionsDAO subscriptionsDAO;
@@ -24,12 +22,12 @@ public class TwitterSubscriptionManager {
 		this.twitterListener = twitterListener;
 	}
 	
-	public void requestTagSubscription(String tag, String channel) throws CredentialsRequiredException {
-		if (!credentialService.hasTwitterAccessToken(USER)) {
+	public void requestTagSubscription(String tag, String channel, String username) throws CredentialsRequiredException {
+		if (!credentialService.hasTwitterAccessToken(username)) {
 			throw new CredentialsRequiredException();
 		}
 		
-		subscriptionsDAO.add(new TwitterTagSubscription(tag));
+		subscriptionsDAO.add(new TwitterTagSubscription(tag, channel, username));
 		reconnect();		
 	}
 

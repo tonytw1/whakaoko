@@ -19,7 +19,11 @@ public class UrlBuilder {
 	public String getInstagramCallbackUrl() {
 		return getBaseUrl() + "/instagram/callback";
 	}
-
+	
+	public String getTwitterCallback() {
+		return getBaseUrl() + "/twitter/callback";
+	}
+	
 	public String getSubscriptionUrl(Subscription subscription) {
 		return getBaseUrl() + "/ui/" + subscription.getUsername() + "/subscriptions/" + subscription.getId();
 	}

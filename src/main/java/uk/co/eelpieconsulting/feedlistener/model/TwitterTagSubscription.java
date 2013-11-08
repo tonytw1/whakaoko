@@ -9,9 +9,11 @@ public class TwitterTagSubscription extends Subscription {
 	public TwitterTagSubscription() {
 	}
 
-	public TwitterTagSubscription(String tag) {
+	public TwitterTagSubscription(String tag, String channel, String username) {
 		this.setId("twitter-" + DigestUtils.md5Hex("tag" + tag));
 		this.setTag(tag);
+		this.setChannelId(channel);
+		this.setUsername(username);
 	}
 	
 	public String getTag() {
