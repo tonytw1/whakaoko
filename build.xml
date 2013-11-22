@@ -20,7 +20,7 @@
                 <filter token="VERSION" value="${version}"/>
             </filterset>
         </copy>
-        <chmod file="target/package/${package.name}/DEBIAN/postinst" perm="755"/>
+        <chmod file="target/package/${package.name}/DEBIAN/*" perm="755"/>
     	
         <echo message="Packaging war file for placement in tomcat webapps" />
         <mkdir dir="target/package/${package.name}/var/lib/tomcat7/webapps"/>
