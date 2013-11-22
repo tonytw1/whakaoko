@@ -7,7 +7,9 @@ import org.htmlparser.Tag;
 import org.htmlparser.filters.TagNameFilter;
 import org.htmlparser.util.NodeList;
 import org.htmlparser.util.ParserException;
+import org.springframework.stereotype.Component;
 
+@Component
 public class HtmlImageExtractor {
 	
 	private static Logger log = Logger.getLogger(HtmlImageExtractor.class);
