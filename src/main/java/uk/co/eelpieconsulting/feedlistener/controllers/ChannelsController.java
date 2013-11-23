@@ -142,12 +142,12 @@ public class ChannelsController {
 		}
 		
 		int pageSizeToUse = pageSize != null ? pageSize : DEFAULT_PAGE_SIZE;
-		int pageToUser = page != null ? pageSize : 1;
+		int pageToUse = (page != null && page > 0) ? page : 1;
 		if (pageSizeToUse > MAXIMUM_PAGE_SIZE) {
 			throw new RuntimeException("Too many records requested");	// TODO use correct exception.
 		}
 		
-		mv.addObject("data", feedItemDAO.getChannelFeedItems(channel.getId(), pageSizeToUse, pageToUser));	
+		mv.addObject("data", feedItemDAO.getChannelFeedItems(channel.getId(), pageSizeToUse, pageToUse));	
 		return mv;
 	}
 	
