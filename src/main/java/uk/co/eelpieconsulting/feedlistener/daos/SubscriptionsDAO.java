@@ -74,6 +74,15 @@ public class SubscriptionsDAO {
 			throw new RuntimeException(e);
 		}
 	}
+	
+	public boolean subscriptionExists(String username, String id) {
+		try {
+			getById(username, id);
+			return true;
+		} catch (UnknownSubscriptionException e) {
+			return false;
+		}
+	}
 
 	public void delete(Subscription subscription) throws UnknownHostException, MongoException {
 		log.info("Deleting subscription: " + subscription);

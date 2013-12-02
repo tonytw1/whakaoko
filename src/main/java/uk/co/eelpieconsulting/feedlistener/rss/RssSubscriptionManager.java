@@ -4,6 +4,7 @@ import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import uk.co.eelpieconsulting.feedlistener.UnknownSubscriptionException;
 import uk.co.eelpieconsulting.feedlistener.daos.SubscriptionsDAO;
 import uk.co.eelpieconsulting.feedlistener.model.RssSubscription;
 import uk.co.eelpieconsulting.feedlistener.model.Subscription;
@@ -23,8 +24,15 @@ public class RssSubscriptionManager {
 	public Subscription requestFeedSubscription(String url, String channel, String username) {
 		log.info("Requesting subscription to feed: " + url);
 		final RssSubscription newSubscription = new RssSubscription(url, channel, username);
-		final Subscription existingSubscription = subscriptionsDAO.getById(username, newSubscription.getId());
-		return existingSubscription != null ? existingSubscription : newSubscription;
+		
+		if (subscriptionsDAO.subscriptionExists(username, newSubscription.getId())) {
+			try {
+				return  subscriptionsDAO.getById(username, newSubscription.getId());
+			} catch (UnknownSubscriptionException e) {
+				return newSubscription;
+			}
+		}
+		return newSubscription;
 	}
 	
 }
