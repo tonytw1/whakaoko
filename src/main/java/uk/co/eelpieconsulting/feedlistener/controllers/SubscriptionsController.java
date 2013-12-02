@@ -203,8 +203,7 @@ public class SubscriptionsController {
 		log.info("Twitter tag: " + tag);
 		twitterSubscriptionManager.requestTagSubscription(tag, channel, username);
 		
-		final ModelAndView mv = new ModelAndView(new RedirectView(urlBuilder.getBaseUrl()));
-		return mv;
+		return new ModelAndView(new RedirectView(urlBuilder.getBaseUrl()));
 	}
 	
 	@RequestMapping(value="/{username}/subscriptions/instagram/tags", method=RequestMethod.POST)
@@ -214,8 +213,7 @@ public class SubscriptionsController {
 		final InstagramSubscription subscription = instagramSubscriptionManager.requestInstagramTagSubscription(tag, channel, username);
 		subscriptionsDAO.add(subscription);
 		
-		final ModelAndView mv = new ModelAndView(new RedirectView(urlBuilder.getBaseUrl()));
-		return mv;
+		return new ModelAndView(new RedirectView(urlBuilder.getBaseUrl()));
 	}
 	
 	@RequestMapping(value="/{username}/subscriptions/instagram/geography", method=RequestMethod.POST)
@@ -229,9 +227,8 @@ public class SubscriptionsController {
 		final InstagramGeographySubscription instagramGeographySubscription = instagramSubscriptionManager.requestInstagramGeographySubscription(latLong, radius, channel, username);
 		log.info("Saving subscription: " + instagramGeographySubscription);
 		subscriptionsDAO.add(instagramGeographySubscription);
-
-		final ModelAndView mv = new ModelAndView(new RedirectView(urlBuilder.getBaseUrl()));
-		return mv;
+				
+		return new ModelAndView(new RedirectView(urlBuilder.getBaseUrl()));
 	}
 
 	private void populateFeedItems(final Subscription subscription, final Integer page, final ModelAndView mv, String field) throws UnknownHostException {

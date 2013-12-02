@@ -153,8 +153,7 @@ public class ChannelsController {
 	
 	@RequestMapping(value="/ui/channels/new", method=RequestMethod.GET)
 	public ModelAndView newChannelForm() {
-		final ModelAndView mv = new ModelAndView("newChannel");
-		return mv;		
+		return new ModelAndView("newChannel");		
 	}
 	
 	@RequestMapping(value="/{username}/channels", method=RequestMethod.POST)
@@ -165,8 +164,7 @@ public class ChannelsController {
 		
 		channelsDAO.add(username, new Channel(idBuilder.makeIdFor(name), name, username));
 		
-		final ModelAndView mv = new ModelAndView(viewFactory.getJsonView()).addObject("data", "ok");
-		return mv;
+		return new ModelAndView(viewFactory.getJsonView()).addObject("data", "ok");
 	}
 	
 }
