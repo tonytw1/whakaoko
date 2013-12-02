@@ -7,6 +7,7 @@ import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import uk.co.eelpieconsulting.feedlistener.UnknownSubscriptionException;
 import uk.co.eelpieconsulting.feedlistener.model.InstagramSubscription;
 import uk.co.eelpieconsulting.feedlistener.model.Subscription;
 
@@ -60,9 +61,13 @@ public class SubscriptionsDAO {
 		}
 	}
 
-	public Subscription getById(String username, String id) {
+	public Subscription getById(String username, String id) throws UnknownSubscriptionException {
         try {
-			return dataStoreFactory.getDatastore().createQuery(Subscription.class).filter("username", username).filter("id", id).get();
+			final Subscription subscription = dataStoreFactory.getDatastore().createQuery(Subscription.class).filter("username", username).filter("id", id).get();
+			if (subscription == null) {
+				throw new UnknownSubscriptionException();
+			}
+			return subscription;
 		} catch (UnknownHostException e) {
 			throw new RuntimeException(e);
 		} catch (MongoException e) {
