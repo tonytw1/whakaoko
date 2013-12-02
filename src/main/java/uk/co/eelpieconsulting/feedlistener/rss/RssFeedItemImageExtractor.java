@@ -51,11 +51,10 @@ public class RssFeedItemImageExtractor {
 		
 		// Look for img srcs in html content
 		final String itemBody = rssFeedItemBodyExtractor.extractBody(item);
-		if (!Strings.isNullOrEmpty(itemBody)) {
+		if (!Strings.isNullOrEmpty(itemBody)) {			
 			String imageSrc = htmlImageExtractor.extractImage(itemBody);
-			imageSrc = ensureFullyQualifiedUrl(imageSrc, item.getLink());			
-
 			if (!Strings.isNullOrEmpty(imageSrc)) {
+				imageSrc = ensureFullyQualifiedUrl(imageSrc, item.getLink());			
 				if (!isBlackListedImageUrl(imageSrc)) {
 					return imageSrc;
 				}				
