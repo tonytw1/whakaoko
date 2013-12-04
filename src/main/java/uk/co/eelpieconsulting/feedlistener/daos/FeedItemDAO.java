@@ -4,6 +4,7 @@ import java.net.UnknownHostException;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -44,7 +45,10 @@ public class FeedItemDAO {
 	}
 	
 	public List<FeedItem> getSubscriptionFeedItems(String subscriptionId, int limit) throws UnknownHostException, MongoException {
-		return subscriptionFeedItemsQuery(subscriptionId).limit(limit).asList();
+		DateTime start = DateTime.now();
+		List<FeedItem> feedItems = subscriptionFeedItemsQuery(subscriptionId).limit(limit).asList();
+		log.info("Feed item query for subscription '" + subscriptionId + "' took " + (DateTime.now().getMillis() - start.getMillis()) + "ms");
+		return feedItems;
 	}
 	
 	public List<FeedItem> getSubscriptionFeedItems(String subscriptionId, int pageSize, int page) throws UnknownHostException, MongoException {
