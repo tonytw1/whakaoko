@@ -24,6 +24,7 @@ import uk.co.eelpieconsulting.common.http.HttpNotFoundException;
 import uk.co.eelpieconsulting.common.views.ViewFactory;
 import uk.co.eelpieconsulting.feedlistener.UnknownSubscriptionException;
 import uk.co.eelpieconsulting.feedlistener.UrlBuilder;
+import uk.co.eelpieconsulting.feedlistener.annotations.Timed;
 import uk.co.eelpieconsulting.feedlistener.daos.ChannelsDAO;
 import uk.co.eelpieconsulting.feedlistener.daos.FeedItemDAO;
 import uk.co.eelpieconsulting.feedlistener.daos.SubscriptionsDAO;
@@ -99,6 +100,7 @@ public class SubscriptionsController {
 		return mv;
 	}
 	
+	@Timed(timingNotes = "")
 	@RequestMapping(value="/{username}/subscriptions/{id}/items", method=RequestMethod.GET)
 	public ModelAndView subscriptionItems(@PathVariable String username, @PathVariable String id,
 			@RequestParam(required=false) Integer page,
