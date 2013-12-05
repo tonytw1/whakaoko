@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.ModelAndView;
 
+import uk.co.eelpieconsulting.feedlistener.annotations.Timed;
 import uk.co.eelpieconsulting.feedlistener.daos.ChannelsDAO;
 import uk.co.eelpieconsulting.feedlistener.daos.UsersDAO;
 
@@ -17,8 +18,11 @@ import com.mongodb.MongoException;
 @Controller
 public class HomepageController {
 	
-	private final ChannelsDAO channelsDAO;
-	private final UsersDAO usersDAO;
+	private ChannelsDAO channelsDAO;
+	private UsersDAO usersDAO;
+	
+	public HomepageController() {
+	}
 	
 	@Autowired
 	public HomepageController(UsersDAO usersDAO, ChannelsDAO channelsDAO) {
@@ -26,6 +30,7 @@ public class HomepageController {
 		this.channelsDAO = channelsDAO;
 	}
 	
+	@Timed(timingNotes = "")
 	@RequestMapping(value="/ui/{username}", method=RequestMethod.GET)
 	public ModelAndView homepage(@PathVariable String username) throws UnknownHostException, MongoException {
 		if (usersDAO.getByUsername(username) == null) {

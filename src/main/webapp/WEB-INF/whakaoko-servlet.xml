@@ -6,7 +6,8 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xmlns:tx="http://www.springframework.org/schema/tx"
     xmlns:p="http://www.springframework.org/schema/p"     
-    xmlns:mvc="http://www.springframework.org/schema/mvc"		
+    xmlns:mvc="http://www.springframework.org/schema/mvc"
+ 	xmlns:aop="http://www.springframework.org/schema/aop"	
     xsi:schemaLocation="
         http://www.springframework.org/schema/beans 
         http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
@@ -17,11 +18,15 @@
        	http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.0.xsd
        	http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-3.0.xsd
 		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
-       	">
+		http://www.springframework.org/schema/aop
+       	http://www.springframework.org/schema/aop/spring-aop-2.0.xsd">
        	
   	<context:annotation-config />
 	<context:component-scan base-package="uk.co.eelpieconsulting" />
 	
+	<aop:aspectj-autoproxy />
+	<bean id="timingAspect" class="uk.co.eelpieconsulting.feedlistener.annotations.TimingAspect" />
+
 	<task:annotation-driven />
 	<task:scheduler id="scheduler" pool-size="10"/>
 	
