@@ -8,6 +8,7 @@ import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import uk.co.eelpieconsulting.feedlistener.annotations.Timed;
 import uk.co.eelpieconsulting.feedlistener.model.FeedItem;
 import uk.co.eelpieconsulting.feedlistener.model.Subscription;
 
@@ -22,8 +23,11 @@ public class FeedItemDAO {
 
 	private static Logger log = Logger.getLogger(FeedItemDAO.class);
 	
-	private final DataStoreFactory dataStoreFactory;
-	private final SubscriptionsDAO subscriptionsDAO;
+	private DataStoreFactory dataStoreFactory;
+	private SubscriptionsDAO subscriptionsDAO;
+	
+	public FeedItemDAO() {
+	}
 	
 	@Autowired
 	public FeedItemDAO(DataStoreFactory dataStoreFactory, SubscriptionsDAO subscriptionsDAO) {
@@ -44,13 +48,12 @@ public class FeedItemDAO {
 		}
 	}
 	
+	@Timed(timingNotes = "")
 	public List<FeedItem> getSubscriptionFeedItems(String subscriptionId, int limit) throws UnknownHostException, MongoException {
-		DateTime start = DateTime.now();
-		List<FeedItem> feedItems = subscriptionFeedItemsQuery(subscriptionId).limit(limit).asList();
-		log.info("Feed item query for subscription '" + subscriptionId + "' took " + (DateTime.now().getMillis() - start.getMillis()) + "ms");
-		return feedItems;
+		return subscriptionFeedItemsQuery(subscriptionId).limit(limit).asList();
 	}
 	
+	@Timed(timingNotes = "")
 	public List<FeedItem> getSubscriptionFeedItems(String subscriptionId, int pageSize, int page) throws UnknownHostException, MongoException {
 		return subscriptionFeedItemsQuery(subscriptionId).limit(pageSize).offset(calculatePageOffset(pageSize, page)).asList();
 	}
@@ -59,22 +62,27 @@ public class FeedItemDAO {
 		 dataStoreFactory.getDatastore().delete(subscriptionFeedItemsQuery(subscription.getId()));
 	}
 	
+	@Timed(timingNotes = "")
 	public long getAllCount() throws UnknownHostException, MongoException {
 		return dataStoreFactory.getDatastore().find(FeedItem.class).countAll();
 	}
 	
+	@Timed(timingNotes = "")
 	public long getSubscriptionFeedItemsCount(String subscriptionId) throws UnknownHostException {
 		return subscriptionFeedItemsQuery(subscriptionId).countAll();
 	}
 	
+	@Timed(timingNotes = "")
 	public long getChannelFeedItemsCount(String channelId) throws UnknownHostException, MongoException {
 		return channelFeedItemsQuery(channelId).countAll();
 	}
 	
+	@Timed(timingNotes = "")
 	public List<FeedItem> getChannelFeedItems(String channelId, int pageSize) throws UnknownHostException, MongoException {		
 		return channelFeedItemsQuery(channelId).limit(pageSize).asList();
 	}
 	
+	@Timed(timingNotes = "")
 	public List<FeedItem> getChannelFeedItems(String channelId, int pageSize, int page) throws UnknownHostException, MongoException {
 		return channelFeedItemsQuery(channelId).limit(pageSize).offset(calculatePageOffset(pageSize, page)).asList();
 	}
