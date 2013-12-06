@@ -4,7 +4,6 @@ import java.net.UnknownHostException;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -87,6 +86,7 @@ public class FeedItemDAO {
 		return channelFeedItemsQuery(channelId).limit(pageSize).offset(calculatePageOffset(pageSize, page)).asList();
 	}
 	
+	@Timed(timingNotes = "")
 	private Query<FeedItem> channelFeedItemsQuery(String channelId) throws UnknownHostException {
 		final List<String> channelSubscriptions = Lists.newArrayList();
 		for (Subscription subscription : subscriptionsDAO.getSubscriptionsForChannel(channelId)) {
