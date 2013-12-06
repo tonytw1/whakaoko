@@ -5,6 +5,8 @@ import java.net.UnknownHostException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import uk.co.eelpieconsulting.feedlistener.model.FeedItem;
+
 import com.google.code.morphia.Datastore;
 import com.google.code.morphia.Morphia;
 import com.mongodb.Mongo;
@@ -45,6 +47,7 @@ public class DataStoreFactory {
 		final Morphia morphia = new Morphia();		
 		final Mongo m = new Mongo(mongoHost);
 		Datastore newDataStore = morphia.createDatastore(m, mongoDatabase);
+		morphia.map(FeedItem.class);
 		newDataStore.ensureIndexes();
 		
 		this.dataStore = newDataStore;

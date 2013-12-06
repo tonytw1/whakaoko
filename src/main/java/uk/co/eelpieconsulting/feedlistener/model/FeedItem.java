@@ -15,9 +15,9 @@ import com.google.code.morphia.annotations.Id;
 import com.google.code.morphia.annotations.Index;
 import com.google.code.morphia.annotations.Indexed;
 import com.google.code.morphia.annotations.Indexes;
+import com.google.code.morphia.utils.IndexDirection;
 
 @Entity("feeditems")
-@Indexes({ @Index("subscriptionId, -date") })
 public class FeedItem implements Serializable, RssFeedable {
 	
 	private static final long serialVersionUID = 1L;
@@ -29,8 +29,12 @@ public class FeedItem implements Serializable, RssFeedable {
 	
 	@Indexed
 	private String url;
+
 	private String body;
+
+	@Indexed(value=IndexDirection.DESC)
 	private Date date;
+	
 	private Place place;
 	private String imageUrl;
 	
