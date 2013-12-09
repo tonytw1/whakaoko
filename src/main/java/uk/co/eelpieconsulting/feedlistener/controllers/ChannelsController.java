@@ -2,7 +2,6 @@ package uk.co.eelpieconsulting.feedlistener.controllers;
 
 import java.net.UnknownHostException;
 import java.util.List;
-import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,7 +24,6 @@ import uk.co.eelpieconsulting.feedlistener.model.Channel;
 import uk.co.eelpieconsulting.feedlistener.model.Subscription;
 
 import com.google.common.base.Strings;
-import com.google.common.collect.Maps;
 import com.mongodb.MongoException;
 
 @Controller
@@ -63,36 +61,6 @@ public class ChannelsController {
 		log.info("Channels for user: " + username);
 		final ModelAndView mv = new ModelAndView(viewFactory.getJsonView());
 		mv.addObject("data", channelsDAO.getChannels(username));
-		return mv;
-	}
-	
-	@RequestMapping(value="/ui/{username}/channels/{id}", method=RequestMethod.GET)
-	public ModelAndView channel(@PathVariable String username, @PathVariable String id,
-			@RequestParam(required=false) Integer page) throws UnknownHostException, MongoException {
-		final Channel channel = channelsDAO.getById(username, id);
-
-		final ModelAndView mv = new ModelAndView("channel");
-		mv.addObject("channel", channel);
-		
-		final List<Subscription> subscriptionsForChannel = subscriptionsDAO.getSubscriptionsForChannel(channel.getId());
-		mv.addObject("subscriptions", subscriptionsForChannel);
-		
-		if (!subscriptionsForChannel.isEmpty()) {
-			mv.addObject("inboxSize", feedItemDAO.getChannelFeedItemsCount(channel.getId()));
-			
-			
-			if (page != null) {
-				mv.addObject("inbox", feedItemDAO.getChannelFeedItems(channel.getId(), DEFAULT_PAGE_SIZE, page));
-			} else {
-				mv.addObject("inbox", feedItemDAO.getChannelFeedItems(channel.getId(), DEFAULT_PAGE_SIZE));
-			}
-			
-			final Map<String, Long> subscriptionCounts = Maps.newHashMap();
-			for (Subscription subscription : subscriptionsForChannel) {
-				subscriptionCounts.put(subscription.getId(), feedItemDAO.getSubscriptionFeedItemsCount(subscription.getId()));	// TODO slow on channels with many subscriptions - cache or index?
-			}
-			mv.addObject("subscriptionCounts", subscriptionCounts);
-		}
 		return mv;
 	}
 	
@@ -142,11 +110,6 @@ public class ChannelsController {
 		
 		mv.addObject("data", feedItemDAO.getChannelFeedItems(channel.getId(), pageSizeToUse, pageToUse));	
 		return mv;
-	}
-	
-	@RequestMapping(value="/ui/channels/new", method=RequestMethod.GET)
-	public ModelAndView newChannelForm() {
-		return new ModelAndView("newChannel");		
 	}
 	
 	@RequestMapping(value="/{username}/channels", method=RequestMethod.POST)

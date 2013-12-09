@@ -26,7 +26,6 @@ import uk.co.eelpieconsulting.feedlistener.CredentialsRequiredException;
 import uk.co.eelpieconsulting.feedlistener.UnknownSubscriptionException;
 import uk.co.eelpieconsulting.feedlistener.UrlBuilder;
 import uk.co.eelpieconsulting.feedlistener.annotations.Timed;
-import uk.co.eelpieconsulting.feedlistener.daos.ChannelsDAO;
 import uk.co.eelpieconsulting.feedlistener.daos.FeedItemDAO;
 import uk.co.eelpieconsulting.feedlistener.daos.SubscriptionsDAO;
 import uk.co.eelpieconsulting.feedlistener.daos.UsersDAO;
@@ -58,7 +57,6 @@ public class SubscriptionsController {
 	private UrlBuilder urlBuilder;
 	private FeedItemDAO feedItemDAO;
 	private TwitterSubscriptionManager twitterSubscriptionManager;
-	private ChannelsDAO channelsDAO;
 	private RssSubscriptionManager rssSubscriptionManager;
 	private ViewFactory viewFactory;
 	
@@ -69,7 +67,6 @@ public class SubscriptionsController {
 	public SubscriptionsController(UsersDAO usersDAO, SubscriptionsDAO subscriptionsDAO, RssPoller rssPoller, TwitterListener twitterListener, 
 			InstagramSubscriptionManager instagramSubscriptionManager, UrlBuilder urlBuilder,
 			FeedItemDAO feedItemDAO,
-			ChannelsDAO channelsDAO,
 			TwitterSubscriptionManager twitterSubscriptionManager,
 			RssSubscriptionManager rssSubscriptionManager,
 			ViewFactory viewFactory) {
@@ -80,27 +77,9 @@ public class SubscriptionsController {
 		this.instagramSubscriptionManager = instagramSubscriptionManager;
 		this.urlBuilder = urlBuilder;
 		this.feedItemDAO = feedItemDAO;
-		this.channelsDAO = channelsDAO;
 		this.twitterSubscriptionManager = twitterSubscriptionManager;
 		this.rssSubscriptionManager = rssSubscriptionManager;
 		this.viewFactory = viewFactory;
-	}
-	
-	@RequestMapping(value="/ui/{username}/subscriptions/{id}", method=RequestMethod.GET)
-	public ModelAndView subscription(@PathVariable String username, @PathVariable String id,
-			@RequestParam(required=false) Integer page) throws UnknownHostException, MongoException, UnknownSubscriptionException, UnknownUserException {
-		usersDAO.getByUsername(username);
-		
-		Subscription subscription = subscriptionsDAO.getById(username, id);
-		if (subscription == null) {
-			throw new RuntimeException("Invalid user");
-		}
-		
-		ModelAndView mv = new ModelAndView("subscription");
-		mv.addObject("subscription", subscription);
-		mv.addObject("subscriptionSize", feedItemDAO.getSubscriptionFeedItemsCount(subscription.getId()));
-		populateFeedItems(subscription, page, mv, "feedItems");		
-		return mv;
 	}
 	
 	@Timed(timingNotes = "")
@@ -157,16 +136,6 @@ public class SubscriptionsController {
 		}
 		
 		ModelAndView mv = new ModelAndView(viewFactory.getJsonView()).addObject("data", "ok");
-		return mv;
-	}
-	
-	@RequestMapping(value="/ui/{username}/subscriptions/new", method=RequestMethod.GET)
-	public ModelAndView newSubscriptionForm(@PathVariable String username) throws UnknownUserException {
-		usersDAO.getByUsername(username);
-		
-		final ModelAndView mv = new ModelAndView("newSubscription");
-		mv.addObject("username", username);
-		mv.addObject("channels", channelsDAO.getChannels(username));
 		return mv;
 	}
 	
