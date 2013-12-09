@@ -11,6 +11,7 @@ import twitter4j.TwitterStream;
 import uk.co.eelpieconsulting.feedlistener.CredentialsRequiredException;
 import uk.co.eelpieconsulting.feedlistener.credentials.CredentialService;
 import uk.co.eelpieconsulting.feedlistener.daos.SubscriptionsDAO;
+import uk.co.eelpieconsulting.feedlistener.exceptions.UnknownUserException;
 import uk.co.eelpieconsulting.feedlistener.model.Subscription;
 import uk.co.eelpieconsulting.feedlistener.model.TwitterTagSubscription;
 
@@ -31,7 +32,7 @@ public class TwitterListener {
 	private TwitterStream twitterStream;
 	
 	@Autowired
-	public TwitterListener(SubscriptionsDAO subscriptionsDAO, TwitterStatusListener twitterListener, CredentialService credentialService, TwitterApiFactory twitterApiFactory) {
+	public TwitterListener(SubscriptionsDAO subscriptionsDAO, TwitterStatusListener twitterListener, CredentialService credentialService, TwitterApiFactory twitterApiFactory) throws UnknownUserException {
 		this.subscriptionsDAO = subscriptionsDAO;
 		this.twitterListener = twitterListener;
 		this.credentialService = credentialService;
@@ -44,7 +45,7 @@ public class TwitterListener {
 		}
 	}
 	
-	public void connect() throws CredentialsRequiredException {
+	public void connect() throws CredentialsRequiredException, UnknownUserException {
 		if (twitterStream != null) {
 			twitterStream.cleanUp();
 		}

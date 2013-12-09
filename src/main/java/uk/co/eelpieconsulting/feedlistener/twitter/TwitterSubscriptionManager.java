@@ -6,6 +6,7 @@ import org.springframework.stereotype.Component;
 import uk.co.eelpieconsulting.feedlistener.CredentialsRequiredException;
 import uk.co.eelpieconsulting.feedlistener.credentials.CredentialService;
 import uk.co.eelpieconsulting.feedlistener.daos.SubscriptionsDAO;
+import uk.co.eelpieconsulting.feedlistener.exceptions.UnknownUserException;
 import uk.co.eelpieconsulting.feedlistener.model.TwitterTagSubscription;
 
 @Component
@@ -22,7 +23,7 @@ public class TwitterSubscriptionManager {
 		this.twitterListener = twitterListener;
 	}
 	
-	public void requestTagSubscription(String tag, String channel, String username) throws CredentialsRequiredException {
+	public void requestTagSubscription(String tag, String channel, String username) throws CredentialsRequiredException, UnknownUserException {
 		if (!credentialService.hasTwitterAccessToken(username)) {
 			throw new CredentialsRequiredException();
 		}
@@ -31,7 +32,7 @@ public class TwitterSubscriptionManager {
 		reconnect();		
 	}
 
-	public void reconnect() {
+	public void reconnect() throws CredentialsRequiredException, UnknownUserException {
 		twitterListener.connect();		
 	}
 

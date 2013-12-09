@@ -12,6 +12,7 @@ import org.springframework.web.servlet.ModelAndView;
 import uk.co.eelpieconsulting.feedlistener.annotations.Timed;
 import uk.co.eelpieconsulting.feedlistener.daos.ChannelsDAO;
 import uk.co.eelpieconsulting.feedlistener.daos.UsersDAO;
+import uk.co.eelpieconsulting.feedlistener.exceptions.UnknownUserException;
 
 import com.mongodb.MongoException;
 
@@ -32,10 +33,8 @@ public class HomepageController {
 	
 	@Timed(timingNotes = "")
 	@RequestMapping(value="/ui/{username}", method=RequestMethod.GET)
-	public ModelAndView homepage(@PathVariable String username) throws UnknownHostException, MongoException {
-		if (usersDAO.getByUsername(username) == null) {
-			throw new RuntimeException("Invalid user");
-		}
+	public ModelAndView homepage(@PathVariable String username) throws UnknownHostException, MongoException, UnknownUserException {
+		usersDAO.getByUsername(username);
 		
 		final ModelAndView mv = new ModelAndView("homepage");
 		mv.addObject("channels", channelsDAO.getChannels(username));		

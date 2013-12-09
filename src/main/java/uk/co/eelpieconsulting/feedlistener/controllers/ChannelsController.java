@@ -20,6 +20,7 @@ import uk.co.eelpieconsulting.feedlistener.daos.ChannelsDAO;
 import uk.co.eelpieconsulting.feedlistener.daos.FeedItemDAO;
 import uk.co.eelpieconsulting.feedlistener.daos.SubscriptionsDAO;
 import uk.co.eelpieconsulting.feedlistener.daos.UsersDAO;
+import uk.co.eelpieconsulting.feedlistener.exceptions.UnknownUserException;
 import uk.co.eelpieconsulting.feedlistener.model.Channel;
 import uk.co.eelpieconsulting.feedlistener.model.Subscription;
 
@@ -56,10 +57,8 @@ public class ChannelsController {
 	}
 	
 	@RequestMapping(value="/{username}/channels", method=RequestMethod.GET)
-	public ModelAndView channelsJson(@PathVariable String username) {
-		if (usersDAO.getByUsername(username) == null) {
-			throw new RuntimeException("Invalid user");
-		}
+	public ModelAndView channelsJson(@PathVariable String username) throws UnknownUserException {
+		usersDAO.getByUsername(username);
 		
 		log.info("Channels for user: " + username);
 		final ModelAndView mv = new ModelAndView(viewFactory.getJsonView());
@@ -98,10 +97,8 @@ public class ChannelsController {
 	}
 	
 	@RequestMapping(value="/{username}/channels/{id}", method=RequestMethod.GET)
-	public ModelAndView channel(@PathVariable String username, @PathVariable String id) throws UnknownHostException, MongoException {		
-		if (usersDAO.getByUsername(username) == null) {
-			throw new RuntimeException("Invalid user");
-		}
+	public ModelAndView channel(@PathVariable String username, @PathVariable String id) throws UnknownHostException, MongoException, UnknownUserException {		
+		usersDAO.getByUsername(username);
 		
 		final Channel channel = channelsDAO.getById(username, id);
 		
@@ -111,10 +108,8 @@ public class ChannelsController {
 	}
 	
 	@RequestMapping(value="/{username}/channels/{id}/subscriptions", method=RequestMethod.GET)
-	public ModelAndView channelSubscriptions(@PathVariable String username, @PathVariable String id) throws UnknownHostException, MongoException {
-		if (usersDAO.getByUsername(username) == null) {
-			throw new RuntimeException("Invalid user");
-		}
+	public ModelAndView channelSubscriptions(@PathVariable String username, @PathVariable String id) throws UnknownHostException, MongoException, UnknownUserException {
+		usersDAO.getByUsername(username);
 		
 		final Channel channel = channelsDAO.getById(username, id);
 		final List<Subscription> subscriptionsForChannel = subscriptionsDAO.getSubscriptionsForChannel(channel.getId());
@@ -129,10 +124,8 @@ public class ChannelsController {
 			@RequestParam(required=false) Integer page,
 			@RequestParam(required=false) Integer pageSize,
 			@RequestParam(required=false) String format
-	) throws UnknownHostException, MongoException {
-		if (usersDAO.getByUsername(username) == null) {
-			throw new RuntimeException("Invalid user");
-		}
+	) throws UnknownHostException, MongoException, UnknownUserException {
+		usersDAO.getByUsername(username);
 		
 		final Channel channel = channelsDAO.getById(username, id);
 		
@@ -157,10 +150,8 @@ public class ChannelsController {
 	}
 	
 	@RequestMapping(value="/{username}/channels", method=RequestMethod.POST)
-	public ModelAndView addChannel(@PathVariable String username, @RequestParam String name) {
-		if (usersDAO.getByUsername(username) == null) {
-			throw new RuntimeException("Invalid user");
-		}
+	public ModelAndView addChannel(@PathVariable String username, @RequestParam String name) throws UnknownUserException {
+		usersDAO.getByUsername(username);
 		
 		channelsDAO.add(username, new Channel(idBuilder.makeIdFor(name), name, username));
 		

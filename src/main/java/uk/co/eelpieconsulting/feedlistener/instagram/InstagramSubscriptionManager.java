@@ -15,6 +15,7 @@ import uk.co.eelpieconsulting.common.http.HttpNotFoundException;
 import uk.co.eelpieconsulting.feedlistener.CredentialsRequiredException;
 import uk.co.eelpieconsulting.feedlistener.UrlBuilder;
 import uk.co.eelpieconsulting.feedlistener.credentials.CredentialService;
+import uk.co.eelpieconsulting.feedlistener.exceptions.UnknownUserException;
 import uk.co.eelpieconsulting.feedlistener.instagram.api.InstagramApi;
 import uk.co.eelpieconsulting.feedlistener.model.InstagramGeographySubscription;
 import uk.co.eelpieconsulting.feedlistener.model.InstagramTagSubscription;
@@ -35,7 +36,7 @@ public class InstagramSubscriptionManager {
 		this.instagramApi = new InstagramApi();		
 	}
 	
-	public InstagramTagSubscription requestInstagramTagSubscription(String tag, String channelId, String username) throws HttpNotFoundException, HttpBadRequestException, HttpForbiddenException, HttpFetchException, UnsupportedEncodingException, JSONException {
+	public InstagramTagSubscription requestInstagramTagSubscription(String tag, String channelId, String username) throws HttpNotFoundException, HttpBadRequestException, HttpForbiddenException, HttpFetchException, UnsupportedEncodingException, JSONException, UnknownUserException {
 		if (!credentialService.hasInstagramAccessToken(username)) {
 			log.info("No instagram credentials available; not requesting subscription");
 			throw new CredentialsRequiredException();
@@ -46,7 +47,7 @@ public class InstagramSubscriptionManager {
 		return subscription;
 	}
 
-	public InstagramGeographySubscription requestInstagramGeographySubscription(LatLong latLong, int radius, String channelId, String username) throws UnsupportedEncodingException, HttpNotFoundException, HttpBadRequestException, HttpForbiddenException, HttpFetchException, JSONException {
+	public InstagramGeographySubscription requestInstagramGeographySubscription(LatLong latLong, int radius, String channelId, String username) throws UnsupportedEncodingException, HttpNotFoundException, HttpBadRequestException, HttpForbiddenException, HttpFetchException, JSONException, UnknownUserException {
 		if (!credentialService.hasInstagramAccessToken(username)) {
 			log.info("No instagram credentials available; not requesting subscription");
 			throw new CredentialsRequiredException();

@@ -6,6 +6,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import uk.co.eelpieconsulting.feedlistener.exceptions.UnknownUserException;
 import uk.co.eelpieconsulting.feedlistener.model.User;
 
 import com.google.common.base.Strings;
@@ -36,14 +37,11 @@ public class UsersDAO {
 		}
 	}
 
-	public User getByUsername(String username) {
-        try {
-			return dataStoreFactory.getDatastore().find(User.class, "username", username).get();
-		} catch (UnknownHostException e) {
-			throw new RuntimeException(e);
-		} catch (MongoException e) {
-			throw new RuntimeException(e);
-		}
+	public User getByUsername(String username) throws UnknownUserException {
+        User user = loadUserFromDatabase(username);
+        if (user != null) {
+        	return user;
+        } throw new UnknownUserException();
 	}
 
 	public synchronized void createUser(String username) throws UnknownHostException, MongoException {
@@ -51,7 +49,7 @@ public class UsersDAO {
 			throw new RuntimeException("No username given");
 		}
 		
-		if (getByUsername(username) != null) {
+		if (loadUserFromDatabase(username) != null) {
 			throw new RuntimeException("Username is not available");
 		}
 		
@@ -60,6 +58,16 @@ public class UsersDAO {
 
 	public void save(final User user) throws UnknownHostException {
 		dataStoreFactory.getDatastore().save(user);
+	}
+	
+	private User loadUserFromDatabase(String username) {
+		try {
+			return dataStoreFactory.getDatastore().find(User.class, "username", username).get();
+		} catch (UnknownHostException e) {
+			throw new RuntimeException(e);
+		} catch (MongoException e) {
+			throw new RuntimeException(e);
+		}
 	}
 	
 }

@@ -18,6 +18,7 @@ import twitter4j.auth.AccessToken;
 import twitter4j.auth.RequestToken;
 import uk.co.eelpieconsulting.feedlistener.UrlBuilder;
 import uk.co.eelpieconsulting.feedlistener.credentials.CredentialService;
+import uk.co.eelpieconsulting.feedlistener.exceptions.UnknownUserException;
 import uk.co.eelpieconsulting.feedlistener.twitter.TwitterApiFactory;
 import uk.co.eelpieconsulting.feedlistener.twitter.TwitterSubscriptionManager;
 
@@ -63,7 +64,7 @@ public class TwitterOauthController {
 	
 	@RequestMapping(value="/twitter/callback", method=RequestMethod.GET)
 	public ModelAndView callback(@RequestParam(value="oauth_token", required=true) String token,
-			@RequestParam(value="oauth_verifier", required=true) String verifier) throws TwitterException, UnknownHostException {
+			@RequestParam(value="oauth_verifier", required=true) String verifier) throws TwitterException, UnknownHostException, UnknownUserException {
 		
 		log.info("Received Twitter oauth callback: oauth_token: " + token + ", oauth_verifier: " + verifier);
 

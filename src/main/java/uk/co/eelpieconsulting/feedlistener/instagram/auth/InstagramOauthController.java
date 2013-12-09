@@ -18,6 +18,7 @@ import uk.co.eelpieconsulting.common.http.HttpForbiddenException;
 import uk.co.eelpieconsulting.common.http.HttpNotFoundException;
 import uk.co.eelpieconsulting.feedlistener.UrlBuilder;
 import uk.co.eelpieconsulting.feedlistener.credentials.CredentialService;
+import uk.co.eelpieconsulting.feedlistener.exceptions.UnknownUserException;
 import uk.co.eelpieconsulting.feedlistener.instagram.api.InstagramApi;
 
 @Controller
@@ -46,7 +47,7 @@ public class InstagramOauthController {
 	}
 	
 	@RequestMapping(value=INSTAGRAM_OAUTH_CALLBACK, method=RequestMethod.GET)
-	public ModelAndView dataCallback(@RequestParam String code) throws IOException, HttpNotFoundException, HttpBadRequestException, HttpForbiddenException, HttpFetchException, JSONException {		
+	public ModelAndView dataCallback(@RequestParam String code) throws IOException, HttpNotFoundException, HttpBadRequestException, HttpForbiddenException, HttpFetchException, JSONException, UnknownUserException {		
 		log.info("Received oauth callback code: " + code);
 		
 		log.info("Exchanging oauth callback code for access token");
