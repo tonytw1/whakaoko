@@ -1,0 +1,8 @@
+<html>
+<head>
+	<link href="/bootstrap/css/bootstrap.css" rel="stylesheet" />
+	<script src="/bootstrap/js/bootstrap.min.js"></script>
+	<link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.7.1/leaflet.css" />
+	<script src="http://cdn.leafletjs.com/leaflet-0.7.1/leaflet.js"></script>
+</head>
+<body>

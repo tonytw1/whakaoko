@@ -1,3 +1,5 @@
+#parse('includes/header.vm')
+
 <p><h4>whakaoko</h4>
 (verb) to listen to.</p>
 
@@ -31,10 +33,18 @@
 <a href="$urlBuilder.getChannelItemsUrl('tonytw1', $channel.id)/items">JSON</a> | 
 <a href="$urlBuilder.getChannelItemsUrl('tonytw1', $channel.id)/items?format=rss">RSS</a>
 
+#parse('includes/map.vm')
+
 #if($inbox && !$inbox.isEmpty()) 
 	<ul>
  	#foreach($feedItem in $inbox)
  		#parse('includes/feeditem.vm')
+ 		#if($feedItem.isGeoTagged())
+			<script>
+	          	var marker = L.marker([${feedItem.place.latLong.latitude}, ${feedItem.place.latLong.longitude}]).addTo(map).bindPopup("$feedItem.title");
+				markers.push(marker);
+	     	</script>
+	   	#end
  	#end
  	</ul>
 #else
@@ -44,3 +54,9 @@
 </td>
 </tr>
 </table>
+
+<script>
+	map.fitBounds(new L.featureGroup(markers).getBounds());
+</script>
+
+#parse('includes/footer.vm')
