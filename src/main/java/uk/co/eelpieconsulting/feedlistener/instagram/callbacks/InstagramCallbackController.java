@@ -64,53 +64,35 @@ public class InstagramCallbackController {
 	}
 	
 	@RequestMapping(value="/instagram/callback", method=RequestMethod.POST)
-	public ModelAndView dataCallback(@RequestBody String body) throws IOException, JSONException, HttpNotFoundException, HttpBadRequestException, HttpForbiddenException, HttpFetchException, UnknownUserException {		
+	public ModelAndView dataCallback(@RequestBody String body) throws IOException, JSONException, HttpNotFoundException, HttpBadRequestException, HttpForbiddenException, HttpFetchException, UnknownUserException {
+		final String username = "tonytw1";	// TODO user specific call back urls
+				
 		log.info("Received subscription callback post: " + body);
 		
-		List<Long> updatedSubscriptions = instagramSubscriptionCallbackParser.parse(body);
-		log.info("Updated subscriptions in this callback: " + updatedSubscriptions);
-		for (Long subscriptionId : updatedSubscriptions) {
+		final List<Long> updatedInstagramSubscriptions = instagramSubscriptionCallbackParser.parse(body);
+		log.info("Updated instagram subscription ids in this callback: " + updatedInstagramSubscriptions);
+		for (Long instagramSubscriptionId : updatedInstagramSubscriptions) {
 			
-			final InstagramSubscription subscription = subscriptionsDAO.getByInstagramId(subscriptionId);
+			final InstagramSubscription subscription = subscriptionsDAO.getByInstagramId(instagramSubscriptionId);
 			
 			if (subscription != null && subscription instanceof InstagramTagSubscription) {
 				final String tag = ((InstagramTagSubscription) subscription).getTag();
-				log.info("Fetching recent media for changed tag: " + tag);
-				List<FeedItem> recentMedia = instagramApi.getRecentMediaForTag(tag, credentialService.getInstagramAccessTokenForUser("tonytw1"));	// TODO user
-								
-				Date latestItemDate = null;
-				for (FeedItem feedItem : recentMedia) {
-					feedItem.setSubscriptionId(subscription.getId());
-					
-					final Date feedItemDate = feedItem.getDate();
-					if (feedItemDate != null && (latestItemDate == null || feedItemDate.after(latestItemDate))) {
-						latestItemDate =  feedItemDate;
-					}
-					
-				}
 				
+				log.info("Fetching recent media for changed tag: " + tag);
+				List<FeedItem> recentMedia = instagramApi.getRecentMediaForTag(tag, credentialService.getInstagramAccessTokenForUser(username));								
+				Date latestItemDate = populateFeedItemSubscriptionIdAndExtractLatestItemDate(subscription, recentMedia);				
 				feedItemDAO.addAll(recentMedia);
 				
 				subscription.setLatestItemDate(latestItemDate);						
 				subscriptionsDAO.save(subscription);
 			}
 			
-			// TOD duplication
 			if (subscription != null && subscription instanceof InstagramGeographySubscription) {
-				log.info("Fetching recent media for changed geography: " + subscription.toString());								
 				final long geoId = ((InstagramGeographySubscription) subscription).getGeoId();
-				List<FeedItem> recentMedia = instagramApi.getRecentMediaForGeography(geoId, credentialService.getInstagramClientId());
-				
-				Date latestItemDate = null;
-				for (FeedItem feedItem : recentMedia) {
-					feedItem.setSubscriptionId(subscription.getId());
-					
-					final Date feedItemDate = feedItem.getDate();
-					if (feedItemDate != null && (latestItemDate == null || feedItemDate.after(latestItemDate))) {
-						latestItemDate =  feedItemDate;
-					}
-				}
-				
+
+				log.info("Fetching recent media for changed geography: " + subscription.toString());								
+				List<FeedItem> recentMedia = instagramApi.getRecentMediaForGeography(geoId, credentialService.getInstagramClientId());				
+				Date latestItemDate = populateFeedItemSubscriptionIdAndExtractLatestItemDate(subscription, recentMedia);				
 				feedItemDAO.addAll(recentMedia);
 				
 				subscription.setLatestItemDate(latestItemDate);						
@@ -119,6 +101,20 @@ public class InstagramCallbackController {
 			
 		}
 		return null;
+	}
+
+	private Date populateFeedItemSubscriptionIdAndExtractLatestItemDate(final InstagramSubscription subscription, List<FeedItem> recentMedia) {
+		Date latestItemDate = null;
+		for (FeedItem feedItem : recentMedia) {
+			feedItem.setSubscriptionId(subscription.getId());
+			
+			final Date feedItemDate = feedItem.getDate();
+			if (feedItemDate != null && (latestItemDate == null || feedItemDate.after(latestItemDate))) {
+				latestItemDate =  feedItemDate;
+			}
+			
+		}
+		return latestItemDate;
 	}
 	
 }
