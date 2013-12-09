@@ -172,7 +172,8 @@ public class SubscriptionsController {
 			throw new RuntimeException("Invalid user");
 		}
 		
-		ModelAndView mv = new ModelAndView("newSubscription");
+		final ModelAndView mv = new ModelAndView("newSubscription");
+		mv.addObject("username", username);
 		mv.addObject("channels", channelsDAO.getChannels(username));
 		return mv;
 	}
