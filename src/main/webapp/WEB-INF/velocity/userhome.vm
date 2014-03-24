@@ -5,6 +5,8 @@
 
 <p><a href="$urlBuilder.getNewChannelUrl('tonytw1')">New channel</a></p>
 
+<p><a href="/ui/tonytw1/subscriptions/new" /></p>
+
 #if($channels && !$channels.isEmpty()) 
 	<ul>
  	#foreach($channel in $channels) 

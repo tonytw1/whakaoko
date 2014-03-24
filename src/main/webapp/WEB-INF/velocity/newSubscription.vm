@@ -12,7 +12,7 @@
 </form>
 <hr/>
 
-<form action="/${username}subscriptions/twitter/tags" method="POST">
+<form action="/${username}/subscriptions/twitter/tags" method="POST">
 	Twitter tag: <input name="tag" />
 	
 	Channel: 
@@ -26,7 +26,7 @@
 </form>
 <hr/>
 
-<form action="/${username}subscriptions/instagram/tags" method="POST">
+<form action="/${username}/subscriptions/instagram/tags" method="POST">
 	Instagram tag: <input name="tag" />
 	
 	Channel: 
@@ -40,7 +40,7 @@
 </form>
 <hr/>
 
-<form action="/${username}subscriptions/instagram/geography" method="POST">
+<form action="/${username}/subscriptions/instagram/geography" method="POST">
 	Instagram geography<br/>
 	Latitude: <input name="latitude" />
 	Longitude: <input name="longitude" />
