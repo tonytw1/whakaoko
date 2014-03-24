@@ -5,7 +5,7 @@
 
 <p><a href="$urlBuilder.getNewChannelUrl('tonytw1')">New channel</a></p>
 
-<p><a href="/ui/tonytw1/subscriptions/new" /></p>
+<p><a href="/ui/tonytw1/subscriptions/new">New subscription</a></p>
 
 #if($channels && !$channels.isEmpty()) 
 	<ul>
