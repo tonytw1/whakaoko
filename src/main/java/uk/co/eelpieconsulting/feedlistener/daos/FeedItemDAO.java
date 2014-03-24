@@ -58,7 +58,7 @@ public class FeedItemDAO {
 	}
 	
 	public void deleteSubscriptionFeedItems(Subscription subscription) throws UnknownHostException, MongoException {
-		 dataStoreFactory.getDatastore().delete(subscriptionFeedItemsQuery(subscription.getId()));
+		 dataStoreFactory.getDatastore().delete(dataStoreFactory.getDatastore().find(FeedItem.class, "subscriptionId", subscription.getId()));
 	}
 	
 	@Timed(timingNotes = "")

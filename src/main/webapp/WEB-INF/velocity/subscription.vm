@@ -5,6 +5,8 @@
 
 <h5>$subscription.channelId / #if($subscription.name)$subscription.name#else$subscription.url#end #if($subscriptionSize > 0) ($subscriptionSize) #end</h5>
 
+<p><a href="$urlBuilder.getDeleteSubscriptionUrl($subscription)">Delete</a></p>
+
 #if($subscription.lastRead)
 	<p><span title="$subscription.lastRead">Last read: $dateFormatter.timeSince($subscription.lastRead)</span></p>
 #end

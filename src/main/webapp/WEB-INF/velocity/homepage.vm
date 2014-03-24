@@ -1,15 +1,2 @@
 <p><h4>whakaoko</h4>
 (verb) to listen to.</p>
-
-<h5>Channels</h5>
-
-#if($channels && !$channels.isEmpty()) 
-	<ul>
- 	#foreach($channel in $channels) 
- 		<li><a href="$urlBuilder.getChannelUrl($channel)">$!channel.name</a>
- 		</li>
- 	#end
- 	</ul>
-#else
-	<p>No channels.</p>
-#end

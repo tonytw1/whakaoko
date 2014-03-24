@@ -115,7 +115,7 @@ public class SubscriptionsController {
 	}
 	
 	@Timed(timingNotes = "")
-	@RequestMapping(value="/subscriptions/{id}/delete")	// TODO should be a HTTP DELETE
+	@RequestMapping(value="/{username}/subscriptions/{id}/delete")	// TODO should be a HTTP DELETE
 	public ModelAndView deleteSubscription(@PathVariable String username, @PathVariable String id) throws UnknownHostException, MongoException, HttpNotFoundException, HttpBadRequestException, HttpForbiddenException, HttpFetchException, UnknownSubscriptionException, UnknownUserException {
 		usersDAO.getByUsername(username);
 		
@@ -135,8 +135,7 @@ public class SubscriptionsController {
 			instagramSubscriptionManager.requestUnsubscribeFrom(((InstagramSubscription) subscription).getSubscriptionId());
 		}
 		
-		ModelAndView mv = new ModelAndView(viewFactory.getJsonView()).addObject("data", "ok");
-		return mv;
+		return new ModelAndView(viewFactory.getJsonView()).addObject("data", "ok");
 	}
 	
 	@Timed(timingNotes = "")

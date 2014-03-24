@@ -74,9 +74,13 @@ public class CredentialService {
 		usersDAO.save(user);		
 	}
 	
-	public boolean hasTwitterAccessToken(String username) throws UnknownUserException {
-		final User user = usersDAO.getByUsername(username);
-		return !Strings.isNullOrEmpty(user.getTwitterAccessToken()) && !Strings.isNullOrEmpty(user.getTwitterAccessSecret());
+	public boolean hasTwitterAccessToken(String username) {
+		try {
+			final User user = usersDAO.getByUsername(username);
+			return !Strings.isNullOrEmpty(user.getTwitterAccessToken()) && !Strings.isNullOrEmpty(user.getTwitterAccessSecret());
+		} catch (UnknownUserException e) {
+			return false;
+		}
 	}
 	
 	public boolean hasInstagramAccessToken(String username) throws UnknownUserException {

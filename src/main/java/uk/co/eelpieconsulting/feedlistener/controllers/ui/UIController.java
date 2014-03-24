@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
 import uk.co.eelpieconsulting.feedlistener.UnknownSubscriptionException;
-import uk.co.eelpieconsulting.feedlistener.annotations.Timed;
 import uk.co.eelpieconsulting.feedlistener.daos.ChannelsDAO;
 import uk.co.eelpieconsulting.feedlistener.daos.FeedItemDAO;
 import uk.co.eelpieconsulting.feedlistener.daos.SubscriptionsDAO;
@@ -47,12 +46,16 @@ public class UIController {
 		this.feedItemDAO = feedItemDAO;
 	}
 	
-	@Timed(timingNotes = "")
+	@RequestMapping(value="/", method=RequestMethod.GET)
+	public ModelAndView homepage() {		
+		return new ModelAndView("homepage");
+	}
+	
 	@RequestMapping(value="/ui/{username}", method=RequestMethod.GET)
-	public ModelAndView homepage(@PathVariable String username) throws UnknownHostException, MongoException, UnknownUserException {
+	public ModelAndView userhome(@PathVariable String username) throws UnknownHostException, MongoException, UnknownUserException {
 		usersDAO.getByUsername(username);
 		
-		final ModelAndView mv = new ModelAndView("homepage");
+		final ModelAndView mv = new ModelAndView("userhome");
 		mv.addObject("channels", channelsDAO.getChannels(username));		
 		return mv;
 	}
@@ -114,12 +117,11 @@ public class UIController {
 		return mv;
 	}
 	
-	@RequestMapping(value="/ui/channels/new", method=RequestMethod.GET)
+	@RequestMapping(value="/ui/{username}/channels/new", method=RequestMethod.GET)
 	public ModelAndView newChannelForm() {
 		return new ModelAndView("newChannel");		
 	}
-	
-	
+		
 	// TODO duplication
 	private void populateFeedItems(Subscription subscription, Integer page, ModelAndView mv, String field) throws UnknownHostException {
 		if (page != null) {

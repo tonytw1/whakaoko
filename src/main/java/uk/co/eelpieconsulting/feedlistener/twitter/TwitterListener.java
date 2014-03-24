@@ -32,26 +32,26 @@ public class TwitterListener {
 	private TwitterStream twitterStream;
 	
 	@Autowired
-	public TwitterListener(SubscriptionsDAO subscriptionsDAO, TwitterStatusListener twitterListener, CredentialService credentialService, TwitterApiFactory twitterApiFactory) throws UnknownUserException {
+	public TwitterListener(SubscriptionsDAO subscriptionsDAO, TwitterStatusListener twitterListener, CredentialService credentialService, TwitterApiFactory twitterApiFactory) {
 		this.subscriptionsDAO = subscriptionsDAO;
 		this.twitterListener = twitterListener;
 		this.credentialService = credentialService;
 		this.twitterApiFactory = twitterApiFactory;
 		
 		try {
-			connect();
+			connect();			
 		} catch (CredentialsRequiredException e) {
 			log.warn("No twitter credentials available; not connecting on start up");
 		}
 	}
 	
-	public void connect() throws CredentialsRequiredException, UnknownUserException {
+	public void connect() throws CredentialsRequiredException {
 		if (twitterStream != null) {
 			twitterStream.cleanUp();
 		}
 		
 		if (!credentialService.hasTwitterAccessToken(USER)) {
-			log.warn("No twitter credentials available; not connecting");
+			log.warn("No twitter credentials available for user '" + USER + "'; not connecting");
 			throw new CredentialsRequiredException();
 		}
 
