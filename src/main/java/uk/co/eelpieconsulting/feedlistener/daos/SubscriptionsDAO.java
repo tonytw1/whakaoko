@@ -31,10 +31,10 @@ public class SubscriptionsDAO {
 	
 	public synchronized void add(Subscription subscription) {
 		if (!subscriptionExists(subscription)) {
-			log.info("Saving subscription");
+			log.debug("Saving subscription");
 			save(subscription);
 		} else {
-			log.info("Not saving duplication subscription");
+			log.debug("Not saving duplication subscription");
 		}
 	}
 	

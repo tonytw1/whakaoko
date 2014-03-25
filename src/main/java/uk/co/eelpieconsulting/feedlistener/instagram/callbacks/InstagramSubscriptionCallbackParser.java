@@ -16,9 +16,9 @@ public class InstagramSubscriptionCallbackParser {
 	private static Logger log = Logger.getLogger(InstagramSubscriptionCallbackParser.class);
 	
 	public List<Long> parse(String json) throws JSONException {
-		log.info("Subscription update callback: " + json);
+		log.debug("Subscription update callback: " + json);
 		JSONArray callbackDataJSON = new JSONArray(json);
-		log.info("Callback contains subscriptions: " + callbackDataJSON.length());
+		log.debug("Callback contains subscriptions: " + callbackDataJSON.length());
 		
 		final List<Long> subscriptions = Lists.newArrayList();
 		for (int i = 0; i < callbackDataJSON.length(); i++) {
