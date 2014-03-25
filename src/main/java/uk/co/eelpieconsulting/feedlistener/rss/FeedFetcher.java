@@ -1,7 +1,6 @@
 package uk.co.eelpieconsulting.feedlistener.rss;
 
 import java.io.ByteArrayInputStream;
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
@@ -13,6 +12,7 @@ import org.xml.sax.InputSource;
 import uk.co.eelpieconsulting.common.http.HttpFetcher;
 import uk.co.eelpieconsulting.feedlistener.model.FeedItem;
 
+import com.google.common.collect.Lists;
 import com.sun.syndication.feed.synd.SyndEntry;
 import com.sun.syndication.feed.synd.SyndFeed;
 import com.sun.syndication.io.SyndFeedInput;
@@ -23,15 +23,18 @@ public class FeedFetcher {
 	private static Logger log = Logger.getLogger(FeedFetcher.class);
 	
 	private RssFeedItemMapper rssFeedItemMapper;
+
+	private HttpFetcher httpFetcher;
 	
 	@Autowired
 	public FeedFetcher(RssFeedItemMapper rssFeedItemMapper) {
 		this.rssFeedItemMapper = rssFeedItemMapper;
+		this.httpFetcher = new HttpFetcher();
 	}
 
 	@SuppressWarnings("unchecked")
 	public FetchedFeed fetchFeed(String url) {
-		final List<FeedItem> feedItems = new ArrayList<FeedItem>();
+		final List<FeedItem> feedItems = Lists.newArrayList();
     	final SyndFeed syndfeed = loadSyndFeedWithFeedFetcher(url);
     	if (syndfeed == null) {
     		log.warn("Could not load syndfeed from url: " + url + ". Returning empty list of items");
@@ -50,10 +53,7 @@ public class FeedFetcher {
 	private SyndFeed loadSyndFeedWithFeedFetcher(String feedUrl) {
 		log.info("Loading SyndFeed from url: " + feedUrl);
 		try {
-			final HttpFetcher httpFetcher = new HttpFetcher();
-			final byte[] bytes = httpFetcher.getBytes(feedUrl);
-			final SyndFeedInput feedInput = new SyndFeedInput();
-			return feedInput.build(new InputSource(new ByteArrayInputStream(bytes)));
+			return new SyndFeedInput().build(new InputSource(new ByteArrayInputStream(httpFetcher.getBytes(feedUrl))));
 			
 		} catch (Exception e) {
 			log.warn("Error while fetching feed: " + e.getMessage());
