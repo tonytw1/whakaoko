@@ -113,7 +113,7 @@ public class SubscriptionsDAO {
 	private boolean subscriptionExists(Subscription subscription) {
 		for (Subscription existingSubscription : getSubscriptions()) {
 			if (existingSubscription.getId().equals(subscription.getId())) {
-				log.info("Subscription exists: " + subscription);
+				log.debug("Subscription exists: " + subscription);
 				return true;
 			}
 		}		
