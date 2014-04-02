@@ -87,7 +87,6 @@ public class SubscriptionsController {
 	public ModelAndView subscriptionItems(@PathVariable String username, @PathVariable String id,
 			@RequestParam(required=false) Integer page,
 			@RequestParam(required=false) String format) throws UnknownHostException, MongoException, UnknownSubscriptionException, UnknownUserException {
-		log.info("Items");
 		usersDAO.getByUsername(username);
 		
 		Subscription subscription = subscriptionsDAO.getById(username, id);
