@@ -9,6 +9,7 @@ import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Component;
 
 import com.mongodb.MongoException;
@@ -43,7 +44,7 @@ public class RssPoller {
 		List<Subscription> subscriptions = subscriptionsDAO.getSubscriptions();
 		for (Subscription subscription : subscriptions) {
 			if (isRssSubscription(subscription)) {
-				taskExecutor.execute(new ProcessFeedTask(feedFetcher, feedItemDAO, subscriptionsDAO, (RssSubscription) subscription));
+				executeRssPoll(subscription);
 			}
 		}
 		log.info("Done");
@@ -51,8 +52,15 @@ public class RssPoller {
 	
 	public void run(Subscription subscription) {
 		log.info("Polling single subscription: " + subscription.getId());
-		taskExecutor.execute(new ProcessFeedTask(feedFetcher, feedItemDAO, subscriptionsDAO, (RssSubscription) subscription));
+		executeRssPoll(subscription);
 		log.info("Done");		
+	}
+	
+	private void executeRssPoll(Subscription subscription) {
+		log.info("Executing RSS poll for: " + subscription.getId());
+		ThreadPoolTaskExecutor threadPoolTaskExecutor = (ThreadPoolTaskExecutor) taskExecutor;
+		log.info("Task executor: active:" + threadPoolTaskExecutor.getActiveCount() + ", pool size: " + threadPoolTaskExecutor.getPoolSize());
+		taskExecutor.execute(new ProcessFeedTask(feedFetcher, feedItemDAO, subscriptionsDAO, (RssSubscription) subscription));
 	}
 	
 	private class ProcessFeedTask implements Runnable {
@@ -70,15 +78,14 @@ public class RssPoller {
 		}
 
 		public void run() {
-			log.info("Processing feed: " + subscription);
+			log.info("Processing feed: " + subscription + " from thread " + Thread.currentThread().getId());
 			final FetchedFeed fetchedFeed = feedFetcher.fetchFeed(subscription.getUrl());			
 			if (fetchedFeed != null) {
 				subscription.setName(fetchedFeed.getFeedName());
 				subscription.setLastRead(DateTime.now().toDate());
 				subscriptionsDAO.save(subscription);
-
-				log.info("Fetched feed: " + fetchedFeed.getFeedName());
 				
+				log.info("Fetched feed: " + fetchedFeed.getFeedName());				
 				Date latestItemDate = null;
 				for (FeedItem feedItem : fetchedFeed.getFeedItems()) {
 					try {
