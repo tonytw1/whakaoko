@@ -32,11 +32,11 @@ public class CachingUrlResolverService {
 		if (url != null && !url.isEmpty()) {			
 			final String cachedResult = (String) cache.get(generateKey(url));
 			if (cachedResult != null) {
-				log.info("Found result for url '" + url + "' in cache: " + cachedResult);
+				log.debug("Found result for url '" + url + "' in cache: " + cachedResult);
 				return cachedResult;				
 			}
 			
-			log.info("Delegrating to live url resolver");
+			log.debug("Delegrating to live url resolver");
 			final String result = urlResolverService.resolveUrl(url);
 			if (result != null) {
 				putUrlIntoCache(url, result);
@@ -50,7 +50,7 @@ public class CachingUrlResolverService {
 	}
 
 	private void putUrlIntoCache(String url, String result) {	
-		log.info("Caching result for url: " + url);
+		log.debug("Caching result for url: " + url);
 		cache.put(generateKey(url), ONE_DAY, result);
 	}
 	
