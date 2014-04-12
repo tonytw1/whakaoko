@@ -11,7 +11,6 @@ import twitter4j.TwitterStream;
 import uk.co.eelpieconsulting.feedlistener.CredentialsRequiredException;
 import uk.co.eelpieconsulting.feedlistener.credentials.CredentialService;
 import uk.co.eelpieconsulting.feedlistener.daos.SubscriptionsDAO;
-import uk.co.eelpieconsulting.feedlistener.exceptions.UnknownUserException;
 import uk.co.eelpieconsulting.feedlistener.model.Subscription;
 import uk.co.eelpieconsulting.feedlistener.model.TwitterTagSubscription;
 

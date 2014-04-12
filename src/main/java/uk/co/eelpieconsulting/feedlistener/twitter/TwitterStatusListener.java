@@ -17,6 +17,7 @@ import uk.co.eelpieconsulting.feedlistener.model.FeedItem;
 import uk.co.eelpieconsulting.feedlistener.model.Subscription;
 import uk.co.eelpieconsulting.feedlistener.model.TwitterTagSubscription;
 
+import com.google.common.collect.Lists;
 import com.mongodb.MongoException;
 
 @Component
@@ -36,29 +37,27 @@ public class TwitterStatusListener implements StatusListener {
 	}
 
 	public void onStatus(Status status) {
-		final FeedItem tweetFeedItem = tweetToFeedItem(status);
-		log.info("Received: " + tweetFeedItem.getHeadline());
+		log.info("Received: " + status.getText());
 		
-		final List<Subscription> twitterSubscriptions = subscriptionsDAO.getTwitterSubscriptions();
-		for (Subscription subscription : twitterSubscriptions) {
-			if (status.getText().toLowerCase().contains(((TwitterTagSubscription) subscription).getTag().toLowerCase())) {
-				tweetFeedItem.setSubscriptionId(subscription.getId());
-				subscription.setLatestItemDate(status.getCreatedAt());
-				subscriptionsDAO.save(subscription);
-			}
-		}
-		
-		try {
-			feedItemDAO.add(tweetFeedItem);
-		} catch (UnknownHostException e) {
-			log.error(e);
-		} catch (MongoException e) {
-			log.error(e);
-		}
+		final List<Subscription> subscriptionsMatchingThisTweet = filterSubscriptionsMatchingThisTweet(subscriptionsDAO.getTwitterSubscriptions(), status);		
+		for (Subscription subscription : subscriptionsMatchingThisTweet) {
+			final FeedItem tweetFeedItem = twitterFeedItemMapper.createFeedItemFrom(status);
+			tweetFeedItem.setSubscriptionId(subscription.getId());	// TODO should we be duplicating tweets like this?
+			subscription.setLatestItemDate(status.getCreatedAt());
+			subscriptionsDAO.save(subscription);
+			
+			try {
+				feedItemDAO.add(tweetFeedItem);
+			} catch (UnknownHostException e) {
+				log.error(e);
+			} catch (MongoException e) {
+				log.error(e);
+			}			
+		}	
 	}
 	
 	public void onDeletionNotice(StatusDeletionNotice statusDeletionNotice) {
-		// TODO implement
+		log.warn("Unimplemented deletion notice action for tweet: " + statusDeletionNotice.getStatusId());			// TODO implement
 	}
 	
 	public void onTrackLimitationNotice(int numberOfLimitedStatuses) {
@@ -71,16 +70,22 @@ public class TwitterStatusListener implements StatusListener {
 
 	@Override
 	public void onScrubGeo(long arg0, long arg1) {
-		// TODO Auto-generated method stub
-	}
-
-	@Override
-	public void onStallWarning(StallWarning arg0) {
-		// TODO Auto-generated method stub
+		log.warn("Unimplemented scrub geo for: " + arg0 + ", " + arg1);	// TODO implement
 	}
 	
-	private FeedItem tweetToFeedItem(Status status) {
-		return twitterFeedItemMapper.createFeedItemFrom(status);
+	@Override
+	public void onStallWarning(StallWarning stallWarning) {
+		log.warn("Unimplemented stall warning: " + stallWarning.getMessage());	// TODO implement
 	}
-
+	
+	private List<Subscription> filterSubscriptionsMatchingThisTweet(List<Subscription> twitterSubscriptions, Status status) {
+		final List<Subscription> filteredSubscriptions = Lists.newArrayList();
+		for (Subscription subscription : twitterSubscriptions) {
+			if (status.getText().toLowerCase().contains(((TwitterTagSubscription) subscription).getTag().toLowerCase())) {
+				filteredSubscriptions.add(subscription);
+			}
+		}
+		return filteredSubscriptions;
+	}
+	
 }
