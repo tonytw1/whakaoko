@@ -1,1 +1,9 @@
-[{"changed_aspect": "media", "subscription_id": 3459542, "object": "tag", "object_id": "nofilter", "time": 1372323961}]
+[
+   {
+      "object" : "tag",
+      "time" : 1372323961,
+      "object_id" : "nofilter",
+      "subscription_id" : 3459542,
+      "changed_aspect" : "media"
+   }
+]
