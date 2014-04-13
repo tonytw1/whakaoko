@@ -12,9 +12,7 @@ import uk.co.eelpieconsulting.common.views.rss.RssFeedable;
 
 import com.google.code.morphia.annotations.Entity;
 import com.google.code.morphia.annotations.Id;
-import com.google.code.morphia.annotations.Index;
 import com.google.code.morphia.annotations.Indexed;
-import com.google.code.morphia.annotations.Indexes;
 import com.google.code.morphia.utils.IndexDirection;
 
 @Entity("feeditems")
