@@ -18,7 +18,9 @@
 	<aop:aspectj-autoproxy />
 	
 	<util:properties id="config" location="classpath:whakaoko.properties" />
-            
+	
+	<bean id="httpFetcher" class="uk.co.eelpieconsulting.common.http.HttpFetcher"/>
+	            
 	<bean id="taskExecutor"
 		class="org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor">
 		<property name="corePoolSize" value="10" />

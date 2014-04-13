@@ -22,16 +22,15 @@ import com.sun.syndication.io.SyndFeedInput;
 @Component
 public class FeedFetcher {
 	
-	private static Logger log = Logger.getLogger(FeedFetcher.class);
+	private final static Logger log = Logger.getLogger(FeedFetcher.class);
 	
 	private RssFeedItemMapper rssFeedItemMapper;
-
 	private HttpFetcher httpFetcher;
 	
 	@Autowired
-	public FeedFetcher(RssFeedItemMapper rssFeedItemMapper) {
+	public FeedFetcher(RssFeedItemMapper rssFeedItemMapper, HttpFetcher httpFetcher) {
 		this.rssFeedItemMapper = rssFeedItemMapper;
-		this.httpFetcher = new HttpFetcher();
+		this.httpFetcher = httpFetcher;
 	}
 
 	public FetchedFeed fetchFeed(String url) {
