@@ -38,17 +38,20 @@ public class FeedItem implements Serializable, RssFeedable {
 	
 	@Indexed
 	private String subscriptionId;
+
+	private String author;
 	
 	public FeedItem() {
 	}
 	
-	public FeedItem(String title, String url, String body, Date date, Place place, String imageUrl) {
+	public FeedItem(String title, String url, String body, Date date, Place place, String imageUrl, String author) {
 		this.title = title;
 		this.url = url;
 		this.body = body;
 		this.date = date;
 		this.place = place;
 		this.imageUrl = imageUrl;
+		this.author = author;
 	}
 	
 	public String getId() {
@@ -95,7 +98,7 @@ public class FeedItem implements Serializable, RssFeedable {
 	@JsonIgnore
 	@Override
 	public String getAuthor() {
-		return subscriptionId;
+		return author;
 	}
 	
 	@Override
