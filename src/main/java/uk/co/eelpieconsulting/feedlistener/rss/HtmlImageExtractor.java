@@ -20,18 +20,24 @@ public class HtmlImageExtractor {
 			parser.setInputHTML(itemBody);
 			NodeFilter tagNameFilter = new TagNameFilter("img");
 			NodeList imageNodes = parser.extractAllNodesThatMatch(tagNameFilter);
-			log.debug("Found images: " + imageNodes.size());
-			for (int i = 0; i < imageNodes.size(); i++) {
-				final Tag imageTag = (Tag) imageNodes.elementAt(0);
-				final String imageSrc = imageTag.getAttribute("src");
-				log.debug("Found first image: " + imageTag.toHtml() + ", " + imageSrc);
-				return imageSrc;			
-			}
+			log.debug("Found images: " + imageNodes.size());			
+			return extractFirstImage(imageNodes);
 			
 		} catch (ParserException e) {
 			log.warn("Failed to parse item body for images", e);
 		}
 		return null;
+	}
+
+	private String extractFirstImage(NodeList imageNodes) {
+		if (imageNodes.size() == 0) {
+			return null;			
+		}
+		
+		final Tag imageTag = (Tag) imageNodes.elementAt(0);
+		final String imageSrc = imageTag.getAttribute("src");
+		log.debug("Found first image: " + imageTag.toHtml() + ", " + imageSrc);
+		return imageSrc;		
 	}
 
 }
