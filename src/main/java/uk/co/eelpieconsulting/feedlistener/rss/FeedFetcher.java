@@ -46,7 +46,7 @@ public class FeedFetcher {
 	}
 	
 	private SyndFeed loadSyndFeedWithFeedFetcher(String feedUrl) {
-		log.info("Loading SyndFeed from url: " + feedUrl);
+		log.info("Loading SyndFeed from url: " + feedUrl + " using http fetcher: " + httpFetcher.hashCode());		
 		try {
 			InputStream byteArrayInputStream = new ByteArrayInputStream(httpFetcher.getBytes(feedUrl));
 			final SyndFeed syndFeed = new SyndFeedInput().build(new InputSource(byteArrayInputStream));
