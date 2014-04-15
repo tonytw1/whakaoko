@@ -17,7 +17,7 @@ public class TwitterFeedItemMapper {
 	public FeedItem createFeedItemFrom(Status status) {
 		final Place place = extractLocationFrom(status);				
 		final String mediaUrl = extractImageUrl(status);
-		return new FeedItem(extractHeadingFrom(status), extractUrlFrom(status), null, status.getCreatedAt(), place, mediaUrl);
+		return new FeedItem(extractHeadingFrom(status), extractUrlFrom(status), null, status.getCreatedAt(), place, mediaUrl, null);
 	}
 	
 	private String extractHeadingFrom(Status status) {

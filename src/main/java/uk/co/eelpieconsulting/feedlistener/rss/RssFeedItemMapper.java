@@ -41,7 +41,7 @@ public class RssFeedItemMapper {
 		final String imageUrl = rssFeedItemImageExtractor.extractImageFrom(syndEntry);		
 		final String body = new HtmlCleaner().stripHtml(StringEscapeUtils.unescapeHtml(rssFeedItemBodyExtractor.extractBody(syndEntry)));		
 		final Date date = syndEntry.getPublishedDate() != null ? syndEntry.getPublishedDate() : syndEntry.getUpdatedDate();						
-		final FeedItem feedItem = new FeedItem(syndEntry.getTitle(), extractUrl(syndEntry), body, date, place, imageUrl);
+		final FeedItem feedItem = new FeedItem(syndEntry.getTitle(), extractUrl(syndEntry), body, date, place, imageUrl, null);
 		return feedItem;
 	}
 
