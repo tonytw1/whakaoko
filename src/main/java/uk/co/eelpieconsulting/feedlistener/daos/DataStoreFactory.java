@@ -9,7 +9,7 @@ import uk.co.eelpieconsulting.feedlistener.model.FeedItem;
 
 import com.google.code.morphia.Datastore;
 import com.google.code.morphia.Morphia;
-import com.mongodb.Mongo;
+import com.mongodb.MongoClient;
 import com.mongodb.MongoException;
 
 @Component
@@ -44,9 +44,10 @@ public class DataStoreFactory {
 			return dataStore;
 		}
 		
-		final Morphia morphia = new Morphia();		
-		final Mongo m = new Mongo(mongoHost);
-		Datastore newDataStore = morphia.createDatastore(m, mongoDatabase);
+		final MongoClient client = new MongoClient(mongoHost);
+		
+		final Morphia morphia = new Morphia();				
+		Datastore newDataStore = morphia.createDatastore(client, mongoDatabase);
 		morphia.map(FeedItem.class);
 		newDataStore.ensureIndexes();
 		
