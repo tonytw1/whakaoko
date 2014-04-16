@@ -16,7 +16,6 @@ import uk.co.eelpieconsulting.common.views.ViewFactory;
 import uk.co.eelpieconsulting.feedlistener.IdBuilder;
 import uk.co.eelpieconsulting.feedlistener.UrlBuilder;
 import uk.co.eelpieconsulting.feedlistener.daos.ChannelsDAO;
-import uk.co.eelpieconsulting.feedlistener.daos.FeedItemDAO;
 import uk.co.eelpieconsulting.feedlistener.daos.SubscriptionsDAO;
 import uk.co.eelpieconsulting.feedlistener.daos.UsersDAO;
 import uk.co.eelpieconsulting.feedlistener.exceptions.UnknownUserException;
@@ -29,29 +28,27 @@ import com.mongodb.MongoException;
 @Controller
 public class ChannelsController {
 	
-	private static Logger log = Logger.getLogger(ChannelsController.class);
+	private final static Logger log = Logger.getLogger(ChannelsController.class);
 	
-	private static final int DEFAULT_PAGE_SIZE = 20;
-	private static final int MAXIMUM_PAGE_SIZE = 100;
-			
 	private final UsersDAO usersDAO;
 	private final ChannelsDAO channelsDAO;
 	private final SubscriptionsDAO subscriptionsDAO;
-	private final FeedItemDAO feedItemDAO;
 	private final IdBuilder idBuilder;
 	private final UrlBuilder urlBuilder;
 	private final ViewFactory viewFactory;
+	private final FeedItemPopulator feedItemPopulator;
 	
 	@Autowired
 	public ChannelsController(UsersDAO usersDAO, ChannelsDAO channelsDAO, SubscriptionsDAO subscriptionsDAO, 
-			FeedItemDAO feedItemDAO, IdBuilder idBuilder, UrlBuilder urlBuilder, ViewFactory viewFactory) {
+			IdBuilder idBuilder, UrlBuilder urlBuilder, ViewFactory viewFactory,
+			FeedItemPopulator feedItemPopulator) {
 		this.usersDAO = usersDAO;
 		this.channelsDAO = channelsDAO;
 		this.subscriptionsDAO = subscriptionsDAO;
-		this.feedItemDAO = feedItemDAO;
 		this.idBuilder = idBuilder;
 		this.urlBuilder = urlBuilder;
 		this.viewFactory = viewFactory;
+		this.feedItemPopulator = feedItemPopulator;
 	}
 	
 	@RequestMapping(value="/{username}/channels", method=RequestMethod.GET)
@@ -91,24 +88,16 @@ public class ChannelsController {
 	public ModelAndView channelJson(@PathVariable String username, @PathVariable String id,
 			@RequestParam(required=false) Integer page,
 			@RequestParam(required=false) Integer pageSize,
-			@RequestParam(required=false) String format
-	) throws UnknownHostException, MongoException, UnknownUserException {
-		usersDAO.getByUsername(username);
-		
+			@RequestParam(required=false) String format) throws UnknownHostException, MongoException, UnknownUserException {
+		usersDAO.getByUsername(username);		
 		final Channel channel = channelsDAO.getById(username, id);
 		
 		ModelAndView mv = new ModelAndView(viewFactory.getJsonView());
-		if (!Strings.isNullOrEmpty(format) && format.equals("rss")) {
+		if (!Strings.isNullOrEmpty(format) && format.equals("rss")) {	// TODO view factory could do this?
 			mv = new ModelAndView(viewFactory.getRssView(channel.getName(), urlBuilder.getChannelUrl(channel), ""));
 		}
 		
-		int pageSizeToUse = pageSize != null ? pageSize : DEFAULT_PAGE_SIZE;
-		int pageToUse = (page != null && page > 0) ? page : 1;
-		if (pageSizeToUse > MAXIMUM_PAGE_SIZE) {
-			throw new RuntimeException("Too many records requested");	// TODO use correct exception.
-		}
-		
-		mv.addObject("data", feedItemDAO.getChannelFeedItems(channel.getId(), pageSizeToUse, pageToUse, username));	
+		feedItemPopulator.populateFeedItems(username, channel, page, mv, "data", pageSize);		
 		return mv;
 	}
 	

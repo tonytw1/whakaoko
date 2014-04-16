@@ -45,9 +45,7 @@ import com.mongodb.MongoException;
 @Controller
 public class SubscriptionsController {
 	
-	private static int MAX_FEED_ITEMS = 20;
-
-	private static Logger log = Logger.getLogger(SubscriptionsController.class);
+	private final static Logger log = Logger.getLogger(SubscriptionsController.class);
 	
 	private UsersDAO usersDAO;
 	private SubscriptionsDAO subscriptionsDAO;
@@ -59,6 +57,7 @@ public class SubscriptionsController {
 	private TwitterSubscriptionManager twitterSubscriptionManager;
 	private RssSubscriptionManager rssSubscriptionManager;
 	private ViewFactory viewFactory;
+	private FeedItemPopulator feedItemPopulator;
 	
 	public SubscriptionsController() {
 	}
@@ -69,7 +68,7 @@ public class SubscriptionsController {
 			FeedItemDAO feedItemDAO,
 			TwitterSubscriptionManager twitterSubscriptionManager,
 			RssSubscriptionManager rssSubscriptionManager,
-			ViewFactory viewFactory) {
+			ViewFactory viewFactory, FeedItemPopulator feedItemPopulator) {
 		this.usersDAO = usersDAO;
 		this.subscriptionsDAO = subscriptionsDAO;
 		this.rssPoller = rssPoller;
@@ -80,6 +79,7 @@ public class SubscriptionsController {
 		this.twitterSubscriptionManager = twitterSubscriptionManager;
 		this.rssSubscriptionManager = rssSubscriptionManager;
 		this.viewFactory = viewFactory;
+		this.feedItemPopulator = feedItemPopulator;
 	}
 	
 	@Timed(timingNotes = "")
@@ -96,7 +96,7 @@ public class SubscriptionsController {
 			mv = new ModelAndView(viewFactory.getRssView(subscription.getName(), urlBuilder.getSubscriptionUrl(subscription), ""));
 		}
 		
-		populateFeedItems(subscription, page, mv, "data");		
+		feedItemPopulator.populateFeedItems(subscription, page, mv, "data");		
 		return mv;
 	}
 	
@@ -108,8 +108,8 @@ public class SubscriptionsController {
 		
 		Subscription subscription = subscriptionsDAO.getById(username, id);
 		
-		ModelAndView mv = new ModelAndView(viewFactory.getJsonView());
-		populateFeedItems(subscription, page, mv, "data");		
+		final ModelAndView mv = new ModelAndView(viewFactory.getJsonView());
+		feedItemPopulator.populateFeedItems(subscription, page, mv, "data");		
 		return mv;
 	}
 	
@@ -198,16 +198,8 @@ public class SubscriptionsController {
 				
 		return new ModelAndView(new RedirectView(urlBuilder.getBaseUrl()));
 	}
-
-	private void populateFeedItems(Subscription subscription, Integer page, ModelAndView mv, String field) throws UnknownHostException {
-		if (page != null) {
-			mv.addObject(field, feedItemDAO.getSubscriptionFeedItems(subscription.getId(), MAX_FEED_ITEMS, page));
-		} else {
-			mv.addObject(field, feedItemDAO.getSubscriptionFeedItems(subscription.getId(), MAX_FEED_ITEMS));
-		}
-	}
 	
-    @ExceptionHandler(UnknownSubscriptionException.class)
+    @ExceptionHandler(UnknownSubscriptionException.class)	// TODO make global
     @ResponseStatus(value=org.springframework.http.HttpStatus.NOT_FOUND)
     public ModelAndView unknownSubscriptionException(UnknownSubscriptionException e) {
             return new ModelAndView(viewFactory.getJsonView()).addObject("data", "Not found");

@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
 import uk.co.eelpieconsulting.feedlistener.UnknownSubscriptionException;
+import uk.co.eelpieconsulting.feedlistener.controllers.FeedItemPopulator;
 import uk.co.eelpieconsulting.feedlistener.credentials.CredentialService;
 import uk.co.eelpieconsulting.feedlistener.daos.ChannelsDAO;
 import uk.co.eelpieconsulting.feedlistener.daos.FeedItemDAO;
@@ -27,26 +28,26 @@ import com.mongodb.MongoException;
 
 @Controller
 public class UIController {
-	
-	private static int MAX_FEED_ITEMS = 20;
-	
+		
 	private ChannelsDAO channelsDAO;
 	private UsersDAO usersDAO;
 	private SubscriptionsDAO subscriptionsDAO;
 	private FeedItemDAO feedItemDAO;
 	private CredentialService credentialService;
+	private FeedItemPopulator feedItemPopulator;
 	
 	public UIController() {
 	}
 	
 	@Autowired
 	public UIController(UsersDAO usersDAO, ChannelsDAO channelsDAO, SubscriptionsDAO subscriptionsDAO,
-			FeedItemDAO feedItemDAO, CredentialService credentialService) {
+			FeedItemDAO feedItemDAO, CredentialService credentialService, FeedItemPopulator feedItemPopulator) {
 		this.usersDAO = usersDAO;
 		this.channelsDAO = channelsDAO;
 		this.subscriptionsDAO = subscriptionsDAO;
 		this.feedItemDAO = feedItemDAO;
 		this.credentialService = credentialService;
+		this.feedItemPopulator = feedItemPopulator;
 	}
 	
 	@RequestMapping(value="/", method=RequestMethod.GET)
@@ -93,7 +94,7 @@ public class UIController {
 		ModelAndView mv = new ModelAndView("subscription");
 		mv.addObject("subscription", subscription);
 		mv.addObject("subscriptionSize", feedItemDAO.getSubscriptionFeedItemsCount(subscription.getId()));
-		populateFeedItems(subscription, page, mv, "feedItems");		
+		feedItemPopulator.populateFeedItems(subscription, page, mv, "feedItems");		
 		return mv;
 	}
 	
@@ -111,12 +112,7 @@ public class UIController {
 		if (!subscriptionsForChannel.isEmpty()) {
 			mv.addObject("inboxSize", feedItemDAO.getChannelFeedItemsCount(channel.getId(), username));
 			
-			
-			if (page != null) {
-				mv.addObject("inbox", feedItemDAO.getChannelFeedItems(channel.getId(), MAX_FEED_ITEMS, page, username));
-			} else {
-				mv.addObject("inbox", feedItemDAO.getChannelFeedItems(channel.getId(), MAX_FEED_ITEMS, username));
-			}
+			feedItemPopulator.populateFeedItems(username, channel, page, mv, "inbox");
 			
 			final Map<String, Long> subscriptionCounts = Maps.newHashMap();
 			for (Subscription subscription : subscriptionsForChannel) {
@@ -130,15 +126,6 @@ public class UIController {
 	@RequestMapping(value="/ui/{username}/channels/new", method=RequestMethod.GET)
 	public ModelAndView newChannelForm() {
 		return new ModelAndView("newChannel");		
-	}
-		
-	// TODO duplication
-	private void populateFeedItems(Subscription subscription, Integer page, ModelAndView mv, String field) throws UnknownHostException {
-		if (page != null) {
-			mv.addObject(field, feedItemDAO.getSubscriptionFeedItems(subscription.getId(), MAX_FEED_ITEMS, page));
-		} else {
-			mv.addObject(field, feedItemDAO.getSubscriptionFeedItems(subscription.getId(), MAX_FEED_ITEMS));
-		}
 	}
 	
 }
