@@ -95,7 +95,6 @@ public class FeedItem implements Serializable, RssFeedable {
 		return place != null;
 	}
 	
-	@JsonIgnore
 	@Override
 	public String getAuthor() {
 		return author;
