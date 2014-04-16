@@ -72,24 +72,24 @@ public class FeedItemDAO {
 	}
 	
 	@Timed(timingNotes = "")
-	public long getChannelFeedItemsCount(String channelId) throws UnknownHostException, MongoException {
-		return channelFeedItemsQuery(channelId).countAll();
+	public long getChannelFeedItemsCount(String channelId, String username) throws UnknownHostException, MongoException {
+		return channelFeedItemsQuery(username, channelId).countAll();
 	}
 	
 	@Timed(timingNotes = "")
-	public List<FeedItem> getChannelFeedItems(String channelId, int pageSize) throws UnknownHostException, MongoException {		
-		return channelFeedItemsQuery(channelId).limit(pageSize).asList();
+	public List<FeedItem> getChannelFeedItems(String channelId, int pageSize, String username) throws UnknownHostException, MongoException {		
+		return channelFeedItemsQuery(username, channelId).limit(pageSize).asList();
 	}
 	
 	@Timed(timingNotes = "")
-	public List<FeedItem> getChannelFeedItems(String channelId, int pageSize, int page) throws UnknownHostException, MongoException {
-		return channelFeedItemsQuery(channelId).limit(pageSize).offset(calculatePageOffset(pageSize, page)).asList();
+	public List<FeedItem> getChannelFeedItems(String channelId, int pageSize, int page, String username) throws UnknownHostException, MongoException {
+		return channelFeedItemsQuery(username, channelId).limit(pageSize).offset(calculatePageOffset(pageSize, page)).asList();
 	}
 	
 	@Timed(timingNotes = "")
-	private Query<FeedItem> channelFeedItemsQuery(String channelId) throws UnknownHostException {
+	private Query<FeedItem> channelFeedItemsQuery(String username, String channelId) throws UnknownHostException {
 		final List<String> channelSubscriptions = Lists.newArrayList();
-		for (Subscription subscription : subscriptionsDAO.getSubscriptionsForChannel(channelId)) {
+		for (Subscription subscription : subscriptionsDAO.getSubscriptionsForChannel(username, channelId)) {
 			channelSubscriptions.add(subscription.getId());
 		}		
 		return dataStoreFactory.getDatastore().find(FeedItem.class).field("subscriptionId").hasAnyOf(channelSubscriptions).order(DATE_DESCENDING);

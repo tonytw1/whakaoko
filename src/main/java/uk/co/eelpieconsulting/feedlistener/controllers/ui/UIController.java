@@ -105,17 +105,17 @@ public class UIController {
 		final ModelAndView mv = new ModelAndView("channel");
 		mv.addObject("channel", channel);
 		
-		final List<Subscription> subscriptionsForChannel = subscriptionsDAO.getSubscriptionsForChannel(channel.getId());
+		final List<Subscription> subscriptionsForChannel = subscriptionsDAO.getSubscriptionsForChannel(username, channel.getId());
 		mv.addObject("subscriptions", subscriptionsForChannel);
 		
 		if (!subscriptionsForChannel.isEmpty()) {
-			mv.addObject("inboxSize", feedItemDAO.getChannelFeedItemsCount(channel.getId()));
+			mv.addObject("inboxSize", feedItemDAO.getChannelFeedItemsCount(channel.getId(), username));
 			
 			
 			if (page != null) {
-				mv.addObject("inbox", feedItemDAO.getChannelFeedItems(channel.getId(), MAX_FEED_ITEMS, page));
+				mv.addObject("inbox", feedItemDAO.getChannelFeedItems(channel.getId(), MAX_FEED_ITEMS, page, username));
 			} else {
-				mv.addObject("inbox", feedItemDAO.getChannelFeedItems(channel.getId(), MAX_FEED_ITEMS));
+				mv.addObject("inbox", feedItemDAO.getChannelFeedItems(channel.getId(), MAX_FEED_ITEMS, username));
 			}
 			
 			final Map<String, Long> subscriptionCounts = Maps.newHashMap();

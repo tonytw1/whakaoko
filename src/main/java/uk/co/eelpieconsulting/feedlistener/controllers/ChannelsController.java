@@ -80,7 +80,7 @@ public class ChannelsController {
 		usersDAO.getByUsername(username);
 		
 		final Channel channel = channelsDAO.getById(username, id);
-		final List<Subscription> subscriptionsForChannel = subscriptionsDAO.getSubscriptionsForChannel(channel.getId());
+		final List<Subscription> subscriptionsForChannel = subscriptionsDAO.getSubscriptionsForChannel(username, channel.getId());
 		
 		final ModelAndView mv = new ModelAndView(viewFactory.getJsonView());
 		mv.addObject("data", subscriptionsForChannel);		
@@ -108,7 +108,7 @@ public class ChannelsController {
 			throw new RuntimeException("Too many records requested");	// TODO use correct exception.
 		}
 		
-		mv.addObject("data", feedItemDAO.getChannelFeedItems(channel.getId(), pageSizeToUse, pageToUse));	
+		mv.addObject("data", feedItemDAO.getChannelFeedItems(channel.getId(), pageSizeToUse, pageToUse, username));	
 		return mv;
 	}
 	

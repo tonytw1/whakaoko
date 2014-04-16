@@ -114,8 +114,10 @@ public class SubscriptionsDAO {
 		return subscriptions;
 	}
 	
-	public List<Subscription> getSubscriptionsForChannel(String channelID) throws UnknownHostException, MongoException {
-		return dataStoreFactory.getDatastore().find(Subscription.class, "channelId", channelID).
+	public List<Subscription> getSubscriptionsForChannel(String username, String channelID) throws UnknownHostException, MongoException {
+		return dataStoreFactory.getDatastore().find(Subscription.class).
+			filter("username", username).
+			filter("channelId", channelID).		
 			order(LATEST_ITEM_DATE).
 			asList();
 	}
