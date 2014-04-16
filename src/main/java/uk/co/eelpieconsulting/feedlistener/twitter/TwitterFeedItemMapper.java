@@ -2,8 +2,6 @@ package uk.co.eelpieconsulting.feedlistener.twitter;
 
 import org.springframework.stereotype.Component;
 
-import com.google.common.base.Strings;
-
 import twitter4j.GeoLocation;
 import twitter4j.MediaEntity;
 import twitter4j.Status;
@@ -11,17 +9,27 @@ import uk.co.eelpieconsulting.common.geo.model.LatLong;
 import uk.co.eelpieconsulting.common.geo.model.Place;
 import uk.co.eelpieconsulting.feedlistener.model.FeedItem;
 
+import com.google.common.base.Strings;
+
 @Component
 public class TwitterFeedItemMapper {
 
 	public FeedItem createFeedItemFrom(Status status) {
 		final Place place = extractLocationFrom(status);				
 		final String mediaUrl = extractImageUrl(status);
-		return new FeedItem(extractHeadingFrom(status), extractUrlFrom(status), null, status.getCreatedAt(), place, mediaUrl, null);
+		final String author = extractAuthorFrom(status);
+		return new FeedItem(extractHeadingFrom(status), extractUrlFrom(status), null, status.getCreatedAt(), place, mediaUrl, author);
 	}
 	
+	private String extractAuthorFrom(Status status) {
+		if (status.getUser() == null) {
+			return null;
+		}
+		return status.getUser().getScreenName();
+	}
+
 	private String extractHeadingFrom(Status status) {
-		return "@" + status.getUser().getScreenName() + ": " + status.getText();
+		return status.getText();
 	}
 
 	private String extractUrlFrom(Status status) {
