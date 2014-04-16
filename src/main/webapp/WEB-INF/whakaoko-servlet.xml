@@ -59,7 +59,8 @@
 			<map>
 				<entry key="currentUserService" value-ref="currentUserService" />						
 				<entry key="dateFormatter" value-ref="dateFormatter" />						
-				<entry key="urlBuilder" value-ref="urlBuilder" />			
+				<entry key="urlBuilder" value-ref="urlBuilder" />
+				<entry key="subscriptionLabelService" value-ref="subscriptionLabelService" />							
 			</map>
 		</property>
 	</bean>
