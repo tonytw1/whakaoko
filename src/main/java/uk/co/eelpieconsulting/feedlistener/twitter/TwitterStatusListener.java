@@ -4,8 +4,6 @@ import java.net.UnknownHostException;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
 import twitter4j.StallWarning;
 import twitter4j.Status;
@@ -20,26 +18,26 @@ import uk.co.eelpieconsulting.feedlistener.model.TwitterTagSubscription;
 import com.google.common.collect.Lists;
 import com.mongodb.MongoException;
 
-@Component
 public class TwitterStatusListener implements StatusListener {
 	
-	private static Logger log = Logger.getLogger(TwitterListener.class);
+	private final static Logger log = Logger.getLogger(TwitterListener.class);
 	
 	private final FeedItemDAO feedItemDAO;
 	private final TwitterFeedItemMapper twitterFeedItemMapper;
 	private final SubscriptionsDAO subscriptionsDAO;
+	private final String username;
 	
-	@Autowired
-	public TwitterStatusListener(FeedItemDAO feedItemDAO, TwitterFeedItemMapper twitterFeedItemMapper, SubscriptionsDAO subscriptionsDAO) {
+	public TwitterStatusListener(FeedItemDAO feedItemDAO, TwitterFeedItemMapper twitterFeedItemMapper, SubscriptionsDAO subscriptionsDAO, String username) {
 		this.feedItemDAO = feedItemDAO;
 		this.twitterFeedItemMapper = twitterFeedItemMapper;
 		this.subscriptionsDAO = subscriptionsDAO;
+		this.username = username;
 	}
 
 	public void onStatus(Status status) {
 		log.info("Received: " + status.getText());
 		
-		final List<Subscription> subscriptionsMatchingThisTweet = filterSubscriptionsMatchingThisTweet(subscriptionsDAO.getTwitterSubscriptions(), status);		
+		final List<Subscription> subscriptionsMatchingThisTweet = filterSubscriptionsMatchingThisTweet(subscriptionsDAO.getTwitterSubscriptionsFor(username), status);		
 		for (Subscription subscription : subscriptionsMatchingThisTweet) {
 			final FeedItem tweetFeedItem = twitterFeedItemMapper.createFeedItemFrom(status);
 			tweetFeedItem.setSubscriptionId(subscription.getId());	// TODO should we be duplicating tweets like this?

@@ -104,6 +104,16 @@ public class SubscriptionsDAO {
 		return subscriptions;
 	}
 	
+	public List<Subscription> getTwitterSubscriptionsFor(String username) {
+		final List<Subscription> subscriptions = Lists.newArrayList();
+		for (Subscription subscription : getSubscriptions()) {
+			if (subscription.getId().startsWith("twitter") && username.equals(subscription.getUsername())) {
+				subscriptions.add(subscription);
+			}
+		}
+		return subscriptions;
+	}
+	
 	public List<Subscription> getSubscriptionsForChannel(String channelID) throws UnknownHostException, MongoException {
 		return dataStoreFactory.getDatastore().find(Subscription.class, "channelId", channelID).
 			order(LATEST_ITEM_DATE).
