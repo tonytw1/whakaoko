@@ -17,3 +17,9 @@
 #else
 	<p>No channels.</p>
 #end
+
+<hr/>
+<h5>Credentials</h5>
+<p>Linked Instagram account: $instagramCredentials - <a href="/instagram/authorise">Link</a></p>
+<p>Linked Twitter account: $twitterCredentials - <a href="/twitter/authorise">Link</a></p>
+<hr/>

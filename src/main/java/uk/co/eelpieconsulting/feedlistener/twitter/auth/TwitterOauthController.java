@@ -28,9 +28,7 @@ import com.google.common.collect.Maps;
 public class TwitterOauthController {
 	
 	private static Logger log = Logger.getLogger(TwitterOauthController.class);
-	
-	private static final String USER = "tonytw1";	// TODO multi tenant
-	
+		
 	private final CredentialService credentialService;
 	private final TwitterApiFactory twitterApiFactory;
 	private final TwitterSubscriptionManager twitterSubscriptionManager;
@@ -65,6 +63,7 @@ public class TwitterOauthController {
 	@RequestMapping(value="/twitter/callback", method=RequestMethod.GET)
 	public ModelAndView callback(@RequestParam(value="oauth_token", required=true) String token,
 			@RequestParam(value="oauth_verifier", required=true) String verifier) throws TwitterException, UnknownHostException, UnknownUserException {
+		final String username = "tonytw1";	// TODO multi tenant
 		
 		log.info("Received Twitter oauth callback: oauth_token: " + token + ", oauth_verifier: " + verifier);
 
@@ -82,11 +81,10 @@ public class TwitterOauthController {
 		log.info("Got twitter access token: " + accessToken.getToken());
 		log.info("Got twitter access secret: " + accessToken.getTokenSecret());
 
-		credentialService.setTwitterAccessTokenForUser(USER, accessToken.getToken());
-		credentialService.setTwitterAccessSecretForUser(USER, accessToken.getTokenSecret());
+		credentialService.setTwitterAccessTokenForUser(username, accessToken.getToken());
+		credentialService.setTwitterAccessSecretForUser(username, accessToken.getTokenSecret());
 
-		twitterSubscriptionManager.reconnect();
-		
+		twitterSubscriptionManager.reconnect();		
 		return null;
 	}
 	

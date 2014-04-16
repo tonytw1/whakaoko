@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
 import uk.co.eelpieconsulting.feedlistener.UnknownSubscriptionException;
+import uk.co.eelpieconsulting.feedlistener.credentials.CredentialService;
 import uk.co.eelpieconsulting.feedlistener.daos.ChannelsDAO;
 import uk.co.eelpieconsulting.feedlistener.daos.FeedItemDAO;
 import uk.co.eelpieconsulting.feedlistener.daos.SubscriptionsDAO;
@@ -33,17 +34,19 @@ public class UIController {
 	private UsersDAO usersDAO;
 	private SubscriptionsDAO subscriptionsDAO;
 	private FeedItemDAO feedItemDAO;
+	private CredentialService credentialService;
 	
 	public UIController() {
 	}
 	
 	@Autowired
 	public UIController(UsersDAO usersDAO, ChannelsDAO channelsDAO, SubscriptionsDAO subscriptionsDAO,
-			FeedItemDAO feedItemDAO) {
+			FeedItemDAO feedItemDAO, CredentialService credentialService) {
 		this.usersDAO = usersDAO;
 		this.channelsDAO = channelsDAO;
 		this.subscriptionsDAO = subscriptionsDAO;
 		this.feedItemDAO = feedItemDAO;
+		this.credentialService = credentialService;
 	}
 	
 	@RequestMapping(value="/", method=RequestMethod.GET)
@@ -51,12 +54,19 @@ public class UIController {
 		return new ModelAndView("homepage");
 	}
 	
+	@RequestMapping(value="/ui/newuser", method=RequestMethod.GET)
+	public ModelAndView newUser() {		
+		return new ModelAndView("newuser");
+	}
+	
 	@RequestMapping(value="/ui/{username}", method=RequestMethod.GET)
 	public ModelAndView userhome(@PathVariable String username) throws UnknownHostException, MongoException, UnknownUserException {
 		usersDAO.getByUsername(username);
 		
 		final ModelAndView mv = new ModelAndView("userhome");
-		mv.addObject("channels", channelsDAO.getChannels(username));		
+		mv.addObject("channels", channelsDAO.getChannels(username));
+		mv.addObject("instagramCredentials", credentialService.hasInstagramAccessToken(username));
+		mv.addObject("twitterCredentials", credentialService.hasTwitterAccessToken(username));
 		return mv;
 	}
 	

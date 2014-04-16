@@ -1,0 +1,5 @@
+<form action="/users" method="POST">
+	Username: <input name="username" />	
+	<input type="submit" />
+</form>
+<hr/>
