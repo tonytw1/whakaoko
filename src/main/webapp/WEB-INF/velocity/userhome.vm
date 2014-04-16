@@ -1,11 +1,11 @@
-<p><h4>whakaoko</h4>
+<p><h4>whakaoko - $currentUserService.currentUser</h4>
 (verb) to listen to.</p>
 
 <h5>Channels</h5>
 
-<p><a href="$urlBuilder.getNewChannelUrl('tonytw1')">New channel</a></p>
+<p><a href="$urlBuilder.getNewChannelUrl($currentUserService.currentUser)">New channel</a></p>
 
-<p><a href="/ui/tonytw1/subscriptions/new">New subscription</a></p>
+<p><a href="/ui/$currentUserService.currentUser/subscriptions/new">New subscription</a></p>
 
 #if($channels && !$channels.isEmpty()) 
 	<ul>

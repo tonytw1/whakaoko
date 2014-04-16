@@ -11,8 +11,8 @@
 	<p><span title="$subscription.lastRead">Last read: $dateFormatter.timeSince($subscription.lastRead)</span></p>
 #end
 
-<a href="$urlBuilder.getSubscriptionItemsUrl('tonytw1', $subscription.id)/items">JSON</a> | 
-<a href="$urlBuilder.getSubscriptionItemsUrl('tonytw1', $subscription.id)/items?format=rss">RSS</a>
+<a href="$urlBuilder.getSubscriptionItemsUrl($currentUserService.currentUser, $subscription.id)/items">JSON</a> | 
+<a href="$urlBuilder.getSubscriptionItemsUrl($currentUserService.currentUser, $subscription.id)/items?format=rss">RSS</a>
 
 #parse('includes/map.vm')
 

@@ -5,7 +5,7 @@
 	#end
 	<br/><span title="$feedItem.date">$dateFormatter.timeSince($feedItem.date)</span>
 	
-	<br/><a href="$urlBuilder.getSubscriptionUrl('tonytw1', $feedItem.subscriptionId)">$feedItem.subscriptionId</a>
+	<br/><a href="$urlBuilder.getSubscriptionUrl($currentUserService.currentUser, $feedItem.subscriptionId)">$feedItem.subscriptionId</a>
 	<br/>$!feedItem.body
 	
 	#if($feedItem.place)

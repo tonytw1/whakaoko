@@ -30,8 +30,8 @@
 
 <h5>Inbox #if($inboxSize) ($inboxSize)#end</h5>
 
-<a href="$urlBuilder.getChannelItemsUrl('tonytw1', $channel.id)/items">JSON</a> | 
-<a href="$urlBuilder.getChannelItemsUrl('tonytw1', $channel.id)/items?format=rss">RSS</a>
+<a href="$urlBuilder.getChannelItemsUrl($currentUserService.currentUser, $channel.id)/items">JSON</a> | 
+<a href="$urlBuilder.getChannelItemsUrl($currentUserService.currentUser, $channel.id)/items?format=rss">RSS</a>
 
 #parse('includes/map.vm')
 
