@@ -56,7 +56,7 @@ public class UIController {
 	
 	@RequestMapping(value="/ui/newuser", method=RequestMethod.GET)
 	public ModelAndView newUser() {		
-		return new ModelAndView("newuser");
+		return new ModelAndView("newUser");
 	}
 	
 	@RequestMapping(value="/ui/{username}", method=RequestMethod.GET)
