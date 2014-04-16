@@ -20,8 +20,8 @@ public class UrlBuilder {
 		return getBaseUrl() + "/instagram/callback";
 	}
 	
-	public String getTwitterCallback() {
-		return getBaseUrl() + "/twitter/callback";
+	public String getTwitterCallback(String username) {
+		return getBaseUrl() + "/twitter/callback/" + username;
 	}
 	
 	public String getSubscriptionUrl(Subscription subscription) {

@@ -6,6 +6,7 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -46,11 +47,11 @@ public class TwitterOauthController {
 		requestTokens = Maps.newConcurrentMap();
 	}
 	
-	@RequestMapping(value="/twitter/authorise", method=RequestMethod.GET)
-	public ModelAndView authorize() throws TwitterException {
+	@RequestMapping(value="/twitter/authorise/{username}", method=RequestMethod.GET)
+	public ModelAndView authorize(@PathVariable String username) throws TwitterException {
 		final Twitter twitterApi = twitterApiFactory.getTwitterApi();
 		
-		RequestToken requestToken = twitterApi.getOAuthRequestToken(urlBuilder.getTwitterCallback());
+		RequestToken requestToken = twitterApi.getOAuthRequestToken(urlBuilder.getTwitterCallback(username));
 		log.info("Stashing request token: " + requestToken.getToken());
 		requestTokens.put(requestToken.getToken(), requestToken);
 		
@@ -60,11 +61,9 @@ public class TwitterOauthController {
 		return new ModelAndView(new RedirectView(authorizeRedirectUrl));
 	}
 	
-	@RequestMapping(value="/twitter/callback", method=RequestMethod.GET)
-	public ModelAndView callback(@RequestParam(value="oauth_token", required=true) String token,
-			@RequestParam(value="oauth_verifier", required=true) String verifier) throws TwitterException, UnknownHostException, UnknownUserException {
-		final String username = "tonytw1";	// TODO multi tenant
-		
+	@RequestMapping(value="/twitter/callback/{username}", method=RequestMethod.GET)
+	public ModelAndView callback(@PathVariable String username, @RequestParam(value="oauth_token", required=true) String token,
+			@RequestParam(value="oauth_verifier", required=true) String verifier) throws TwitterException, UnknownHostException, UnknownUserException {		
 		log.info("Received Twitter oauth callback: oauth_token: " + token + ", oauth_verifier: " + verifier);
 
 		log.info("Popping stashed request token: " + token);
