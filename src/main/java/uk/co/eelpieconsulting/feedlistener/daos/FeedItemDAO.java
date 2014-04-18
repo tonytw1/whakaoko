@@ -18,7 +18,7 @@ import com.mongodb.MongoException;
 @Component
 public class FeedItemDAO {
 	
-	private static final String DATE_DESCENDING = "-date -_id";	// TODO needs to sub order by insert date for feeds with no publication dates.
+	private static final String DATE_DESCENDING = "-date,-objectId";	// TODO needs to sub order by insert date for feeds with no publication dates.
 
 	private static Logger log = Logger.getLogger(FeedItemDAO.class);
 	
