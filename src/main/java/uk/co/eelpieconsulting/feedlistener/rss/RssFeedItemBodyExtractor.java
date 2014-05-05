@@ -16,18 +16,18 @@ public class RssFeedItemBodyExtractor {
 	
 	@SuppressWarnings("unchecked")
 	public String extractBody(final SyndEntry syndEntry) {
-		String body = getItemDescription(syndEntry);
-		if (!Strings.isNullOrEmpty(body)) {
-			return body;
-		}
-		
-		log.info("No description tag found; looking for contents");
 		final List<SyndContentImpl> contents = syndEntry.getContents();
 		if (!contents.isEmpty()) {
-			final String contentBody = contents.get(0).getValue();
+			final String contentBody = contents.get(0).getValue();		
 			return contentBody;
 		}
 		
+		log.debug("No content body found; looking for description");
+		String body = getItemDescription(syndEntry);
+		if (!Strings.isNullOrEmpty(body)) {			
+			return body;
+		}
+						
 		return null;		
 	}
 	
