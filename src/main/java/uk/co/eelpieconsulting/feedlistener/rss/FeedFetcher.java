@@ -47,7 +47,8 @@ public class FeedFetcher {
 	private SyndFeed loadSyndFeedWithFeedFetcher(String feedUrl) {
 		log.info("Loading SyndFeed from url: " + feedUrl + " using http fetcher: " + httpFetcher.hashCode());		
 		try {
-			InputStream byteArrayInputStream = new ByteArrayInputStream(httpFetcher.getBytes(feedUrl));
+			byte[] bytes = httpFetcher.getBytes(feedUrl);
+			InputStream byteArrayInputStream = cleanLeadingWhitespace(bytes);
 			final SyndFeed syndFeed = new SyndFeedInput().build(new InputSource(byteArrayInputStream));
 			IOUtils.closeQuietly(byteArrayInputStream);			
 			return syndFeed;
@@ -56,6 +57,18 @@ public class FeedFetcher {
 			log.warn("Error while fetching feed: " + e.getMessage());
 		}
 		return null;
+	}
+
+	private ByteArrayInputStream cleanLeadingWhitespace(byte[] bytes) {
+		try {
+			String string = new String(bytes);
+			if (string.trim().equals(string)) {
+				return new ByteArrayInputStream(bytes);
+			}
+			return new ByteArrayInputStream(string.trim().getBytes());
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	@SuppressWarnings("unchecked")
