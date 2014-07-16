@@ -51,8 +51,7 @@ public class RssFeedItemMapper {
 			return null;
 		}
 		
-		final String resolvedUrl = cachingUrlResolverService.resolveUrl(url);
-		return urlCleaner.cleanSubmittedItemUrl(resolvedUrl);
+		return urlCleaner.cleanSubmittedItemUrl(cachingUrlResolverService.resolveUrl(url));
 	}
 	
 	private Place extractLocationFrom(SyndEntry syndEntry) {

@@ -33,40 +33,40 @@ public class TwitterListener {
 	private final FeedItemDAO feedItemDAO;
 	private final TwitterFeedItemMapper twitterFeedItemMapper;
 	private final UsersDAO usersDAO;
-
+	
 	private Map<String, TwitterStream> twitterStreams;
 	
 	@Autowired
-	public TwitterListener(SubscriptionsDAO subscriptionsDAO, CredentialService credentialService, TwitterApiFactory twitterApiFactory,
+	public TwitterListener(SubscriptionsDAO subscriptionsDAO, CredentialService credentialService, TwitterApiFactory twitterApiFactory, 
 			FeedItemDAO feedItemDAO, TwitterFeedItemMapper twitterFeedItemMapper, UsersDAO usersDAO) {
 		this.subscriptionsDAO = subscriptionsDAO;
 		this.credentialService = credentialService;
 		this.twitterApiFactory = twitterApiFactory;
 		this.feedItemDAO = feedItemDAO;
 		this.twitterFeedItemMapper = twitterFeedItemMapper;
-		this.usersDAO = usersDAO;
+		this.usersDAO = usersDAO;	
 		twitterStreams = Maps.newConcurrentMap();
 
-		connect();
+		connect();		
 	}
 	
-	public synchronized void connect()  {
+	public synchronized void connect()  {		
 		for (String username : usersWithTwitterSubscriptions()) {
 			log.info("Connecting Twitter listener for user: " + username);
 			if (credentialService.hasTwitterAccessToken(username)) {
-
+				
 				TwitterStream twitterStream = getTwitterStreamForUser(username);
 				if (twitterStream != null) {
 					twitterStream.cleanUp();
 				}
-
-				twitterStream = setUpTwitterStreamForUser(username);
+				
+				twitterStream = setUpTwitterStreamForUser(username);				
 				twitterStreams.put(username, twitterStream);
-
+				
 			} else {
 				log.warn("No twitter credentials available for user '" + username + "'; not connecting");
-			}
-		}
+			}			
+		}		
 	}
 
 	private TwitterStream setUpTwitterStreamForUser(String username) {
@@ -74,7 +74,6 @@ public class TwitterListener {
 		final String twitterAccessSecretForUser = credentialService.getTwitterAccessSecretForUser(username);
 		log.info("Using twitter access credentials: " + twitterAccessTokenForUser + ", " + twitterAccessSecretForUser);
 
-		
 		TwitterStatusListener twitterListener = new TwitterStatusListener(feedItemDAO, twitterFeedItemMapper, subscriptionsDAO, username);
 
 		TwitterStream twitterStream = twitterApiFactory.getStreamingApi(twitterAccessTokenForUser, twitterAccessSecretForUser);
@@ -102,7 +101,7 @@ public class TwitterListener {
 		for (User user : users) {
 			if (!subscriptionsDAO.getTwitterSubscriptionsFor(user.getUsername()).isEmpty()) {
 				usersWithTwitterSubscriptions.add(user.getUsername());
-			}
+			}			
 		}
 		return usersWithTwitterSubscriptions;
 	}
@@ -110,5 +109,5 @@ public class TwitterListener {
 	private TwitterStream getTwitterStreamForUser(String username) {
 		return twitterStreams.get(username);
 	}
-
+	
 }

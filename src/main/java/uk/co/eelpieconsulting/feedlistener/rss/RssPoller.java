@@ -2,7 +2,6 @@ package uk.co.eelpieconsulting.feedlistener.rss;
 
 import java.net.UnknownHostException;
 import java.util.Date;
-import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.joda.time.DateTime;
@@ -12,18 +11,18 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Component;
 
-import com.mongodb.MongoException;
-
 import uk.co.eelpieconsulting.feedlistener.daos.FeedItemDAO;
 import uk.co.eelpieconsulting.feedlistener.daos.SubscriptionsDAO;
 import uk.co.eelpieconsulting.feedlistener.model.FeedItem;
 import uk.co.eelpieconsulting.feedlistener.model.RssSubscription;
 import uk.co.eelpieconsulting.feedlistener.model.Subscription;
 
+import com.mongodb.MongoException;
+
 @Component
 public class RssPoller {
 	
-	private static Logger log = Logger.getLogger(RssPoller.class);
+	private final static Logger log = Logger.getLogger(RssPoller.class);
 	
 	private final SubscriptionsDAO subscriptionsDAO;
 	private final FeedFetcher feedFetcher;
@@ -41,8 +40,7 @@ public class RssPoller {
 	@Scheduled(fixedRate=3600000)
 	public void run() {
 		log.info("Polling subscriptions");
-		List<Subscription> subscriptions = subscriptionsDAO.getSubscriptions();
-		for (Subscription subscription : subscriptions) {
+		for (Subscription subscription : subscriptionsDAO.getSubscriptions()) {
 			if (isRssSubscription(subscription)) {
 				executeRssPoll(subscription);
 			}
