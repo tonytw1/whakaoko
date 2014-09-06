@@ -20,7 +20,11 @@
 	<util:properties id="config" location="classpath:whakaoko.properties" />
 	
 	<bean id="httpFetcher" class="uk.co.eelpieconsulting.common.http.HttpFetcher"/>
-	            
+	  
+	<bean id="memcache" class="uk.co.eelpieconsulting.common.caching.MemcachedCache">
+	        <constructor-arg index="0" value="#{config['memcached.urls']}" />
+	</bean>
+      
 	<bean id="taskExecutor"
 		class="org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor">
 		<property name="corePoolSize" value="10" />
