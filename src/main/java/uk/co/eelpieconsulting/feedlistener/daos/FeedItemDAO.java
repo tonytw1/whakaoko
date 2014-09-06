@@ -2,6 +2,7 @@ package uk.co.eelpieconsulting.feedlistener.daos;
 
 import java.net.UnknownHostException;
 import java.util.List;
+import java.util.regex.Pattern;
 
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -84,6 +85,14 @@ public class FeedItemDAO {
 	@Timed(timingNotes = "")
 	public List<FeedItem> getChannelFeedItems(String channelId, int pageSize, int page, String username) throws UnknownHostException, MongoException {
 		return channelFeedItemsQuery(username, channelId).limit(pageSize).offset(calculatePageOffset(pageSize, page)).asList();
+	}
+	
+	@Timed(timingNotes = "")
+	public List<FeedItem> searchChannelFeedItems(String channelId, int pageSize, int page, String username, String q) throws UnknownHostException {		
+		return channelFeedItemsQuery(username, channelId).
+				filter("title", Pattern.compile(q)).				
+				limit(pageSize).
+				offset(calculatePageOffset(pageSize, page)).asList();
 	}
 	
 	@Timed(timingNotes = "")

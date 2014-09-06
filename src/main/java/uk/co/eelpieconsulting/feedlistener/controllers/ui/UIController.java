@@ -99,8 +99,11 @@ public class UIController {
 	}
 	
 	@RequestMapping(value="/ui/{username}/channels/{id}", method=RequestMethod.GET)
-	public ModelAndView channel(@PathVariable String username, @PathVariable String id,
-			@RequestParam(required=false) Integer page) throws UnknownHostException, MongoException {
+	public ModelAndView channel(@PathVariable String username,
+			@PathVariable String id,
+			@RequestParam(required=false) Integer page,
+			@RequestParam(required=false) String q		
+			) throws UnknownHostException, MongoException {
 		final Channel channel = channelsDAO.getById(username, id);
 
 		final ModelAndView mv = new ModelAndView("channel");
@@ -112,7 +115,7 @@ public class UIController {
 		if (!subscriptionsForChannel.isEmpty()) {
 			mv.addObject("inboxSize", feedItemDAO.getChannelFeedItemsCount(channel.getId(), username));
 			
-			feedItemPopulator.populateFeedItems(username, channel, page, mv, "inbox");
+			feedItemPopulator.populateFeedItems(username, channel, page, mv, "inbox", q);
 			
 			final Map<String, Long> subscriptionCounts = Maps.newHashMap();
 			for (Subscription subscription : subscriptionsForChannel) {

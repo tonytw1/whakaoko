@@ -88,7 +88,9 @@ public class ChannelsController {
 	public ModelAndView channelJson(@PathVariable String username, @PathVariable String id,
 			@RequestParam(required=false) Integer page,
 			@RequestParam(required=false) Integer pageSize,
-			@RequestParam(required=false) String format) throws UnknownHostException, MongoException, UnknownUserException {
+			@RequestParam(required=false) String format,
+			@RequestParam(required=false) String q
+			) throws UnknownHostException, MongoException, UnknownUserException {
 		usersDAO.getByUsername(username);		
 		final Channel channel = channelsDAO.getById(username, id);
 		
@@ -97,7 +99,7 @@ public class ChannelsController {
 			mv = new ModelAndView(viewFactory.getRssView(channel.getName(), urlBuilder.getChannelUrl(channel), ""));
 		}
 		
-		feedItemPopulator.populateFeedItems(username, channel, page, mv, "data", pageSize);		
+		feedItemPopulator.populateFeedItems(username, channel, page, mv, "data", pageSize, q);		
 		return mv;
 	}
 	

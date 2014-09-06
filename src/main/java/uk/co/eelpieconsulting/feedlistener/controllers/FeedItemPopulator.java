@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.ModelAndView;
 
+import com.google.common.base.Strings;
 import com.mongodb.MongoException;
 
 import uk.co.eelpieconsulting.feedlistener.daos.FeedItemDAO;
@@ -32,16 +33,22 @@ public class FeedItemPopulator {
 		}
 	}
 	
-	public void populateFeedItems(String username, Channel channel, Integer page, ModelAndView mv, String field) throws UnknownHostException, MongoException {
-		populateFeedItems(username, channel, page, mv, field, MAX_FEED_ITEMS);
+	public void populateFeedItems(String username, Channel channel, Integer page, ModelAndView mv, String field, String q) throws UnknownHostException, MongoException {
+		populateFeedItems(username, channel, page, mv, field, MAX_FEED_ITEMS, q);
 	}
 	
-	public void populateFeedItems(String username, Channel channel, Integer page, ModelAndView mv, String field, Integer pageSize) throws UnknownHostException, MongoException {		
+	public void populateFeedItems(String username, Channel channel, Integer page, ModelAndView mv, String field, Integer pageSize, String q) throws UnknownHostException, MongoException {		
 		final int pageSizeToUse = pageSize != null ? pageSize : MAX_FEED_ITEMS;
 		final int pageToUse = (page != null && page > 0) ? page : 1;
 		if (pageSizeToUse > MAX_FEED_ITEMS) {
 			throw new RuntimeException("Too many records requested");	// TODO use correct exception.
-		}		
+		}
+
+		if (!Strings.isNullOrEmpty(q)) {
+			mv.addObject(field, feedItemDAO.searchChannelFeedItems(channel.getId(), pageSizeToUse, pageToUse, username, q));
+			return;
+		}
+		
 		mv.addObject(field, feedItemDAO.getChannelFeedItems(channel.getId(), pageSizeToUse, pageToUse, username));
 	}
 	
