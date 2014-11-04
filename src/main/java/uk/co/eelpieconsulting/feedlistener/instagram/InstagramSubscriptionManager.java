@@ -16,9 +16,9 @@ import uk.co.eelpieconsulting.feedlistener.CredentialsRequiredException;
 import uk.co.eelpieconsulting.feedlistener.UrlBuilder;
 import uk.co.eelpieconsulting.feedlistener.credentials.CredentialService;
 import uk.co.eelpieconsulting.feedlistener.exceptions.UnknownUserException;
-import uk.co.eelpieconsulting.feedlistener.instagram.api.InstagramApi;
 import uk.co.eelpieconsulting.feedlistener.model.InstagramGeographySubscription;
 import uk.co.eelpieconsulting.feedlistener.model.InstagramTagSubscription;
+import uk.co.eelpieconsulting.instagram.api.InstagramApi;
 
 @Component
 public class InstagramSubscriptionManager {

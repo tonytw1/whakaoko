@@ -24,11 +24,11 @@ import uk.co.eelpieconsulting.feedlistener.credentials.CredentialService;
 import uk.co.eelpieconsulting.feedlistener.daos.FeedItemDAO;
 import uk.co.eelpieconsulting.feedlistener.daos.SubscriptionsDAO;
 import uk.co.eelpieconsulting.feedlistener.exceptions.UnknownUserException;
-import uk.co.eelpieconsulting.feedlistener.instagram.api.InstagramApi;
 import uk.co.eelpieconsulting.feedlistener.model.FeedItem;
 import uk.co.eelpieconsulting.feedlistener.model.InstagramGeographySubscription;
 import uk.co.eelpieconsulting.feedlistener.model.InstagramSubscription;
 import uk.co.eelpieconsulting.feedlistener.model.InstagramTagSubscription;
+import uk.co.eelpieconsulting.instagram.api.InstagramApi;
 
 @Controller
 public class InstagramCallbackController {
