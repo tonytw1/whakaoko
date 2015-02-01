@@ -4,12 +4,12 @@ import java.io.Serializable;
 import java.util.Date;
 
 import org.bson.types.ObjectId;
-import org.codehaus.jackson.annotate.JsonIgnore;
 
 import uk.co.eelpieconsulting.common.geo.model.LatLong;
 import uk.co.eelpieconsulting.common.geo.model.Place;
 import uk.co.eelpieconsulting.common.views.rss.RssFeedable;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.google.code.morphia.annotations.Entity;
 import com.google.code.morphia.annotations.Id;
 import com.google.code.morphia.annotations.Indexed;

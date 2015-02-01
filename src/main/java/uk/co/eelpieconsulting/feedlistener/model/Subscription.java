@@ -3,8 +3,8 @@ package uk.co.eelpieconsulting.feedlistener.model;
 import java.util.Date;
 
 import org.bson.types.ObjectId;
-import org.codehaus.jackson.annotate.JsonPropertyOrder;
 
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.google.code.morphia.annotations.Entity;
 import com.google.code.morphia.annotations.Id;
 import com.google.code.morphia.annotations.Indexed;
