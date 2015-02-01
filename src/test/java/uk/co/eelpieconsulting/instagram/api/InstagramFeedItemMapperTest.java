@@ -1,4 +1,4 @@
-package uk.co.eelpieconsulting.feedlistener.instagram.api;
+package uk.co.eelpieconsulting.instagram.api;
 
 import static org.junit.Assert.assertEquals;
 

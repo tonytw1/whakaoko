@@ -1,4 +1,4 @@
-package uk.co.eelpieconsulting.feedlistener.instagram.api;
+package uk.co.eelpieconsulting.instagram.api;
 
 import java.io.UnsupportedEncodingException;
 import java.util.List;

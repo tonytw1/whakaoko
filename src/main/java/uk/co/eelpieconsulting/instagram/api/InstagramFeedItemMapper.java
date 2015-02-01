@@ -1,4 +1,4 @@
-package uk.co.eelpieconsulting.feedlistener.instagram.api;
+package uk.co.eelpieconsulting.instagram.api;
 
 import org.apache.log4j.Logger;
 import org.joda.time.DateTime;
