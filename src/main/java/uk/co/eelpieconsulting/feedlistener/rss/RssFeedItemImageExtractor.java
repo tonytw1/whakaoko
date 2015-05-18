@@ -99,7 +99,7 @@ public class RssFeedItemImageExtractor {
 	}
 
 	private boolean isBlackListedImageUrl(String url) {
-		return url.startsWith("http://stats.wordpress.com") && !url.contains("gravatar.com/avatar");
+		return url.startsWith("http://stats.wordpress.com") && !url.contains("gravatar.com/avatar") && !url.contains("share_save_171_16");
 	}
 	
 	private boolean isImage(MediaContent mediaContent) {
