@@ -71,7 +71,7 @@ Lists the subscriptions which make up a given channel.
 
 |Parameter	|	Description |
 |----------|----------------|
-| format | [json|rss] |
+| format | json / rss |
 | page | pagination number |
 	
 Content items received from this channel. Contains all content items 
@@ -87,7 +87,7 @@ Details for a specific subscription.
 
 |Parameter	|	Description |
 |----------|----------------|
-|format | [json|rss] |
+|format | json / rss |
 |page  | pagination number |
 
 Content items received from this subscription.
