@@ -68,8 +68,11 @@ Lists the subscriptions which make up a given channel.
 
 
 ####/{userid}/channels/{channelid}/items
-	format - [json|rss]
-	page - pagination number
+
+|Parameter	|	Description |
+|----------|----------------|
+| format | [json|rss] |
+| page | pagination number |
 	
 Content items received from this channel. Contains all content items 
 received from all of the subscriptions which make up this channel.
@@ -81,29 +84,41 @@ Details for a specific subscription.
 
 
 ####/{userid}/subscriptions/{subscriptionid}/items
-	format - [json|rss]
-	page - pagination number
+
+|Parameter	|	Description |
+|----------|----------------|
+|format | [json|rss] |
+|page  | pagination number |
 
 Content items received from this subscription.
 
 
 #### POST /{username}/subscriptions/feeds
-	channel - The channel id to add this subscription to.
-	url - The url of an RSS or ATOM feed
+
+| Parameter	|	Description |
+|channel | The channel id to add this subscription to|
+|url | The url of an RSS or ATOM feed|
 	
 Request a new subscription to a RSS or ATOM feed url.
 
 #### POST /subscriptions/twitter/tags
-	channel - The channel id to add this subscription to.
-	tag - The twitter tag to subscribed to.
+
+|Parameter |	Description |
+|----------|---------------- |
+|channel | The channel id to add this subscription to|
+|tag | The twitter tag to subscribed to|
 	
 Request a new subscription to a Twitter tag.
 Requires the API users account to be linked to a Twitter account.
 
 
 #### POST /subscriptions/instagram/tags
-	channel - The channel id to add this subscription to.
-	tag - The twitter tag to subscribed to.
+
+
+| Parameter	|	Description |
+|----------|----------------|
+|channel|The channel id to add this subscription to|
+|tag|The twitter tag to subscribed to|
 	
 Request a new subscription to an Instagram tag.
 Requires the API users account to be linked to an Instagram account.
