@@ -109,11 +109,14 @@ Request a new subscription to an Instagram tag.
 Requires the API users account to be linked to an Instagram account.
 
 	
-#### POST /subscriptions/instagram/geography	
-	channel - The channel id to add this subscription to.
-	latitude - The latitude of the center of circle to follow.
-	longitude - The longitude of the center of circle to follow.
-	radius - The radius in metres of the circle to follow (1 - 5000).
+#### POST /subscriptions/instagram/geography
+
+Parameter	|	Description
+---------------------------
+channel | The channel id to add this subscription to.
+latitude | The latitude of the center of circle to follow.
+longitude | The longitude of the center of circle to follow.
+radius | The radius in metres of the circle to follow (1 - 5000).
 
 Request a new subscription to an Instagram geography. An Instagram geography is a circle
 centered on a given latitude/longitude with a radius upto 5000 metres.
