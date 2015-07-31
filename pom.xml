@@ -4,7 +4,7 @@
 	<groupId>uk.co.eelpieconsulting.whakaoko</groupId>
 	<artifactId>whakaoko</artifactId>
 	<packaging>war</packaging>
-	<name>Feed listener</name>
+	<name>Whakaoko</name>
 	<version>0.0.1-SNAPSHOT</version>
 
 	<properties>
