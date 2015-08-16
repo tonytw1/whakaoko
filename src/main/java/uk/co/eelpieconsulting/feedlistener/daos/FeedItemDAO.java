@@ -48,12 +48,10 @@ public class FeedItemDAO {
 		}
 	}
 	
-	@Timed(timingNotes = "")
 	public List<FeedItem> getSubscriptionFeedItems(String subscriptionId, int limit) throws UnknownHostException, MongoException {
 		return subscriptionFeedItemsQuery(subscriptionId).limit(limit).asList();
 	}
 	
-	@Timed(timingNotes = "")
 	public List<FeedItem> getSubscriptionFeedItems(String subscriptionId, int pageSize, int page) throws UnknownHostException, MongoException {
 		return subscriptionFeedItemsQuery(subscriptionId).limit(pageSize).offset(calculatePageOffset(pageSize, page)).asList();
 	}
