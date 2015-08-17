@@ -16,10 +16,10 @@ public abstract class Subscription {
     @Id
     ObjectId objectId;
     
-    private String id, name, username;
-    
+    private String id, name, username;  
     private Date lastRead, latestItemDate;
-    
+    private String error;
+  
     @Indexed
     private String channelId;
         
@@ -71,10 +71,18 @@ public abstract class Subscription {
 		this.username = username;
 	}
 
+	public String getError() {
+		return error;
+	}
+
+	public void setError(String error) {
+		this.error = error;
+	}
+
 	@Override
 	public String toString() {
-		return "Subscription [channelId=" + channelId + ", id=" + id
-				+ ", lastRead=" + lastRead + ", latestItemDate="
+		return "Subscription [channelId=" + channelId + ", error=" + error
+				+ ", id=" + id + ", lastRead=" + lastRead + ", latestItemDate="
 				+ latestItemDate + ", name=" + name + ", username=" + username
 				+ "]";
 	}

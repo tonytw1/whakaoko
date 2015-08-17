@@ -90,13 +90,19 @@ public class RssPoller {
 				persistFeedItems(fetchedFeed);
 				
 				subscription.setName(fetchedFeed.getFeedName());
+				subscription.setError(null);
 				subscription.setLatestItemDate(getLatestItemDate(fetchedFeed.getFeedItems()));
 				subscriptionsDAO.save(subscription);				
 				
 			} catch (HttpFetchException e) {
 				log.error("Http fetch exception while fetching RSS subscription: " + subscription.getName() + ": " + e.getMessage());
+				subscription.setError("Http fetch: " + e.getMessage());
+				subscriptionsDAO.save(subscription);				
+
 			} catch (FeedException e) {
 				log.error("Feed exception while parsing RSS subscription: " + subscription.getName() + ": " + e.getMessage());
+				subscription.setError("Feed exception: " + e.getMessage());
+				subscriptionsDAO.save(subscription);				
 			}
 			// TODO record error condition			
 		}
