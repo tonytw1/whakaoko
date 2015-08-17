@@ -11,12 +11,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.xml.sax.InputSource;
 
+import uk.co.eelpieconsulting.common.http.HttpFetchException;
 import uk.co.eelpieconsulting.common.http.HttpFetcher;
 import uk.co.eelpieconsulting.feedlistener.model.FeedItem;
 
 import com.google.common.collect.Lists;
 import com.sun.syndication.feed.synd.SyndEntry;
 import com.sun.syndication.feed.synd.SyndFeed;
+import com.sun.syndication.io.FeedException;
 import com.sun.syndication.io.SyndFeedInput;
 
 @Component
@@ -33,30 +35,18 @@ public class FeedFetcher {
 		this.httpFetcher = httpFetcher;
 	}
 
-	public FetchedFeed fetchFeed(String url) {
-    	final SyndFeed syndfeed = loadSyndFeedWithFeedFetcher(url);
-    	if (syndfeed == null) {
-    		log.warn("Could not load syndfeed from url: " + url + ". Returning empty list of items");
-    		return null;
-    	}
-    	
+	public FetchedFeed fetchFeed(String url) throws HttpFetchException, FeedException {
+    	final SyndFeed syndfeed = loadSyndFeedWithFeedFetcher(url);    
     	final List<FeedItem> feedItems = getFeedItemsFrom(syndfeed);        
         return new FetchedFeed(syndfeed.getTitle(), feedItems);
 	}
 	
-	private SyndFeed loadSyndFeedWithFeedFetcher(String feedUrl) {
+	private SyndFeed loadSyndFeedWithFeedFetcher(String feedUrl) throws HttpFetchException, FeedException {
 		log.info("Loading SyndFeed from url: " + feedUrl + " using http fetcher: " + httpFetcher.hashCode());		
-		try {
-			byte[] bytes = httpFetcher.getBytes(feedUrl);
-			InputStream byteArrayInputStream = cleanLeadingWhitespace(bytes);
-			final SyndFeed syndFeed = new SyndFeedInput().build(new InputSource(byteArrayInputStream));
-			IOUtils.closeQuietly(byteArrayInputStream);			
-			return syndFeed;
-			
-		} catch (Exception e) {
-			log.warn("Error while fetching feed: " + e.getMessage());	// TODO feed errors need to be past up and recorded
-		}
-		return null;
+		final InputStream byteArrayInputStream = cleanLeadingWhitespace(httpFetcher.getBytes(feedUrl));
+		final SyndFeed syndFeed = new SyndFeedInput().build(new InputSource(byteArrayInputStream));
+		IOUtils.closeQuietly(byteArrayInputStream);
+		return syndFeed;
 	}
 
 	private ByteArrayInputStream cleanLeadingWhitespace(byte[] bytes) {

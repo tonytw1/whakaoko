@@ -11,6 +11,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Component;
 
+import uk.co.eelpieconsulting.common.http.HttpFetchException;
 import uk.co.eelpieconsulting.feedlistener.daos.FeedItemDAO;
 import uk.co.eelpieconsulting.feedlistener.daos.SubscriptionsDAO;
 import uk.co.eelpieconsulting.feedlistener.model.FeedItem;
@@ -18,11 +19,12 @@ import uk.co.eelpieconsulting.feedlistener.model.RssSubscription;
 import uk.co.eelpieconsulting.feedlistener.model.Subscription;
 
 import com.mongodb.MongoException;
+import com.sun.syndication.io.FeedException;
 
 @Component
 public class RssPoller {
 	
-	private final static Logger log = Logger.getLogger(RssPoller.class);
+	private static final Logger log = Logger.getLogger(RssPoller.class);
 	
 	private final SubscriptionsDAO subscriptionsDAO;
 	private final FeedFetcher feedFetcher;
@@ -77,38 +79,43 @@ public class RssPoller {
 
 		public void run() {
 			log.info("Processing feed: " + subscription + " from thread " + Thread.currentThread().getId());
-			final FetchedFeed fetchedFeed = feedFetcher.fetchFeed(subscription.getUrl());			
-			if (fetchedFeed != null) {
-				subscription.setName(fetchedFeed.getFeedName());
-				subscription.setLastRead(DateTime.now().toDate());
-				subscriptionsDAO.save(subscription);
-				
-				log.info("Fetched feed: " + fetchedFeed.getFeedName());				
+			subscription.setLastRead(DateTime.now().toDate());
+			subscriptionsDAO.save(subscription);
+			
+			try {
+				final FetchedFeed fetchedFeed = feedFetcher.fetchFeed(subscription.getUrl());
+
+				log.info("Fetched feed: " + fetchedFeed.getFeedName());
 				Date latestItemDate = null;
 				for (FeedItem feedItem : fetchedFeed.getFeedItems()) {
 					try {
 						feedItem.setSubscriptionId(subscription.getId());
 						feedItemDAO.add(feedItem);
-						
+
 						final Date feedItemDate = feedItem.getDate();
 						if (feedItemDate != null && (latestItemDate == null || feedItemDate.after(latestItemDate))) {
-							latestItemDate =  feedItemDate;
+							latestItemDate = feedItemDate;
 						}
-						
+
 					} catch (UnknownHostException e) {
 						log.error(e);
 					} catch (MongoException e) {
 						log.error(e);
 					}
 				}
-				
-				subscription.setLatestItemDate(latestItemDate);						
-				subscriptionsDAO.save(subscription);
 
-			} else {
-				log.warn("Failed to fetch feed: " + subscription);
+				subscription.setName(fetchedFeed.getFeedName());
+				subscription.setLatestItemDate(latestItemDate);
+				subscriptionsDAO.save(subscription);
+				
+				
+			} catch (HttpFetchException e) {
+				log.error("Http fetch exception while fetching RSS subscription: " + subscription.getName() + ": " + e.getMessage());
+			} catch (FeedException e) {
+				log.error("Feed exception while parsing RSS subscription: " + subscription.getName() + ": " + e.getMessage());
 			}
-		}		
+			// TODO record error condition			
+		}
 	}
 	
 	private boolean isRssSubscription(Subscription subscription) {
