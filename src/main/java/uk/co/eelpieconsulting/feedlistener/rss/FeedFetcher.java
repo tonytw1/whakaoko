@@ -54,7 +54,7 @@ public class FeedFetcher {
 			return syndFeed;
 			
 		} catch (Exception e) {
-			log.warn("Error while fetching feed: " + e.getMessage());
+			log.warn("Error while fetching feed: " + e.getMessage());	// TODO feed errors need to be past up and recorded
 		}
 		return null;
 	}
