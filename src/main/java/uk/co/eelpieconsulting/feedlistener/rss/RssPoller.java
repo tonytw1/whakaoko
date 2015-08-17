@@ -2,6 +2,7 @@ package uk.co.eelpieconsulting.feedlistener.rss;
 
 import java.net.UnknownHostException;
 import java.util.Date;
+import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.joda.time.DateTime;
@@ -84,30 +85,13 @@ public class RssPoller {
 			
 			try {
 				final FetchedFeed fetchedFeed = feedFetcher.fetchFeed(subscription.getUrl());
-
 				log.info("Fetched feed: " + fetchedFeed.getFeedName());
-				Date latestItemDate = null;
-				for (FeedItem feedItem : fetchedFeed.getFeedItems()) {
-					try {
-						feedItem.setSubscriptionId(subscription.getId());
-						feedItemDAO.add(feedItem);
-
-						final Date feedItemDate = feedItem.getDate();
-						if (feedItemDate != null && (latestItemDate == null || feedItemDate.after(latestItemDate))) {
-							latestItemDate = feedItemDate;
-						}
-
-					} catch (UnknownHostException e) {
-						log.error(e);
-					} catch (MongoException e) {
-						log.error(e);
-					}
-				}
-
-				subscription.setName(fetchedFeed.getFeedName());
-				subscription.setLatestItemDate(latestItemDate);
-				subscriptionsDAO.save(subscription);
 				
+				persistFeedItems(fetchedFeed);
+				
+				subscription.setName(fetchedFeed.getFeedName());
+				subscription.setLatestItemDate(getLatestItemDate(fetchedFeed.getFeedItems()));
+				subscriptionsDAO.save(subscription);				
 				
 			} catch (HttpFetchException e) {
 				log.error("Http fetch exception while fetching RSS subscription: " + subscription.getName() + ": " + e.getMessage());
@@ -115,6 +99,30 @@ public class RssPoller {
 				log.error("Feed exception while parsing RSS subscription: " + subscription.getName() + ": " + e.getMessage());
 			}
 			// TODO record error condition			
+		}
+
+		private void persistFeedItems(final FetchedFeed fetchedFeed) {
+			for (FeedItem feedItem : fetchedFeed.getFeedItems()) {
+				try {
+					feedItem.setSubscriptionId(subscription.getId());
+					feedItemDAO.add(feedItem);
+				} catch (UnknownHostException e) {
+					log.error(e);
+				} catch (MongoException e) {
+					log.error(e);
+				}
+			}
+		}
+
+		private Date getLatestItemDate(List<FeedItem> feedItems) {
+			Date latestItemDate = null;
+			for (FeedItem feedItem : feedItems) {
+				final Date feedItemDate = feedItem.getDate();
+				if (feedItemDate != null && (latestItemDate == null || feedItemDate.after(latestItemDate))) {
+					latestItemDate = feedItemDate;
+				}
+			}
+			return latestItemDate;
 		}
 	}
 	
