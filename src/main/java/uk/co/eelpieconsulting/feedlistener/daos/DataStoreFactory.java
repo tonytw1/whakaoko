@@ -1,58 +1,72 @@
 package uk.co.eelpieconsulting.feedlistener.daos;
 
 import java.net.UnknownHostException;
+import java.util.List;
 
+import org.apache.log4j.Logger;
+import org.mongodb.morphia.Datastore;
+import org.mongodb.morphia.Morphia;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import uk.co.eelpieconsulting.feedlistener.model.Channel;
 import uk.co.eelpieconsulting.feedlistener.model.FeedItem;
+import uk.co.eelpieconsulting.feedlistener.model.Subscription;
+import uk.co.eelpieconsulting.feedlistener.model.User;
 
-import com.google.code.morphia.Datastore;
-import com.google.code.morphia.Morphia;
+import com.google.common.collect.Lists;
 import com.mongodb.MongoClient;
+import com.mongodb.MongoCredential;
 import com.mongodb.MongoException;
+import com.mongodb.ServerAddress;
 
 @Component
 public class DataStoreFactory {
+
+	private static final Logger log = Logger.getLogger(DataStoreFactory.class);
+	    
+	private final ServerAddress serverAddress;
+	private final String mongoDatabase;
 	
-    @Value("#{config['mongo.host']}")
-    private String mongoHost;
-    
-    @Value("#{config['mongo.database']}")
-    private String mongoDatabase;
+	private final List<MongoCredential> credentials;
 
-	private Datastore dataStore;
-        
-	public DataStoreFactory() {
-	}
+	private Datastore datastore;
 
-	public DataStoreFactory(String mongoHost, String mongoDatabase) {
-		this.mongoHost = mongoHost;
+	@Autowired
+	public DataStoreFactory(@Value("#{squadlistApi['mongoHost']}") String mongoHost,
+			@Value("#{squadlistApi['mongoDatabase']}") String mongoDatabase,
+			@Value("#{squadlistApi['mongoUser']}") String mongoUser,
+			@Value("#{squadlistApi['mongoPassword']}") String mongoPassword) throws UnknownHostException, MongoException {
+		this.serverAddress = new ServerAddress(mongoHost);
 		this.mongoDatabase = mongoDatabase;
+		MongoCredential createCredential = MongoCredential.createCredential(mongoUser, mongoDatabase, mongoPassword.toCharArray());
+		this.credentials = Lists.newArrayList(createCredential);
 	}
 	
-	public Datastore getDatastore() throws UnknownHostException, MongoException {
-		if (dataStore != null) {
-			return dataStore;
+	public Datastore getDs() {
+		if (datastore == null) {
+			datastore = createDataStore(mongoDatabase);
+			datastore.ensureIndexes();
 		}
-		
-		return connect();
+		return datastore;
 	}
-
-	private synchronized Datastore connect() throws UnknownHostException {
-		if (dataStore != null) {
-			return dataStore;
-		}
-		
-		final MongoClient client = new MongoClient(mongoHost);
-		
-		final Morphia morphia = new Morphia();				
-		Datastore newDataStore = morphia.createDatastore(client, mongoDatabase);
+	
+	private Datastore createDataStore(String database) {
+		Morphia morphia = new Morphia();
 		morphia.map(FeedItem.class);
-		newDataStore.ensureIndexes();
+		morphia.map(Subscription.class);
+		morphia.map(Channel.class);
+		morphia.map(User.class);
 		
-		this.dataStore = newDataStore;
-		return this.dataStore;
+		try {
+			MongoClient m = new MongoClient(serverAddress, credentials);
+			return morphia.createDatastore(m, database);
+			
+		} catch (MongoException e) {
+			log.error(e);
+			throw new RuntimeException(e);
+		}		
 	}
 	
 }

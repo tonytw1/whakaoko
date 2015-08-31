@@ -4,16 +4,16 @@ import java.io.Serializable;
 import java.util.Date;
 
 import org.bson.types.ObjectId;
+import org.mongodb.morphia.annotations.Entity;
+import org.mongodb.morphia.annotations.Id;
+import org.mongodb.morphia.annotations.Indexed;
+import org.mongodb.morphia.utils.IndexDirection;
 
 import uk.co.eelpieconsulting.common.geo.model.LatLong;
 import uk.co.eelpieconsulting.common.geo.model.Place;
 import uk.co.eelpieconsulting.common.views.rss.RssFeedable;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.google.code.morphia.annotations.Entity;
-import com.google.code.morphia.annotations.Id;
-import com.google.code.morphia.annotations.Indexed;
-import com.google.code.morphia.utils.IndexDirection;
 
 @Entity("feeditems")
 public class FeedItem implements Serializable, RssFeedable {

@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.regex.Pattern;
 
 import org.apache.log4j.Logger;
+import org.mongodb.morphia.query.Query;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -12,7 +13,6 @@ import uk.co.eelpieconsulting.feedlistener.annotations.Timed;
 import uk.co.eelpieconsulting.feedlistener.model.FeedItem;
 import uk.co.eelpieconsulting.feedlistener.model.Subscription;
 
-import com.google.code.morphia.query.Query;
 import com.google.common.collect.Lists;
 import com.mongodb.MongoException;
 
@@ -36,9 +36,9 @@ public class FeedItemDAO {
 	}
 	
 	public void add(FeedItem feedItem) throws UnknownHostException, MongoException {
-		if (dataStoreFactory.getDatastore().find(FeedItem.class, "url", feedItem.getUrl()).asList().isEmpty()) {	// TODO
+		if (dataStoreFactory.getDs().find(FeedItem.class, "url", feedItem.getUrl()).asList().isEmpty()) {	// TODO
 			log.info("Added: " + feedItem.getSubscriptionId() + ", " + feedItem.getTitle());
-			dataStoreFactory.getDatastore().save(feedItem);
+			dataStoreFactory.getDs().save(feedItem);
 		}
 	}
 	
@@ -57,12 +57,12 @@ public class FeedItemDAO {
 	}
 	
 	public void deleteSubscriptionFeedItems(Subscription subscription) throws UnknownHostException, MongoException {
-		 dataStoreFactory.getDatastore().delete(dataStoreFactory.getDatastore().find(FeedItem.class, "subscriptionId", subscription.getId()));
+		 dataStoreFactory.getDs().delete(dataStoreFactory.getDs().find(FeedItem.class, "subscriptionId", subscription.getId()));
 	}
 	
 	@Timed(timingNotes = "")
 	public long getAllCount() throws UnknownHostException, MongoException {
-		return dataStoreFactory.getDatastore().find(FeedItem.class).countAll();
+		return dataStoreFactory.getDs().find(FeedItem.class).countAll();
 	}
 	
 	@Timed(timingNotes = "")
@@ -99,11 +99,11 @@ public class FeedItemDAO {
 		for (Subscription subscription : subscriptionsDAO.getSubscriptionsForChannel(username, channelId)) {
 			channelSubscriptions.add(subscription.getId());
 		}		
-		return dataStoreFactory.getDatastore().find(FeedItem.class).field("subscriptionId").hasAnyOf(channelSubscriptions).order(DATE_DESCENDING);
+		return dataStoreFactory.getDs().find(FeedItem.class).field("subscriptionId").hasAnyOf(channelSubscriptions).order(DATE_DESCENDING);
 	}
 	
 	private Query<FeedItem> subscriptionFeedItemsQuery(String subscriptionId) throws UnknownHostException {
-		return dataStoreFactory.getDatastore().find(FeedItem.class, "subscriptionId", subscriptionId).order(DATE_DESCENDING);
+		return dataStoreFactory.getDs().find(FeedItem.class, "subscriptionId", subscriptionId).order(DATE_DESCENDING);
 	}
 	
 	private int calculatePageOffset(int pageSize, int page) {

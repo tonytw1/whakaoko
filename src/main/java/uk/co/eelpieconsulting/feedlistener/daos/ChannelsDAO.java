@@ -1,6 +1,5 @@
 package uk.co.eelpieconsulting.feedlistener.daos;
 
-import java.net.UnknownHostException;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -25,10 +24,7 @@ public class ChannelsDAO {
 
 	public List<Channel> getChannels(String username) {
 		try {
-			return dataStoreFactory.getDatastore().find(Channel.class, "username", username).asList();
-			
-		} catch (UnknownHostException e) {
-			throw new RuntimeException(e);
+			return dataStoreFactory.getDs().find(Channel.class, "username", username).asList();
 		} catch (MongoException e) {
 			throw new RuntimeException(e);
 		}
@@ -36,9 +32,7 @@ public class ChannelsDAO {
 
 	public Channel getById(String username, String id) {
         try {
-			return dataStoreFactory.getDatastore().createQuery(Channel.class).filter("id", id).filter("username", username).get();
-		} catch (UnknownHostException e) {
-			throw new RuntimeException(e);
+			return dataStoreFactory.getDs().createQuery(Channel.class).filter("id", id).filter("username", username).get();
 		} catch (MongoException e) {
 			throw new RuntimeException(e);
 		}
@@ -55,9 +49,7 @@ public class ChannelsDAO {
 	
 	public void save(Channel channel) {
 		try {
-			dataStoreFactory.getDatastore().save(channel);			
-		} catch (UnknownHostException e) {
-			throw new RuntimeException(e);
+			dataStoreFactory.getDs().save(channel);
 		} catch (MongoException e) {
 			throw new RuntimeException(e);
 		}

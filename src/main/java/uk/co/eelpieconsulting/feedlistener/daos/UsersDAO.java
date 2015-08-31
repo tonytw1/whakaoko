@@ -26,12 +26,9 @@ public class UsersDAO {
 	
 	public List<User> getUsers() {
 		try {
-			return dataStoreFactory.getDatastore().find(User.class).
+			return dataStoreFactory.getDs().find(User.class).
 				order(USERNAME).
 				asList();
-			
-		} catch (UnknownHostException e) {
-			throw new RuntimeException(e);
 		} catch (MongoException e) {
 			throw new RuntimeException(e);
 		}
@@ -57,14 +54,12 @@ public class UsersDAO {
 	}
 
 	public void save(final User user) throws UnknownHostException {
-		dataStoreFactory.getDatastore().save(user);
+		dataStoreFactory.getDs().save(user);
 	}
 	
 	private User loadUserFromDatabase(String username) {
 		try {
-			return dataStoreFactory.getDatastore().find(User.class, "username", username).get();
-		} catch (UnknownHostException e) {
-			throw new RuntimeException(e);
+			return dataStoreFactory.getDs().find(User.class, "username", username).get();		
 		} catch (MongoException e) {
 			throw new RuntimeException(e);
 		}

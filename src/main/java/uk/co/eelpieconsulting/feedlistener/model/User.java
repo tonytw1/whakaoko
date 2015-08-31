@@ -1,10 +1,10 @@
 package uk.co.eelpieconsulting.feedlistener.model;
 
 import org.bson.types.ObjectId;
+import org.mongodb.morphia.annotations.Entity;
+import org.mongodb.morphia.annotations.Id;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.google.code.morphia.annotations.Entity;
-import com.google.code.morphia.annotations.Id;
 
 @Entity("users")
 public class User {
