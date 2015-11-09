@@ -1,6 +1,5 @@
 package uk.co.eelpieconsulting.feedlistener.twitter;
 
-import java.net.UnknownHostException;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -9,26 +8,26 @@ import twitter4j.StallWarning;
 import twitter4j.Status;
 import twitter4j.StatusDeletionNotice;
 import twitter4j.StatusListener;
-import uk.co.eelpieconsulting.feedlistener.daos.FeedItemDAO;
 import uk.co.eelpieconsulting.feedlistener.daos.SubscriptionsDAO;
+import uk.co.eelpieconsulting.feedlistener.exceptions.FeeditemPersistanceException;
 import uk.co.eelpieconsulting.feedlistener.model.FeedItem;
 import uk.co.eelpieconsulting.feedlistener.model.Subscription;
 import uk.co.eelpieconsulting.feedlistener.model.TwitterTagSubscription;
+import uk.co.eelpieconsulting.feedlistener.persistance.FeedItemDestination;
 
 import com.google.common.collect.Lists;
-import com.mongodb.MongoException;
 
 public class TwitterStatusListener implements StatusListener {
 	
 	private final static Logger log = Logger.getLogger(TwitterListener.class);
 	
-	private final FeedItemDAO feedItemDAO;
+	private final FeedItemDestination feedItemDestination;
 	private final TwitterFeedItemMapper twitterFeedItemMapper;
 	private final SubscriptionsDAO subscriptionsDAO;
 	private final String username;
 	
-	public TwitterStatusListener(FeedItemDAO feedItemDAO, TwitterFeedItemMapper twitterFeedItemMapper, SubscriptionsDAO subscriptionsDAO, String username) {
-		this.feedItemDAO = feedItemDAO;
+	public TwitterStatusListener(FeedItemDestination feedItemDestination, TwitterFeedItemMapper twitterFeedItemMapper, SubscriptionsDAO subscriptionsDAO, String username) {
+		this.feedItemDestination = feedItemDestination;
 		this.twitterFeedItemMapper = twitterFeedItemMapper;
 		this.subscriptionsDAO = subscriptionsDAO;
 		this.username = username;
@@ -45,10 +44,8 @@ public class TwitterStatusListener implements StatusListener {
 			subscriptionsDAO.save(subscription);
 			
 			try {
-				feedItemDAO.add(tweetFeedItem);
-			} catch (UnknownHostException e) {
-				log.error(e);
-			} catch (MongoException e) {
+				feedItemDestination.add(tweetFeedItem);
+			} catch (FeeditemPersistanceException e) {
 				log.error(e);
 			}			
 		}	

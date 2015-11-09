@@ -1,6 +1,5 @@
 package uk.co.eelpieconsulting.feedlistener.rss;
 
-import java.net.UnknownHostException;
 import java.util.Date;
 import java.util.List;
 
@@ -13,13 +12,13 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Component;
 
 import uk.co.eelpieconsulting.common.http.HttpFetchException;
-import uk.co.eelpieconsulting.feedlistener.daos.FeedItemDAO;
 import uk.co.eelpieconsulting.feedlistener.daos.SubscriptionsDAO;
+import uk.co.eelpieconsulting.feedlistener.exceptions.FeeditemPersistanceException;
 import uk.co.eelpieconsulting.feedlistener.model.FeedItem;
 import uk.co.eelpieconsulting.feedlistener.model.RssSubscription;
 import uk.co.eelpieconsulting.feedlistener.model.Subscription;
+import uk.co.eelpieconsulting.feedlistener.persistance.FeedItemDestination;
 
-import com.mongodb.MongoException;
 import com.sun.syndication.io.FeedException;
 
 @Component
@@ -29,14 +28,14 @@ public class RssPoller {
 	
 	private final SubscriptionsDAO subscriptionsDAO;
 	private final FeedFetcher feedFetcher;
-	private final FeedItemDAO feedItemDAO;
+	private final FeedItemDestination feedItemDestination;
 	private final TaskExecutor taskExecutor;
 	
 	@Autowired
-	public RssPoller(SubscriptionsDAO subscriptionsDAO, FeedFetcher feedFetcher, FeedItemDAO feedItemDAO, TaskExecutor taskExecutor) {
+	public RssPoller(SubscriptionsDAO subscriptionsDAO, FeedFetcher feedFetcher, FeedItemDestination feedItemDestination, TaskExecutor taskExecutor) {
 		this.subscriptionsDAO = subscriptionsDAO;
 		this.feedFetcher = feedFetcher;
-		this.feedItemDAO = feedItemDAO;
+		this.feedItemDestination = feedItemDestination;
 		this.taskExecutor = taskExecutor;
 	}
 	
@@ -61,19 +60,19 @@ public class RssPoller {
 		log.info("Executing RSS poll for: " + subscription.getId());
 		ThreadPoolTaskExecutor threadPoolTaskExecutor = (ThreadPoolTaskExecutor) taskExecutor;
 		log.info("Task executor: active:" + threadPoolTaskExecutor.getActiveCount() + ", pool size: " + threadPoolTaskExecutor.getPoolSize());
-		taskExecutor.execute(new ProcessFeedTask(feedFetcher, feedItemDAO, subscriptionsDAO, (RssSubscription) subscription));
+		taskExecutor.execute(new ProcessFeedTask(feedFetcher, feedItemDestination, subscriptionsDAO, (RssSubscription) subscription));
 	}
 	
 	private class ProcessFeedTask implements Runnable {
 		
 		private final FeedFetcher feedFetcher;
-		private final FeedItemDAO feedItemDAO;
+		private final FeedItemDestination feedItemDestination;
 		private final RssSubscription subscription;
 		private final SubscriptionsDAO subscriptionsDAO;
 				
-		public ProcessFeedTask(FeedFetcher feedFetcher, FeedItemDAO feedItemDAO, SubscriptionsDAO subscriptionsDAO, RssSubscription subscription) {
+		public ProcessFeedTask(FeedFetcher feedFetcher, FeedItemDestination feedItemDestination, SubscriptionsDAO subscriptionsDAO, RssSubscription subscription) {
 			this.feedFetcher = feedFetcher;
-			this.feedItemDAO = feedItemDAO;
+			this.feedItemDestination = feedItemDestination;
 			this.subscription = subscription;
 			this.subscriptionsDAO = subscriptionsDAO;
 		}
@@ -111,10 +110,8 @@ public class RssPoller {
 			for (FeedItem feedItem : fetchedFeed.getFeedItems()) {
 				try {
 					feedItem.setSubscriptionId(subscription.getId());
-					feedItemDAO.add(feedItem);
-				} catch (UnknownHostException e) {
-					log.error(e);
-				} catch (MongoException e) {
+					feedItemDestination.add(feedItem);
+				} catch (FeeditemPersistanceException e) {
 					log.error(e);
 				}
 			}

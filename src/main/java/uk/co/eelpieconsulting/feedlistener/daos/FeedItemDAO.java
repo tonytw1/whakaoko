@@ -10,14 +10,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import uk.co.eelpieconsulting.feedlistener.annotations.Timed;
+import uk.co.eelpieconsulting.feedlistener.exceptions.FeeditemPersistanceException;
 import uk.co.eelpieconsulting.feedlistener.model.FeedItem;
 import uk.co.eelpieconsulting.feedlistener.model.Subscription;
+import uk.co.eelpieconsulting.feedlistener.persistance.FeedItemDestination;
 
 import com.google.common.collect.Lists;
 import com.mongodb.MongoException;
 
 @Component
-public class FeedItemDAO {
+public class FeedItemDAO implements FeedItemDestination {
 	
 	private static final String DATE_DESCENDING = "-date,_id";
 
@@ -35,14 +37,18 @@ public class FeedItemDAO {
 		this.subscriptionsDAO = subscriptionsDAO;
 	}
 	
-	public void add(FeedItem feedItem) throws UnknownHostException, MongoException {
-		if (dataStoreFactory.getDs().find(FeedItem.class, "url", feedItem.getUrl()).asList().isEmpty()) {	// TODO
-			log.info("Added: " + feedItem.getSubscriptionId() + ", " + feedItem.getTitle());
-			dataStoreFactory.getDs().save(feedItem);
+	public void add(FeedItem feedItem) {
+		try {
+			if (dataStoreFactory.getDs().find(FeedItem.class, "url", feedItem.getUrl()).asList().isEmpty()) {	// TODO shouldn't need to read before every write - use an upsert?
+				log.info("Added: " + feedItem.getSubscriptionId() + ", " + feedItem.getTitle());
+				dataStoreFactory.getDs().save(feedItem);
+			}
+		} catch (Exception e) {
+			throw new FeeditemPersistanceException(e);
 		}
 	}
 	
-	public void addAll(List<FeedItem> feedItems) throws UnknownHostException, MongoException {
+	public void addAll(List<FeedItem> feedItems) {
 		for (FeedItem feedItem : feedItems) {
 			add(feedItem);
 		}

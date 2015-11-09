@@ -21,13 +21,13 @@ import uk.co.eelpieconsulting.common.http.HttpFetchException;
 import uk.co.eelpieconsulting.common.http.HttpForbiddenException;
 import uk.co.eelpieconsulting.common.http.HttpNotFoundException;
 import uk.co.eelpieconsulting.feedlistener.credentials.CredentialService;
-import uk.co.eelpieconsulting.feedlistener.daos.FeedItemDAO;
 import uk.co.eelpieconsulting.feedlistener.daos.SubscriptionsDAO;
 import uk.co.eelpieconsulting.feedlistener.exceptions.UnknownUserException;
 import uk.co.eelpieconsulting.feedlistener.model.FeedItem;
 import uk.co.eelpieconsulting.feedlistener.model.InstagramGeographySubscription;
 import uk.co.eelpieconsulting.feedlistener.model.InstagramSubscription;
 import uk.co.eelpieconsulting.feedlistener.model.InstagramTagSubscription;
+import uk.co.eelpieconsulting.feedlistener.persistance.FeedItemDestination;
 import uk.co.eelpieconsulting.instagram.api.InstagramApi;
 
 @Controller
@@ -38,14 +38,14 @@ public class InstagramCallbackController {
 	private final InstagramApi instagramApi;
 	private final InstagramSubscriptionCallbackParser instagramSubscriptionCallbackParser;
 	private final SubscriptionsDAO subscriptionsDAO;
-	private final FeedItemDAO feedItemDAO;
+	private final FeedItemDestination feedItemDestination;
 	private final CredentialService credentialService;
 	
 	@Autowired
-	public InstagramCallbackController(InstagramSubscriptionCallbackParser instagramSubscriptionCallbackParser, FeedItemDAO feedItemDAO,
+	public InstagramCallbackController(InstagramSubscriptionCallbackParser instagramSubscriptionCallbackParser, FeedItemDestination feedItemDestination,
 			SubscriptionsDAO subscriptionsDAO, CredentialService credentialService) {
 		this.instagramSubscriptionCallbackParser = instagramSubscriptionCallbackParser;
-		this.feedItemDAO = feedItemDAO;
+		this.feedItemDestination = feedItemDestination;
 		this.subscriptionsDAO = subscriptionsDAO;
 		this.credentialService = credentialService;
 		this.instagramApi = new InstagramApi();		
@@ -81,7 +81,7 @@ public class InstagramCallbackController {
 				log.info("Fetching recent media for changed tag: " + tag);
 				List<FeedItem> recentMedia = instagramApi.getRecentMediaForTag(tag, credentialService.getInstagramAccessTokenForUser(username));								
 				Date latestItemDate = populateFeedItemSubscriptionIdAndExtractLatestItemDate(subscription, recentMedia);				
-				feedItemDAO.addAll(recentMedia);
+				feedItemDestination.addAll(recentMedia);
 				
 				subscription.setLatestItemDate(latestItemDate);						
 				subscriptionsDAO.save(subscription);
@@ -93,7 +93,7 @@ public class InstagramCallbackController {
 				log.info("Fetching recent media for changed geography: " + subscription.toString());								
 				List<FeedItem> recentMedia = instagramApi.getRecentMediaForGeography(geoId, credentialService.getInstagramClientId());				
 				Date latestItemDate = populateFeedItemSubscriptionIdAndExtractLatestItemDate(subscription, recentMedia);				
-				feedItemDAO.addAll(recentMedia);
+				feedItemDestination.addAll(recentMedia);
 				
 				subscription.setLatestItemDate(latestItemDate);						
 				subscriptionsDAO.save(subscription);
