@@ -32,6 +32,7 @@ import uk.co.eelpieconsulting.feedlistener.instagram.InstagramSubscriptionManage
 import uk.co.eelpieconsulting.feedlistener.model.InstagramGeographySubscription;
 import uk.co.eelpieconsulting.feedlistener.model.InstagramSubscription;
 import uk.co.eelpieconsulting.feedlistener.model.Subscription;
+import uk.co.eelpieconsulting.feedlistener.persistance.FeedItemDestination;
 import uk.co.eelpieconsulting.feedlistener.rss.RssPoller;
 import uk.co.eelpieconsulting.feedlistener.rss.RssSubscriptionManager;
 import uk.co.eelpieconsulting.feedlistener.twitter.TwitterListener;
@@ -51,7 +52,7 @@ public class SubscriptionsController {
 	private TwitterListener twitterListener;
 	private InstagramSubscriptionManager instagramSubscriptionManager;
 	private UrlBuilder urlBuilder;
-	private FeedItemDAO feedItemDAO;
+	private FeedItemDestination feedItemDAO;
 	private TwitterSubscriptionManager twitterSubscriptionManager;
 	private RssSubscriptionManager rssSubscriptionManager;
 	private ViewFactory viewFactory;
@@ -63,7 +64,7 @@ public class SubscriptionsController {
 	@Autowired
 	public SubscriptionsController(UsersDAO usersDAO, SubscriptionsDAO subscriptionsDAO, RssPoller rssPoller, TwitterListener twitterListener, 
 			InstagramSubscriptionManager instagramSubscriptionManager, UrlBuilder urlBuilder,
-			FeedItemDAO feedItemDAO,
+		    FeedItemDestination feedItemDAO,
 			TwitterSubscriptionManager twitterSubscriptionManager,
 			RssSubscriptionManager rssSubscriptionManager,
 			ViewFactory viewFactory, FeedItemPopulator feedItemPopulator) {
@@ -122,7 +123,7 @@ public class SubscriptionsController {
 			return null;
 		}
 		
-		feedItemDAO.deleteSubscriptionFeedItems(subscription);
+		// feedItemDAO.deleteSubscriptionFeedItems(subscription); TODO
 		subscriptionsDAO.delete(subscription);
 						
 		if (subscription.getId().startsWith("twitter")) {
