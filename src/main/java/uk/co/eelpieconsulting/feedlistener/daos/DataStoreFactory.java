@@ -40,6 +40,7 @@ public class DataStoreFactory {
 		MongoCredential createCredential = MongoCredential.createCredential(mongoUser, mongoDatabase, mongoPassword.toCharArray());
 		this.credentials = Lists.newArrayList(createCredential);
 
+		log.info("Mongo host " + mongoHost + " SSL: " + mongoSSL);
 		this.mongoClientOptions = MongoClientOptions.builder().sslEnabled(mongoSSL).build();
 		this.serverAddress = new ServerAddress(mongoHost);
 	}
