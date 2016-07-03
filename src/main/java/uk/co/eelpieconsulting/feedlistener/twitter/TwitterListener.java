@@ -1,26 +1,24 @@
 package uk.co.eelpieconsulting.feedlistener.twitter;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
 import twitter4j.FilterQuery;
 import twitter4j.TwitterStream;
 import uk.co.eelpieconsulting.feedlistener.credentials.CredentialService;
+import uk.co.eelpieconsulting.feedlistener.daos.FeedItemDAO;
 import uk.co.eelpieconsulting.feedlistener.daos.SubscriptionsDAO;
 import uk.co.eelpieconsulting.feedlistener.daos.UsersDAO;
 import uk.co.eelpieconsulting.feedlistener.model.Subscription;
 import uk.co.eelpieconsulting.feedlistener.model.TwitterTagSubscription;
 import uk.co.eelpieconsulting.feedlistener.model.User;
-import uk.co.eelpieconsulting.feedlistener.persistance.FeedItemDestination;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 @Component
 public class TwitterListener {
@@ -30,15 +28,15 @@ public class TwitterListener {
 	private final SubscriptionsDAO subscriptionsDAO;
 	private final CredentialService credentialService;
 	private final TwitterApiFactory twitterApiFactory;
-	private final FeedItemDestination feedItemDestination;
+	private final FeedItemDAO feedItemDestination;
 	private final TwitterFeedItemMapper twitterFeedItemMapper;
 	private final UsersDAO usersDAO;
 	
 	private Map<String, TwitterStream> twitterStreams;
 	
 	@Autowired
-	public TwitterListener(SubscriptionsDAO subscriptionsDAO, CredentialService credentialService, TwitterApiFactory twitterApiFactory, 
-			FeedItemDestination feedItemDestination, TwitterFeedItemMapper twitterFeedItemMapper, UsersDAO usersDAO) {
+	public TwitterListener(SubscriptionsDAO subscriptionsDAO, CredentialService credentialService, TwitterApiFactory twitterApiFactory,
+						   FeedItemDAO feedItemDestination, TwitterFeedItemMapper twitterFeedItemMapper, UsersDAO usersDAO) {
 		this.subscriptionsDAO = subscriptionsDAO;
 		this.credentialService = credentialService;
 		this.twitterApiFactory = twitterApiFactory;

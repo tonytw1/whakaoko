@@ -1,8 +1,6 @@
 package uk.co.eelpieconsulting.feedlistener.rss;
 
-import java.util.Date;
-import java.util.List;
-
+import com.sun.syndication.io.FeedException;
 import org.apache.log4j.Logger;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,16 +8,16 @@ import org.springframework.core.task.TaskExecutor;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Component;
-
 import uk.co.eelpieconsulting.common.http.HttpFetchException;
+import uk.co.eelpieconsulting.feedlistener.daos.FeedItemDAO;
 import uk.co.eelpieconsulting.feedlistener.daos.SubscriptionsDAO;
 import uk.co.eelpieconsulting.feedlistener.exceptions.FeeditemPersistanceException;
 import uk.co.eelpieconsulting.feedlistener.model.FeedItem;
 import uk.co.eelpieconsulting.feedlistener.model.RssSubscription;
 import uk.co.eelpieconsulting.feedlistener.model.Subscription;
-import uk.co.eelpieconsulting.feedlistener.persistance.FeedItemDestination;
 
-import com.sun.syndication.io.FeedException;
+import java.util.Date;
+import java.util.List;
 
 @Component
 public class RssPoller {
@@ -28,11 +26,11 @@ public class RssPoller {
 	
 	private final SubscriptionsDAO subscriptionsDAO;
 	private final FeedFetcher feedFetcher;
-	private final FeedItemDestination feedItemDestination;
+	private final FeedItemDAO feedItemDestination;
 	private final TaskExecutor taskExecutor;
 	
 	@Autowired
-	public RssPoller(SubscriptionsDAO subscriptionsDAO, FeedFetcher feedFetcher, FeedItemDestination feedItemDestination, TaskExecutor taskExecutor) {
+	public RssPoller(SubscriptionsDAO subscriptionsDAO, FeedFetcher feedFetcher, FeedItemDAO feedItemDestination, TaskExecutor taskExecutor) {
 		this.subscriptionsDAO = subscriptionsDAO;
 		this.feedFetcher = feedFetcher;
 		this.feedItemDestination = feedItemDestination;
@@ -66,11 +64,11 @@ public class RssPoller {
 	private class ProcessFeedTask implements Runnable {
 		
 		private final FeedFetcher feedFetcher;
-		private final FeedItemDestination feedItemDestination;
+		private final FeedItemDAO feedItemDestination;
 		private final RssSubscription subscription;
 		private final SubscriptionsDAO subscriptionsDAO;
 				
-		public ProcessFeedTask(FeedFetcher feedFetcher, FeedItemDestination feedItemDestination, SubscriptionsDAO subscriptionsDAO, RssSubscription subscription) {
+		public ProcessFeedTask(FeedFetcher feedFetcher, FeedItemDAO feedItemDestination, SubscriptionsDAO subscriptionsDAO, RssSubscription subscription) {
 			this.feedFetcher = feedFetcher;
 			this.feedItemDestination = feedItemDestination;
 			this.subscription = subscription;

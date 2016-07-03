@@ -1,32 +1,30 @@
 package uk.co.eelpieconsulting.feedlistener.twitter;
 
-import java.util.List;
-
+import com.google.common.collect.Lists;
 import org.apache.log4j.Logger;
-
 import twitter4j.StallWarning;
 import twitter4j.Status;
 import twitter4j.StatusDeletionNotice;
 import twitter4j.StatusListener;
+import uk.co.eelpieconsulting.feedlistener.daos.FeedItemDAO;
 import uk.co.eelpieconsulting.feedlistener.daos.SubscriptionsDAO;
 import uk.co.eelpieconsulting.feedlistener.exceptions.FeeditemPersistanceException;
 import uk.co.eelpieconsulting.feedlistener.model.FeedItem;
 import uk.co.eelpieconsulting.feedlistener.model.Subscription;
 import uk.co.eelpieconsulting.feedlistener.model.TwitterTagSubscription;
-import uk.co.eelpieconsulting.feedlistener.persistance.FeedItemDestination;
 
-import com.google.common.collect.Lists;
+import java.util.List;
 
 public class TwitterStatusListener implements StatusListener {
 	
 	private final static Logger log = Logger.getLogger(TwitterListener.class);
-	
-	private final FeedItemDestination feedItemDestination;
+
+	private final FeedItemDAO feedItemDestination;
 	private final TwitterFeedItemMapper twitterFeedItemMapper;
 	private final SubscriptionsDAO subscriptionsDAO;
 	private final String username;
 	
-	public TwitterStatusListener(FeedItemDestination feedItemDestination, TwitterFeedItemMapper twitterFeedItemMapper, SubscriptionsDAO subscriptionsDAO, String username) {
+	public TwitterStatusListener(FeedItemDAO feedItemDestination, TwitterFeedItemMapper twitterFeedItemMapper, SubscriptionsDAO subscriptionsDAO, String username) {
 		this.feedItemDestination = feedItemDestination;
 		this.twitterFeedItemMapper = twitterFeedItemMapper;
 		this.subscriptionsDAO = subscriptionsDAO;

@@ -1,17 +1,15 @@
 package uk.co.eelpieconsulting.feedlistener.controllers;
 
-import java.net.UnknownHostException;
-
+import com.google.common.base.Strings;
+import com.mongodb.MongoException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.ModelAndView;
-
-import com.google.common.base.Strings;
-import com.mongodb.MongoException;
-
 import uk.co.eelpieconsulting.feedlistener.daos.FeedItemDAO;
 import uk.co.eelpieconsulting.feedlistener.model.Channel;
 import uk.co.eelpieconsulting.feedlistener.model.Subscription;
+
+import java.net.UnknownHostException;
 
 @Component
 public class FeedItemPopulator {

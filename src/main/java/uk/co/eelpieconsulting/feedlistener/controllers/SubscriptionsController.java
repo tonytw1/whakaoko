@@ -1,8 +1,7 @@
 package uk.co.eelpieconsulting.feedlistener.controllers;
 
-import java.io.UnsupportedEncodingException;
-import java.net.UnknownHostException;
-
+import com.google.common.base.Strings;
+import com.mongodb.MongoException;
 import org.apache.log4j.Logger;
 import org.json.JSONException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,7 +12,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.view.RedirectView;
-
 import uk.co.eelpieconsulting.common.geo.model.LatLong;
 import uk.co.eelpieconsulting.common.http.HttpBadRequestException;
 import uk.co.eelpieconsulting.common.http.HttpFetchException;
@@ -32,14 +30,13 @@ import uk.co.eelpieconsulting.feedlistener.instagram.InstagramSubscriptionManage
 import uk.co.eelpieconsulting.feedlistener.model.InstagramGeographySubscription;
 import uk.co.eelpieconsulting.feedlistener.model.InstagramSubscription;
 import uk.co.eelpieconsulting.feedlistener.model.Subscription;
-import uk.co.eelpieconsulting.feedlistener.persistance.FeedItemDestination;
 import uk.co.eelpieconsulting.feedlistener.rss.RssPoller;
 import uk.co.eelpieconsulting.feedlistener.rss.RssSubscriptionManager;
 import uk.co.eelpieconsulting.feedlistener.twitter.TwitterListener;
 import uk.co.eelpieconsulting.feedlistener.twitter.TwitterSubscriptionManager;
 
-import com.google.common.base.Strings;
-import com.mongodb.MongoException;
+import java.io.UnsupportedEncodingException;
+import java.net.UnknownHostException;
 
 @Controller
 public class SubscriptionsController {
@@ -52,7 +49,7 @@ public class SubscriptionsController {
 	private TwitterListener twitterListener;
 	private InstagramSubscriptionManager instagramSubscriptionManager;
 	private UrlBuilder urlBuilder;
-	private FeedItemDestination feedItemDAO;
+	private FeedItemDAO feedItemDAO;
 	private TwitterSubscriptionManager twitterSubscriptionManager;
 	private RssSubscriptionManager rssSubscriptionManager;
 	private ViewFactory viewFactory;
@@ -64,7 +61,7 @@ public class SubscriptionsController {
 	@Autowired
 	public SubscriptionsController(UsersDAO usersDAO, SubscriptionsDAO subscriptionsDAO, RssPoller rssPoller, TwitterListener twitterListener, 
 			InstagramSubscriptionManager instagramSubscriptionManager, UrlBuilder urlBuilder,
-		    FeedItemDestination feedItemDAO,
+								   FeedItemDAO feedItemDAO,
 			TwitterSubscriptionManager twitterSubscriptionManager,
 			RssSubscriptionManager rssSubscriptionManager,
 			ViewFactory viewFactory, FeedItemPopulator feedItemPopulator) {

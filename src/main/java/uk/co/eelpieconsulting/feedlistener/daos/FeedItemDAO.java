@@ -1,25 +1,22 @@
 package uk.co.eelpieconsulting.feedlistener.daos;
 
-import java.net.UnknownHostException;
-import java.util.List;
-import java.util.regex.Pattern;
-
+import com.google.common.collect.Lists;
+import com.mongodb.MongoException;
 import org.apache.log4j.Logger;
 import org.mongodb.morphia.query.Query;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
 import uk.co.eelpieconsulting.feedlistener.annotations.Timed;
 import uk.co.eelpieconsulting.feedlistener.exceptions.FeeditemPersistanceException;
 import uk.co.eelpieconsulting.feedlistener.model.FeedItem;
 import uk.co.eelpieconsulting.feedlistener.model.Subscription;
-import uk.co.eelpieconsulting.feedlistener.persistance.FeedItemDestination;
 
-import com.google.common.collect.Lists;
-import com.mongodb.MongoException;
+import java.net.UnknownHostException;
+import java.util.List;
+import java.util.regex.Pattern;
 
 @Component
-public class FeedItemDAO implements FeedItemDestination {
+public class FeedItemDAO {
 	
 	private static final String DATE_DESCENDING = "-date,_id";
 
