@@ -30,11 +30,11 @@ public class DataStoreFactory {
 	private Datastore datastore;
 
 	@Autowired
-	public DataStoreFactory(@Value("#{config['mongoHost']}") String mongoHost,
-			@Value("#{config['mongoDatabase']}") String mongoDatabase,
-			@Value("#{config['mongoUser']}") String mongoUser,
-			@Value("#{config['mongoPassword']}") String mongoPassword,
-			@Value("#{config['mongoSSL']}") Boolean mongoSSL) throws UnknownHostException, MongoException {
+	public DataStoreFactory(@Value("#{config['mongo.host']}") String mongoHost,
+			@Value("#{config['mongo.database']}") String mongoDatabase,
+			@Value("#{config['mongo.user']}") String mongoUser,
+			@Value("#{config['mongo.password']}") String mongoPassword,
+			@Value("#{config['mongo.ssl']}") Boolean mongoSSL) throws UnknownHostException, MongoException {
 		this.mongoDatabase = mongoDatabase;
 
 		MongoCredential createCredential = MongoCredential.createCredential(mongoUser, mongoDatabase, mongoPassword.toCharArray());
