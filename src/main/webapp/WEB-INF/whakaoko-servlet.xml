@@ -45,7 +45,9 @@
 		<property name="resourceLoaderPath" value="/WEB-INF/velocity" />
 	</bean>
 	
-	<bean id="dateFormatter" class="uk.co.eelpieconsulting.common.dates.DateFormatter" />
+	<bean id="dateFormatter" class="uk.co.eelpieconsulting.common.dates.DateFormatter">
+		<constructor-arg value="UTC" />
+	</bean>
 		
 	<bean id="viewResolver" class="org.springframework.web.servlet.view.velocity.VelocityViewResolver">
 		<property name="cache" value="true" />
