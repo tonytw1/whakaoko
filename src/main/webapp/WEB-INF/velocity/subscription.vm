@@ -5,6 +5,8 @@
 
 <h5>$subscription.channelId / #if($subscription.name)$subscription.name#else$subscription.url#end #if($subscriptionSize > 0) ($subscriptionSize) #end</h5>
 
+<code><a href="$subscription.url">$subscription.url</a></code>
+
 <p><a href="$urlBuilder.getDeleteSubscriptionUrl($subscription)">Delete</a></p>
 
 #if($subscription.lastRead)
