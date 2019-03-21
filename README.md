@@ -147,3 +147,16 @@ Initiate linking of an Instragram account by redirecting to the Instagram author
 #### /twitter/authorise
 
 Initiate linking of an Twitter account by redirecting to the Twitter authorise url.
+
+
+# Setup
+
+## Create a user
+
+```
+curl -XPOST http://localhost:9100/users?username=new-user
+```
+or
+```
+http://localhost:9100/ui/newuser
+```
