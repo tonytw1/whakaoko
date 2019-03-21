@@ -5,8 +5,6 @@
 
 <p><a href="$urlBuilder.getNewChannelUrl($currentUserService.currentUser)">New channel</a></p>
 
-<p><a href="/ui/$currentUserService.currentUser/subscriptions/new">New subscription</a></p>
-
 #if($channels && !$channels.isEmpty()) 
 	<ul>
  	#foreach($channel in $channels) 
@@ -17,6 +15,10 @@
 #else
 	<p>No channels.</p>
 #end
+
+<h5>Subscriptions</h5>
+
+<p><a href="/ui/$currentUserService.currentUser/subscriptions/new">New subscription</a></p>
 
 <hr/>
 <h5>Credentials</h5>
