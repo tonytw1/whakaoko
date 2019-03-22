@@ -1,16 +1,14 @@
 <li>
 	#if($feedItem.author) @$feedItem.author - #end <a href="$feedItem.url">#if($feedItem.title) $!feedItem.title#else$feedItem.url#end</a>
-	#if($feedItem.imageUrl) <br/>
-		<a href="$feedItem.url"><img src="$feedItem.imageUrl" border="0"></a>	
-	#end
-	
 	#if($feedItem.date)<br/><span title="$feedItem.date">$dateFormatter.timeSince($feedItem.date)</span>#end
-		
-	<br/><a href="$urlBuilder.getSubscriptionUrl($currentUserService.currentUser, $feedItem.subscriptionId)">$subscriptionLabelService.label($feedItem.subscriptionId)</a>
+	from <a href="$urlBuilder.getSubscriptionUrl($currentUserService.currentUser, $feedItem.subscriptionId)">$subscriptionLabelService.label($feedItem.subscriptionId)</a>
+
+	#if($feedItem.imageUrl) <br/>
+        <a href="$feedItem.url"><img src="$feedItem.imageUrl" border="0"></a>
+    #end
 	<br/>$!feedItem.body
 	
 	#if($feedItem.place)
 		<p>$feedItem.place</p>
 	#end
-		
 </li>
