@@ -1,7 +1,9 @@
 <li>
 	#if($feedItem.author) @$feedItem.author - #end <a href="$feedItem.url">#if($feedItem.title) $!feedItem.title#else$feedItem.url#end</a>
 	#if($feedItem.date)<br/><span title="$feedItem.date">$dateFormatter.timeSince($feedItem.date)</span>#end
-	from <a href="$urlBuilder.getSubscriptionUrl($currentUserService.currentUser, $feedItem.subscriptionId)">$subscriptionLabelService.label($feedItem.subscriptionId)</a>
+	#if(!$subscription)
+	    from <a href="$urlBuilder.getSubscriptionUrl($currentUserService.currentUser, $feedItem.subscriptionId)">$subscriptionLabelService.label($feedItem.subscriptionId)</a>
+    #end
 
 	#if($feedItem.imageUrl) <br/>
         <a href="$feedItem.url"><img src="$feedItem.imageUrl" border="0"></a>
