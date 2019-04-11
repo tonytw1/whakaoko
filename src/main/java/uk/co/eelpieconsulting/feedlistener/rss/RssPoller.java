@@ -92,7 +92,7 @@ public class RssPoller {
 				subscriptionsDAO.save(subscription);				
 				
 			} catch (HttpFetchException e) {
-				log.error("Http fetch exception while fetching RSS subscription: " + subscription.getName() + ": " + e.getMessage());
+				log.error("Http fetch exception while fetching RSS subscription: " + subscription.getUrl() + ": " + e.getClass().getSimpleName());
 				subscription.setError("Http fetch: " + e.getMessage());
 				subscriptionsDAO.save(subscription);				
 
