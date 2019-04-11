@@ -97,7 +97,7 @@ public class RssPoller {
 				subscriptionsDAO.save(subscription);				
 
 			} catch (FeedException e) {
-				log.error("Feed exception while parsing RSS subscription: " + subscription.getName() + ": " + e.getMessage());
+				log.error("Feed exception while parsing RSS subscription: " + subscription.getUrl() + ": " + e.getMessage());
 				subscription.setError("Feed exception: " + e.getMessage());
 				subscriptionsDAO.save(subscription);				
 			}
