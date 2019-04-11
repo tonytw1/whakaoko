@@ -40,25 +40,25 @@ public class RssPoller {
 	@Scheduled(fixedRate=3600000)
 	public void run() {
 		log.info("Polling subscriptions");
-		for (Subscription subscription : subscriptionsDAO.getSubscriptions()) {
+		for (Subscription subscription : subscriptionsDAO.getSubscriptions()) {	// TODO explict get RSS subscriptions end point
 			if (isRssSubscription(subscription)) {
-				executeRssPoll(subscription);
+				executeRssPoll((RssSubscription) subscription);
 			}
 		}
 		log.info("Done");
 	}
 	
-	public void run(Subscription subscription) {
+	public void run(RssSubscription subscription) {
 		log.info("Polling single subscription: " + subscription.getId());
 		executeRssPoll(subscription);
 		log.info("Done");		
 	}
 	
-	private void executeRssPoll(Subscription subscription) {
+	private void executeRssPoll(RssSubscription subscription) {
 		log.info("Executing RSS poll for: " + subscription.getId());
 		ThreadPoolTaskExecutor threadPoolTaskExecutor = (ThreadPoolTaskExecutor) taskExecutor;
 		log.info("Task executor: active:" + threadPoolTaskExecutor.getActiveCount() + ", pool size: " + threadPoolTaskExecutor.getPoolSize());
-		taskExecutor.execute(new ProcessFeedTask(feedFetcher, feedItemDestination, subscriptionsDAO, (RssSubscription) subscription));
+		taskExecutor.execute(new ProcessFeedTask(feedFetcher, feedItemDestination, subscriptionsDAO, subscription));
 	}
 	
 	private class ProcessFeedTask implements Runnable {

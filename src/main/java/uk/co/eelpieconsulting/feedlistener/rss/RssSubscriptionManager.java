@@ -21,13 +21,13 @@ public class RssSubscriptionManager {
 		this.subscriptionsDAO = subscriptionsDAO;
 	}
 	
-	public Subscription requestFeedSubscription(String url, String channel, String username) {
+	public RssSubscription requestFeedSubscription(String url, String channel, String username) {
 		log.info("Requesting subscription to feed: " + url);
 		final RssSubscription newSubscription = new RssSubscription(url, channel, username);
 		
 		if (subscriptionsDAO.subscriptionExists(username, newSubscription.getId())) {
 			try {
-				return  subscriptionsDAO.getById(username, newSubscription.getId());
+				return (RssSubscription) subscriptionsDAO.getById(username, newSubscription.getId());
 			} catch (UnknownSubscriptionException e) {
 				return newSubscription;
 			}

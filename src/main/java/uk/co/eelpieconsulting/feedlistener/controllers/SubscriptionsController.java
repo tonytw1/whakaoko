@@ -29,6 +29,7 @@ import uk.co.eelpieconsulting.feedlistener.exceptions.UnknownUserException;
 import uk.co.eelpieconsulting.feedlistener.instagram.InstagramSubscriptionManager;
 import uk.co.eelpieconsulting.feedlistener.model.InstagramGeographySubscription;
 import uk.co.eelpieconsulting.feedlistener.model.InstagramSubscription;
+import uk.co.eelpieconsulting.feedlistener.model.RssSubscription;
 import uk.co.eelpieconsulting.feedlistener.model.Subscription;
 import uk.co.eelpieconsulting.feedlistener.rss.RssPoller;
 import uk.co.eelpieconsulting.feedlistener.rss.RssSubscriptionManager;
@@ -95,7 +96,22 @@ public class SubscriptionsController {
 		feedItemPopulator.populateFeedItems(subscription, page, mv, "data");		
 		return mv;
 	}
-	
+
+	@Timed(timingNotes = "")
+	@RequestMapping(value="/{username}/subscriptions/{id}/reload", method=RequestMethod.GET)
+	public ModelAndView reload(@PathVariable String username, @PathVariable String id) throws UnknownHostException, MongoException, UnknownSubscriptionException, UnknownUserException {
+		usersDAO.getByUsername(username);
+
+		RssSubscription subscription = (RssSubscription) subscriptionsDAO.getById(username, id);
+
+		log.info("Requesting reload of subscription: " + subscription.getName() + " / " + subscription.getUrl());
+		rssPoller.run(subscription);
+
+		ModelAndView mv = new ModelAndView(viewFactory.getJsonView());
+		mv.addObject("data", "ok");
+		return mv;
+	}
+
 	@Timed(timingNotes = "")
 	@RequestMapping(value="/subscriptions/{id}", method=RequestMethod.GET)	
 	public ModelAndView subscriptionJson(@PathVariable String username, @PathVariable String id,
@@ -148,7 +164,7 @@ public class SubscriptionsController {
 	public ModelAndView addFeedSubscription(@PathVariable String username, @RequestParam String url, @RequestParam String channel) throws UnknownUserException {
 		usersDAO.getByUsername(username);
 		
-		Subscription subscription = rssSubscriptionManager.requestFeedSubscription(url, channel, username);
+		RssSubscription subscription = rssSubscriptionManager.requestFeedSubscription(url, channel, username);
 		subscriptionsDAO.add(subscription);
 		log.info("Added subscription: " + subscription);
 		
