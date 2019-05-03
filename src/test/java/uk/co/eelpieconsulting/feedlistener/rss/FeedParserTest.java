@@ -19,4 +19,13 @@ public class FeedParserTest {
         assertEquals("Wellington City Council - News", syndFeed.getTitle());
     }
 
+    @Test
+    public void parsingMalformed() throws Exception {
+        String input = IOUtils.toString(new FileInputStream(this.getClass().getClassLoader().getResource("vinnies-news.xml").getFile()));
+
+        SyndFeed syndFeed = new FeedParser().parseSyndFeed(input.getBytes());
+
+        assertEquals("Wellington City Council - News", syndFeed.getTitle());
+    }
+
 }
