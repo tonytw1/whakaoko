@@ -20,12 +20,12 @@ public class FeedParserTest {
     }
 
     @Test
-    public void parsingMalformed() throws Exception {
+    public void needToStripNBSPFromMalformedFeeds() throws Exception {
         String input = IOUtils.toString(new FileInputStream(this.getClass().getClassLoader().getResource("vinnies-news.xml").getFile()));
 
         SyndFeed syndFeed = new FeedParser().parseSyndFeed(input.getBytes());
 
-        assertEquals("Wellington City Council - News", syndFeed.getTitle());
+        assertEquals("Latest News - St Vincent de Paul Society Wellington", syndFeed.getTitle());
     }
 
 }
