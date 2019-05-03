@@ -1,25 +1,18 @@
 package uk.co.eelpieconsulting.feedlistener.rss;
 
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
-import java.util.Iterator;
-import java.util.List;
-
-import org.apache.commons.io.IOUtils;
-import org.apache.log4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-import org.xml.sax.InputSource;
-
-import uk.co.eelpieconsulting.common.http.HttpFetchException;
-import uk.co.eelpieconsulting.common.http.HttpFetcher;
-import uk.co.eelpieconsulting.feedlistener.model.FeedItem;
-
 import com.google.common.collect.Lists;
 import com.sun.syndication.feed.synd.SyndEntry;
 import com.sun.syndication.feed.synd.SyndFeed;
 import com.sun.syndication.io.FeedException;
-import com.sun.syndication.io.SyndFeedInput;
+import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+import uk.co.eelpieconsulting.common.http.HttpFetchException;
+import uk.co.eelpieconsulting.common.http.HttpFetcher;
+import uk.co.eelpieconsulting.feedlistener.model.FeedItem;
+
+import java.util.Iterator;
+import java.util.List;
 
 @Component
 public class FeedFetcher {
@@ -28,11 +21,13 @@ public class FeedFetcher {
 	
 	private RssFeedItemMapper rssFeedItemMapper;
 	private HttpFetcher httpFetcher;
+	private FeedParser feedParser;
 	
 	@Autowired
-	public FeedFetcher(RssFeedItemMapper rssFeedItemMapper, HttpFetcher httpFetcher) {
+	public FeedFetcher(RssFeedItemMapper rssFeedItemMapper, HttpFetcher httpFetcher, FeedParser feedParser) {
 		this.rssFeedItemMapper = rssFeedItemMapper;
 		this.httpFetcher = httpFetcher;
+		this.feedParser = feedParser;
 	}
 
 	public FetchedFeed fetchFeed(String url) throws HttpFetchException, FeedException {
@@ -42,23 +37,8 @@ public class FeedFetcher {
 	}
 	
 	private SyndFeed loadSyndFeedWithFeedFetcher(String feedUrl) throws HttpFetchException, FeedException {
-		log.info("Loading SyndFeed from url: " + feedUrl + " using http fetcher: " + httpFetcher.hashCode());		
-		final InputStream byteArrayInputStream = cleanLeadingWhitespace(httpFetcher.getBytes(feedUrl));
-		final SyndFeed syndFeed = new SyndFeedInput().build(new InputSource(byteArrayInputStream));
-		IOUtils.closeQuietly(byteArrayInputStream);
-		return syndFeed;
-	}
-
-	private ByteArrayInputStream cleanLeadingWhitespace(byte[] bytes) {
-		try {
-			String string = new String(bytes);
-			if (string.trim().equals(string)) {
-				return new ByteArrayInputStream(bytes);
-			}
-			return new ByteArrayInputStream(string.trim().getBytes());
-		} catch (Exception e) {
-			throw new RuntimeException(e);
-		}
+		log.info("Loading SyndFeed from url: " + feedUrl + " using http fetcher: " + httpFetcher.hashCode());
+		return feedParser.parseSyndFeed(httpFetcher.getBytes(feedUrl));
 	}
 
 	@SuppressWarnings("unchecked")
