@@ -19,7 +19,10 @@
 	
 	<util:properties id="config" location="classpath:whakaoko.properties" />
 	
-	<bean id="httpFetcher" class="uk.co.eelpieconsulting.common.http.HttpFetcher"/>
+	<bean id="httpFetcher" class="uk.co.eelpieconsulting.common.http.HttpFetcher">
+			<constructor-arg index="0">UTF8</constructor-arg>
+			<constructor-arg index="1">Whakaoko</constructor-arg>
+	</bean>
 	  
 	<bean id="memcache" class="uk.co.eelpieconsulting.common.caching.MemcachedCache">
 	        <constructor-arg index="0" value="#{config['memcached.urls']}" />
