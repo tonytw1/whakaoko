@@ -55,7 +55,7 @@ public class RssFeedItemImageExtractor {
             String imageSrc = htmlImageExtractor.extractImage(itemBody);
             if (!Strings.isNullOrEmpty(imageSrc)) {
                 imageSrc = ensureFullyQualifiedUrl(imageSrc, item.getLink());
-                if (!isBlackListedImageUrl(imageSrc)) {
+                if (imageSrc != null && !isBlackListedImageUrl(imageSrc)) {
                     return imageSrc;
                 }
             }
@@ -88,6 +88,7 @@ public class RssFeedItemImageExtractor {
             }
         }
 
+        log.warn("Returning null fully qualified image url for: " + imageSrc + " / " + itemUrl);
         return null;
     }
 
