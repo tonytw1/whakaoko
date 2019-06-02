@@ -16,40 +16,40 @@ import java.util.List;
 
 @Component
 public class FeedFetcher {
-	
-	private final static Logger log = Logger.getLogger(FeedFetcher.class);
-	
-	private RssFeedItemMapper rssFeedItemMapper;
-	private HttpFetcher httpFetcher;
-	private FeedParser feedParser;
-	
-	@Autowired
-	public FeedFetcher(RssFeedItemMapper rssFeedItemMapper, HttpFetcher httpFetcher, FeedParser feedParser) {
-		this.rssFeedItemMapper = rssFeedItemMapper;
-		this.httpFetcher = httpFetcher;
-		this.feedParser = feedParser;
-	}
 
-	public FetchedFeed fetchFeed(String url) throws HttpFetchException, FeedException {
-    	final SyndFeed syndfeed = loadSyndFeedWithFeedFetcher(url);    
-    	final List<FeedItem> feedItems = getFeedItemsFrom(syndfeed);        
+    private final static Logger log = Logger.getLogger(FeedFetcher.class);
+
+    private RssFeedItemMapper rssFeedItemMapper;
+    private HttpFetcher httpFetcher;
+    private FeedParser feedParser;
+
+    @Autowired
+    public FeedFetcher(RssFeedItemMapper rssFeedItemMapper, HttpFetcher httpFetcher, FeedParser feedParser) {
+        this.rssFeedItemMapper = rssFeedItemMapper;
+        this.httpFetcher = httpFetcher;
+        this.feedParser = feedParser;
+    }
+
+    public FetchedFeed fetchFeed(String url) throws HttpFetchException, FeedException {
+        final SyndFeed syndfeed = loadSyndFeedWithFeedFetcher(url);
+        final List<FeedItem> feedItems = getFeedItemsFrom(syndfeed);
         return new FetchedFeed(syndfeed.getTitle(), feedItems);
-	}
-	
-	private SyndFeed loadSyndFeedWithFeedFetcher(String feedUrl) throws HttpFetchException, FeedException {
-		log.info("Loading SyndFeed from url: " + feedUrl + " using http fetcher: " + httpFetcher.hashCode());
-		return feedParser.parseSyndFeed(httpFetcher.getBytes(feedUrl));
-	}
+    }
 
-	@SuppressWarnings("unchecked")
-	private List<FeedItem> getFeedItemsFrom(final SyndFeed syndfeed) {
-		final List<FeedItem> feedItems = Lists.newArrayList();
+    private SyndFeed loadSyndFeedWithFeedFetcher(String feedUrl) throws HttpFetchException, FeedException {
+        log.info("Loading SyndFeed from url: " + feedUrl + " using http fetcher: " + httpFetcher.hashCode());
+        return feedParser.parseSyndFeed(httpFetcher.getBytes(feedUrl));
+    }
+
+    @SuppressWarnings("unchecked")
+    private List<FeedItem> getFeedItemsFrom(final SyndFeed syndfeed) {
+        final List<FeedItem> feedItems = Lists.newArrayList();
         final Iterator<SyndEntry> feedItemsIterator = syndfeed.getEntries().iterator();
-        while (feedItemsIterator.hasNext()) {        	
-        	final SyndEntry syndEntry = (SyndEntry) feedItemsIterator.next();
-        	feedItems.add(rssFeedItemMapper.createFeedItemFrom(syndEntry));
+        while (feedItemsIterator.hasNext()) {
+            final SyndEntry syndEntry = feedItemsIterator.next();
+            feedItems.add(rssFeedItemMapper.createFeedItemFrom(syndEntry));
         }
-		return feedItems;
-	}
-	
+        return feedItems;
+    }
+
 }
