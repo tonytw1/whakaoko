@@ -30,89 +30,89 @@ import java.util.List;
 
 @Controller
 public class InstagramCallbackController {
-	
-	private static Logger log = Logger.getLogger(InstagramCallbackController.class);
-	
-	private final InstagramApi instagramApi;
-	private final InstagramSubscriptionCallbackParser instagramSubscriptionCallbackParser;
-	private final SubscriptionsDAO subscriptionsDAO;
-	private final FeedItemDAO feedItemDestination;
-	private final CredentialService credentialService;
-	
-	@Autowired
-	public InstagramCallbackController(InstagramSubscriptionCallbackParser instagramSubscriptionCallbackParser, FeedItemDAO feedItemDestination,
-			SubscriptionsDAO subscriptionsDAO, CredentialService credentialService) {
-		this.instagramSubscriptionCallbackParser = instagramSubscriptionCallbackParser;
-		this.feedItemDestination = feedItemDestination;
-		this.subscriptionsDAO = subscriptionsDAO;
-		this.credentialService = credentialService;
-		this.instagramApi = new InstagramApi();		
-	}
 
-	@RequestMapping(value="/instagram/callback", method=RequestMethod.GET)
-	public ModelAndView subscribeCallback(@RequestParam(value="hub.mode", required=false) String hubMode,
-			@RequestParam(value="hub.challenge", required=false) String hubChallenge,
-			@RequestParam(value="hub.verify_token", required=false) String hubToken,
-			HttpServletResponse response) throws IOException {
-		
-		log.info("Received callback: " + hubMode + ", " + hubChallenge + ", " + hubToken);
-		response.getOutputStream().print(hubChallenge);
-		response.flushBuffer();
-		return null;
-	}
-	
-	@RequestMapping(value="/instagram/callback", method=RequestMethod.POST)
-	public ModelAndView dataCallback(@RequestBody String body) throws IOException, JSONException, HttpNotFoundException, HttpBadRequestException, HttpForbiddenException, HttpFetchException, UnknownUserException {
-		final String username = "tonytw1";	// TODO user specific call back urls
-				
-		log.info("Received subscription callback post: " + body);
-		
-		final List<Long> updatedInstagramSubscriptions = instagramSubscriptionCallbackParser.parse(body);
-		log.info("Updated instagram subscription ids in this callback: " + updatedInstagramSubscriptions);
-		for (Long instagramSubscriptionId : updatedInstagramSubscriptions) {
-			
-			final InstagramSubscription subscription = subscriptionsDAO.getByInstagramId(instagramSubscriptionId);
-			
-			if (subscription != null && subscription instanceof InstagramTagSubscription) {
-				final String tag = ((InstagramTagSubscription) subscription).getTag();
-				
-				log.info("Fetching recent media for changed tag: " + tag);
-				List<FeedItem> recentMedia = instagramApi.getRecentMediaForTag(tag, credentialService.getInstagramAccessTokenForUser(username));								
-				Date latestItemDate = populateFeedItemSubscriptionIdAndExtractLatestItemDate(subscription, recentMedia);				
-				feedItemDestination.addAll(recentMedia);
-				
-				subscription.setLatestItemDate(latestItemDate);						
-				subscriptionsDAO.save(subscription);
-			}
-			
-			if (subscription != null && subscription instanceof InstagramGeographySubscription) {
-				final long geoId = ((InstagramGeographySubscription) subscription).getGeoId();
+    private static Logger log = Logger.getLogger(InstagramCallbackController.class);
 
-				log.info("Fetching recent media for changed geography: " + subscription.toString());								
-				List<FeedItem> recentMedia = instagramApi.getRecentMediaForGeography(geoId, credentialService.getInstagramClientId());				
-				Date latestItemDate = populateFeedItemSubscriptionIdAndExtractLatestItemDate(subscription, recentMedia);				
-				feedItemDestination.addAll(recentMedia);
-				
-				subscription.setLatestItemDate(latestItemDate);						
-				subscriptionsDAO.save(subscription);
-			}
-			
-		}
-		return null;
-	}
+    private final InstagramApi instagramApi;
+    private final InstagramSubscriptionCallbackParser instagramSubscriptionCallbackParser;
+    private final SubscriptionsDAO subscriptionsDAO;
+    private final FeedItemDAO feedItemDestination;
+    private final CredentialService credentialService;
 
-	private Date populateFeedItemSubscriptionIdAndExtractLatestItemDate(final InstagramSubscription subscription, List<FeedItem> recentMedia) {
-		Date latestItemDate = null;
-		for (FeedItem feedItem : recentMedia) {
-			feedItem.setSubscriptionId(subscription.getId());
-			
-			final Date feedItemDate = feedItem.getDate();
-			if (feedItemDate != null && (latestItemDate == null || feedItemDate.after(latestItemDate))) {
-				latestItemDate =  feedItemDate;
-			}
-			
-		}
-		return latestItemDate;
-	}
-	
+    @Autowired
+    public InstagramCallbackController(InstagramSubscriptionCallbackParser instagramSubscriptionCallbackParser, FeedItemDAO feedItemDestination,
+                                       SubscriptionsDAO subscriptionsDAO, CredentialService credentialService, InstagramApi instagramApi) {
+        this.instagramSubscriptionCallbackParser = instagramSubscriptionCallbackParser;
+        this.feedItemDestination = feedItemDestination;
+        this.subscriptionsDAO = subscriptionsDAO;
+        this.credentialService = credentialService;
+        this.instagramApi = instagramApi;
+    }
+
+    @RequestMapping(value = "/instagram/callback", method = RequestMethod.GET)
+    public ModelAndView subscribeCallback(@RequestParam(value = "hub.mode", required = false) String hubMode,
+                                          @RequestParam(value = "hub.challenge", required = false) String hubChallenge,
+                                          @RequestParam(value = "hub.verify_token", required = false) String hubToken,
+                                          HttpServletResponse response) throws IOException {
+
+        log.info("Received callback: " + hubMode + ", " + hubChallenge + ", " + hubToken);
+        response.getOutputStream().print(hubChallenge);
+        response.flushBuffer();
+        return null;
+    }
+
+    @RequestMapping(value = "/instagram/callback", method = RequestMethod.POST)
+    public ModelAndView dataCallback(@RequestBody String body) throws IOException, JSONException, HttpNotFoundException, HttpBadRequestException, HttpForbiddenException, HttpFetchException, UnknownUserException {
+        final String username = "tonytw1";    // TODO user specific call back urls
+
+        log.info("Received subscription callback post: " + body);
+
+        final List<Long> updatedInstagramSubscriptions = instagramSubscriptionCallbackParser.parse(body);
+        log.info("Updated instagram subscription ids in this callback: " + updatedInstagramSubscriptions);
+        for (Long instagramSubscriptionId : updatedInstagramSubscriptions) {
+
+            final InstagramSubscription subscription = subscriptionsDAO.getByInstagramId(instagramSubscriptionId);
+
+            if (subscription != null && subscription instanceof InstagramTagSubscription) {
+                final String tag = ((InstagramTagSubscription) subscription).getTag();
+
+                log.info("Fetching recent media for changed tag: " + tag);
+                List<FeedItem> recentMedia = instagramApi.getRecentMediaForTag(tag, credentialService.getInstagramAccessTokenForUser(username));
+                Date latestItemDate = populateFeedItemSubscriptionIdAndExtractLatestItemDate(subscription, recentMedia);
+                feedItemDestination.addAll(recentMedia);
+
+                subscription.setLatestItemDate(latestItemDate);
+                subscriptionsDAO.save(subscription);
+            }
+
+            if (subscription != null && subscription instanceof InstagramGeographySubscription) {
+                final long geoId = ((InstagramGeographySubscription) subscription).getGeoId();
+
+                log.info("Fetching recent media for changed geography: " + subscription.toString());
+                List<FeedItem> recentMedia = instagramApi.getRecentMediaForGeography(geoId, credentialService.getInstagramClientId());
+                Date latestItemDate = populateFeedItemSubscriptionIdAndExtractLatestItemDate(subscription, recentMedia);
+                feedItemDestination.addAll(recentMedia);
+
+                subscription.setLatestItemDate(latestItemDate);
+                subscriptionsDAO.save(subscription);
+            }
+
+        }
+        return null;
+    }
+
+    private Date populateFeedItemSubscriptionIdAndExtractLatestItemDate(final InstagramSubscription subscription, List<FeedItem> recentMedia) {
+        Date latestItemDate = null;
+        for (FeedItem feedItem : recentMedia) {
+            feedItem.setSubscriptionId(subscription.getId());
+
+            final Date feedItemDate = feedItem.getDate();
+            if (feedItemDate != null && (latestItemDate == null || feedItemDate.after(latestItemDate))) {
+                latestItemDate = feedItemDate;
+            }
+
+        }
+        return latestItemDate;
+    }
+
 }

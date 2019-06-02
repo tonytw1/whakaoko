@@ -22,45 +22,45 @@ import uk.co.eelpieconsulting.instagram.api.InstagramApi;
 
 @Component
 public class InstagramSubscriptionManager {
-	
-	private static Logger log = Logger.getLogger(InstagramSubscriptionManager.class);
-	
-	private final UrlBuilder urlBuilder;
-	private final CredentialService credentialService;
-	private final InstagramApi instagramApi;
-	
-	@Autowired
-	public InstagramSubscriptionManager(UrlBuilder urlBuilder, CredentialService credentialService) throws HttpNotFoundException, HttpBadRequestException, HttpForbiddenException, HttpFetchException, UnsupportedEncodingException {
-		this.urlBuilder = urlBuilder;
-		this.credentialService = credentialService;		
-		this.instagramApi = new InstagramApi();		
-	}
-	
-	public InstagramTagSubscription requestInstagramTagSubscription(String tag, String channelId, String username) throws HttpNotFoundException, HttpBadRequestException, HttpForbiddenException, HttpFetchException, UnsupportedEncodingException, JSONException, UnknownUserException {
-		if (!credentialService.hasInstagramAccessToken(username)) {
-			log.info("No instagram credentials available; not requesting subscription");
-			throw new CredentialsRequiredException();
-		}
-		
-		final InstagramTagSubscription subscription = instagramApi.createTagSubscription(tag, credentialService.getInstagramClientId(), credentialService.getInstagramClientSecret(), urlBuilder.getInstagramCallbackUrl(), channelId, username);
-		log.info("Subscribed to instagram tag '" + tag + ": " + subscription);
-		return subscription;
-	}
 
-	public InstagramGeographySubscription requestInstagramGeographySubscription(LatLong latLong, int radius, String channelId, String username) throws UnsupportedEncodingException, HttpNotFoundException, HttpBadRequestException, HttpForbiddenException, HttpFetchException, JSONException, UnknownUserException {
-		if (!credentialService.hasInstagramAccessToken(username)) {
-			log.info("No instagram credentials available; not requesting subscription");
-			throw new CredentialsRequiredException();
-		}
-		
-		InstagramGeographySubscription subscription = instagramApi.createGeographySubscription(latLong, radius, credentialService.getInstagramClientId(), credentialService.getInstagramClientSecret(), urlBuilder.getInstagramCallbackUrl(), channelId, username);
-		log.info("Subscribed to instagram geography: " + subscription);
-		return subscription;
-	}
+    private static Logger log = Logger.getLogger(InstagramSubscriptionManager.class);
 
-	public void requestUnsubscribeFrom(long id) throws HttpNotFoundException, HttpBadRequestException, HttpForbiddenException, HttpFetchException {
-		log.info("Unsubscribing from instagram: " + id);
-		instagramApi.deleteSubscription(id, credentialService.getInstagramClientId(), credentialService.getInstagramClientSecret());		
-	}
-	
+    private final UrlBuilder urlBuilder;
+    private final CredentialService credentialService;
+    private final InstagramApi instagramApi;
+
+    @Autowired
+    public InstagramSubscriptionManager(UrlBuilder urlBuilder, CredentialService credentialService, InstagramApi instagramApi) throws HttpNotFoundException, HttpBadRequestException, HttpForbiddenException, HttpFetchException, UnsupportedEncodingException {
+        this.urlBuilder = urlBuilder;
+        this.credentialService = credentialService;
+        this.instagramApi = instagramApi;
+    }
+
+    public InstagramTagSubscription requestInstagramTagSubscription(String tag, String channelId, String username) throws HttpNotFoundException, HttpBadRequestException, HttpForbiddenException, HttpFetchException, UnsupportedEncodingException, JSONException, UnknownUserException {
+        if (!credentialService.hasInstagramAccessToken(username)) {
+            log.info("No instagram credentials available; not requesting subscription");
+            throw new CredentialsRequiredException();
+        }
+
+        final InstagramTagSubscription subscription = instagramApi.createTagSubscription(tag, credentialService.getInstagramClientId(), credentialService.getInstagramClientSecret(), urlBuilder.getInstagramCallbackUrl(), channelId, username);
+        log.info("Subscribed to instagram tag '" + tag + ": " + subscription);
+        return subscription;
+    }
+
+    public InstagramGeographySubscription requestInstagramGeographySubscription(LatLong latLong, int radius, String channelId, String username) throws UnsupportedEncodingException, HttpNotFoundException, HttpBadRequestException, HttpForbiddenException, HttpFetchException, JSONException, UnknownUserException {
+        if (!credentialService.hasInstagramAccessToken(username)) {
+            log.info("No instagram credentials available; not requesting subscription");
+            throw new CredentialsRequiredException();
+        }
+
+        InstagramGeographySubscription subscription = instagramApi.createGeographySubscription(latLong, radius, credentialService.getInstagramClientId(), credentialService.getInstagramClientSecret(), urlBuilder.getInstagramCallbackUrl(), channelId, username);
+        log.info("Subscribed to instagram geography: " + subscription);
+        return subscription;
+    }
+
+    public void requestUnsubscribeFrom(long id) throws HttpNotFoundException, HttpBadRequestException, HttpForbiddenException, HttpFetchException {
+        log.info("Unsubscribing from instagram: " + id);
+        instagramApi.deleteSubscription(id, credentialService.getInstagramClientId(), credentialService.getInstagramClientSecret());
+    }
+
 }
