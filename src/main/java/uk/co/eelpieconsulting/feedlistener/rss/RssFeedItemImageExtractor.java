@@ -73,7 +73,7 @@ public class RssFeedItemImageExtractor {
         } catch (MalformedURLException e) {
         }
 
-        log.warn("Image src is not a url; attempting to fully qualify");
+        log.debug("Image src is not a url; attempting to fully qualify");
         if (imageSrc.startsWith("/")) {
             try {
                 final URL itemUrlUrl = new URL(itemUrl);
@@ -88,7 +88,7 @@ public class RssFeedItemImageExtractor {
             }
         }
 
-        log.warn("Returning null fully qualified image url for: " + imageSrc + " / " + itemUrl);
+        log.debug("Returning null fully qualified image url for: " + imageSrc + " / " + itemUrl);
         return null;
     }
 
