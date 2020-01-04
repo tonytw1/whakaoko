@@ -18,6 +18,7 @@
     <bean id="httpFetcher" class="uk.co.eelpieconsulting.common.http.HttpFetcher">
         <constructor-arg index="0" value="UTF-8"/>
         <constructor-arg index="1" value="Whakaoko"/>
+        <constructor-arg index="2" value="30000"/>
     </bean>
 
     <bean id="memcache" class="uk.co.eelpieconsulting.common.caching.MemcachedCache">
