@@ -96,6 +96,7 @@ Show content from this subscription.
 #### POST /{username}/subscriptions/feeds
 
 | Parameter	|	Description |
+|----------|----------------|
 |channel | The channel id to add this subscription to|
 |url | The url of an RSS or ATOM feed|
 	
