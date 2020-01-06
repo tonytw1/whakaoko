@@ -156,6 +156,8 @@ Initiate linking of an Twitter account by redirecting to the Twitter authorise u
 
 ## Run as a Docker image
 
+Start the image pointed at your MongoDB instance:
+
 
 
 ## Create a user
