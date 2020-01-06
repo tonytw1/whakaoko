@@ -15,17 +15,20 @@ A subscription represents a source of 3rd party content.
 The following sources are currently supported.
 
 - RSS / ATOM feeds
+
 Content, media RSS and geoRSS tags.
 
 - Twitter
+
 Receives Twitter posts via the Twitter real time API.
-The real time API allows considerably more content to be retrived within the default rate limits, than polling the REST API.
+The real time API allowed considerably more content to be retrieved than polling the REST API.
 The following subscriptions are currently supported:
 
 	Twitter tag
 	Content tagged with a twitter hashtag. ie. #twickenham
 
 - Instagram
+
 Receives Instagram posts via the Instagram call back API.
 The following subscriptions are currently supported:
 
