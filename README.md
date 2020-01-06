@@ -4,6 +4,8 @@ A service for aggregating 3rd party content from a variety of sources (RSS / Twi
 
 Provides an local API for applications to consume the aggregated content via a single HTTP/JSON interface.
 
+MongoDB is used for storage.
+
 
 ## Concepts
 
