@@ -4,7 +4,7 @@ A service for aggregating 3rd party content from a variety of sources (RSS / Twi
 
 Provides a local API for applications to consume the aggregated content via a single HTTP/JSON interface.
 
-MongoDB is used for storage.
+MongoDB 3.4 is used for storage. Memcached is used for caching.
 
 
 ## Concepts
@@ -159,8 +159,20 @@ Initiate linking of an Twitter account by redirecting to the Twitter authorise u
 
 ## Run as a Docker image
 
+Start Mongo and Memcached dependencies:
+
+```
+docker run -p 27017:27017 mongo:3.4
+docker run -p11211:11211 memcached
+```
+
 Start the image pointed at your MongoDB instance:
 
+```
+TODO
+```
+
+The service will be visible on localhost port 9100.
 
 
 ## Create a user
