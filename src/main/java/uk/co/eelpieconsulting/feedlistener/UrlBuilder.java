@@ -5,6 +5,7 @@ import org.springframework.stereotype.Component;
 
 import uk.co.eelpieconsulting.feedlistener.model.Channel;
 import uk.co.eelpieconsulting.feedlistener.model.Subscription;
+import uk.co.eelpieconsulting.feedlistener.model.User;
 
 @Component
 public class UrlBuilder {
@@ -46,6 +47,10 @@ public class UrlBuilder {
 	
 	public String getChannelUrl(Channel channel) {
 		return getBaseUrl() + "/ui/" + channel.getUsername() + "/channels/" + channel.getId();
+	}
+
+	public String getUserUrl(User user) {
+		return getBaseUrl() + "/ui/" + user.getUsername();
 	}
 	
 	public String getNewChannelUrl(String username) {

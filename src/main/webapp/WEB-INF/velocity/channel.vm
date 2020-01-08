@@ -7,7 +7,7 @@
 <tr valign="top">
 <td>
 
-<h5>Channel / $channel.name</h5>
+<h5><a href="$urlBuilder.getUserUrl($user)">$user.username</a> / $channel.name</h5>
 
 #if($subscriptions && !$subscriptions.isEmpty()) 
 	<ul>

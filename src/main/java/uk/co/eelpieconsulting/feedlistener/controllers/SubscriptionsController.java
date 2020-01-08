@@ -13,23 +13,18 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.view.RedirectView;
 import uk.co.eelpieconsulting.common.geo.model.LatLong;
-import uk.co.eelpieconsulting.common.http.HttpBadRequestException;
 import uk.co.eelpieconsulting.common.http.HttpFetchException;
-import uk.co.eelpieconsulting.common.http.HttpForbiddenException;
-import uk.co.eelpieconsulting.common.http.HttpNotFoundException;
 import uk.co.eelpieconsulting.common.views.ViewFactory;
 import uk.co.eelpieconsulting.feedlistener.CredentialsRequiredException;
 import uk.co.eelpieconsulting.feedlistener.UnknownSubscriptionException;
 import uk.co.eelpieconsulting.feedlistener.UrlBuilder;
 import uk.co.eelpieconsulting.feedlistener.annotations.Timed;
+import uk.co.eelpieconsulting.feedlistener.daos.ChannelsDAO;
 import uk.co.eelpieconsulting.feedlistener.daos.SubscriptionsDAO;
 import uk.co.eelpieconsulting.feedlistener.daos.UsersDAO;
 import uk.co.eelpieconsulting.feedlistener.exceptions.UnknownUserException;
 import uk.co.eelpieconsulting.feedlistener.instagram.InstagramSubscriptionManager;
-import uk.co.eelpieconsulting.feedlistener.model.InstagramGeographySubscription;
-import uk.co.eelpieconsulting.feedlistener.model.InstagramSubscription;
-import uk.co.eelpieconsulting.feedlistener.model.RssSubscription;
-import uk.co.eelpieconsulting.feedlistener.model.Subscription;
+import uk.co.eelpieconsulting.feedlistener.model.*;
 import uk.co.eelpieconsulting.feedlistener.rss.RssPoller;
 import uk.co.eelpieconsulting.feedlistener.rss.RssSubscriptionManager;
 import uk.co.eelpieconsulting.feedlistener.twitter.TwitterListener;
@@ -53,6 +48,7 @@ public class SubscriptionsController {
     private RssSubscriptionManager rssSubscriptionManager;
     private ViewFactory viewFactory;
     private FeedItemPopulator feedItemPopulator;
+    private ChannelsDAO channelsDAO;
 
     public SubscriptionsController() {
     }
@@ -62,7 +58,8 @@ public class SubscriptionsController {
                                    InstagramSubscriptionManager instagramSubscriptionManager, UrlBuilder urlBuilder,
                                    TwitterSubscriptionManager twitterSubscriptionManager,
                                    RssSubscriptionManager rssSubscriptionManager,
-                                   ViewFactory viewFactory, FeedItemPopulator feedItemPopulator) {
+                                   ViewFactory viewFactory, FeedItemPopulator feedItemPopulator,
+                                   ChannelsDAO channelsDAO) {
         this.usersDAO = usersDAO;
         this.subscriptionsDAO = subscriptionsDAO;
         this.rssPoller = rssPoller;
@@ -73,6 +70,7 @@ public class SubscriptionsController {
         this.rssSubscriptionManager = rssSubscriptionManager;
         this.viewFactory = viewFactory;
         this.feedItemPopulator = feedItemPopulator;
+        this.channelsDAO = channelsDAO;
     }
 
     @Timed(timingNotes = "")

@@ -3,7 +3,9 @@
 <p><h4>whakaoko</h4>
 (verb) to listen to.</p>
 
-<h5>$subscription.channelId / #if($subscription.name)$subscription.name#else$subscription.url#end #if($subscriptionSize > 0) ($subscriptionSize) #end</h5>
+<h5><a href="$urlBuilder.getUserUrl($user)">$user.username</a> /
+<a href="$urlBuilder.getChannelUrl($channel)">$channel.name</a> /
+#if($subscription.name)$subscription.name#else$subscription.url#end #if($subscriptionSize > 0) ($subscriptionSize) #end</h5>
 
 <code><a href="$subscription.url">$subscription.url</a></code>
 
