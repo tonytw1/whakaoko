@@ -96,7 +96,7 @@ public class SubscriptionsController {
 
     @Timed(timingNotes = "")
     @RequestMapping(value = "/{username}/subscriptions/{id}/reload", method = RequestMethod.GET)
-    public ModelAndView reload(@PathVariable String username, @PathVariable String id) throws UnknownHostException, MongoException, UnknownSubscriptionException, UnknownUserException {
+    public ModelAndView reload(@PathVariable String username, @PathVariable String id) throws MongoException, UnknownSubscriptionException, UnknownUserException {
         usersDAO.getByUsername(username);
 
         RssSubscription subscription = (RssSubscription) subscriptionsDAO.getById(username, id);
@@ -124,7 +124,7 @@ public class SubscriptionsController {
 
     @Timed(timingNotes = "")
     @RequestMapping(value = "/{username}/subscriptions/{id}/delete")    // TODO should be a HTTP DELETE
-    public ModelAndView deleteSubscription(@PathVariable String username, @PathVariable String id) throws UnknownHostException, MongoException, HttpNotFoundException, HttpBadRequestException, HttpForbiddenException, HttpFetchException, UnknownSubscriptionException, UnknownUserException {
+    public ModelAndView deleteSubscription(@PathVariable String username, @PathVariable String id) throws UnknownHostException, MongoException, HttpFetchException, UnknownSubscriptionException, UnknownUserException {
         usersDAO.getByUsername(username);
 
         Subscription subscription = subscriptionsDAO.getById(username, id);
@@ -167,9 +167,7 @@ public class SubscriptionsController {
 
         rssPoller.run(subscription);
 
-        ModelAndView mv = new ModelAndView(viewFactory.getJsonView());
-        mv.addObject("data", subscription);
-        return mv;
+        return new ModelAndView(new RedirectView(urlBuilder.getSubscriptionUrl(subscription)));
     }
 
     @Timed(timingNotes = "")
@@ -184,7 +182,7 @@ public class SubscriptionsController {
     @Timed(timingNotes = "")
     @RequestMapping(value = "/{username}/subscriptions/instagram/tags", method = RequestMethod.POST)
     public ModelAndView addInstagramTagSubscription(@PathVariable String username,
-                                                    @RequestParam String tag, @RequestParam String channel) throws HttpNotFoundException, HttpBadRequestException, HttpForbiddenException, UnsupportedEncodingException, HttpFetchException, JSONException, UnknownUserException {
+                                                    @RequestParam String tag, @RequestParam String channel) throws UnsupportedEncodingException, HttpFetchException, JSONException, UnknownUserException {
         log.info("Instagram tag");
         InstagramSubscription subscription = instagramSubscriptionManager.requestInstagramTagSubscription(tag, channel, username);
         subscriptionsDAO.add(subscription);
@@ -198,7 +196,7 @@ public class SubscriptionsController {
                                                     @RequestParam double latitude,
                                                     @RequestParam double longitude,
                                                     @RequestParam int radius,
-                                                    @RequestParam String channel) throws HttpNotFoundException, HttpBadRequestException, HttpForbiddenException, UnsupportedEncodingException, HttpFetchException, JSONException, UnknownUserException {
+                                                    @RequestParam String channel) throws UnsupportedEncodingException, HttpFetchException, JSONException, UnknownUserException {
         LatLong latLong = new LatLong(latitude, longitude);
 
         InstagramGeographySubscription instagramGeographySubscription = instagramSubscriptionManager.requestInstagramGeographySubscription(latLong, radius, channel, username);
