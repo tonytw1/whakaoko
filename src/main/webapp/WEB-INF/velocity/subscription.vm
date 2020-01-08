@@ -13,7 +13,7 @@
 	<p><span title="$subscription.lastRead">Last read: $dateFormatter.timeSince($subscription.lastRead)</span></p>
 #end
 
-<p>$subscription.error</p>
+<p>$!subscription.error</p>
 
 <a href="$urlBuilder.getSubscriptionItemsUrl($currentUserService.currentUser, $subscription.id)/items">JSON</a> | 
 <a href="$urlBuilder.getSubscriptionItemsUrl($currentUserService.currentUser, $subscription.id)/items?format=rss">RSS</a>
