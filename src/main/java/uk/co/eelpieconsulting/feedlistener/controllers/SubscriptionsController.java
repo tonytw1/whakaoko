@@ -22,7 +22,6 @@ import uk.co.eelpieconsulting.feedlistener.CredentialsRequiredException;
 import uk.co.eelpieconsulting.feedlistener.UnknownSubscriptionException;
 import uk.co.eelpieconsulting.feedlistener.UrlBuilder;
 import uk.co.eelpieconsulting.feedlistener.annotations.Timed;
-import uk.co.eelpieconsulting.feedlistener.daos.FeedItemDAO;
 import uk.co.eelpieconsulting.feedlistener.daos.SubscriptionsDAO;
 import uk.co.eelpieconsulting.feedlistener.daos.UsersDAO;
 import uk.co.eelpieconsulting.feedlistener.exceptions.UnknownUserException;
@@ -41,174 +40,172 @@ import java.net.UnknownHostException;
 
 @Controller
 public class SubscriptionsController {
-	
-	private final static Logger log = Logger.getLogger(SubscriptionsController.class);
-	
-	private UsersDAO usersDAO;
-	private SubscriptionsDAO subscriptionsDAO;
-	private RssPoller rssPoller;
-	private TwitterListener twitterListener;
-	private InstagramSubscriptionManager instagramSubscriptionManager;
-	private UrlBuilder urlBuilder;
-	private FeedItemDAO feedItemDAO;
-	private TwitterSubscriptionManager twitterSubscriptionManager;
-	private RssSubscriptionManager rssSubscriptionManager;
-	private ViewFactory viewFactory;
-	private FeedItemPopulator feedItemPopulator;
-	
-	public SubscriptionsController() {
-	}
-	
-	@Autowired
-	public SubscriptionsController(UsersDAO usersDAO, SubscriptionsDAO subscriptionsDAO, RssPoller rssPoller, TwitterListener twitterListener, 
-			InstagramSubscriptionManager instagramSubscriptionManager, UrlBuilder urlBuilder,
-								   FeedItemDAO feedItemDAO,
-			TwitterSubscriptionManager twitterSubscriptionManager,
-			RssSubscriptionManager rssSubscriptionManager,
-			ViewFactory viewFactory, FeedItemPopulator feedItemPopulator) {
-		this.usersDAO = usersDAO;
-		this.subscriptionsDAO = subscriptionsDAO;
-		this.rssPoller = rssPoller;
-		this.twitterListener = twitterListener;
-		this.instagramSubscriptionManager = instagramSubscriptionManager;
-		this.urlBuilder = urlBuilder;
-		this.feedItemDAO = feedItemDAO;
-		this.twitterSubscriptionManager = twitterSubscriptionManager;
-		this.rssSubscriptionManager = rssSubscriptionManager;
-		this.viewFactory = viewFactory;
-		this.feedItemPopulator = feedItemPopulator;
-	}
-	
-	@Timed(timingNotes = "")
-	@RequestMapping(value="/{username}/subscriptions/{id}/items", method=RequestMethod.GET)
-	public ModelAndView subscriptionItems(@PathVariable String username, @PathVariable String id,
-			@RequestParam(required=false) Integer page,
-			@RequestParam(required=false) String format) throws UnknownHostException, MongoException, UnknownSubscriptionException, UnknownUserException {
-		usersDAO.getByUsername(username);
-		
-		Subscription subscription = subscriptionsDAO.getById(username, id);
-		
-		ModelAndView mv = new ModelAndView(viewFactory.getJsonView());
-		if (!Strings.isNullOrEmpty(format) && format.equals("rss")) {
-			mv = new ModelAndView(viewFactory.getRssView(subscription.getName(), urlBuilder.getSubscriptionUrl(subscription), ""));
-		}
-		
-		feedItemPopulator.populateFeedItems(subscription, page, mv, "data");		
-		return mv;
-	}
 
-	@Timed(timingNotes = "")
-	@RequestMapping(value="/{username}/subscriptions/{id}/reload", method=RequestMethod.GET)
-	public ModelAndView reload(@PathVariable String username, @PathVariable String id) throws UnknownHostException, MongoException, UnknownSubscriptionException, UnknownUserException {
-		usersDAO.getByUsername(username);
+    private final static Logger log = Logger.getLogger(SubscriptionsController.class);
 
-		RssSubscription subscription = (RssSubscription) subscriptionsDAO.getById(username, id);
+    private UsersDAO usersDAO;
+    private SubscriptionsDAO subscriptionsDAO;
+    private RssPoller rssPoller;
+    private TwitterListener twitterListener;
+    private InstagramSubscriptionManager instagramSubscriptionManager;
+    private UrlBuilder urlBuilder;
+    private TwitterSubscriptionManager twitterSubscriptionManager;
+    private RssSubscriptionManager rssSubscriptionManager;
+    private ViewFactory viewFactory;
+    private FeedItemPopulator feedItemPopulator;
 
-		log.info("Requesting reload of subscription: " + subscription.getName() + " / " + subscription.getUrl());
-		rssPoller.run(subscription);
+    public SubscriptionsController() {
+    }
 
-		ModelAndView mv = new ModelAndView(viewFactory.getJsonView());
-		mv.addObject("data", "ok");
-		return mv;
-	}
+    @Autowired
+    public SubscriptionsController(UsersDAO usersDAO, SubscriptionsDAO subscriptionsDAO, RssPoller rssPoller, TwitterListener twitterListener,
+                                   InstagramSubscriptionManager instagramSubscriptionManager, UrlBuilder urlBuilder,
+                                   TwitterSubscriptionManager twitterSubscriptionManager,
+                                   RssSubscriptionManager rssSubscriptionManager,
+                                   ViewFactory viewFactory, FeedItemPopulator feedItemPopulator) {
+        this.usersDAO = usersDAO;
+        this.subscriptionsDAO = subscriptionsDAO;
+        this.rssPoller = rssPoller;
+        this.twitterListener = twitterListener;
+        this.instagramSubscriptionManager = instagramSubscriptionManager;
+        this.urlBuilder = urlBuilder;
+        this.twitterSubscriptionManager = twitterSubscriptionManager;
+        this.rssSubscriptionManager = rssSubscriptionManager;
+        this.viewFactory = viewFactory;
+        this.feedItemPopulator = feedItemPopulator;
+    }
 
-	@Timed(timingNotes = "")
-	@RequestMapping(value="/subscriptions/{id}", method=RequestMethod.GET)	
-	public ModelAndView subscriptionJson(@PathVariable String username, @PathVariable String id,
-			@RequestParam(required=false) Integer page) throws UnknownHostException, MongoException, UnknownSubscriptionException, UnknownUserException {
-		usersDAO.getByUsername(username);
-		
-		Subscription subscription = subscriptionsDAO.getById(username, id);
-		
-		final ModelAndView mv = new ModelAndView(viewFactory.getJsonView());
-		feedItemPopulator.populateFeedItems(subscription, page, mv, "data");		
-		return mv;
-	}
-	
-	@Timed(timingNotes = "")
-	@RequestMapping(value="/{username}/subscriptions/{id}/delete")	// TODO should be a HTTP DELETE
-	public ModelAndView deleteSubscription(@PathVariable String username, @PathVariable String id) throws UnknownHostException, MongoException, HttpNotFoundException, HttpBadRequestException, HttpForbiddenException, HttpFetchException, UnknownSubscriptionException, UnknownUserException {
-		usersDAO.getByUsername(username);
-		
-		Subscription subscription = subscriptionsDAO.getById(username, id);
-		if (subscription == null) {
-			// TODO 404
-			return null;
-		}
-		
-		// feedItemDAO.deleteSubscriptionFeedItems(subscription); TODO
-		subscriptionsDAO.delete(subscription);
-						
-		if (subscription.getId().startsWith("twitter")) {
-			twitterListener.connect();
-		}
-		if (subscription.getId().startsWith("instagram")) {
-			instagramSubscriptionManager.requestUnsubscribeFrom(((InstagramSubscription) subscription).getSubscriptionId());
-		}
-		
-		return new ModelAndView(viewFactory.getJsonView()).addObject("data", "ok");
-	}
-	
-	@Timed(timingNotes = "")
-	@RequestMapping(value="/{username}/subscriptions", method=RequestMethod.GET)
-	public ModelAndView subscriptions(@PathVariable String username) throws UnknownUserException {
-		usersDAO.getByUsername(username);
-		
-		final ModelAndView mv = new ModelAndView(viewFactory.getJsonView());
-		mv.addObject("data", subscriptionsDAO.getSubscriptions());
-		return mv;
-	}
-	
-	@Timed(timingNotes = "")
-	@RequestMapping(value="/{username}/subscriptions/feeds", method=RequestMethod.POST)
-	public ModelAndView addFeedSubscription(@PathVariable String username, @RequestParam String url, @RequestParam String channel) throws UnknownUserException {
-		usersDAO.getByUsername(username);
-		
-		RssSubscription subscription = rssSubscriptionManager.requestFeedSubscription(url, channel, username);
-		subscriptionsDAO.add(subscription);
-		log.info("Added subscription: " + subscription);
-		
-		rssPoller.run(subscription);
-		
-		ModelAndView mv = new ModelAndView(viewFactory.getJsonView());
-		mv.addObject("data", subscription);
-		return mv;
-	}
-	
-	@Timed(timingNotes = "")
-	@RequestMapping(value="/{username}/subscriptions/twitter/tags", method=RequestMethod.POST)
-	public ModelAndView addTwitterTagSubscription(@PathVariable String username, @RequestParam String tag, @RequestParam String channel) throws CredentialsRequiredException, UnknownUserException {
-		log.info("Twitter tag: " + tag);
-		twitterSubscriptionManager.requestTagSubscription(tag, channel, username);
-		
-		return new ModelAndView(new RedirectView(urlBuilder.getBaseUrl()));
-	}
-	
-	@Timed(timingNotes = "")
-	@RequestMapping(value="/{username}/subscriptions/instagram/tags", method=RequestMethod.POST)
-	public ModelAndView addInstagramTagSubscription(@PathVariable String username, 
-			@RequestParam String tag, @RequestParam String channel) throws HttpNotFoundException, HttpBadRequestException, HttpForbiddenException, UnsupportedEncodingException, HttpFetchException, JSONException, UnknownUserException {		
-		log.info("Instagram tag");
-		InstagramSubscription subscription = instagramSubscriptionManager.requestInstagramTagSubscription(tag, channel, username);
-		subscriptionsDAO.add(subscription);
-		
-		return new ModelAndView(new RedirectView(urlBuilder.getBaseUrl()));
-	}
-	
-	@Timed(timingNotes = "")
-	@RequestMapping(value="/{username}/subscriptions/instagram/geography", method=RequestMethod.POST)
-	public ModelAndView addInstagramTagSubscription(@PathVariable String username, 
-			@RequestParam double latitude,
-			@RequestParam double longitude, 
-			@RequestParam int radius,
-			@RequestParam String channel) throws HttpNotFoundException, HttpBadRequestException, HttpForbiddenException, UnsupportedEncodingException, HttpFetchException, JSONException, UnknownUserException {
-		LatLong latLong = new LatLong(latitude, longitude);
-		
-		InstagramGeographySubscription instagramGeographySubscription = instagramSubscriptionManager.requestInstagramGeographySubscription(latLong, radius, channel, username);
-		log.info("Saving subscription: " + instagramGeographySubscription);
-		subscriptionsDAO.add(instagramGeographySubscription);
-				
-		return new ModelAndView(new RedirectView(urlBuilder.getBaseUrl()));
-	}
+    @Timed(timingNotes = "")
+    @RequestMapping(value = "/{username}/subscriptions/{id}/items", method = RequestMethod.GET)
+    public ModelAndView subscriptionItems(@PathVariable String username, @PathVariable String id,
+                                          @RequestParam(required = false) Integer page,
+                                          @RequestParam(required = false) String format) throws UnknownHostException, MongoException, UnknownSubscriptionException, UnknownUserException {
+        usersDAO.getByUsername(username);
+
+        Subscription subscription = subscriptionsDAO.getById(username, id);
+
+        ModelAndView mv = new ModelAndView(viewFactory.getJsonView());
+        if (!Strings.isNullOrEmpty(format) && format.equals("rss")) {
+            String title = !Strings.isNullOrEmpty(subscription.getName()) ? subscription.getName() : subscription.getId();
+            mv = new ModelAndView(viewFactory.getRssView(title, urlBuilder.getSubscriptionUrl(subscription), ""));
+        }
+
+        feedItemPopulator.populateFeedItems(subscription, page, mv, "data");
+        return mv;
+    }
+
+    @Timed(timingNotes = "")
+    @RequestMapping(value = "/{username}/subscriptions/{id}/reload", method = RequestMethod.GET)
+    public ModelAndView reload(@PathVariable String username, @PathVariable String id) throws UnknownHostException, MongoException, UnknownSubscriptionException, UnknownUserException {
+        usersDAO.getByUsername(username);
+
+        RssSubscription subscription = (RssSubscription) subscriptionsDAO.getById(username, id);
+
+        log.info("Requesting reload of subscription: " + subscription.getName() + " / " + subscription.getUrl());
+        rssPoller.run(subscription);
+
+        ModelAndView mv = new ModelAndView(viewFactory.getJsonView());
+        mv.addObject("data", "ok");
+        return mv;
+    }
+
+    @Timed(timingNotes = "")
+    @RequestMapping(value = "/subscriptions/{id}", method = RequestMethod.GET)
+    public ModelAndView subscriptionJson(@PathVariable String username, @PathVariable String id,
+                                         @RequestParam(required = false) Integer page) throws UnknownHostException, MongoException, UnknownSubscriptionException, UnknownUserException {
+        usersDAO.getByUsername(username);
+
+        Subscription subscription = subscriptionsDAO.getById(username, id);
+
+        final ModelAndView mv = new ModelAndView(viewFactory.getJsonView());
+        feedItemPopulator.populateFeedItems(subscription, page, mv, "data");
+        return mv;
+    }
+
+    @Timed(timingNotes = "")
+    @RequestMapping(value = "/{username}/subscriptions/{id}/delete")    // TODO should be a HTTP DELETE
+    public ModelAndView deleteSubscription(@PathVariable String username, @PathVariable String id) throws UnknownHostException, MongoException, HttpNotFoundException, HttpBadRequestException, HttpForbiddenException, HttpFetchException, UnknownSubscriptionException, UnknownUserException {
+        usersDAO.getByUsername(username);
+
+        Subscription subscription = subscriptionsDAO.getById(username, id);
+        if (subscription == null) {
+            // TODO 404
+            return null;
+        }
+
+        // feedItemDAO.deleteSubscriptionFeedItems(subscription); TODO
+        subscriptionsDAO.delete(subscription);
+
+        if (subscription.getId().startsWith("twitter")) {
+            twitterListener.connect();
+        }
+        if (subscription.getId().startsWith("instagram")) {
+            instagramSubscriptionManager.requestUnsubscribeFrom(((InstagramSubscription) subscription).getSubscriptionId());
+        }
+
+        return new ModelAndView(viewFactory.getJsonView()).addObject("data", "ok");
+    }
+
+    @Timed(timingNotes = "")
+    @RequestMapping(value = "/{username}/subscriptions", method = RequestMethod.GET)
+    public ModelAndView subscriptions(@PathVariable String username) throws UnknownUserException {
+        usersDAO.getByUsername(username);
+
+        final ModelAndView mv = new ModelAndView(viewFactory.getJsonView());
+        mv.addObject("data", subscriptionsDAO.getSubscriptions());
+        return mv;
+    }
+
+    @Timed(timingNotes = "")
+    @RequestMapping(value = "/{username}/subscriptions/feeds", method = RequestMethod.POST)
+    public ModelAndView addFeedSubscription(@PathVariable String username, @RequestParam String url, @RequestParam String channel) throws UnknownUserException {
+        usersDAO.getByUsername(username);
+
+        RssSubscription subscription = rssSubscriptionManager.requestFeedSubscription(url, channel, username);
+        subscriptionsDAO.add(subscription);
+        log.info("Added subscription: " + subscription);
+
+        rssPoller.run(subscription);
+
+        ModelAndView mv = new ModelAndView(viewFactory.getJsonView());
+        mv.addObject("data", subscription);
+        return mv;
+    }
+
+    @Timed(timingNotes = "")
+    @RequestMapping(value = "/{username}/subscriptions/twitter/tags", method = RequestMethod.POST)
+    public ModelAndView addTwitterTagSubscription(@PathVariable String username, @RequestParam String tag, @RequestParam String channel) throws CredentialsRequiredException, UnknownUserException {
+        log.info("Twitter tag: " + tag);
+        twitterSubscriptionManager.requestTagSubscription(tag, channel, username);
+
+        return new ModelAndView(new RedirectView(urlBuilder.getBaseUrl()));
+    }
+
+    @Timed(timingNotes = "")
+    @RequestMapping(value = "/{username}/subscriptions/instagram/tags", method = RequestMethod.POST)
+    public ModelAndView addInstagramTagSubscription(@PathVariable String username,
+                                                    @RequestParam String tag, @RequestParam String channel) throws HttpNotFoundException, HttpBadRequestException, HttpForbiddenException, UnsupportedEncodingException, HttpFetchException, JSONException, UnknownUserException {
+        log.info("Instagram tag");
+        InstagramSubscription subscription = instagramSubscriptionManager.requestInstagramTagSubscription(tag, channel, username);
+        subscriptionsDAO.add(subscription);
+
+        return new ModelAndView(new RedirectView(urlBuilder.getBaseUrl()));
+    }
+
+    @Timed(timingNotes = "")
+    @RequestMapping(value = "/{username}/subscriptions/instagram/geography", method = RequestMethod.POST)
+    public ModelAndView addInstagramTagSubscription(@PathVariable String username,
+                                                    @RequestParam double latitude,
+                                                    @RequestParam double longitude,
+                                                    @RequestParam int radius,
+                                                    @RequestParam String channel) throws HttpNotFoundException, HttpBadRequestException, HttpForbiddenException, UnsupportedEncodingException, HttpFetchException, JSONException, UnknownUserException {
+        LatLong latLong = new LatLong(latitude, longitude);
+
+        InstagramGeographySubscription instagramGeographySubscription = instagramSubscriptionManager.requestInstagramGeographySubscription(latLong, radius, channel, username);
+        log.info("Saving subscription: " + instagramGeographySubscription);
+        subscriptionsDAO.add(instagramGeographySubscription);
+
+        return new ModelAndView(new RedirectView(urlBuilder.getBaseUrl()));
+    }
 
 }
