@@ -157,19 +157,19 @@ Initiate linking of an Twitter account by redirecting to the Twitter authorise u
 
 # Setup
 
-## Run as a Docker image
+## Run locally
 
-Start Mongo and Memcached dependencies:
+Start Mongo and Memcached dependencies as Docker images:
 
 ```
 docker run -p 27017:27017 mongo:3.4
-docker run -p11211:11211 memcached
+docker run -p 11211:11211 memcached
 ```
 
-Start the image pointed at your MongoDB instance:
+Run with Maven Tomcat plugin:
 
 ```
-TODO
+mvn tomcat7:run
 ```
 
 The service will be visible on localhost port 9100.
