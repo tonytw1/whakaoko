@@ -33,18 +33,20 @@
 <a href="$urlBuilder.getChannelItemsUrl($currentUserService.currentUser, $channel.id)/items">JSON</a> | 
 <a href="$urlBuilder.getChannelItemsUrl($currentUserService.currentUser, $channel.id)/items?format=rss">RSS</a>
 
-#parse('includes/map.vm')
+#if(!$geotagged.isEmpty())
+    #parse('includes/map.vm')
+    #foreach($feedItem in $geotagged)
+        <script>
+            var marker = L.marker([${feedItem.place.latLong.latitude}, ${feedItem.place.latLong.longitude}]).addTo(map).bindPopup("$feedItem.title");
+            markers.push(marker);
+        </script>
+    #end
+#end
 
 #if($inbox && !$inbox.isEmpty()) 
 	<ul>
  	#foreach($feedItem in $inbox)
  		#parse('includes/feeditem.vm')
- 		#if($feedItem.isGeoTagged())
-			<script>
-	          	var marker = L.marker([${feedItem.place.latLong.latitude}, ${feedItem.place.latLong.longitude}]).addTo(map).bindPopup("$feedItem.title");
-				markers.push(marker);
-	     	</script>
-	   	#end
  	#end
  	</ul>
 #else
