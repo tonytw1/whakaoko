@@ -27,11 +27,15 @@ public class FeedItemPopulator {
 	}
 	
 	public void populateFeedItems(Subscription subscription, Integer page, ModelAndView mv, String field) throws UnknownHostException {
-		if (page != null) {
-			mv.addObject(field, feedItemDAO.getSubscriptionFeedItems(subscription.getId(), MAX_FEED_ITEMS, page));
+        List<FeedItem> feedItems;
+        if (page != null) {
+            feedItems = feedItemDAO.getSubscriptionFeedItems(subscription.getId(), MAX_FEED_ITEMS, page);
 		} else {
-			mv.addObject(field, feedItemDAO.getSubscriptionFeedItems(subscription.getId(), MAX_FEED_ITEMS));
+			feedItems = feedItemDAO.getSubscriptionFeedItems(subscription.getId(), MAX_FEED_ITEMS);
 		}
+
+        mv.addObject(field, feedItems);
+        mv.addObject("geotagged", geoTagged(feedItems));
 	}
 	
 	public void populateFeedItems(String username, Channel channel, Integer page, ModelAndView mv, String field, String q) throws UnknownHostException, MongoException {
@@ -52,10 +56,12 @@ public class FeedItemPopulator {
 			feedItems = feedItemDAO.getChannelFeedItems(channel.getId(), pageSizeToUse, pageToUse, username);
 		}
 
-		List<FeedItem> geotagged = feedItems.stream().filter(FeedItem::isGeoTagged).collect(Collectors.toList());
-		mv.addObject("geotagged", geotagged);
-
-		mv.addObject(field, feedItems);
+        mv.addObject(field, feedItems);
+        mv.addObject("geotagged", geoTagged(feedItems));
 	}
-	
+
+    private List<FeedItem> geoTagged(List<FeedItem> feedItems) {
+        return feedItems.stream().filter(FeedItem::isGeoTagged).collect(Collectors.toList());
+    }
+
 }

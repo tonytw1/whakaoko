@@ -20,23 +20,22 @@
 <a href="$urlBuilder.getSubscriptionItemsUrl($currentUserService.currentUser, $subscription.id)/items">JSON</a> | 
 <a href="$urlBuilder.getSubscriptionItemsUrl($currentUserService.currentUser, $subscription.id)/items?format=rss">RSS</a>
 
-#parse('includes/map.vm')
+#if(!$geotagged.isEmpty())
+    #parse('includes/map.vm')
+    #foreach($feedItem in $geotagged)
+        <script>
+            var marker = L.marker([${feedItem.place.latLong.latitude}, ${feedItem.place.latLong.longitude}]).addTo(map).bindPopup("$feedItem.title");
+            markers.push(marker);
+        </script>
+    #end
+#end
 
-#if($feedItems && !$feedItems.isEmpty()) 
-
+#if($feedItems && !$feedItems.isEmpty())
 	<ul>
 	 	#foreach($feedItem in $feedItems)
-	 		#parse('includes/feeditem.vm') 		
-			
-			#if($feedItem.isGeoTagged())
-				<script>
-	          		var marker = L.marker([${feedItem.place.latLong.latitude}, ${feedItem.place.latLong.longitude}]).addTo(map).bindPopup("$feedItem.title");
-					markers.push(marker);
-	          	</script>
-	       	#end
+	 		#parse('includes/feeditem.vm')
 		#end
  	</ul>
- 	
 #else
 	<p>No items from this subscription.</p>
 #end
