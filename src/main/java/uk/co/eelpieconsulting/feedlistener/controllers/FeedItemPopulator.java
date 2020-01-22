@@ -1,6 +1,7 @@
 package uk.co.eelpieconsulting.feedlistener.controllers;
 
 import com.google.common.base.Strings;
+import com.google.common.collect.Lists;
 import com.mongodb.MongoException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -12,7 +13,6 @@ import uk.co.eelpieconsulting.feedlistener.model.Subscription;
 
 import java.net.UnknownHostException;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Component
 public class FeedItemPopulator {
@@ -61,7 +61,13 @@ public class FeedItemPopulator {
 	}
 
     private List<FeedItem> geoTagged(List<FeedItem> feedItems) {
-        return feedItems.stream().filter(FeedItem::isGeoTagged).collect(Collectors.toList());
+		List<FeedItem> geotagged = Lists.newArrayList();
+		for (FeedItem feedItem: feedItems) {
+			if (feedItem.isGeoTagged()) {
+				geotagged.add(feedItem);
+			}
+		}
+		return geotagged;
     }
 
 }
