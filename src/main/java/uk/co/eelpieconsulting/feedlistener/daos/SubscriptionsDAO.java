@@ -48,9 +48,11 @@ public class SubscriptionsDAO {
 	
 	public List<Subscription> getSubscriptions() {
 		try {
-			return dataStoreFactory.getDs().find(Subscription.class).
-				order(LATEST_ITEM_DATE).
-				asList();
+			List<Subscription> subscriptions = dataStoreFactory.getDs().find(Subscription.class).
+					order(LATEST_ITEM_DATE).
+					asList();
+			log.info("Loaded subscriptions: " + subscriptions.size());
+			return subscriptions;
 		} catch (MongoException e) {
 			throw new RuntimeException(e);
 		}
