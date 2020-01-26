@@ -150,7 +150,7 @@ public class SubscriptionsController {
         usersDAO.getByUsername(username);
 
         final ModelAndView mv = new ModelAndView(viewFactory.getJsonView());
-        mv.addObject("data", subscriptionsDAO.getSubscriptions());
+        mv.addObject("data", subscriptionsDAO.getSubscriptions(SubscriptionsDAO.LATEST_ITEM_DATE_DESCENDING));
         return mv;
     }
 

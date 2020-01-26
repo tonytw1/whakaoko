@@ -20,8 +20,9 @@ public class SubscriptionsDAO {
 	
 	private static Logger log = Logger.getLogger(SubscriptionsDAO.class);
 	
-	private static final String LATEST_ITEM_DATE = "-latestItemDate";
-	
+	public static final String LATEST_ITEM_DATE_DESCENDING = "-latestItemDate";
+	public static final String LAST_READ_ASCENDING = "lastRead";
+
 	private final DataStoreFactory dataStoreFactory;
 
 	@Autowired
@@ -46,10 +47,10 @@ public class SubscriptionsDAO {
 		}
 	}
 	
-	public List<Subscription> getSubscriptions() {
+	public List<Subscription> getSubscriptions(String order) {
 		try {
 			List<Subscription> subscriptions = dataStoreFactory.getDs().find(Subscription.class).
-					order(LATEST_ITEM_DATE).
+					order(order).
 					asList();
 			log.info("Loaded subscriptions: " + subscriptions.size());
 			return subscriptions;
@@ -91,7 +92,7 @@ public class SubscriptionsDAO {
 
 	public List<Subscription> getTwitterSubscriptions() {
 		final List<Subscription> subscriptions = Lists.newArrayList();
-		for (Subscription subscription : getSubscriptions()) {
+		for (Subscription subscription : getSubscriptions(SubscriptionsDAO.LATEST_ITEM_DATE_DESCENDING)) {
 			if (subscription.getId().startsWith("twitter")) {
 				subscriptions.add(subscription);
 			}
@@ -101,7 +102,7 @@ public class SubscriptionsDAO {
 	
 	public List<Subscription> getTwitterSubscriptionsFor(String username) {
 		final List<Subscription> subscriptions = Lists.newArrayList();
-		for (Subscription subscription : getSubscriptions()) {
+		for (Subscription subscription : getSubscriptions(SubscriptionsDAO.LATEST_ITEM_DATE_DESCENDING)) {
 			if (subscription.getId().startsWith("twitter") && username.equals(subscription.getUsername())) {
 				subscriptions.add(subscription);
 			}
@@ -113,12 +114,12 @@ public class SubscriptionsDAO {
 		return dataStoreFactory.getDs().find(Subscription.class).
 			filter("username", username).
 			filter("channelId", channelID).		
-			order(LATEST_ITEM_DATE).
+			order(LATEST_ITEM_DATE_DESCENDING).
 			asList();
 	}
 	
 	private boolean subscriptionExists(Subscription subscription) {
-		for (Subscription existingSubscription : getSubscriptions()) {
+		for (Subscription existingSubscription : getSubscriptions(LATEST_ITEM_DATE_DESCENDING)) {
 			if (existingSubscription.getId().equals(subscription.getId())) {
 				log.debug("Subscription exists: " + subscription);
 				return true;
