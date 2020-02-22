@@ -38,12 +38,16 @@ public class FeedParser {
     private SyndFeed parse(byte[] bytes) throws FeedException {
         final InputStream byteArrayInputStream = new ByteArrayInputStream(bytes);
         InputSource inputStream = new InputSource(byteArrayInputStream);
+        try {
+            SyndFeedInput syndFeedInput = new SyndFeedInput(false);
+            final SyndFeed syndFeed = syndFeedInput.build(inputStream);
+            IOUtils.closeQuietly(byteArrayInputStream);
+            return syndFeed;
 
-        SyndFeedInput syndFeedInput = new SyndFeedInput(false);
-        final SyndFeed syndFeed = syndFeedInput.build(inputStream);
-        IOUtils.closeQuietly(byteArrayInputStream);
-        return syndFeed;
-        // TODO IO closes
+        } catch (FeedException e) {
+            IOUtils.closeQuietly(byteArrayInputStream);
+            throw (e);
+        }
     }
 
     private byte[] cleanLeadingWhitespace(byte[] bytes) {
