@@ -15,33 +15,44 @@ import java.io.InputStream;
 public class FeedParser {
 
     public SyndFeed parseSyndFeed(byte[] bytes) throws FeedException {
-        final InputStream byteArrayInputStream = cleanLeadingWhitespace(bytes);
-        InputSource inputStream = new InputSource(byteArrayInputStream);
-        SyndFeedInput syndFeedInput = new SyndFeedInput(false);
+        final byte[] cleaned = cleanLeadingWhitespace(bytes);
 
         try {
-            final SyndFeed syndFeed = syndFeedInput.build(inputStream);
-            IOUtils.closeQuietly(byteArrayInputStream);
-            return syndFeed;
+            return parse(cleaned);
 
         } catch (ParsingFeedException p) {
-            IOUtils.closeQuietly(byteArrayInputStream);
             if (p.getMessage().contains("The entity \"nbsp\" was referenced, but not declared.")) {
                 byte[] withOutNbsp = new String(bytes).replaceAll("\\&nbsp;", " ").getBytes();
-                return parseSyndFeed(withOutNbsp);
+                return parse(withOutNbsp);
+
+            } else if (p.getMessage().contains("Invalid XML: Error on line 1: Content is not allowed in prolog")) {
+                byte[] withUtf8 = new String(bytes).replaceAll("utf-16", "utf-8").getBytes();
+                return parse(withUtf8);
+
             } else {
                 throw (p);
             }
         }
     }
 
-    private ByteArrayInputStream cleanLeadingWhitespace(byte[] bytes) {
+    private SyndFeed parse(byte[] bytes) throws FeedException {
+        final InputStream byteArrayInputStream = new ByteArrayInputStream(bytes);
+        InputSource inputStream = new InputSource(byteArrayInputStream);
+
+        SyndFeedInput syndFeedInput = new SyndFeedInput(false);
+        final SyndFeed syndFeed = syndFeedInput.build(inputStream);
+        IOUtils.closeQuietly(byteArrayInputStream);
+        return syndFeed;
+        // TODO IO closes
+    }
+
+    private byte[] cleanLeadingWhitespace(byte[] bytes) {
         try {
             String string = new String(bytes);
             if (string.trim().equals(string)) {
-                return new ByteArrayInputStream(bytes);
+                return bytes;
             }
-            return new ByteArrayInputStream(string.trim().getBytes());
+            return string.trim().getBytes();
 
         } catch (Exception e) {
             throw new RuntimeException(e);
