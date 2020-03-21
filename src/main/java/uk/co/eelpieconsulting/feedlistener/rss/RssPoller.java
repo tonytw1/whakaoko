@@ -40,7 +40,7 @@ public class RssPoller {
 	@Scheduled(fixedRate=3600000)
 	public void run() {
 		log.info("Polling subscriptions");
-		for (Subscription subscription : subscriptionsDAO.getSubscriptions(SubscriptionsDAO.LAST_READ_ASCENDING)) {	// TODO explict get RSS subscriptions end point
+		for (Subscription subscription : subscriptionsDAO.getSubscriptions(SubscriptionsDAO.LAST_READ_ASCENDING, null)) {	// TODO explict get RSS subscriptions end point
 			if (isRssSubscription(subscription)) {
 				executeRssPoll((RssSubscription) subscription);
 			}

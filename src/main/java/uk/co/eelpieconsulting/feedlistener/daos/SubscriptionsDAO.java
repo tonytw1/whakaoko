@@ -3,8 +3,10 @@ package uk.co.eelpieconsulting.feedlistener.daos;
 import java.net.UnknownHostException;
 import java.util.List;
 
+import com.google.common.base.Strings;
 import org.apache.log4j.Logger;
 import org.mongodb.morphia.Datastore;
+import org.mongodb.morphia.query.Query;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -47,11 +49,14 @@ public class SubscriptionsDAO {
 		}
 	}
 	
-	public List<Subscription> getSubscriptions(String order) {
+	public List<Subscription> getSubscriptions(String order, String url) {
 		try {
-			List<Subscription> subscriptions = dataStoreFactory.getDs().find(Subscription.class).
-					order(order).
-					asList();
+			Query<Subscription> query = dataStoreFactory.getDs().createQuery(Subscription.class);
+			if (Strings.isNullOrEmpty(url)) {
+				query = query.filter("url", url);
+			}
+
+			List<Subscription> subscriptions = query.order(order).asList();
 			log.info("Loaded subscriptions: " + subscriptions.size());
 			return subscriptions;
 		} catch (MongoException e) {
@@ -70,7 +75,7 @@ public class SubscriptionsDAO {
 			throw new RuntimeException(e);
 		}
 	}
-	
+
 	public boolean subscriptionExists(String username, String id) {
 		try {
 			getById(username, id);
@@ -92,7 +97,7 @@ public class SubscriptionsDAO {
 
 	public List<Subscription> getTwitterSubscriptions() {
 		final List<Subscription> subscriptions = Lists.newArrayList();
-		for (Subscription subscription : getSubscriptions(SubscriptionsDAO.LATEST_ITEM_DATE_DESCENDING)) {
+		for (Subscription subscription : getSubscriptions(SubscriptionsDAO.LATEST_ITEM_DATE_DESCENDING, null)) {
 			if (subscription.getId().startsWith("twitter")) {
 				subscriptions.add(subscription);
 			}
@@ -102,7 +107,7 @@ public class SubscriptionsDAO {
 	
 	public List<Subscription> getTwitterSubscriptionsFor(String username) {
 		final List<Subscription> subscriptions = Lists.newArrayList();
-		for (Subscription subscription : getSubscriptions(SubscriptionsDAO.LATEST_ITEM_DATE_DESCENDING)) {
+		for (Subscription subscription : getSubscriptions(SubscriptionsDAO.LATEST_ITEM_DATE_DESCENDING, null)) {
 			if (subscription.getId().startsWith("twitter") && username.equals(subscription.getUsername())) {
 				subscriptions.add(subscription);
 			}
@@ -119,7 +124,7 @@ public class SubscriptionsDAO {
 	}
 	
 	private boolean subscriptionExists(Subscription subscription) {
-		for (Subscription existingSubscription : getSubscriptions(LATEST_ITEM_DATE_DESCENDING)) {
+		for (Subscription existingSubscription : getSubscriptions(LATEST_ITEM_DATE_DESCENDING, null)) {
 			if (existingSubscription.getId().equals(subscription.getId())) {
 				log.debug("Subscription exists: " + subscription);
 				return true;
