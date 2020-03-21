@@ -48,7 +48,6 @@ public class SubscriptionsController {
     private RssSubscriptionManager rssSubscriptionManager;
     private ViewFactory viewFactory;
     private FeedItemPopulator feedItemPopulator;
-    private ChannelsDAO channelsDAO;
 
     public SubscriptionsController() {
     }
@@ -58,8 +57,7 @@ public class SubscriptionsController {
                                    InstagramSubscriptionManager instagramSubscriptionManager, UrlBuilder urlBuilder,
                                    TwitterSubscriptionManager twitterSubscriptionManager,
                                    RssSubscriptionManager rssSubscriptionManager,
-                                   ViewFactory viewFactory, FeedItemPopulator feedItemPopulator,
-                                   ChannelsDAO channelsDAO) {
+                                   ViewFactory viewFactory, FeedItemPopulator feedItemPopulator) {
         this.usersDAO = usersDAO;
         this.subscriptionsDAO = subscriptionsDAO;
         this.rssPoller = rssPoller;
@@ -70,7 +68,6 @@ public class SubscriptionsController {
         this.rssSubscriptionManager = rssSubscriptionManager;
         this.viewFactory = viewFactory;
         this.feedItemPopulator = feedItemPopulator;
-        this.channelsDAO = channelsDAO;
     }
 
     @Timed(timingNotes = "")
