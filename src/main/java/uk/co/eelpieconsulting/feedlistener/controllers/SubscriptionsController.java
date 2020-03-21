@@ -143,7 +143,7 @@ public class SubscriptionsController {
 
     @Timed(timingNotes = "")
     @RequestMapping(value = "/{username}/subscriptions", method = RequestMethod.GET)
-    public ModelAndView subscriptions(@PathVariable String username, @RequestParam String url) throws UnknownUserException {
+    public ModelAndView subscriptions(@PathVariable String username, @RequestParam(required = false) String url) throws UnknownUserException {
         usersDAO.getByUsername(username);
 
         final ModelAndView mv = new ModelAndView(viewFactory.getJsonView());

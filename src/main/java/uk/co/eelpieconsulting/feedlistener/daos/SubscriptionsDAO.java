@@ -53,7 +53,7 @@ public class SubscriptionsDAO {
 		try {
 			Query<Subscription> query = dataStoreFactory.getDs().createQuery(Subscription.class);
 			if (!Strings.isNullOrEmpty(url)) {
-				query = query.filter("url", url).disableValidation();	// TODO subclasses to helping here
+				query = query.disableValidation().filter("url", url);	// TODO subclasses to helping here
 			}
 
 			List<Subscription> subscriptions = query.order(order).asList();
