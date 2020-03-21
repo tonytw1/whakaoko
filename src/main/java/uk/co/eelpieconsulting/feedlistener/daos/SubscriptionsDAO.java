@@ -115,12 +115,15 @@ public class SubscriptionsDAO {
 		return subscriptions;
 	}
 	
-	public List<Subscription> getSubscriptionsForChannel(String username, String channelID) throws UnknownHostException, MongoException {
-		return dataStoreFactory.getDs().find(Subscription.class).
-			filter("username", username).
-			filter("channelId", channelID).		
-			order(LATEST_ITEM_DATE_DESCENDING).
-			asList();
+	public List<Subscription> getSubscriptionsForChannel(String username, String channelID, String url) throws MongoException {
+        Query<Subscription> query = dataStoreFactory.getDs().find(Subscription.class).
+                filter("username", username).
+                filter("channelId", channelID);
+        if (!Strings.isNullOrEmpty(url)) {
+            query = query.disableValidation().filter("url", url);	// TODO subclasses to helping here
+        }
+
+        return query.order(LATEST_ITEM_DATE_DESCENDING).asList();
 	}
 	
 	private boolean subscriptionExists(Subscription subscription) {

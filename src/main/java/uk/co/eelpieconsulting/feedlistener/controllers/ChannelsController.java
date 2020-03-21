@@ -72,11 +72,11 @@ public class ChannelsController {
     }
 
     @RequestMapping(value = "/{username}/channels/{id}/subscriptions", method = RequestMethod.GET)
-    public ModelAndView channelSubscriptions(@PathVariable String username, @PathVariable String id) throws UnknownHostException, MongoException, UnknownUserException {
+    public ModelAndView channelSubscriptions(@PathVariable String username, @PathVariable String id, @RequestParam(required = false) String url) throws UnknownHostException, MongoException, UnknownUserException {
         usersDAO.getByUsername(username);
 
         final Channel channel = channelsDAO.getById(username, id);
-        final List<Subscription> subscriptionsForChannel = subscriptionsDAO.getSubscriptionsForChannel(username, channel.getId());
+        final List<Subscription> subscriptionsForChannel = subscriptionsDAO.getSubscriptionsForChannel(username, channel.getId(), url);
 
         final ModelAndView mv = new ModelAndView(viewFactory.getJsonView());
         mv.addObject("data", subscriptionsForChannel);

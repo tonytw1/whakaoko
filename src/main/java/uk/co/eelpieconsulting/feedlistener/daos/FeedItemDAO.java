@@ -97,9 +97,9 @@ public class FeedItemDAO {
 	}
 	
 	@Timed(timingNotes = "")
-	private Query<FeedItem> channelFeedItemsQuery(String username, String channelId) throws UnknownHostException {
+	private Query<FeedItem> channelFeedItemsQuery(String username, String channelId) {
 		final List<String> channelSubscriptions = Lists.newArrayList();
-		for (Subscription subscription : subscriptionsDAO.getSubscriptionsForChannel(username, channelId)) {
+		for (Subscription subscription : subscriptionsDAO.getSubscriptionsForChannel(username, channelId, null)) {
 			channelSubscriptions.add(subscription.getId());
 		}		
 		return dataStoreFactory.getDs().find(FeedItem.class).field("subscriptionId").hasAnyOf(channelSubscriptions).order(DATE_DESCENDING);

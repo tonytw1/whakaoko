@@ -120,7 +120,7 @@ public class UIController {
         mv.addObject("user", user);
         mv.addObject("channel", channel);
 
-        final List<Subscription> subscriptionsForChannel = subscriptionsDAO.getSubscriptionsForChannel(username, channel.getId());
+        final List<Subscription> subscriptionsForChannel = subscriptionsDAO.getSubscriptionsForChannel(username, channel.getId(), null);
         mv.addObject("subscriptions", subscriptionsForChannel);
 
         if (!subscriptionsForChannel.isEmpty()) {
