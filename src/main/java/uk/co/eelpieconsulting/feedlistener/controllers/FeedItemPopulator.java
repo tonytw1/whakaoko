@@ -17,7 +17,7 @@ import java.util.stream.Collectors;
 @Component
 public class FeedItemPopulator {
 	
-	private static int MAX_FEED_ITEMS = 20;
+	private static int MAX_FEED_ITEMS = 25;
 
 	private final FeedItemDAO feedItemDAO;
 	
