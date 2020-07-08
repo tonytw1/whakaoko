@@ -28,12 +28,8 @@ public class FeedItemPopulator {
     }
 
     public void populateFeedItems(Subscription subscription, Integer page, ModelAndView mv, String field) throws UnknownHostException {
-        List<FeedItem> feedItems;
-        if (page != null) {
-            feedItems = feedItemDAO.getSubscriptionFeedItems(subscription.getId(), MAX_FEED_ITEMS, page);
-        } else {
-            feedItems = feedItemDAO.getSubscriptionFeedItems(subscription.getId(), MAX_FEED_ITEMS);
-        }
+        List<FeedItem> feedItems = page != null ? feedItemDAO.getSubscriptionFeedItems(subscription.getId(), MAX_FEED_ITEMS, page) :
+                feedItemDAO.getSubscriptionFeedItems(subscription.getId(), MAX_FEED_ITEMS);
 
         populate(mv, field, feedItems);
     }
@@ -52,17 +48,17 @@ public class FeedItemPopulator {
         List<FeedItem> feedItems = !Strings.isNullOrEmpty(q) ? feedItemDAO.searchChannelFeedItems(channel.getId(), pageSizeToUse, pageToUse, username, q) :
                 feedItemDAO.getChannelFeedItems(channel.getId(), pageSizeToUse, pageToUse, username);
 
+        populate(mv, field, feedItems);
+    }
+
+    private void populate(ModelAndView mv, String field, List<FeedItem> feedItems) {
         // Some source feeds incorrectly over escape entities.
         // In these cases we will import and persist the feed items as provided and HTML unescape when outputting
         // This is repeated processing but makes for a reversible change and an accurate persisted representation of the source feed.
         List<FeedItem> cleanedFeedItems = feedItems.stream().map(this::overlyUnescape).collect(Collectors.toList());
 
-        populate(mv, field, cleanedFeedItems);
-    }
-
-    private void populate(ModelAndView mv, String field, List<FeedItem> feedItems) {
-        mv.addObject(field, feedItems);
-        mv.addObject("geotagged", geoTagged(feedItems));
+        mv.addObject(field, cleanedFeedItems);
+        mv.addObject("geotagged", geoTagged(cleanedFeedItems));
     }
 
     private List<FeedItem> geoTagged(List<FeedItem> feedItems) {
