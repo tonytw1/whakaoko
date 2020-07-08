@@ -35,8 +35,7 @@ public class FeedItemPopulator {
             feedItems = feedItemDAO.getSubscriptionFeedItems(subscription.getId(), MAX_FEED_ITEMS);
         }
 
-        mv.addObject(field, feedItems);
-        mv.addObject("geotagged", geoTagged(feedItems));
+        populate(mv, field, feedItems);
     }
 
     public void populateFeedItems(String username, Channel channel, Integer page, ModelAndView mv, String field, String q) throws UnknownHostException, MongoException {
@@ -58,15 +57,19 @@ public class FeedItemPopulator {
         // This is repeated processing but makes for a reversible change and an accurate persisted representation of the source feed.
         List<FeedItem> cleanedFeedItems = feedItems.stream().map(this::overlyUnescape).collect(Collectors.toList());
 
-        mv.addObject(field, cleanedFeedItems);
-        mv.addObject("geotagged", geoTagged(cleanedFeedItems));
+        populate(mv, field, cleanedFeedItems);
+    }
+
+    private void populate(ModelAndView mv, String field, List<FeedItem> feedItems) {
+        mv.addObject(field, feedItems);
+        mv.addObject("geotagged", geoTagged(feedItems));
     }
 
     private List<FeedItem> geoTagged(List<FeedItem> feedItems) {
         return feedItems.stream().filter(FeedItem::isGeoTagged).collect(Collectors.toList());
     }
 
-    private FeedItem overlyUnescape(FeedItem feedItem) {
+    protected FeedItem overlyUnescape(FeedItem feedItem) {
         return new FeedItem(StringEscapeUtils.unescapeHtml(feedItem.getTitle()),
                 feedItem.getUrl(),
                 StringEscapeUtils.unescapeHtml(feedItem.getBody()),
