@@ -55,9 +55,8 @@ public class ChannelsController {
         usersDAO.getByUsername(username);
 
         log.info("Channels for user: " + username);
-        final ModelAndView mv = new ModelAndView(viewFactory.getJsonView());
-        mv.addObject("data", channelsDAO.getChannels(username));
-        return mv;
+        return new ModelAndView(viewFactory.getJsonView()).
+                addObject("data", channelsDAO.getChannels(username));
     }
 
     @RequestMapping(value = "/{username}/channels/{id}", method = RequestMethod.GET)
@@ -66,9 +65,8 @@ public class ChannelsController {
 
         final Channel channel = channelsDAO.getById(username, id);
 
-        final ModelAndView mv = new ModelAndView(viewFactory.getJsonView());
-        mv.addObject("data", channel);
-        return mv;
+        return new ModelAndView(viewFactory.getJsonView()).
+                addObject("data", channel);
     }
 
     @RequestMapping(value = "/{username}/channels/{id}/subscriptions", method = RequestMethod.GET)
