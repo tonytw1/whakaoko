@@ -66,7 +66,7 @@ public class FeedItemPopulator {
     }
 
     protected FeedItem overlyUnescape(FeedItem feedItem) {
-        return new FeedItem(StringEscapeUtils.unescapeHtml(feedItem.getTitle()),
+        FeedItem fixed = new FeedItem(StringEscapeUtils.unescapeHtml(feedItem.getTitle()),
                 feedItem.getUrl(),
                 StringEscapeUtils.unescapeHtml(feedItem.getBody()),
                 feedItem.getDate(),
@@ -74,6 +74,8 @@ public class FeedItemPopulator {
                 feedItem.getImageUrl(),
                 feedItem.getAuthor()
         );
+        fixed.setSubscriptionId(feedItem.getSubscriptionId());
+        return fixed;
     }
 
 }
