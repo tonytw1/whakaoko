@@ -2,6 +2,7 @@ package uk.co.eelpieconsulting.feedlistener.daos;
 
 import com.google.common.collect.Lists;
 import com.mongodb.MongoException;
+import dev.morphia.query.FindOptions;
 import dev.morphia.query.Query;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,9 +10,9 @@ import org.springframework.stereotype.Component;
 import uk.co.eelpieconsulting.feedlistener.annotations.Timed;
 import uk.co.eelpieconsulting.feedlistener.exceptions.FeeditemPersistanceException;
 import uk.co.eelpieconsulting.feedlistener.model.FeedItem;
+import uk.co.eelpieconsulting.feedlistener.model.FeedItemsResult;
 import uk.co.eelpieconsulting.feedlistener.model.Subscription;
 
-import java.net.UnknownHostException;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -51,12 +52,21 @@ public class FeedItemDAO {
 		}
 	}
 	
-	public List<FeedItem> getSubscriptionFeedItems(String subscriptionId, int limit) throws UnknownHostException, MongoException {
-		return subscriptionFeedItemsQuery(subscriptionId).limit(limit).asList();
+	public FeedItemsResult getSubscriptionFeedItems(String subscriptionId, int pageSize) throws MongoException {
+		Query<FeedItem> query = subscriptionFeedItemsQuery(subscriptionId);
+		List<FeedItem> feedItems = query.find(new FindOptions().limit(pageSize)).toList();
+		long totalItems = query.count();
+		return new FeedItemsResult(feedItems, totalItems);
 	}
 	
-	public List<FeedItem> getSubscriptionFeedItems(String subscriptionId, int pageSize, int page) throws UnknownHostException, MongoException {
-		return subscriptionFeedItemsQuery(subscriptionId).limit(pageSize).offset(calculatePageOffset(pageSize, page)).asList();
+	public FeedItemsResult getSubscriptionFeedItems(String subscriptionId, int pageSize, int page) throws MongoException {
+		Query<FeedItem> query = subscriptionFeedItemsQuery(subscriptionId);
+		int offset = calculatePageOffset(pageSize, page);
+		FindOptions withPagination = new FindOptions().limit(pageSize).skip(offset);
+		List<FeedItem> feedItems = query.find(withPagination).toList();
+
+		long totalItems = query.count();
+		return new FeedItemsResult(feedItems, totalItems);
 	}
 	
 	public void deleteSubscriptionFeedItems(Subscription subscription) throws MongoException {
@@ -69,7 +79,7 @@ public class FeedItemDAO {
 	}
 	
 	@Timed(timingNotes = "")
-	public long getSubscriptionFeedItemsCount(String subscriptionId) throws UnknownHostException {
+	public long getSubscriptionFeedItemsCount(String subscriptionId) {
 		return subscriptionFeedItemsQuery(subscriptionId).countAll();
 	}
 	
