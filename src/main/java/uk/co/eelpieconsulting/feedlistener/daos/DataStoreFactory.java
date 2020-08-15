@@ -14,7 +14,6 @@ import uk.co.eelpieconsulting.feedlistener.model.FeedItem;
 import uk.co.eelpieconsulting.feedlistener.model.Subscription;
 import uk.co.eelpieconsulting.feedlistener.model.User;
 
-import java.net.UnknownHostException;
 import java.util.List;
 
 @Component
@@ -26,7 +25,7 @@ public class DataStoreFactory {
     private final String mongoDatabase;
     private final MongoClientOptions mongoClientOptions;
 
-    private final List<MongoCredential> credentials;
+    private MongoCredential credential;
 
     private Datastore datastore;
 
@@ -36,7 +35,7 @@ public class DataStoreFactory {
                             @Value("#{config['mongo.database']}") String mongoDatabase,
                             @Value("#{config['mongo.user']}") String mongoUser,
                             @Value("#{config['mongo.password']}") String mongoPassword,
-                            @Value("#{config['mongo.ssl']}") Boolean mongoSSL) throws UnknownHostException, MongoException {
+                            @Value("#{config['mongo.ssl']}") Boolean mongoSSL) throws MongoException {
 
         List<ServerAddress> addresses = Lists.newArrayList();
         String[] split = mongoHost.split(",");
@@ -47,7 +46,7 @@ public class DataStoreFactory {
 
         this.mongoDatabase = mongoDatabase;
         this.mongoClientOptions = MongoClientOptions.builder().sslEnabled(mongoSSL).build();
-        this.credentials = !Strings.isNullOrEmpty(mongoUser) ? Lists.newArrayList(MongoCredential.createCredential(mongoUser, mongoDatabase, mongoPassword.toCharArray())) : null;
+        this.credential = !Strings.isNullOrEmpty(mongoUser) ? MongoCredential.createCredential(mongoUser, mongoDatabase, mongoPassword.toCharArray()) : null;
     }
 
     public Datastore getDs() {
@@ -66,7 +65,7 @@ public class DataStoreFactory {
         morphia.map(User.class);
 
         try {
-            MongoClient m = credentials != null ? new MongoClient(serverAddresses, credentials, mongoClientOptions) : new MongoClient(serverAddresses, mongoClientOptions);
+            MongoClient m = credential != null ? new MongoClient(serverAddresses, credential, mongoClientOptions) : new MongoClient(serverAddresses, mongoClientOptions);
             return morphia.createDatastore(m, database);
 
         } catch (MongoException e) {
