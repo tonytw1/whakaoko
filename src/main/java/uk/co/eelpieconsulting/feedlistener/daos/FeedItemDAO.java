@@ -2,8 +2,8 @@ package uk.co.eelpieconsulting.feedlistener.daos;
 
 import com.google.common.collect.Lists;
 import com.mongodb.MongoException;
+import dev.morphia.query.Query;
 import org.apache.log4j.Logger;
-import org.mongodb.morphia.query.Query;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import uk.co.eelpieconsulting.feedlistener.annotations.Timed;
@@ -59,12 +59,12 @@ public class FeedItemDAO {
 		return subscriptionFeedItemsQuery(subscriptionId).limit(pageSize).offset(calculatePageOffset(pageSize, page)).asList();
 	}
 	
-	public void deleteSubscriptionFeedItems(Subscription subscription) throws UnknownHostException, MongoException {
+	public void deleteSubscriptionFeedItems(Subscription subscription) throws MongoException {
 		 dataStoreFactory.getDs().delete(dataStoreFactory.getDs().find(FeedItem.class, "subscriptionId", subscription.getId()));
 	}
 	
 	@Timed(timingNotes = "")
-	public long getAllCount() throws UnknownHostException, MongoException {
+	public long getAllCount() throws MongoException {
 		return dataStoreFactory.getDs().find(FeedItem.class).countAll();
 	}
 	
@@ -74,22 +74,22 @@ public class FeedItemDAO {
 	}
 	
 	@Timed(timingNotes = "")
-	public long getChannelFeedItemsCount(String channelId, String username) throws UnknownHostException, MongoException {
+	public long getChannelFeedItemsCount(String channelId, String username) throws MongoException {
 		return channelFeedItemsQuery(username, channelId).countAll();
 	}
 	
 	@Timed(timingNotes = "")
-	public List<FeedItem> getChannelFeedItems(String channelId, int pageSize, String username) throws UnknownHostException, MongoException {		
+	public List<FeedItem> getChannelFeedItems(String channelId, int pageSize, String username) throws MongoException {
 		return channelFeedItemsQuery(username, channelId).limit(pageSize).asList();
 	}
 	
 	@Timed(timingNotes = "")
-	public List<FeedItem> getChannelFeedItems(String channelId, int pageSize, int page, String username) throws UnknownHostException, MongoException {
+	public List<FeedItem> getChannelFeedItems(String channelId, int pageSize, int page, String username) throws MongoException {
 		return channelFeedItemsQuery(username, channelId).limit(pageSize).offset(calculatePageOffset(pageSize, page)).asList();
 	}
 	
 	@Timed(timingNotes = "")
-	public List<FeedItem> searchChannelFeedItems(String channelId, int pageSize, int page, String username, String q) throws UnknownHostException {		
+	public List<FeedItem> searchChannelFeedItems(String channelId, int pageSize, int page, String username, String q) {
 		return channelFeedItemsQuery(username, channelId).
 				filter("title", Pattern.compile(q)).				
 				limit(pageSize).
@@ -105,7 +105,7 @@ public class FeedItemDAO {
 		return dataStoreFactory.getDs().find(FeedItem.class).field("subscriptionId").hasAnyOf(channelSubscriptions).order(DATE_DESCENDING);
 	}
 	
-	private Query<FeedItem> subscriptionFeedItemsQuery(String subscriptionId) throws UnknownHostException {
+	private Query<FeedItem> subscriptionFeedItemsQuery(String subscriptionId) {
 		return dataStoreFactory.getDs().find(FeedItem.class, "subscriptionId", subscriptionId).order(DATE_DESCENDING);
 	}
 	

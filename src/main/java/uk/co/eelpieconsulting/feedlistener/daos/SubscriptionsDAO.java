@@ -3,9 +3,9 @@ package uk.co.eelpieconsulting.feedlistener.daos;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.mongodb.MongoException;
+import dev.morphia.Datastore;
+import dev.morphia.query.Query;
 import org.apache.log4j.Logger;
-import org.mongodb.morphia.Datastore;
-import org.mongodb.morphia.query.Query;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import uk.co.eelpieconsulting.feedlistener.UnknownSubscriptionException;
@@ -17,7 +17,7 @@ import java.util.List;
 @Component
 public class SubscriptionsDAO {
 
-    private static Logger log = Logger.getLogger(SubscriptionsDAO.class);
+    private final static Logger log = Logger.getLogger(SubscriptionsDAO.class);
 
     public static final String LATEST_ITEM_DATE_DESCENDING = "-latestItemDate";
     public static final String LAST_READ_ASCENDING = "lastRead";
