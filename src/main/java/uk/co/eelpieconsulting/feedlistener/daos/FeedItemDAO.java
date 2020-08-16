@@ -69,16 +69,9 @@ public class FeedItemDAO {
         dataStoreFactory.getDs().delete(dataStoreFactory.getDs().find(FeedItem.class, "subscriptionId", subscription.getId()));
     }
 
-    @Deprecated // Returned as part of main query
     @Timed(timingNotes = "")
     public long getSubscriptionFeedItemsCount(String subscriptionId) {
         return subscriptionFeedItemsQuery(subscriptionId).countAll();
-    }
-
-	@Deprecated // Returned as part of main query
-	@Timed(timingNotes = "")
-    public long getChannelFeedItemsCount(String channelId, String username) throws MongoException {
-        return channelFeedItemsQuery(username, channelId).countAll();
     }
 
     @Timed(timingNotes = "")

@@ -12,7 +12,6 @@ import uk.co.eelpieconsulting.feedlistener.model.FeedItem;
 import uk.co.eelpieconsulting.feedlistener.model.FeedItemsResult;
 import uk.co.eelpieconsulting.feedlistener.model.Subscription;
 
-import java.net.UnknownHostException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -35,8 +34,8 @@ public class FeedItemPopulator {
         return feedItemsResult.getTotalCount();
     }
 
-    public void populateFeedItems(String username, Channel channel, Integer page, ModelAndView mv, String field, String q) throws UnknownHostException, MongoException {
-        populateFeedItems(username, channel, page, mv, field, MAX_FEED_ITEMS, q);
+    public long populateFeedItems(String username, Channel channel, Integer page, ModelAndView mv, String field, String q) throws MongoException {
+        return populateFeedItems(username, channel, page, mv, field, MAX_FEED_ITEMS, q);
     }
 
     long populateFeedItems(String username, Channel channel, Integer page, ModelAndView mv, String field, Integer pageSize, String q) throws MongoException {
