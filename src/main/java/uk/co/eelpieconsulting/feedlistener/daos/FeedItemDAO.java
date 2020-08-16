@@ -58,11 +58,8 @@ public class FeedItemDAO {
 
     public FeedItemsResult getSubscriptionFeedItems(String subscriptionId, int pageSize, int page) throws MongoException {
         Query<FeedItem> query = subscriptionFeedItemsQuery(subscriptionId);
-        FindOptions withPagination = new FindOptions().limit(pageSize).skip(calculatePageOffset(pageSize, page));
-        List<FeedItem> feedItems = query.find(withPagination).toList();
-
         long totalItems = query.count();
-        return new FeedItemsResult(feedItems, totalItems);
+        return new FeedItemsResult(query.find(withPaginationFor(pageSize, page)).toList(), totalItems);
     }
 
     public void deleteSubscriptionFeedItems(Subscription subscription) throws MongoException {
@@ -78,15 +75,13 @@ public class FeedItemDAO {
     public FeedItemsResult getChannelFeedItems(String channelId, int pageSize, int page, String username) throws MongoException {
         Query<FeedItem> query = channelFeedItemsQuery(username, channelId);
         long totalCount = query.count();
-        FindOptions withPagination = new FindOptions().limit(pageSize).skip(calculatePageOffset(pageSize, page));
-        return new FeedItemsResult(query.find(withPagination).toList(), totalCount);
+        return new FeedItemsResult(query.find(withPaginationFor(pageSize, page)).toList(), totalCount);
     }
 
     @Timed(timingNotes = "")
     public FeedItemsResult searchChannelFeedItems(String channelId, int pageSize, int page, String username, String q) {
         Query<FeedItem> query = channelFeedItemsQuery(username, channelId).filter("title", Pattern.compile(q));
-        FindOptions withPagination = new FindOptions().limit(pageSize).skip(calculatePageOffset(pageSize, page));
-        return new FeedItemsResult(query.find(withPagination).toList(), query.count());
+        return new FeedItemsResult(query.find(withPaginationFor(pageSize, page)).toList(), query.count());
     }
 
     @Timed(timingNotes = "")
@@ -100,6 +95,10 @@ public class FeedItemDAO {
 
     private Query<FeedItem> subscriptionFeedItemsQuery(String subscriptionId) {
         return dataStoreFactory.getDs().find(FeedItem.class, "subscriptionId", subscriptionId).order(DATE_DESCENDING);
+    }
+
+    private FindOptions withPaginationFor(int pageSize, int page) {
+        return new FindOptions().limit(pageSize).skip(calculatePageOffset(pageSize, page));
     }
 
     private int calculatePageOffset(int pageSize, int page) {
