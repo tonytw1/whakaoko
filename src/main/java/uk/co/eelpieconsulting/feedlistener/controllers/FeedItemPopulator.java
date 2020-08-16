@@ -39,17 +39,18 @@ public class FeedItemPopulator {
         populateFeedItems(username, channel, page, mv, field, MAX_FEED_ITEMS, q);
     }
 
-    void populateFeedItems(String username, Channel channel, Integer page, ModelAndView mv, String field, Integer pageSize, String q) throws UnknownHostException, MongoException {
+    long populateFeedItems(String username, Channel channel, Integer page, ModelAndView mv, String field, Integer pageSize, String q) throws MongoException {
         final int pageSizeToUse = pageSize != null ? pageSize : MAX_FEED_ITEMS;
         final int pageToUse = (page != null && page > 0) ? page : 1;
         if (pageSizeToUse > MAX_FEED_ITEMS) {
             throw new RuntimeException("Too many records requested");    // TODO use correct exception.
         }
 
-        List<FeedItem> feedItems = !Strings.isNullOrEmpty(q) ? feedItemDAO.searchChannelFeedItems(channel.getId(), pageSizeToUse, pageToUse, username, q) :
+        FeedItemsResult results = !Strings.isNullOrEmpty(q) ? feedItemDAO.searchChannelFeedItems(channel.getId(), pageSizeToUse, pageToUse, username, q) :
                 feedItemDAO.getChannelFeedItems(channel.getId(), pageSizeToUse, pageToUse, username);
 
-        populate(mv, field, feedItems);
+        populate(mv, field, results.getFeedsItems());
+        return results.getTotalCount();
     }
 
     private void populate(ModelAndView mv, String field, List<FeedItem> feedItems) {

@@ -37,7 +37,9 @@ import java.net.UnknownHostException;
 @Controller
 public class SubscriptionsController {
 
-    private final static Logger log = Logger.getLogger(SubscriptionsController.class);
+    private static final Logger log = Logger.getLogger(SubscriptionsController.class);
+
+    private static final String X_TOTAL_COUNT = "X-Total-Count";
 
     private UsersDAO usersDAO;
     private SubscriptionsDAO subscriptionsDAO;
@@ -88,7 +90,7 @@ public class SubscriptionsController {
         }
 
         long totalCount = feedItemPopulator.populateFeedItems(subscription, page, mv, "data");
-        response.addHeader("X-Total-Count", Long.toString(totalCount));
+        response.addHeader(X_TOTAL_COUNT, Long.toString(totalCount));
         return mv;
     }
 
