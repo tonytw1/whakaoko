@@ -30,13 +30,16 @@ import uk.co.eelpieconsulting.feedlistener.rss.RssSubscriptionManager;
 import uk.co.eelpieconsulting.feedlistener.twitter.TwitterListener;
 import uk.co.eelpieconsulting.feedlistener.twitter.TwitterSubscriptionManager;
 
+import javax.servlet.http.HttpServletResponse;
 import java.io.UnsupportedEncodingException;
 import java.net.UnknownHostException;
 
 @Controller
 public class SubscriptionsController {
 
-    private final static Logger log = Logger.getLogger(SubscriptionsController.class);
+    private static final Logger log = Logger.getLogger(SubscriptionsController.class);
+
+    private static final String X_TOTAL_COUNT = "X-Total-Count";
 
     private UsersDAO usersDAO;
     private SubscriptionsDAO subscriptionsDAO;
@@ -74,7 +77,8 @@ public class SubscriptionsController {
     @RequestMapping(value = "/{username}/subscriptions/{id}/items", method = RequestMethod.GET)
     public ModelAndView subscriptionItems(@PathVariable String username, @PathVariable String id,
                                           @RequestParam(required = false) Integer page,
-                                          @RequestParam(required = false) String format) throws UnknownHostException, MongoException, UnknownSubscriptionException, UnknownUserException {
+                                          @RequestParam(required = false) String format,
+                                          HttpServletResponse response) throws MongoException, UnknownSubscriptionException, UnknownUserException {
         usersDAO.getByUsername(username);
 
         Subscription subscription = subscriptionsDAO.getById(username, id);
@@ -85,7 +89,8 @@ public class SubscriptionsController {
             mv = new ModelAndView(viewFactory.getRssView(title, urlBuilder.getSubscriptionUrl(subscription), ""));
         }
 
-        feedItemPopulator.populateFeedItems(subscription, page, mv, "data");
+        long totalCount = feedItemPopulator.populateFeedItems(subscription, page, mv, "data");
+        response.addHeader(X_TOTAL_COUNT, Long.toString(totalCount));
         return mv;
     }
 
@@ -107,19 +112,19 @@ public class SubscriptionsController {
     @Timed(timingNotes = "")
     @RequestMapping(value = "/subscriptions/{id}", method = RequestMethod.GET)
     public ModelAndView subscriptionJson(@PathVariable String username, @PathVariable String id,
-                                         @RequestParam(required = false) Integer page) throws UnknownHostException, MongoException, UnknownSubscriptionException, UnknownUserException {
+                                         @RequestParam(required = false) Integer page) throws MongoException, UnknownSubscriptionException, UnknownUserException {
         usersDAO.getByUsername(username);
 
         Subscription subscription = subscriptionsDAO.getById(username, id);
 
         final ModelAndView mv = new ModelAndView(viewFactory.getJsonView());
-        feedItemPopulator.populateFeedItems(subscription, page, mv, "data");
+        feedItemPopulator.populateFeedItems(subscription, page, mv, "data");    // TODO this looks incorrect
         return mv;
     }
 
     @Timed(timingNotes = "")
     @RequestMapping(value = "/{username}/subscriptions/{id}/delete")    // TODO should be a HTTP DELETE
-    public ModelAndView deleteSubscription(@PathVariable String username, @PathVariable String id) throws UnknownHostException, MongoException, HttpFetchException, UnknownSubscriptionException, UnknownUserException {
+    public ModelAndView deleteSubscription(@PathVariable String username, @PathVariable String id) throws MongoException, HttpFetchException, UnknownSubscriptionException, UnknownUserException {
         usersDAO.getByUsername(username);
 
         Subscription subscription = subscriptionsDAO.getById(username, id);

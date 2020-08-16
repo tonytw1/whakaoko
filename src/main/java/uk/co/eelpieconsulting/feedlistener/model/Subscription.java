@@ -2,10 +2,10 @@ package uk.co.eelpieconsulting.feedlistener.model;
 
 import java.util.Date;
 
+import dev.morphia.annotations.Entity;
+import dev.morphia.annotations.Id;
+import dev.morphia.annotations.Indexed;
 import org.bson.types.ObjectId;
-import org.mongodb.morphia.annotations.Entity;
-import org.mongodb.morphia.annotations.Id;
-import org.mongodb.morphia.annotations.Indexed;
 
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 

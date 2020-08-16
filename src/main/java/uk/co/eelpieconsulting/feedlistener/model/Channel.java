@@ -1,8 +1,8 @@
 package uk.co.eelpieconsulting.feedlistener.model;
 
+import dev.morphia.annotations.Entity;
+import dev.morphia.annotations.Id;
 import org.bson.types.ObjectId;
-import org.mongodb.morphia.annotations.Entity;
-import org.mongodb.morphia.annotations.Id;
 
 @Entity("channels")
 public class Channel {

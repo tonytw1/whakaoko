@@ -1,9 +1,9 @@
 package uk.co.eelpieconsulting.feedlistener.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import dev.morphia.annotations.*;
+import dev.morphia.utils.IndexDirection;
 import org.bson.types.ObjectId;
-import org.mongodb.morphia.annotations.*;
-import org.mongodb.morphia.utils.IndexDirection;
 import uk.co.eelpieconsulting.common.geo.model.LatLong;
 import uk.co.eelpieconsulting.common.geo.model.Place;
 import uk.co.eelpieconsulting.common.views.rss.RssFeedable;
@@ -11,7 +11,7 @@ import uk.co.eelpieconsulting.common.views.rss.RssFeedable;
 import java.io.Serializable;
 import java.util.Date;
 
-import static org.mongodb.morphia.utils.IndexType.DESC;
+import static dev.morphia.utils.IndexType.DESC;
 
 @Entity("feeditems")
 @Indexes({

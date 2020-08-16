@@ -9,9 +9,9 @@ import org.springframework.web.servlet.ModelAndView;
 import uk.co.eelpieconsulting.feedlistener.daos.FeedItemDAO;
 import uk.co.eelpieconsulting.feedlistener.model.Channel;
 import uk.co.eelpieconsulting.feedlistener.model.FeedItem;
+import uk.co.eelpieconsulting.feedlistener.model.FeedItemsResult;
 import uk.co.eelpieconsulting.feedlistener.model.Subscription;
 
-import java.net.UnknownHostException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -27,28 +27,29 @@ public class FeedItemPopulator {
         this.feedItemDAO = feedItemDAO;
     }
 
-    public void populateFeedItems(Subscription subscription, Integer page, ModelAndView mv, String field) throws UnknownHostException {
-        List<FeedItem> feedItems = page != null ? feedItemDAO.getSubscriptionFeedItems(subscription.getId(), MAX_FEED_ITEMS, page) :
+    public long populateFeedItems(Subscription subscription, Integer page, ModelAndView mv, String field) {
+        FeedItemsResult feedItemsResult = page != null ? feedItemDAO.getSubscriptionFeedItems(subscription.getId(), MAX_FEED_ITEMS, page) :
                 feedItemDAO.getSubscriptionFeedItems(subscription.getId(), MAX_FEED_ITEMS);
-
-        populate(mv, field, feedItems);
+        populate(mv, field, feedItemsResult.getFeedsItems());
+        return feedItemsResult.getTotalCount();
     }
 
-    public void populateFeedItems(String username, Channel channel, Integer page, ModelAndView mv, String field, String q) throws UnknownHostException, MongoException {
-        populateFeedItems(username, channel, page, mv, field, MAX_FEED_ITEMS, q);
+    public long populateFeedItems(String username, Channel channel, Integer page, ModelAndView mv, String field, String q) throws MongoException {
+        return populateFeedItems(username, channel, page, mv, field, MAX_FEED_ITEMS, q);
     }
 
-    void populateFeedItems(String username, Channel channel, Integer page, ModelAndView mv, String field, Integer pageSize, String q) throws UnknownHostException, MongoException {
+    long populateFeedItems(String username, Channel channel, Integer page, ModelAndView mv, String field, Integer pageSize, String q) throws MongoException {
         final int pageSizeToUse = pageSize != null ? pageSize : MAX_FEED_ITEMS;
         final int pageToUse = (page != null && page > 0) ? page : 1;
         if (pageSizeToUse > MAX_FEED_ITEMS) {
             throw new RuntimeException("Too many records requested");    // TODO use correct exception.
         }
 
-        List<FeedItem> feedItems = !Strings.isNullOrEmpty(q) ? feedItemDAO.searchChannelFeedItems(channel.getId(), pageSizeToUse, pageToUse, username, q) :
+        FeedItemsResult results = !Strings.isNullOrEmpty(q) ? feedItemDAO.searchChannelFeedItems(channel.getId(), pageSizeToUse, pageToUse, username, q) :
                 feedItemDAO.getChannelFeedItems(channel.getId(), pageSizeToUse, pageToUse, username);
 
-        populate(mv, field, feedItems);
+        populate(mv, field, results.getFeedsItems());
+        return results.getTotalCount();
     }
 
     private void populate(ModelAndView mv, String field, List<FeedItem> feedItems) {

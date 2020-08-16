@@ -21,13 +21,16 @@ import uk.co.eelpieconsulting.feedlistener.exceptions.UnknownUserException;
 import uk.co.eelpieconsulting.feedlistener.model.Channel;
 import uk.co.eelpieconsulting.feedlistener.model.Subscription;
 
+import javax.servlet.http.HttpServletResponse;
 import java.net.UnknownHostException;
 import java.util.List;
 
 @Controller
 public class ChannelsController {
 
-    private final static Logger log = Logger.getLogger(ChannelsController.class);
+    private static final Logger log = Logger.getLogger(ChannelsController.class);
+
+    private static final String X_TOTAL_COUNT = "X-Total-Count";
 
     private final UsersDAO usersDAO;
     private final ChannelsDAO channelsDAO;
@@ -86,8 +89,8 @@ public class ChannelsController {
                                     @RequestParam(required = false) Integer page,
                                     @RequestParam(required = false) Integer pageSize,
                                     @RequestParam(required = false) String format,
-                                    @RequestParam(required = false) String q
-    ) throws UnknownHostException, MongoException, UnknownUserException {
+                                    @RequestParam(required = false) String q,
+                                    HttpServletResponse response) throws MongoException, UnknownUserException {
         usersDAO.getByUsername(username);
         final Channel channel = channelsDAO.getById(username, id);
 
@@ -96,7 +99,8 @@ public class ChannelsController {
             mv = new ModelAndView(viewFactory.getRssView(channel.getName(), urlBuilder.getChannelUrl(channel), ""));
         }
 
-        feedItemPopulator.populateFeedItems(username, channel, page, mv, "data", pageSize, q);
+        long totalCount = feedItemPopulator.populateFeedItems(username, channel, page, mv, "data", pageSize, q);
+        response.addHeader(X_TOTAL_COUNT, Long.toString(totalCount));
         return mv;
     }
 

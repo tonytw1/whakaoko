@@ -1,9 +1,7 @@
 package uk.co.eelpieconsulting.feedlistener.controllers.ui;
 
-import java.net.UnknownHostException;
-import java.util.List;
-import java.util.Map;
-
+import com.google.common.collect.Maps;
+import com.mongodb.MongoException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -11,7 +9,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
-
 import uk.co.eelpieconsulting.feedlistener.UnknownSubscriptionException;
 import uk.co.eelpieconsulting.feedlistener.controllers.FeedItemPopulator;
 import uk.co.eelpieconsulting.feedlistener.credentials.CredentialService;
@@ -22,10 +19,11 @@ import uk.co.eelpieconsulting.feedlistener.daos.UsersDAO;
 import uk.co.eelpieconsulting.feedlistener.exceptions.UnknownUserException;
 import uk.co.eelpieconsulting.feedlistener.model.Channel;
 import uk.co.eelpieconsulting.feedlistener.model.Subscription;
-
-import com.google.common.collect.Maps;
-import com.mongodb.MongoException;
 import uk.co.eelpieconsulting.feedlistener.model.User;
+
+import java.net.UnknownHostException;
+import java.util.List;
+import java.util.Map;
 
 @Controller
 public class UIController {
@@ -62,7 +60,7 @@ public class UIController {
     }
 
     @RequestMapping(value = "/ui/{username}", method = RequestMethod.GET)
-    public ModelAndView userhome(@PathVariable String username) throws UnknownHostException, MongoException, UnknownUserException {
+    public ModelAndView userhome(@PathVariable String username) throws MongoException, UnknownUserException {
         usersDAO.getByUsername(username);
 
         final ModelAndView mv = new ModelAndView("userhome");
@@ -84,7 +82,7 @@ public class UIController {
 
     @RequestMapping(value = "/ui/{username}/subscriptions/{id}", method = RequestMethod.GET)
     public ModelAndView subscription(@PathVariable String username, @PathVariable String id,
-                                     @RequestParam(required = false) Integer page) throws UnknownHostException, MongoException, UnknownSubscriptionException, UnknownUserException {
+                                     @RequestParam(required = false) Integer page) throws MongoException, UnknownSubscriptionException, UnknownUserException {
         User user = usersDAO.getByUsername(username);
 
         Subscription subscription = subscriptionsDAO.getById(user.getUsername(), id);
@@ -101,8 +99,8 @@ public class UIController {
         mv.addObject("user", user);
         mv.addObject("channel", channel);
         mv.addObject("subscription", subscription);
-        mv.addObject("subscriptionSize", feedItemDAO.getSubscriptionFeedItemsCount(subscription.getId()));
-        feedItemPopulator.populateFeedItems(subscription, page, mv, "feedItems");
+        long totalCount = feedItemPopulator.populateFeedItems(subscription, page, mv, "feedItems");
+        mv.addObject("subscriptionSize", totalCount);
         return mv;
     }
 
@@ -124,9 +122,8 @@ public class UIController {
         mv.addObject("subscriptions", subscriptionsForChannel);
 
         if (!subscriptionsForChannel.isEmpty()) {
-            mv.addObject("inboxSize", feedItemDAO.getChannelFeedItemsCount(channel.getId(), username));
-
-            feedItemPopulator.populateFeedItems(username, channel, page, mv, "inbox", q);
+            long totalCount = feedItemPopulator.populateFeedItems(username, channel, page, mv, "inbox", q);
+            mv.addObject("inboxSize", totalCount);
 
             final Map<String, Long> subscriptionCounts = Maps.newHashMap();
             for (Subscription subscription : subscriptionsForChannel) {
