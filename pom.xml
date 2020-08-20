@@ -9,7 +9,7 @@
 
     <properties>
         <org.springframework.version>4.3.5.RELEASE</org.springframework.version>
-        <jackson.version>2.9.10</jackson.version>
+        <jackson.version>2.11.2</jackson.version>
         <spymemcached.version>2.11.2</spymemcached.version>
     </properties>
 
