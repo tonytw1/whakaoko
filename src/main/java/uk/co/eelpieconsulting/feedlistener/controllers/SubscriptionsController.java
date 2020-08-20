@@ -19,12 +19,14 @@ import uk.co.eelpieconsulting.feedlistener.CredentialsRequiredException;
 import uk.co.eelpieconsulting.feedlistener.UnknownSubscriptionException;
 import uk.co.eelpieconsulting.feedlistener.UrlBuilder;
 import uk.co.eelpieconsulting.feedlistener.annotations.Timed;
-import uk.co.eelpieconsulting.feedlistener.daos.ChannelsDAO;
 import uk.co.eelpieconsulting.feedlistener.daos.SubscriptionsDAO;
 import uk.co.eelpieconsulting.feedlistener.daos.UsersDAO;
 import uk.co.eelpieconsulting.feedlistener.exceptions.UnknownUserException;
 import uk.co.eelpieconsulting.feedlistener.instagram.InstagramSubscriptionManager;
-import uk.co.eelpieconsulting.feedlistener.model.*;
+import uk.co.eelpieconsulting.feedlistener.model.InstagramGeographySubscription;
+import uk.co.eelpieconsulting.feedlistener.model.InstagramSubscription;
+import uk.co.eelpieconsulting.feedlistener.model.RssSubscription;
+import uk.co.eelpieconsulting.feedlistener.model.Subscription;
 import uk.co.eelpieconsulting.feedlistener.rss.RssPoller;
 import uk.co.eelpieconsulting.feedlistener.rss.RssSubscriptionManager;
 import uk.co.eelpieconsulting.feedlistener.twitter.TwitterListener;
@@ -32,7 +34,6 @@ import uk.co.eelpieconsulting.feedlistener.twitter.TwitterSubscriptionManager;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.UnsupportedEncodingException;
-import java.net.UnknownHostException;
 
 @Controller
 public class SubscriptionsController {
@@ -110,16 +111,14 @@ public class SubscriptionsController {
     }
 
     @Timed(timingNotes = "")
-    @RequestMapping(value = "/subscriptions/{id}", method = RequestMethod.GET)
+    @RequestMapping(value = "/{username}/subscriptions/{id}", method = RequestMethod.GET)
     public ModelAndView subscriptionJson(@PathVariable String username, @PathVariable String id,
                                          @RequestParam(required = false) Integer page) throws MongoException, UnknownSubscriptionException, UnknownUserException {
         usersDAO.getByUsername(username);
 
         Subscription subscription = subscriptionsDAO.getById(username, id);
 
-        final ModelAndView mv = new ModelAndView(viewFactory.getJsonView());
-        feedItemPopulator.populateFeedItems(subscription, page, mv, "data");    // TODO this looks incorrect
-        return mv;
+        return new ModelAndView(viewFactory.getJsonView()).addObject("data", subscription);
     }
 
     @Timed(timingNotes = "")
