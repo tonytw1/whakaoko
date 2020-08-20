@@ -8,7 +8,7 @@
     <version>0.0.1-SNAPSHOT</version>
 
     <properties>
-        <org.springframework.version>4.3.5.RELEASE</org.springframework.version>
+        <org.springframework.version>5.2.8.RELEASE</org.springframework.version>
         <jackson.version>2.9.10</jackson.version>
         <spymemcached.version>2.11.2</spymemcached.version>
     </properties>
