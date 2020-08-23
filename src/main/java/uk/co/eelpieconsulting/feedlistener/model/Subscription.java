@@ -18,7 +18,7 @@ public abstract class Subscription {
     
     private String id, name, username;  
     private Date lastRead, latestItemDate;
-    private String error;
+    private String error, etag;
   
     @Indexed
     private String channelId;
@@ -79,12 +79,27 @@ public abstract class Subscription {
 		this.error = error;
 	}
 
+	public String getEtag() {
+		return etag;
+	}
+
+	public void setEtag(String etag) {
+		this.etag = etag;
+	}
+
 	@Override
 	public String toString() {
-		return "Subscription [channelId=" + channelId + ", error=" + error
-				+ ", id=" + id + ", lastRead=" + lastRead + ", latestItemDate="
-				+ latestItemDate + ", name=" + name + ", username=" + username
-				+ "]";
+		return "Subscription{" +
+				"objectId=" + objectId +
+				", id='" + id + '\'' +
+				", name='" + name + '\'' +
+				", username='" + username + '\'' +
+				", lastRead=" + lastRead +
+				", latestItemDate=" + latestItemDate +
+				", error='" + error + '\'' +
+				", etag='" + etag + '\'' +
+				", channelId='" + channelId + '\'' +
+				'}';
 	}
 	
 }

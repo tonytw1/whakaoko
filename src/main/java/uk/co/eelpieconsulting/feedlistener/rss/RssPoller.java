@@ -88,6 +88,7 @@ public class RssPoller {
 				
 				subscription.setName(fetchedFeed.getFeedName());
 				subscription.setError(null);
+				subscription.setEtag(fetchedFeed.getEtag());
 				subscription.setLatestItemDate(getLatestItemDate(fetchedFeed.getFeedItems()));
 				subscriptionsDAO.save(subscription);				
 				

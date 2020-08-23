@@ -33,7 +33,7 @@ public class FeedFetcher {
     public FetchedFeed fetchFeed(String url) throws HttpFetchException, FeedException {
         final SyndFeed syndfeed = loadSyndFeedWithFeedFetcher(url);
         final List<FeedItem> feedItems = getFeedItemsFrom(syndfeed);
-        return new FetchedFeed(syndfeed.getTitle(), feedItems);
+        return new FetchedFeed(syndfeed.getTitle(), feedItems, null);   // TODO we'd like to be able to capture etag and other caching related headers
     }
 
     private SyndFeed loadSyndFeedWithFeedFetcher(String feedUrl) throws HttpFetchException, FeedException {

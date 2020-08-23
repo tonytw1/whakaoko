@@ -9,12 +9,13 @@ public class FetchedFeed implements Serializable {
 	
 	private static final long serialVersionUID = 1L;
 	
-	private final String feedName;
+	private final String feedName, etag;
 	private final List<FeedItem> feedItems;
 	
-	public FetchedFeed(String feedName, List<FeedItem> feedItems) {
+	public FetchedFeed(String feedName, List<FeedItem> feedItems, String etag) {
 		this.feedName = feedName;
 		this.feedItems = feedItems;
+		this.etag = etag;
 	}
 	
 	public String getFeedName() {
@@ -25,10 +26,16 @@ public class FetchedFeed implements Serializable {
 		return feedItems;
 	}
 
+	public String getEtag() {
+		return etag;
+	}
+
 	@Override
 	public String toString() {
-		return "FetchedFeed [feedItems=" + feedItems + ", feedName=" + feedName
-				+ "]";
+		return "FetchedFeed{" +
+				"feedName='" + feedName + '\'' +
+				", etag='" + etag + '\'' +
+				", feedItems=" + feedItems +
+				'}';
 	}
-	
 }
