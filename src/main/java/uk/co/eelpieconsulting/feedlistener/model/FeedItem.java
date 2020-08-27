@@ -16,6 +16,7 @@ import static dev.morphia.utils.IndexType.DESC;
 @Entity("feeditems")
 @Indexes({
         @Index(fields = {@Field(value = "date", type = DESC), @Field(value = "_id")}),
+        @Index(fields = {@Field(value = "subscriptionId"), @Field(value = "date", type = DESC), @Field(value = "_id")}),
 })
 
 public class FeedItem implements Serializable, RssFeedable {
