@@ -1,5 +1,6 @@
 package uk.co.eelpieconsulting.feedlistener.rss;
 
+import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -55,7 +56,7 @@ public class CachingUrlResolverService {
 	}
 	
 	private String generateKey(String id) {
-		return KEY_PREFIX + id;
+		return KEY_PREFIX + DigestUtils.sha256Hex(id);
 	}
 	
 }
