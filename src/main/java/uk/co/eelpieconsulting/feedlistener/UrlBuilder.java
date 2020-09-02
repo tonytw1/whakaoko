@@ -10,7 +10,7 @@ import uk.co.eelpieconsulting.feedlistener.model.User;
 @Component
 public class UrlBuilder {
 
-    @Value("#{config['base.url']}")
+    @Value("${base.url}")
 	private String baseUrl;
 
 	public String getBaseUrl() {

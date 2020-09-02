@@ -7,16 +7,16 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class CurrentUserService {
-	
+
 	private final HttpServletRequest request;
-		
-	@Autowired	
+
+	@Autowired
 	public CurrentUserService(HttpServletRequest request) {
 		this.request = request;
 	}
 	
 	public String getCurrentUser() {
-		return request.getPathInfo().split("/")[2];
+		return request.getRequestURI().split("/")[2];
 	}
 	
 }

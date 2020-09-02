@@ -172,15 +172,15 @@ Run with Maven Tomcat plugin:
 mvn tomcat7:run
 ```
 
-The service will be visible on localhost port 9100.
+The service will be visible on localhost port 8080.
 
 
 ## Create a user
 
 ```
-curl -XPOST http://localhost:9100/users?username=new-user
+curl -XPOST http://localhost:8080/users?username=new-user
 ```
 or
 ```
-http://localhost:9100/ui/newuser
+http://localhost:8080/ui/newuser
 ```

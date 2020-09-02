@@ -23,10 +23,10 @@ public class CredentialService {
 	private final UsersDAO usersDAO;
 	
 	@Autowired
-	public CredentialService(UsersDAO usersDAO, @Value("#{config['instagram.client.id']}") String instagramClientId, 
-			@Value("#{config['instagram.client.secret']}") String instagramClientSecret,
-			@Value("#{config['twitter.consumer.key']}") String twitterConsumerKey, 
-			@Value("#{config['twitter.consumer.secret']}") String twitterConsumerSecret) {
+	public CredentialService(UsersDAO usersDAO, @Value("${instagram.client.id}") String instagramClientId,
+			@Value("${instagram.client.secret}") String instagramClientSecret,
+			@Value("${twitter.consumer.key}") String twitterConsumerKey,
+			@Value("${twitter.consumer.secret}") String twitterConsumerSecret) {
 		this.usersDAO = usersDAO;
 		this.instagramClientId = instagramClientId;
 		this.instagramClientSecret = instagramClientSecret;
