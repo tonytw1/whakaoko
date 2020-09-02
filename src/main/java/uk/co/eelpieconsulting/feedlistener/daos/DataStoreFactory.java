@@ -30,12 +30,12 @@ public class DataStoreFactory {
     private Datastore datastore;
 
     @Autowired
-    public DataStoreFactory(@Value("#{config['mongo.host']}") String mongoHost,
-                            @Value("#{config['mongo.port']}") Integer mongoPort,
-                            @Value("#{config['mongo.database']}") String mongoDatabase,
-                            @Value("#{config['mongo.user']}") String mongoUser,
-                            @Value("#{config['mongo.password']}") String mongoPassword,
-                            @Value("#{config['mongo.ssl']}") Boolean mongoSSL) throws MongoException {
+    public DataStoreFactory(@Value("${mongo.host}") String mongoHost,
+                            @Value("${mongoPort}") Integer mongoPort,
+                            @Value("${mongo.database}") String mongoDatabase,
+                            @Value("${mongo.user}") String mongoUser,
+                            @Value("${mongo.password}") String mongoPassword,
+                            @Value("${mongo.ssl}") Boolean mongoSSL) throws MongoException {
 
         List<ServerAddress> addresses = Lists.newArrayList();
         String[] split = mongoHost.split(",");
