@@ -1,4 +1,4 @@
-FROM openjdk:10-jre
+FROM openjdk:11-jre
 COPY target/whakaoko-0.0.1-SNAPSHOT.jar /opt/whakaoko/whakaoko-0.0.1-SNAPSHOT.jar
 
 COPY certs/gdig2.crt gdig2.crt
