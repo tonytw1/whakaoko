@@ -119,8 +119,8 @@ public class SubscriptionsDAO {
 
     public List<Subscription> getSubscriptionsForChannel(String username, String channelID, String url) throws MongoException {
         log.info("Listing subscriptions for channel: " + username + " / " + channelID);
-        Query<Subscription> query = dataStoreFactory.getDs().find(Subscription.class);
-//                filter(Filters.eq("username", username), Filters.eq("channelId", channelID));
+        Query<Subscription> query = dataStoreFactory.getDs().find(Subscription.class).
+                filter(Filters.eq("username", username), Filters.eq("channelId", channelID));
 
         if (!Strings.isNullOrEmpty(url)) {
             query = query.disableValidation().filter(Filters.eq("url", url));    // TODO subclasses to helping here
