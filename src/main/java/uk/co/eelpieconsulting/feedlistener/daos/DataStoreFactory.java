@@ -9,6 +9,8 @@ import com.mongodb.ServerAddress;
 import com.mongodb.client.MongoClients;
 import dev.morphia.Datastore;
 import dev.morphia.Morphia;
+import dev.morphia.mapping.DiscriminatorFunction;
+import dev.morphia.mapping.MapperOptions;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -62,7 +64,9 @@ public class DataStoreFactory {
         try {
             //MongoClient m = credential != null ? new MongoClient(serverAddresses, credential, mongoClientOptions) : new MongoClient(serverAddresses, mongoClientOptions);
 
-            Datastore datastore = Morphia.createDatastore(MongoClients.create(), database);
+            MapperOptions mapperOptions = MapperOptions.builder().discriminatorKey("className").discriminator(DiscriminatorFunction.className()).build();
+
+            Datastore datastore = Morphia.createDatastore(MongoClients.create(), database,mapperOptions);
             return datastore;
 
             //morphia.map(FeedItem.class);
