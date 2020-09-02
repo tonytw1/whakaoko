@@ -21,7 +21,7 @@ import java.util.regex.Pattern;
 @Component
 public class FeedItemDAO {
 
-    private static final Sort[] DATE_DESCENDING_THEN_ID = {Sort.descending("date,_id"), Sort.ascending("_id")};
+    private static final Sort[] DATE_DESCENDING_THEN_ID = {Sort.descending("date"), Sort.ascending("_id")};
 
     private static Logger log = Logger.getLogger(FeedItemDAO.class);
 
