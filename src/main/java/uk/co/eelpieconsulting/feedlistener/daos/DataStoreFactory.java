@@ -1,11 +1,7 @@
 package uk.co.eelpieconsulting.feedlistener.daos;
 
-import com.google.common.base.Strings;
-import com.google.common.collect.Lists;
-import com.mongodb.MongoClientOptions;
-import com.mongodb.MongoCredential;
 import com.mongodb.MongoException;
-import com.mongodb.ServerAddress;
+import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
 import dev.morphia.Datastore;
 import dev.morphia.Morphia;
@@ -17,50 +13,33 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import uk.co.eelpieconsulting.feedlistener.model.*;
 
-import java.util.List;
-
 @Component
 public class DataStoreFactory {
 
     private static final Logger log = Logger.getLogger(DataStoreFactory.class);
 
-    private final List<ServerAddress> serverAddresses;
+    private final String mongoUri;
     private final String mongoDatabase;
-    private final MongoClientOptions mongoClientOptions;
-
-    private MongoCredential credential;
 
     private Datastore datastore;
 
     @Autowired
-    public DataStoreFactory(@Value("${mongo.host}") String mongoHost,
-                            @Value("${mongoPort}") Integer mongoPort,
-                            @Value("${mongo.database}") String mongoDatabase,
-                            @Value("${mongo.user}") String mongoUser,
-                            @Value("${mongo.password}") String mongoPassword,
-                            @Value("${mongo.ssl}") Boolean mongoSSL) throws MongoException {
-
-        List<ServerAddress> addresses = Lists.newArrayList();
-        String[] split = mongoHost.split(",");
-        for (int i = 0; i < split.length; i++) {
-            addresses.add(new ServerAddress(split[i], mongoPort));
-        }
-        this.serverAddresses = addresses;
-
+    public DataStoreFactory(@Value("${mongo.uri}") String mongoUri,
+                            @Value("${mongo.database}") String mongoDatabase
+                            ) throws MongoException {
+        this.mongoUri = mongoUri;
         this.mongoDatabase = mongoDatabase;
-        this.mongoClientOptions = MongoClientOptions.builder().sslEnabled(mongoSSL).build();
-        this.credential = !Strings.isNullOrEmpty(mongoUser) ? MongoCredential.createCredential(mongoUser, mongoDatabase, mongoPassword.toCharArray()) : null;
     }
 
     public Datastore getDs() {
         if (datastore == null) {
-            datastore = createDataStore(mongoDatabase);
+            datastore = createDataStore(mongoUri, mongoDatabase);
             datastore.ensureIndexes();
         }
         return datastore;
     }
 
-    private Datastore createDataStore(String database) {
+    private Datastore createDataStore(String mongoUri, String database) {
 
         try {
             //MongoClient m = credential != null ? new MongoClient(serverAddresses, credential, mongoClientOptions) : new MongoClient(serverAddresses, mongoClientOptions);
@@ -69,7 +48,8 @@ public class DataStoreFactory {
                     discriminatorKey("className").discriminator(DiscriminatorFunction.className()).
                     build();
 
-            Datastore datastore = Morphia.createDatastore(MongoClients.create(), database,mapperOptions);
+            MongoClient mongoClient = MongoClients.create(mongoUri);
+            Datastore datastore = Morphia.createDatastore(mongoClient, database, mapperOptions);
 
             // These explicit mappings are needed to trigger subclass querying during finds;
             // see subtype in LegacyQuery source code for hints
