@@ -4,7 +4,10 @@ import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.mongodb.MongoException;
 import dev.morphia.Datastore;
+import dev.morphia.query.FindOptions;
 import dev.morphia.query.Query;
+import dev.morphia.query.Sort;
+import dev.morphia.query.experimental.filters.Filters;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -19,8 +22,8 @@ public class SubscriptionsDAO {
 
     private final static Logger log = Logger.getLogger(SubscriptionsDAO.class);
 
-    public static final String LATEST_ITEM_DATE_DESCENDING = "-latestItemDate";
-    public static final String LAST_READ_ASCENDING = "lastRead";
+    public static final Sort LATEST_ITEM_DATE_DESCENDING = Sort.descending("latestItemDate");
+    public static final Sort LAST_READ_ASCENDING = Sort.ascending("lastRead");
 
     private final DataStoreFactory dataStoreFactory;
 
@@ -46,14 +49,14 @@ public class SubscriptionsDAO {
         }
     }
 
-    public List<Subscription> getSubscriptions(String order, String url) {
+    public List<Subscription> getSubscriptions(Sort sort, String url) {
         try {
-            Query<Subscription> query = dataStoreFactory.getDs().createQuery(Subscription.class);
+            Query<Subscription> query = dataStoreFactory.getDs().find(Subscription.class);
             if (!Strings.isNullOrEmpty(url)) {
-                query = query.disableValidation().filter("url", url);    // TODO subclasses to helping here
+                query = query.disableValidation().filter(Filters.eq("url", url));    // TODO subclasses to helping here Why is validation disabled?
             }
 
-            List<Subscription> subscriptions = query.order(order).asList();
+            List<Subscription> subscriptions = query.iterator(new FindOptions().sort(sort)).toList();
             log.info("Loaded subscriptions: " + subscriptions.size());
             return subscriptions;
         } catch (MongoException e) {
@@ -63,7 +66,7 @@ public class SubscriptionsDAO {
 
     public Subscription getById(String username, String id) throws UnknownSubscriptionException {
         try {
-            final Subscription subscription = dataStoreFactory.getDs().createQuery(Subscription.class).filter("username", username).filter("id", id).get();
+            final Subscription subscription = dataStoreFactory.getDs().find(Subscription.class).filter(Filters.eq("username", username), Filters.eq("id", id)).first();
             if (subscription == null) {
                 throw new UnknownSubscriptionException();
             }
@@ -85,11 +88,11 @@ public class SubscriptionsDAO {
     public void delete(Subscription subscription) throws MongoException {
         log.info("Deleting subscription: " + subscription);
         final Datastore datastore = dataStoreFactory.getDs();
-        datastore.delete(datastore.createQuery(Subscription.class).filter("id", subscription.getId()));
+        datastore.find(Subscription.class).filter(Filters.eq("id", subscription.getId())).first();
     }
 
     public InstagramSubscription getByInstagramId(Long subscriptionId) throws MongoException {
-        return dataStoreFactory.getDs().find(InstagramSubscription.class, "subscriptionId", subscriptionId).get();    // TODO subscriptionId is not a very clear field name
+        return dataStoreFactory.getDs().find(InstagramSubscription.class).filter(Filters.eq("subscriptionId", subscriptionId)).first();    // TODO subscriptionId is not a very clear field name
     }
 
     public List<Subscription> getTwitterSubscriptions() {
@@ -114,13 +117,12 @@ public class SubscriptionsDAO {
 
     public List<Subscription> getSubscriptionsForChannel(String username, String channelID, String url) throws MongoException {
         Query<Subscription> query = dataStoreFactory.getDs().find(Subscription.class).
-                filter("username", username).
-                filter("channelId", channelID);
-        if (!Strings.isNullOrEmpty(url)) {
-            query = query.disableValidation().filter("url", url);    // TODO subclasses to helping here
-        }
+                filter(Filters.eq("username", username), Filters.eq("channelId", channelID));
 
-        return query.order(LATEST_ITEM_DATE_DESCENDING).asList();
+        if (!Strings.isNullOrEmpty(url)) {
+            query = query.disableValidation().filter(Filters.eq("url", url));    // TODO subclasses to helping here
+        }
+        return query.iterator(new FindOptions().sort(LATEST_ITEM_DATE_DESCENDING)).toList();
     }
 
     private boolean subscriptionExists(Subscription subscription) {
