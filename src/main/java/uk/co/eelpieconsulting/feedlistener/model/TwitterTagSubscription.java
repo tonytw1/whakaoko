@@ -1,7 +1,9 @@
 package uk.co.eelpieconsulting.feedlistener.model;
 
+import dev.morphia.annotations.Entity;
 import org.apache.commons.codec.digest.DigestUtils;
 
+@Entity("subscriptions")
 public class TwitterTagSubscription extends Subscription {
 
 	private String tag;

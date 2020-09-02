@@ -1,15 +1,14 @@
 package uk.co.eelpieconsulting.feedlistener.daos;
 
-import java.util.List;
-
+import com.mongodb.MongoException;
+import dev.morphia.query.Query;
 import dev.morphia.query.experimental.filters.Filters;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
 import uk.co.eelpieconsulting.feedlistener.model.Channel;
 
-import com.mongodb.MongoException;
+import java.util.List;
 
 @Component
 public class ChannelsDAO {
@@ -25,7 +24,8 @@ public class ChannelsDAO {
 
     public List<Channel> getChannels(String username) {
         try {
-            return dataStoreFactory.getDs().find(Channel.class).filter(Filters.eq("username", username)).iterator().toList();
+            Query<Channel> channelsByUser = dataStoreFactory.getDs().find(Channel.class).filter(Filters.eq("username", username));
+            return channelsByUser.iterator().toList();
         } catch (MongoException e) {
             throw new RuntimeException(e);
         }

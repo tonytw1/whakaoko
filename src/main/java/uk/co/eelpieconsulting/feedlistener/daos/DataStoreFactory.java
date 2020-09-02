@@ -15,6 +15,7 @@ import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import uk.co.eelpieconsulting.feedlistener.model.*;
 
 import java.util.List;
 
@@ -64,16 +65,20 @@ public class DataStoreFactory {
         try {
             //MongoClient m = credential != null ? new MongoClient(serverAddresses, credential, mongoClientOptions) : new MongoClient(serverAddresses, mongoClientOptions);
 
-            MapperOptions mapperOptions = MapperOptions.builder().discriminatorKey("className").discriminator(DiscriminatorFunction.className()).build();
+            MapperOptions mapperOptions = MapperOptions.builder().
+                    discriminatorKey("className").discriminator(DiscriminatorFunction.className()).
+                    build();
 
             Datastore datastore = Morphia.createDatastore(MongoClients.create(), database,mapperOptions);
+
+            // These explicit mappings are needed to trigger subclass querying during finds;
+            // see subtype in LegacyQuery source code for hints
+            datastore.getMapper().map(InstagramSubscription.class);
+            datastore.getMapper().map(InstagramGeographySubscription.class);
+            datastore.getMapper().map(InstagramTagSubscription.class);
+            datastore.getMapper().map(TwitterTagSubscription.class);
+            datastore.getMapper().map(RssSubscription.class);
             return datastore;
-
-            //morphia.map(FeedItem.class);
-            //morphia.map(Subscription.class);
-            //morphia.map(Channel.class);
-            //morphia.map(User.class);
-
 
         } catch (MongoException e) {
             log.error(e);

@@ -8,6 +8,7 @@ import dev.morphia.query.FindOptions;
 import dev.morphia.query.Query;
 import dev.morphia.query.Sort;
 import dev.morphia.query.experimental.filters.Filters;
+import dev.morphia.query.internal.MorphiaCursor;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -68,6 +69,7 @@ public class SubscriptionsDAO {
         try {
             final Subscription subscription = dataStoreFactory.getDs().find(Subscription.class).filter(Filters.eq("username", username), Filters.eq("id", id)).first();
             if (subscription == null) {
+                log.info("Subscription not found");
                 throw new UnknownSubscriptionException();
             }
             return subscription;
@@ -116,13 +118,20 @@ public class SubscriptionsDAO {
     }
 
     public List<Subscription> getSubscriptionsForChannel(String username, String channelID, String url) throws MongoException {
-        Query<Subscription> query = dataStoreFactory.getDs().find(Subscription.class).
-                filter(Filters.eq("username", username), Filters.eq("channelId", channelID));
+        log.info("Listing subscriptions for channel: " + username + " / " + channelID);
+        Query<Subscription> query = dataStoreFactory.getDs().find(Subscription.class);
+//                filter(Filters.eq("username", username), Filters.eq("channelId", channelID));
 
         if (!Strings.isNullOrEmpty(url)) {
             query = query.disableValidation().filter(Filters.eq("url", url));    // TODO subclasses to helping here
         }
-        return query.iterator(new FindOptions().sort(LATEST_ITEM_DATE_DESCENDING)).toList();
+
+        MorphiaCursor<Subscription> iterator = query.iterator();
+        log.info(iterator.hasNext());
+
+        List<Subscription> subscriptions = iterator.toList();
+        log.info("Returning: " + subscriptions.size());
+        return subscriptions;
     }
 
     private boolean subscriptionExists(Subscription subscription) {
@@ -135,4 +144,7 @@ public class SubscriptionsDAO {
         return false;
     }
 
+    public List<Subscription> getAllSubscriptions() {
+        return dataStoreFactory.getDs().find(Subscription.class).iterator().toList();
+    }
 }
