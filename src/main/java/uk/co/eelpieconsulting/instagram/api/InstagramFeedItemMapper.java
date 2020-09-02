@@ -4,9 +4,6 @@ import org.apache.log4j.Logger;
 import org.joda.time.DateTime;
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import uk.co.eelpieconsulting.common.geo.model.LatLong;
-import uk.co.eelpieconsulting.common.geo.model.Place;
 import uk.co.eelpieconsulting.feedlistener.model.FeedItem;
 
 public class InstagramFeedItemMapper {
@@ -43,12 +40,12 @@ public class InstagramFeedItemMapper {
 
 		final String url = json.getString(LINK);
 
-		Place place = null;
+		uk.co.eelpieconsulting.feedlistener.model.Place place = null;
 		if (json.has(LOCATION) && !json.isNull(LOCATION)) {
 			final JSONObject locationJson = json.getJSONObject(LOCATION);
 			if (locationJson.has(LATITUDE) && locationJson.has(LONGITUDE)) {
-				LatLong latLong = new LatLong(locationJson.getDouble(LATITUDE), locationJson.getDouble(LONGITUDE));	// TODO preserve name and id if available.
-				place = new Place(null, latLong, null);
+				uk.co.eelpieconsulting.feedlistener.model.LatLong latLong = new uk.co.eelpieconsulting.feedlistener.model.LatLong(locationJson.getDouble(LATITUDE), locationJson.getDouble(LONGITUDE));	// TODO preserve name and id if available.
+				place = new uk.co.eelpieconsulting.feedlistener.model.Place(null, latLong);
 			} else {
 				log.warn("Location has no lat long: " + locationJson.toString());
 			}

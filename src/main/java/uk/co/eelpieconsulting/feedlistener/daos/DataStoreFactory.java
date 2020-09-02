@@ -2,23 +2,17 @@ package uk.co.eelpieconsulting.feedlistener.daos;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
-import com.mongodb.*;
+import com.mongodb.MongoClientOptions;
+import com.mongodb.MongoCredential;
+import com.mongodb.MongoException;
+import com.mongodb.ServerAddress;
 import com.mongodb.client.MongoClients;
 import dev.morphia.Datastore;
 import dev.morphia.Morphia;
 import org.apache.log4j.Logger;
-import org.bson.codecs.configuration.CodecRegistry;
-import org.bson.codecs.pojo.PojoCodecProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-import uk.co.eelpieconsulting.feedlistener.model.Channel;
-import uk.co.eelpieconsulting.feedlistener.model.FeedItem;
-import uk.co.eelpieconsulting.feedlistener.model.Subscription;
-import uk.co.eelpieconsulting.feedlistener.model.User;
-
-import static org.bson.codecs.configuration.CodecRegistries.fromProviders;
-import static org.bson.codecs.configuration.CodecRegistries.fromRegistries;
 
 import java.util.List;
 
@@ -68,7 +62,9 @@ public class DataStoreFactory {
         try {
             //MongoClient m = credential != null ? new MongoClient(serverAddresses, credential, mongoClientOptions) : new MongoClient(serverAddresses, mongoClientOptions);
 
-            return Morphia.createDatastore(MongoClients.create(), database);
+            Datastore datastore = Morphia.createDatastore(MongoClients.create(), database);
+            return datastore;
+
             //morphia.map(FeedItem.class);
             //morphia.map(Subscription.class);
             //morphia.map(Channel.class);

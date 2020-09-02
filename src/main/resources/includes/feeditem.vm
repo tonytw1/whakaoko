@@ -9,7 +9,7 @@
         <a href="$feedItem.url"><img src="$feedItem.imageUrl" border="0"></a>
     #end
 	<br/>$!feedItem.body
-	
+
 	#if($feedItem.place)
 		<p>$feedItem.place</p>
 	#end

@@ -71,7 +71,7 @@ public class FeedItemPopulator {
                 feedItem.getUrl(),
                 StringEscapeUtils.unescapeHtml(feedItem.getBody()),
                 feedItem.getDate(),
-                null,
+                feedItem.getPlace(),
                 feedItem.getImageUrl(),
                 feedItem.getAuthor()
         );

@@ -38,6 +38,8 @@ public class FeedItemDAO {
             if (dataStoreFactory.getDs().find(FeedItem.class).filter(Filters.eq("url", feedItem.getUrl())).iterator().toList().isEmpty()) {    // TODO shouldn't need to read before every write - use an upsert?
                 log.info("Added: " + feedItem.getSubscriptionId() + ", " + feedItem.getTitle());
                 dataStoreFactory.getDs().save(feedItem);
+            } else {
+                log.info("Skipping previously added: " + feedItem.getTitle());
             }
         } catch (Exception e) {
             throw new FeeditemPersistanceException(e);
