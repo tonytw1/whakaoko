@@ -31,6 +31,7 @@ public class DataStoreFactory {
 
     @Autowired
     public DataStoreFactory(@Value("${mongo.host}") String mongoHost,
+                            @Value("${mongo.port}") Integer mongoPort,
                             @Value("${mongo.database}") String mongoDatabase,
                             @Value("${mongo.user}") String mongoUser,
                             @Value("${mongo.password}") String mongoPassword,
@@ -39,7 +40,7 @@ public class DataStoreFactory {
         List<ServerAddress> addresses = Lists.newArrayList();
         String[] split = mongoHost.split(",");
         for (int i = 0; i < split.length; i++) {
-            addresses.add(new ServerAddress(split[i], 27017));
+            addresses.add(new ServerAddress(split[i], mongoPort));
         }
         this.serverAddresses = addresses;
 
