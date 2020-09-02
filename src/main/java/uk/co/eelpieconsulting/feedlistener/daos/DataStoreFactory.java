@@ -31,7 +31,7 @@ public class DataStoreFactory {
 
     @Autowired
     public DataStoreFactory(@Value("${mongo.host}") String mongoHost,
-                            @Value("${mongo.port}") Integer mongoPort,
+                            @Value("${mongoPort}") Integer mongoPort,
                             @Value("${mongo.database}") String mongoDatabase,
                             @Value("${mongo.user}") String mongoUser,
                             @Value("${mongo.password}") String mongoPassword,
