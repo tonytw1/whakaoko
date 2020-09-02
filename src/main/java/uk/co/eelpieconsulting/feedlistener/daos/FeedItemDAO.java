@@ -4,6 +4,7 @@ import com.google.common.collect.Lists;
 import com.mongodb.MongoException;
 import dev.morphia.query.FindOptions;
 import dev.morphia.query.Query;
+import dev.morphia.query.Sort;
 import dev.morphia.query.experimental.filters.Filters;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,7 +21,7 @@ import java.util.regex.Pattern;
 @Component
 public class FeedItemDAO {
 
-    private static final String DATE_DESCENDING = "-date,_id";
+    private static final Sort[] DATE_DESCENDING_THEN_ID = {Sort.descending("date,_id"), Sort.ascending("_id")};
 
     private static Logger log = Logger.getLogger(FeedItemDAO.class);
 
@@ -59,7 +60,7 @@ public class FeedItemDAO {
     public FeedItemsResult getSubscriptionFeedItems(String subscriptionId, int pageSize, int page) throws MongoException {
         Query<FeedItem> query = subscriptionFeedItemsQuery(subscriptionId);
         long totalItems = query.count();
-        return new FeedItemsResult(query.iterator(withPaginationFor(pageSize, page)).toList(), totalItems);
+        return new FeedItemsResult(query.iterator(withPaginationFor(pageSize, page).sort(DATE_DESCENDING_THEN_ID)).toList(), totalItems);
     }
 
     public void deleteSubscriptionFeedItems(Subscription subscription) throws MongoException {
@@ -75,7 +76,7 @@ public class FeedItemDAO {
     public FeedItemsResult getChannelFeedItems(String channelId, int pageSize, int page, String username) throws MongoException {
         Query<FeedItem> query = channelFeedItemsQuery(username, channelId);
         long totalCount = query.count();
-        return new FeedItemsResult(query.iterator(withPaginationFor(pageSize, page)).toList(), totalCount);
+        return new FeedItemsResult(query.iterator(withPaginationFor(pageSize, page).sort(DATE_DESCENDING_THEN_ID)).toList(), totalCount);
     }
 
     @Timed(timingNotes = "")
@@ -90,11 +91,11 @@ public class FeedItemDAO {
         for (Subscription subscription : subscriptionsDAO.getSubscriptionsForChannel(username, channelId, null)) {
             channelSubscriptionIds.add(subscription.getId());
         }
-        return dataStoreFactory.getDs().find(FeedItem.class).filter(Filters.in("subscriptionId", channelSubscriptionIds)); // TODO .order(DATE_DESCENDING);
+        return dataStoreFactory.getDs().find(FeedItem.class).filter(Filters.in("subscriptionId", channelSubscriptionIds));
     }
 
     private Query<FeedItem> subscriptionFeedItemsQuery(String subscriptionId) {
-        return dataStoreFactory.getDs().find(FeedItem.class).filter(Filters.eq("subscriptionId", subscriptionId));  // TODO order(DATE_DESCENDING);
+        return dataStoreFactory.getDs().find(FeedItem.class).filter(Filters.eq("subscriptionId", subscriptionId));
     }
 
     private FindOptions withPaginationFor(int pageSize, int page) {
