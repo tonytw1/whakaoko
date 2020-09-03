@@ -60,38 +60,4 @@ public class UIController {
         return mv;
     }
 
-    @RequestMapping(value = "/ui/{username}/subscriptions/new", method = RequestMethod.GET)
-    public ModelAndView newSubscriptionForm(@PathVariable String username) throws UnknownUserException {
-        usersDAO.getByUsername(username);
-
-        final ModelAndView mv = new ModelAndView("newSubscription");
-        mv.addObject("username", username);
-        mv.addObject("channels", channelsDAO.getChannels(username));
-        return mv;
-    }
-
-    @RequestMapping(value = "/ui/{username}/subscriptions/{id}", method = RequestMethod.GET)
-    public ModelAndView subscription(@PathVariable String username, @PathVariable String id,
-                                     @RequestParam(required = false) Integer page) throws MongoException, UnknownSubscriptionException, UnknownUserException {
-        User user = usersDAO.getByUsername(username);
-
-        Subscription subscription = subscriptionsDAO.getById(user.getUsername(), id);
-        if (subscription == null) {
-            throw new RuntimeException("Invalid subscription");
-        }
-
-        Channel channel = null;
-        if (user.getUsername() != null && subscription.getChannelId() != null) {
-            channel = channelsDAO.getById(subscription.getUsername(), subscription.getChannelId());
-        }
-
-        ModelAndView mv = new ModelAndView("subscription");
-        mv.addObject("user", user);
-        mv.addObject("channel", channel);
-        mv.addObject("subscription", subscription);
-        long totalCount = feedItemPopulator.populateFeedItems(subscription, page, mv, "feedItems");
-        mv.addObject("subscriptionSize", totalCount);
-        return mv;
-    }
-
 }
