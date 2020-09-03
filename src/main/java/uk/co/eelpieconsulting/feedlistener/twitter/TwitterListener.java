@@ -70,7 +70,7 @@ public class TwitterListener {
     private TwitterStream setUpTwitterStreamForUser(String username) {
         final String twitterAccessTokenForUser = credentialService.getTwitterAccessTokenForUser(username);
         final String twitterAccessSecretForUser = credentialService.getTwitterAccessSecretForUser(username);
-        log.info("Using twitter access credentials: " + twitterAccessTokenForUser + ", " + twitterAccessSecretForUser);
+        log.info("Using twitter access credentials to create twitter stream for user " + username + ": " + twitterAccessTokenForUser + ", " + twitterAccessSecretForUser);
 
         TwitterStatusListener twitterListener = new TwitterStatusListener(feedItemDestination, twitterFeedItemMapper, subscriptionsDAO, username);
 

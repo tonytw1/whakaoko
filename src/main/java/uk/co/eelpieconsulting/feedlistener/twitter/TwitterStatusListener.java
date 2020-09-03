@@ -14,6 +14,7 @@ import uk.co.eelpieconsulting.feedlistener.model.Subscription;
 import uk.co.eelpieconsulting.feedlistener.model.TwitterTagSubscription;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class TwitterStatusListener implements StatusListener {
 	
@@ -21,7 +22,7 @@ public class TwitterStatusListener implements StatusListener {
 
 	private final FeedItemDAO feedItemDestination;
 	private final TwitterFeedItemMapper twitterFeedItemMapper;
-	private final SubscriptionsDAO subscriptionsDAO;
+	private final SubscriptionsDAO subscriptionsDAO;	// TODO subscriptions dao is an odd pass in; list of subscriptions would be better?
 	private final String username;
 	
 	public TwitterStatusListener(FeedItemDAO feedItemDestination, TwitterFeedItemMapper twitterFeedItemMapper, SubscriptionsDAO subscriptionsDAO, String username) {
@@ -33,8 +34,9 @@ public class TwitterStatusListener implements StatusListener {
 
 	public void onStatus(Status status) {
 		log.info("Received: " + status.getText());
-		
-		final List<Subscription> subscriptionsMatchingThisTweet = filterSubscriptionsMatchingThisTweet(subscriptionsDAO.getTwitterSubscriptionsFor(username), status);		
+
+		List<TwitterTagSubscription> usersTwitterSubscriptions = subscriptionsDAO.getTwitterSubscriptionsFor(username);	// TODO dao hint in each tweet =(
+		final List<Subscription> subscriptionsMatchingThisTweet = filterSubscriptionsMatchingThisTweet(usersTwitterSubscriptions, status);
 		for (Subscription subscription : subscriptionsMatchingThisTweet) {
 			final FeedItem tweetFeedItem = twitterFeedItemMapper.createFeedItemFrom(status);
 			tweetFeedItem.setSubscriptionId(subscription.getId());	// TODO should we be duplicating tweets like this?
@@ -71,14 +73,10 @@ public class TwitterStatusListener implements StatusListener {
 		log.warn("Unimplemented stall warning: " + stallWarning.getMessage());	// TODO implement
 	}
 	
-	private List<Subscription> filterSubscriptionsMatchingThisTweet(List<Subscription> twitterSubscriptions, Status status) {
-		final List<Subscription> filteredSubscriptions = Lists.newArrayList();
-		for (Subscription subscription : twitterSubscriptions) {
-			if (status.getText().toLowerCase().contains(((TwitterTagSubscription) subscription).getTag().toLowerCase())) {
-				filteredSubscriptions.add(subscription);
-			}
-		}
-		return filteredSubscriptions;
+	private List<Subscription> filterSubscriptionsMatchingThisTweet(List<TwitterTagSubscription> twitterSubscriptions, Status status) {
+		return twitterSubscriptions.stream().filter(subscription ->
+			status.getText().toLowerCase().contains(subscription.getTag().toLowerCase())
+		).collect(Collectors.toList());
 	}
 	
 }

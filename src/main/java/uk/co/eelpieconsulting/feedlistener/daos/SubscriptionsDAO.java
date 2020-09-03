@@ -15,8 +15,10 @@ import uk.co.eelpieconsulting.feedlistener.UnknownSubscriptionException;
 import uk.co.eelpieconsulting.feedlistener.model.InstagramSubscription;
 import uk.co.eelpieconsulting.feedlistener.model.RssSubscription;
 import uk.co.eelpieconsulting.feedlistener.model.Subscription;
+import uk.co.eelpieconsulting.feedlistener.model.TwitterTagSubscription;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Component
 public class SubscriptionsDAO {
@@ -107,14 +109,11 @@ public class SubscriptionsDAO {
         return subscriptions;
     }
 
-    public List<Subscription> getTwitterSubscriptionsFor(String username) {
-        final List<Subscription> subscriptions = Lists.newArrayList();
-        for (Subscription subscription : getSubscriptions(SubscriptionsDAO.LATEST_ITEM_DATE_DESCENDING, null)) {
-            if (subscription.getId().startsWith("twitter") && username.equals(subscription.getUsername())) {
-                subscriptions.add(subscription);
-            }
-        }
-        return subscriptions;
+    public List<TwitterTagSubscription> getTwitterSubscriptionsFor(String username) {
+        List<TwitterTagSubscription> allTwitterSubscriptions = dataStoreFactory.getDs().find(TwitterTagSubscription.class).iterator().toList();
+        return allTwitterSubscriptions.stream().filter(subscription ->
+                username.equals(subscription.getUsername())
+        ).collect(Collectors.toList());
     }
 
     public List<Subscription> getSubscriptionsForChannel(String username, String channelID, String url) throws MongoException {
