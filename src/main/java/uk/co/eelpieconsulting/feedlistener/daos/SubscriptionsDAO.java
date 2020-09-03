@@ -126,12 +126,7 @@ public class SubscriptionsDAO {
             query = query.disableValidation().filter(Filters.eq("url", url));    // TODO subclasses to helping here
         }
 
-        MorphiaCursor<Subscription> iterator = query.iterator();
-        log.info(iterator.hasNext());
-
-        List<Subscription> subscriptions = iterator.toList();
-        log.info("Returning: " + subscriptions.size());
-        return subscriptions;
+        return query.iterator(new FindOptions().sort((LATEST_ITEM_DATE_DESCENDING))).toList();
     }
 
     private boolean subscriptionExists(Subscription subscription) {
