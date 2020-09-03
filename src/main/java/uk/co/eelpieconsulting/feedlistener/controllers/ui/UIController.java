@@ -1,6 +1,5 @@
 package uk.co.eelpieconsulting.feedlistener.controllers.ui;
 
-import com.google.common.collect.Maps;
 import com.mongodb.MongoException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -20,10 +19,6 @@ import uk.co.eelpieconsulting.feedlistener.exceptions.UnknownUserException;
 import uk.co.eelpieconsulting.feedlistener.model.Channel;
 import uk.co.eelpieconsulting.feedlistener.model.Subscription;
 import uk.co.eelpieconsulting.feedlistener.model.User;
-
-import java.net.UnknownHostException;
-import java.util.List;
-import java.util.Map;
 
 @Controller
 public class UIController {
@@ -47,11 +42,6 @@ public class UIController {
         this.feedItemDAO = feedItemDAO;
         this.credentialService = credentialService;
         this.feedItemPopulator = feedItemPopulator;
-    }
-
-    @RequestMapping(value = "/", method = RequestMethod.GET)
-    public ModelAndView homepage() {
-        return new ModelAndView("homepage");
     }
 
     @RequestMapping(value = "/ui/newuser", method = RequestMethod.GET)
@@ -102,41 +92,6 @@ public class UIController {
         long totalCount = feedItemPopulator.populateFeedItems(subscription, page, mv, "feedItems");
         mv.addObject("subscriptionSize", totalCount);
         return mv;
-    }
-
-    @RequestMapping(value = "/ui/{username}/channels/{id}", method = RequestMethod.GET)
-    public ModelAndView channel(@PathVariable String username,
-                                @PathVariable String id,
-                                @RequestParam(required = false) Integer page,
-                                @RequestParam(required = false) String q
-    ) throws UnknownHostException, MongoException {
-        User user = usersDAO.getByUsername(username);
-
-        final Channel channel = channelsDAO.getById(user.getUsername(), id);
-
-        final ModelAndView mv = new ModelAndView("channel");
-        mv.addObject("user", user);
-        mv.addObject("channel", channel);
-
-        final List<Subscription> subscriptionsForChannel = subscriptionsDAO.getSubscriptionsForChannel(username, channel.getId(), null);
-        mv.addObject("subscriptions", subscriptionsForChannel);
-
-        if (!subscriptionsForChannel.isEmpty()) {
-            long totalCount = feedItemPopulator.populateFeedItems(username, channel, page, mv, "inbox", q);
-            mv.addObject("inboxSize", totalCount);
-
-            final Map<String, Long> subscriptionCounts = Maps.newHashMap();
-            for (Subscription subscription : subscriptionsForChannel) {
-                subscriptionCounts.put(subscription.getId(), feedItemDAO.getSubscriptionFeedItemsCount(subscription.getId()));    // TODO slow on channels with many subscriptions - cache or index?
-            }
-            mv.addObject("subscriptionCounts", subscriptionCounts);
-        }
-        return mv;
-    }
-
-    @RequestMapping(value = "/ui/{username}/channels/new", method = RequestMethod.GET)
-    public ModelAndView newChannelForm() {
-        return new ModelAndView("newChannel");
     }
 
 }
