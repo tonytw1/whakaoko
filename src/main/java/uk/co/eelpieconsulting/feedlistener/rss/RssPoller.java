@@ -37,10 +37,10 @@ public class RssPoller {
 		this.taskExecutor = taskExecutor;
 	}
 	
-	@Scheduled(fixedRate=3600000)
+	@Scheduled(fixedRate=3600000, initialDelay = 300000)
 	public void run() {
 		log.info("Polling subscriptions");
-		for (Subscription subscription : subscriptionsDAO.getSubscriptions(SubscriptionsDAO.LAST_READ_ASCENDING, null)) {	// TODO explict get RSS subscriptions end point
+		for (Subscription subscription : subscriptionsDAO.getSubscriptions(SubscriptionsDAO.LAST_READ_ASCENDING, null)) {	// TODO explicit get RSS subscriptions end point
 			if (isRssSubscription(subscription)) {
 				executeRssPoll((RssSubscription) subscription);
 			}
