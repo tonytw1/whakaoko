@@ -8,13 +8,16 @@ import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.servlet.ModelAndView
 import uk.co.eelpieconsulting.feedlistener.controllers.FeedItemPopulator
 import uk.co.eelpieconsulting.feedlistener.daos.ChannelsDAO
+import uk.co.eelpieconsulting.feedlistener.daos.FeedItemDAO
 import uk.co.eelpieconsulting.feedlistener.daos.SubscriptionsDAO
 import uk.co.eelpieconsulting.feedlistener.daos.UsersDAO
 import uk.co.eelpieconsulting.feedlistener.model.Channel
+import uk.co.eelpieconsulting.feedlistener.model.FeedItemsResult
 
 @Controller
 class SubscriptionsController @Autowired constructor(val usersDAO: UsersDAO, val channelsDAO: ChannelsDAO,
                                                      val subscriptionsDAO: SubscriptionsDAO,
+                                                     val feedItemDAO: FeedItemDAO,
                                                      val feedItemPopulator: FeedItemPopulator) {
 
     @GetMapping("/ui/{username}/subscriptions/new")
@@ -34,11 +37,15 @@ class SubscriptionsController @Autowired constructor(val usersDAO: UsersDAO, val
             channel = channelsDAO.getById(subscription.username, subscription.channelId)
         }
 
+        val feedItemsResult: FeedItemsResult = if (page != null)
+            feedItemDAO.getSubscriptionFeedItems(subscription.id, FeedItemPopulator.MAX_FEED_ITEMS, page)
+        else feedItemDAO.getSubscriptionFeedItems(subscription.id, FeedItemPopulator.MAX_FEED_ITEMS)
+
         val mv = ModelAndView("subscription")
-        val totalCount: Long = feedItemPopulator.populateFeedItems(subscription, page, mv, "feedItems")
+        feedItemPopulator.populateFeedItems(feedItemsResult, mv, "feedItems")
         mv.addObject("user", user)
                 .addObject("channel", channel).addObject("subscription", subscription)
-                .addObject("subscriptionSize", totalCount)
+                .addObject("subscriptionSize", feedItemsResult.totalCount)  // TODO push into populate call?
         return mv
     }
 

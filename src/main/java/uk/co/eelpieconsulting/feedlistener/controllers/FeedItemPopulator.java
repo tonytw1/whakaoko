@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
 @Component
 public class FeedItemPopulator {
 
-    private static int MAX_FEED_ITEMS = 25;
+    public static int MAX_FEED_ITEMS = 25;
 
     private final FeedItemDAO feedItemDAO;
 
@@ -27,11 +27,8 @@ public class FeedItemPopulator {
         this.feedItemDAO = feedItemDAO;
     }
 
-    public long populateFeedItems(Subscription subscription, Integer page, ModelAndView mv, String field) {
-        FeedItemsResult feedItemsResult = page != null ? feedItemDAO.getSubscriptionFeedItems(subscription.getId(), MAX_FEED_ITEMS, page) :
-                feedItemDAO.getSubscriptionFeedItems(subscription.getId(), MAX_FEED_ITEMS);
+    public void populateFeedItems(FeedItemsResult feedItemsResult, ModelAndView mv, String field) {
         populate(mv, field, feedItemsResult.getFeedsItems());
-        return feedItemsResult.getTotalCount();
     }
 
     public long populateFeedItems(String username, Channel channel, Integer page, ModelAndView mv, String field, String q) throws MongoException {

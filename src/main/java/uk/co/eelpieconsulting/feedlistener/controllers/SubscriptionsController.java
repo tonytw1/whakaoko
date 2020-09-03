@@ -19,14 +19,12 @@ import uk.co.eelpieconsulting.feedlistener.CredentialsRequiredException;
 import uk.co.eelpieconsulting.feedlistener.UnknownSubscriptionException;
 import uk.co.eelpieconsulting.feedlistener.UrlBuilder;
 import uk.co.eelpieconsulting.feedlistener.annotations.Timed;
+import uk.co.eelpieconsulting.feedlistener.daos.FeedItemDAO;
 import uk.co.eelpieconsulting.feedlistener.daos.SubscriptionsDAO;
 import uk.co.eelpieconsulting.feedlistener.daos.UsersDAO;
 import uk.co.eelpieconsulting.feedlistener.exceptions.UnknownUserException;
 import uk.co.eelpieconsulting.feedlistener.instagram.InstagramSubscriptionManager;
-import uk.co.eelpieconsulting.feedlistener.model.InstagramGeographySubscription;
-import uk.co.eelpieconsulting.feedlistener.model.InstagramSubscription;
-import uk.co.eelpieconsulting.feedlistener.model.RssSubscription;
-import uk.co.eelpieconsulting.feedlistener.model.Subscription;
+import uk.co.eelpieconsulting.feedlistener.model.*;
 import uk.co.eelpieconsulting.feedlistener.rss.RssPoller;
 import uk.co.eelpieconsulting.feedlistener.rss.RssSubscriptionManager;
 import uk.co.eelpieconsulting.feedlistener.twitter.TwitterListener;
@@ -51,6 +49,7 @@ public class SubscriptionsController {
     private TwitterSubscriptionManager twitterSubscriptionManager;
     private RssSubscriptionManager rssSubscriptionManager;
     private ViewFactory viewFactory;
+    private FeedItemDAO feedItemDAO;
     private FeedItemPopulator feedItemPopulator;
 
     public SubscriptionsController() {
@@ -61,7 +60,9 @@ public class SubscriptionsController {
                                    InstagramSubscriptionManager instagramSubscriptionManager, UrlBuilder urlBuilder,
                                    TwitterSubscriptionManager twitterSubscriptionManager,
                                    RssSubscriptionManager rssSubscriptionManager,
-                                   ViewFactory viewFactory, FeedItemPopulator feedItemPopulator) {
+                                   ViewFactory viewFactory,
+                                   FeedItemDAO feedItemDAO,
+                                   FeedItemPopulator feedItemPopulator) {
         this.usersDAO = usersDAO;
         this.subscriptionsDAO = subscriptionsDAO;
         this.rssPoller = rssPoller;
@@ -71,6 +72,7 @@ public class SubscriptionsController {
         this.twitterSubscriptionManager = twitterSubscriptionManager;
         this.rssSubscriptionManager = rssSubscriptionManager;
         this.viewFactory = viewFactory;
+        this.feedItemDAO = feedItemDAO;
         this.feedItemPopulator = feedItemPopulator;
     }
 
@@ -90,8 +92,12 @@ public class SubscriptionsController {
             mv = new ModelAndView(viewFactory.getRssView(title, urlBuilder.getSubscriptionUrl(subscription), ""));
         }
 
-        long totalCount = feedItemPopulator.populateFeedItems(subscription, page, mv, "data");
-        response.addHeader(X_TOTAL_COUNT, Long.toString(totalCount));
+        // TODO duplication with UI controller
+        FeedItemsResult feedItemsResult = page != null ? feedItemDAO.getSubscriptionFeedItems(subscription.getId(), FeedItemPopulator.MAX_FEED_ITEMS, page) :
+                feedItemDAO.getSubscriptionFeedItems(subscription.getId(), FeedItemPopulator.MAX_FEED_ITEMS);
+
+        feedItemPopulator.populateFeedItems(feedItemsResult, mv, "data");
+        response.addHeader(X_TOTAL_COUNT, Long.toString(feedItemsResult.getTotalCount()));
         return mv;
     }
 
