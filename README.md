@@ -166,10 +166,10 @@ docker run -p 27017:27017 mongo:3.4
 docker run -p 11211:11211 memcached
 ```
 
-Run with Maven Tomcat plugin:
+Run using the Spring Boot plugin:
 
 ```
-mvn tomcat7:run
+mvn spring-boot:run
 ```
 
 The service will be visible on localhost port 8080.
@@ -177,10 +177,12 @@ The service will be visible on localhost port 8080.
 
 ## Create a user
 
-```
-curl -XPOST http://localhost:8080/users?username=new-user
-```
-or
+Using the user interface:
 ```
 http://localhost:8080/ui/newuser
+```
+
+or curl:
+```
+curl -XPOST http://localhost:8080/users?username=new-user
 ```
