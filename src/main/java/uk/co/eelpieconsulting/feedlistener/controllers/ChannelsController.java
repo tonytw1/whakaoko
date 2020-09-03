@@ -99,7 +99,7 @@ public class ChannelsController {
             mv = new ModelAndView(viewFactory.getRssView(channel.getName(), urlBuilder.getChannelUrl(channel), ""));
         }
 
-        long totalCount = feedItemPopulator.populateFeedItems(username, channel, page, mv, "data", pageSize, q);
+        long totalCount = feedItemPopulator.populateChannelFeedItems(username, channel, page, mv, "data", q, pageSize);
         response.addHeader(X_TOTAL_COUNT, Long.toString(totalCount));
         return mv;
     }

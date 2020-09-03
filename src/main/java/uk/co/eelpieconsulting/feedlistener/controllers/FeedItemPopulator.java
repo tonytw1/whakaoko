@@ -27,15 +27,13 @@ public class FeedItemPopulator {
         this.feedItemDAO = feedItemDAO;
     }
 
-    public void populateFeedItems(FeedItemsResult feedItemsResult, ModelAndView mv, String field) {
-        populate(mv, field, feedItemsResult.getFeedsItems());
+    // TODO This should be pushed up to the controller
+    public long populateChannelFeedItems(String username, Channel channel, Integer page, ModelAndView mv, String field, String q) throws MongoException {
+        return populateChannelFeedItems(username, channel, page, mv, field, q, MAX_FEED_ITEMS);
     }
 
-    public long populateFeedItems(String username, Channel channel, Integer page, ModelAndView mv, String field, String q) throws MongoException {
-        return populateFeedItems(username, channel, page, mv, field, MAX_FEED_ITEMS, q);
-    }
-
-    long populateFeedItems(String username, Channel channel, Integer page, ModelAndView mv, String field, Integer pageSize, String q) throws MongoException {
+    // TODO This should be pushed up to the controller
+    public long populateChannelFeedItems(String username, Channel channel, Integer page, ModelAndView mv, String field, String q, Integer pageSize) throws MongoException {
         final int pageSizeToUse = pageSize != null ? pageSize : MAX_FEED_ITEMS;
         final int pageToUse = (page != null && page > 0) ? page : 1;
         if (pageSizeToUse > MAX_FEED_ITEMS) {
@@ -47,6 +45,10 @@ public class FeedItemPopulator {
 
         populate(mv, field, results.getFeedsItems());
         return results.getTotalCount();
+    }
+
+    public void populateFeedItems(FeedItemsResult feedItemsResult, ModelAndView mv, String field) {
+        populate(mv, field, feedItemsResult.getFeedsItems());
     }
 
     private void populate(ModelAndView mv, String field, List<FeedItem> feedItems) {
