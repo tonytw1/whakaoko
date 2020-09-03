@@ -15,10 +15,12 @@ import uk.co.eelpieconsulting.common.views.ViewFactory;
 import uk.co.eelpieconsulting.feedlistener.IdBuilder;
 import uk.co.eelpieconsulting.feedlistener.UrlBuilder;
 import uk.co.eelpieconsulting.feedlistener.daos.ChannelsDAO;
+import uk.co.eelpieconsulting.feedlistener.daos.FeedItemDAO;
 import uk.co.eelpieconsulting.feedlistener.daos.SubscriptionsDAO;
 import uk.co.eelpieconsulting.feedlistener.daos.UsersDAO;
 import uk.co.eelpieconsulting.feedlistener.exceptions.UnknownUserException;
 import uk.co.eelpieconsulting.feedlistener.model.Channel;
+import uk.co.eelpieconsulting.feedlistener.model.FeedItemsResult;
 import uk.co.eelpieconsulting.feedlistener.model.Subscription;
 
 import javax.servlet.http.HttpServletResponse;
@@ -39,11 +41,12 @@ public class ChannelsController {
     private final UrlBuilder urlBuilder;
     private final ViewFactory viewFactory;
     private final FeedItemPopulator feedItemPopulator;
+    private final FeedItemDAO feedItemDAO;
 
     @Autowired
     public ChannelsController(UsersDAO usersDAO, ChannelsDAO channelsDAO, SubscriptionsDAO subscriptionsDAO,
                               IdBuilder idBuilder, UrlBuilder urlBuilder, ViewFactory viewFactory,
-                              FeedItemPopulator feedItemPopulator) {
+                              FeedItemPopulator feedItemPopulator, FeedItemDAO feedItemDAO) {
         this.usersDAO = usersDAO;
         this.channelsDAO = channelsDAO;
         this.subscriptionsDAO = subscriptionsDAO;
@@ -51,6 +54,7 @@ public class ChannelsController {
         this.urlBuilder = urlBuilder;
         this.viewFactory = viewFactory;
         this.feedItemPopulator = feedItemPopulator;
+        this.feedItemDAO = feedItemDAO;
     }
 
     @RequestMapping(value = "/{username}/channels", method = RequestMethod.GET)
@@ -99,7 +103,9 @@ public class ChannelsController {
             mv = new ModelAndView(viewFactory.getRssView(channel.getName(), urlBuilder.getChannelUrl(channel), ""));
         }
 
-        long totalCount = feedItemPopulator.populateChannelFeedItems(username, channel, page, mv, "data", q, pageSize);
+        FeedItemsResult results = feedItemDAO.getChannelFeedItemsResult(username, channel, page, q, pageSize);
+        feedItemPopulator.populateFeedItems(results, mv, "data");
+        long totalCount = results.getTotalCount();
         response.addHeader(X_TOTAL_COUNT, Long.toString(totalCount));
         return mv;
     }

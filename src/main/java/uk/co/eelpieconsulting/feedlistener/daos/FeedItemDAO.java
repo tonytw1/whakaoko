@@ -1,5 +1,6 @@
 package uk.co.eelpieconsulting.feedlistener.daos;
 
+import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.mongodb.MongoException;
 import dev.morphia.query.FindOptions;
@@ -12,6 +13,7 @@ import org.springframework.stereotype.Component;
 import uk.co.eelpieconsulting.feedlistener.annotations.Timed;
 import uk.co.eelpieconsulting.feedlistener.controllers.FeedItemPopulator;
 import uk.co.eelpieconsulting.feedlistener.exceptions.FeeditemPersistanceException;
+import uk.co.eelpieconsulting.feedlistener.model.Channel;
 import uk.co.eelpieconsulting.feedlistener.model.FeedItem;
 import uk.co.eelpieconsulting.feedlistener.model.FeedItemsResult;
 import uk.co.eelpieconsulting.feedlistener.model.Subscription;
@@ -60,6 +62,17 @@ public class FeedItemDAO {
         } else {
             return getSubscriptionFeedItems(subscription.getId(), FeedItemPopulator.MAX_FEED_ITEMS);
         }
+    }
+
+    public FeedItemsResult getChannelFeedItemsResult(String username, Channel channel, Integer page, String q, Integer pageSize) {
+        final int pageSizeToUse = pageSize != null ? pageSize : FeedItemPopulator.MAX_FEED_ITEMS;
+        final int pageToUse = (page != null && page > 0) ? page : 1;
+        if (pageSizeToUse > FeedItemPopulator.MAX_FEED_ITEMS) {
+            throw new RuntimeException("Too many records requested");    // TODO use correct exception.
+        }
+
+        return !Strings.isNullOrEmpty(q) ? searchChannelFeedItems(channel.getId(), pageSizeToUse, pageToUse, username, q) :
+                getChannelFeedItems(channel.getId(), pageSizeToUse, pageToUse, username);
     }
 
     private FeedItemsResult getSubscriptionFeedItems(String subscriptionId, int pageSize) throws MongoException {
