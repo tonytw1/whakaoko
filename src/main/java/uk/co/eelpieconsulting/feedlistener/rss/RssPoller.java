@@ -14,11 +14,9 @@ import uk.co.eelpieconsulting.feedlistener.daos.SubscriptionsDAO;
 import uk.co.eelpieconsulting.feedlistener.exceptions.FeeditemPersistanceException;
 import uk.co.eelpieconsulting.feedlistener.model.FeedItem;
 import uk.co.eelpieconsulting.feedlistener.model.RssSubscription;
-import uk.co.eelpieconsulting.feedlistener.model.Subscription;
 
 import java.util.Date;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Component
 public class RssPoller {
@@ -43,12 +41,8 @@ public class RssPoller {
         log.info("Polling subscriptions");
 
         // TODO want explicit get RSS subscriptions end point
-        List<Subscription> allSubscriptions = subscriptionsDAO.getSubscriptions(SubscriptionsDAO.LAST_READ_ASCENDING, null);
-        List<RssSubscription> rssSubscriptions = allSubscriptions.stream().
-                filter(subscription -> isRssSubscription(subscription)).
-                map(subscription -> (RssSubscription) subscription).collect(Collectors.toList());
 
-        for (RssSubscription subscription : rssSubscriptions) {
+        for (RssSubscription subscription : subscriptionsDAO.getAllRssSubscriptions()) {
             executeRssPoll(subscription);
         }
         log.info("Done");
@@ -132,10 +126,6 @@ public class RssPoller {
             }
             return latestItemDate;
         }
-    }
-
-    private boolean isRssSubscription(Subscription subscription) {
-        return subscription.getId().contains("feed-");    // TODO implement better
     }
 
 }

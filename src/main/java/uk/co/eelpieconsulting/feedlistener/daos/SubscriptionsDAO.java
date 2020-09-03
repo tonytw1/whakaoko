@@ -9,13 +9,16 @@ import dev.morphia.query.Query;
 import dev.morphia.query.Sort;
 import dev.morphia.query.experimental.filters.Filters;
 import org.apache.log4j.Logger;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import uk.co.eelpieconsulting.feedlistener.UnknownSubscriptionException;
 import uk.co.eelpieconsulting.feedlistener.model.InstagramSubscription;
+import uk.co.eelpieconsulting.feedlistener.model.RssSubscription;
 import uk.co.eelpieconsulting.feedlistener.model.Subscription;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Component
 public class SubscriptionsDAO {
@@ -126,6 +129,17 @@ public class SubscriptionsDAO {
         }
 
         return query.iterator(new FindOptions().sort((LATEST_ITEM_DATE_DESCENDING))).toList();
+    }
+
+    public List<RssSubscription> getAllRssSubscriptions() {
+        List<Subscription> allSubscriptions = getSubscriptions(SubscriptionsDAO.LAST_READ_ASCENDING, null);
+        return allSubscriptions.stream().
+                filter(subscription -> isRssSubscription(subscription)).
+                map(subscription -> (RssSubscription) subscription).collect(Collectors.toList());
+    }
+
+    private boolean isRssSubscription(Subscription subscription) {
+        return subscription.getId().contains("feed-");    // TODO implement better
     }
 
     private boolean subscriptionExists(Subscription subscription) {
