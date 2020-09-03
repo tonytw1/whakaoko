@@ -12,7 +12,6 @@ import uk.co.eelpieconsulting.feedlistener.daos.FeedItemDAO
 import uk.co.eelpieconsulting.feedlistener.daos.SubscriptionsDAO
 import uk.co.eelpieconsulting.feedlistener.daos.UsersDAO
 import uk.co.eelpieconsulting.feedlistener.model.Channel
-import uk.co.eelpieconsulting.feedlistener.model.FeedItemsResult
 
 @Controller
 class SubscriptionsController @Autowired constructor(val usersDAO: UsersDAO, val channelsDAO: ChannelsDAO,
@@ -37,9 +36,7 @@ class SubscriptionsController @Autowired constructor(val usersDAO: UsersDAO, val
             channel = channelsDAO.getById(subscription.username, subscription.channelId)
         }
 
-        val feedItemsResult: FeedItemsResult = if (page != null)
-            feedItemDAO.getSubscriptionFeedItems(subscription.id, FeedItemPopulator.MAX_FEED_ITEMS, page)
-        else feedItemDAO.getSubscriptionFeedItems(subscription.id, FeedItemPopulator.MAX_FEED_ITEMS)
+        val feedItemsResult = feedItemDAO.getSubscriptionFeedItems(subscription, page)
 
         val mv = ModelAndView("subscription")
         feedItemPopulator.populateFeedItems(feedItemsResult, mv, "feedItems")

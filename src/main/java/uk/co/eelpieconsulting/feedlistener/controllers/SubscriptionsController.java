@@ -92,9 +92,7 @@ public class SubscriptionsController {
             mv = new ModelAndView(viewFactory.getRssView(title, urlBuilder.getSubscriptionUrl(subscription), ""));
         }
 
-        // TODO duplication with UI controller
-        FeedItemsResult feedItemsResult = page != null ? feedItemDAO.getSubscriptionFeedItems(subscription.getId(), FeedItemPopulator.MAX_FEED_ITEMS, page) :
-                feedItemDAO.getSubscriptionFeedItems(subscription.getId(), FeedItemPopulator.MAX_FEED_ITEMS);
+        FeedItemsResult feedItemsResult = feedItemDAO.getSubscriptionFeedItems(subscription, page);
 
         feedItemPopulator.populateFeedItems(feedItemsResult, mv, "data");
         response.addHeader(X_TOTAL_COUNT, Long.toString(feedItemsResult.getTotalCount()));

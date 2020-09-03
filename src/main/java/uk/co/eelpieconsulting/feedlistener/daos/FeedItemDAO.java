@@ -10,6 +10,7 @@ import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import uk.co.eelpieconsulting.feedlistener.annotations.Timed;
+import uk.co.eelpieconsulting.feedlistener.controllers.FeedItemPopulator;
 import uk.co.eelpieconsulting.feedlistener.exceptions.FeeditemPersistanceException;
 import uk.co.eelpieconsulting.feedlistener.model.FeedItem;
 import uk.co.eelpieconsulting.feedlistener.model.FeedItemsResult;
@@ -53,11 +54,18 @@ public class FeedItemDAO {
         }
     }
 
-    public FeedItemsResult getSubscriptionFeedItems(String subscriptionId, int pageSize) throws MongoException {
-        return getSubscriptionFeedItems(subscriptionId, pageSize, 0);
+    public FeedItemsResult getSubscriptionFeedItems(Subscription subscription, Integer page) {
+        if (page != null) {
+            return getSubscriptionFeedItems(subscription.getId(), FeedItemPopulator.MAX_FEED_ITEMS, page);
+        } else {
+            return getSubscriptionFeedItems(subscription.getId(), FeedItemPopulator.MAX_FEED_ITEMS);
+        }
     }
 
-    public FeedItemsResult getSubscriptionFeedItems(String subscriptionId, int pageSize, int page) throws MongoException {
+    private FeedItemsResult getSubscriptionFeedItems(String subscriptionId, int pageSize) throws MongoException {
+        return getSubscriptionFeedItems(subscriptionId, pageSize, 0);
+    }
+    private FeedItemsResult getSubscriptionFeedItems(String subscriptionId, int pageSize, int page) throws MongoException {
         Query<FeedItem> query = subscriptionFeedItemsQuery(subscriptionId);
         long totalItems = query.count();
         return new FeedItemsResult(query.iterator(withPaginationFor(pageSize, page).sort(DATE_DESCENDING_THEN_ID)).toList(), totalItems);
