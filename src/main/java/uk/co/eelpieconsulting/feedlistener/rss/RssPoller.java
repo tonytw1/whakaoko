@@ -39,12 +39,7 @@ public class RssPoller {
     @Scheduled(fixedRate = 3600000, initialDelay = 300000)
     public void run() {
         log.info("Polling subscriptions");
-
-        // TODO want explicit get RSS subscriptions end point
-
-        for (RssSubscription subscription : subscriptionsDAO.getAllRssSubscriptions()) {
-            executeRssPoll(subscription);
-        }
+        subscriptionsDAO.getAllRssSubscriptions().forEach(this::executeRssPoll);
         log.info("Done");
     }
 
