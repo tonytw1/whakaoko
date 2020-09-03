@@ -18,118 +18,124 @@ import uk.co.eelpieconsulting.feedlistener.model.Subscription;
 
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Component
 public class RssPoller {
-	
-	private static final Logger log = Logger.getLogger(RssPoller.class);
-	
-	private final SubscriptionsDAO subscriptionsDAO;
-	private final FeedFetcher feedFetcher;
-	private final FeedItemDAO feedItemDestination;
-	private final TaskExecutor taskExecutor;
-	
-	@Autowired
-	public RssPoller(SubscriptionsDAO subscriptionsDAO, FeedFetcher feedFetcher, FeedItemDAO feedItemDestination, TaskExecutor taskExecutor) {
-		this.subscriptionsDAO = subscriptionsDAO;
-		this.feedFetcher = feedFetcher;
-		this.feedItemDestination = feedItemDestination;
-		this.taskExecutor = taskExecutor;
-	}
-	
-	@Scheduled(fixedRate=3600000, initialDelay = 300000)
-	public void run() {
-		log.info("Polling subscriptions");
-		for (Subscription subscription : subscriptionsDAO.getSubscriptions(SubscriptionsDAO.LAST_READ_ASCENDING, null)) {	// TODO explicit get RSS subscriptions end point
-			if (isRssSubscription(subscription)) {
-				executeRssPoll((RssSubscription) subscription);
-			}
-		}
-		log.info("Done");
-	}
-	
-	public void run(RssSubscription subscription) {
-		log.info("Polling single subscription: " + subscription.getId());
-		executeRssPoll(subscription);
-		log.info("Done");		
-	}
-	
-	private void executeRssPoll(RssSubscription subscription) {
-		log.info("Executing RSS poll for: " + subscription.getId());
-		ThreadPoolTaskExecutor threadPoolTaskExecutor = (ThreadPoolTaskExecutor) taskExecutor;
-		log.info("Task executor: active:" + threadPoolTaskExecutor.getActiveCount() + ", pool size: " + threadPoolTaskExecutor.getPoolSize());
-		taskExecutor.execute(new ProcessFeedTask(feedFetcher, feedItemDestination, subscriptionsDAO, subscription));
-	}
-	
-	private class ProcessFeedTask implements Runnable {
-		
-		private final FeedFetcher feedFetcher;
-		private final FeedItemDAO feedItemDestination;
-		private final RssSubscription subscription;
-		private final SubscriptionsDAO subscriptionsDAO;
-				
-		public ProcessFeedTask(FeedFetcher feedFetcher, FeedItemDAO feedItemDestination, SubscriptionsDAO subscriptionsDAO, RssSubscription subscription) {
-			this.feedFetcher = feedFetcher;
-			this.feedItemDestination = feedItemDestination;
-			this.subscription = subscription;
-			this.subscriptionsDAO = subscriptionsDAO;
-		}
 
-		public void run() {
-			log.info("Processing feed: " + subscription + " from thread " + Thread.currentThread().getId());
-			subscription.setLastRead(DateTime.now().toDate());
-			subscriptionsDAO.save(subscription);
-			
-			try {
-				final FetchedFeed fetchedFeed = feedFetcher.fetchFeed(subscription.getUrl());
-				log.info("Fetched feed: " + fetchedFeed.getFeedName());
-				
-				persistFeedItems(fetchedFeed);
-				
-				subscription.setName(fetchedFeed.getFeedName());
-				subscription.setError(null);
-				subscription.setEtag(fetchedFeed.getEtag());
-				subscription.setLatestItemDate(getLatestItemDate(fetchedFeed.getFeedItems()));
-				subscriptionsDAO.save(subscription);				
-				
-			} catch (HttpFetchException e) {
-				log.error("Http fetch exception while fetching RSS subscription: " + subscription.getUrl() + ": " + e.getClass().getSimpleName());
-				subscription.setError("Http fetch: " + e.getMessage());
-				subscriptionsDAO.save(subscription);				
+    private static final Logger log = Logger.getLogger(RssPoller.class);
 
-			} catch (FeedException e) {
-				log.error("Feed exception while parsing RSS subscription: " + subscription.getUrl() + ": " + e.getMessage());
-				subscription.setError("Feed exception: " + e.getMessage());
-				subscriptionsDAO.save(subscription);				
-			}
-			// TODO record error condition			
-		}
+    private final SubscriptionsDAO subscriptionsDAO;
+    private final FeedFetcher feedFetcher;
+    private final FeedItemDAO feedItemDestination;
+    private final TaskExecutor taskExecutor;
 
-		private void persistFeedItems(final FetchedFeed fetchedFeed) {
-			for (FeedItem feedItem : fetchedFeed.getFeedItems()) {
-				try {
-					feedItem.setSubscriptionId(subscription.getId());
-					feedItemDestination.add(feedItem);
-				} catch (FeeditemPersistanceException e) {
-					log.error(e);
-				}
-			}
-		}
+    @Autowired
+    public RssPoller(SubscriptionsDAO subscriptionsDAO, FeedFetcher feedFetcher, FeedItemDAO feedItemDestination, TaskExecutor taskExecutor) {
+        this.subscriptionsDAO = subscriptionsDAO;
+        this.feedFetcher = feedFetcher;
+        this.feedItemDestination = feedItemDestination;
+        this.taskExecutor = taskExecutor;
+    }
 
-		private Date getLatestItemDate(List<FeedItem> feedItems) {
-			Date latestItemDate = null;
-			for (FeedItem feedItem : feedItems) {
-				final Date feedItemDate = feedItem.getDate();
-				if (feedItemDate != null && (latestItemDate == null || feedItemDate.after(latestItemDate))) {
-					latestItemDate = feedItemDate;
-				}
-			}
-			return latestItemDate;
-		}
-	}
-	
-	private boolean isRssSubscription(Subscription subscription) {
-		return subscription.getId().contains("feed-");	// TODO implement better
-	}
-	
+    @Scheduled(fixedRate = 3600000, initialDelay = 300000)
+    public void run() {
+        log.info("Polling subscriptions");
+
+        // TODO want explicit get RSS subscriptions end point
+        List<Subscription> allSubscriptions = subscriptionsDAO.getSubscriptions(SubscriptionsDAO.LAST_READ_ASCENDING, null);
+        List<RssSubscription> rssSubscriptions = allSubscriptions.stream().
+                filter(subscription -> isRssSubscription(subscription)).
+                map(subscription -> (RssSubscription) subscription).collect(Collectors.toList());
+
+        for (RssSubscription subscription : rssSubscriptions) {
+            executeRssPoll(subscription);
+        }
+        log.info("Done");
+    }
+
+    public void run(RssSubscription subscription) {
+        log.info("Polling single subscription: " + subscription.getId());
+        executeRssPoll(subscription);
+        log.info("Done");
+    }
+
+    private void executeRssPoll(RssSubscription subscription) {
+        log.info("Executing RSS poll for: " + subscription.getId());
+        ThreadPoolTaskExecutor threadPoolTaskExecutor = (ThreadPoolTaskExecutor) taskExecutor;
+        log.info("Task executor: active:" + threadPoolTaskExecutor.getActiveCount() + ", pool size: " + threadPoolTaskExecutor.getPoolSize());
+        taskExecutor.execute(new ProcessFeedTask(feedFetcher, feedItemDestination, subscriptionsDAO, subscription));
+    }
+
+    private class ProcessFeedTask implements Runnable {
+
+        private final FeedFetcher feedFetcher;
+        private final FeedItemDAO feedItemDestination;
+        private final RssSubscription subscription;
+        private final SubscriptionsDAO subscriptionsDAO;
+
+        public ProcessFeedTask(FeedFetcher feedFetcher, FeedItemDAO feedItemDestination, SubscriptionsDAO subscriptionsDAO, RssSubscription subscription) {
+            this.feedFetcher = feedFetcher;
+            this.feedItemDestination = feedItemDestination;
+            this.subscription = subscription;
+            this.subscriptionsDAO = subscriptionsDAO;
+        }
+
+        public void run() {
+            log.info("Processing feed: " + subscription + " from thread " + Thread.currentThread().getId());
+            subscription.setLastRead(DateTime.now().toDate());
+            subscriptionsDAO.save(subscription);
+
+            try {
+                final FetchedFeed fetchedFeed = feedFetcher.fetchFeed(subscription.getUrl());
+                log.info("Fetched feed: " + fetchedFeed.getFeedName());
+
+                persistFeedItems(fetchedFeed);
+
+                subscription.setName(fetchedFeed.getFeedName());
+                subscription.setError(null);
+                subscription.setEtag(fetchedFeed.getEtag());
+                subscription.setLatestItemDate(getLatestItemDate(fetchedFeed.getFeedItems()));
+                subscriptionsDAO.save(subscription);
+
+            } catch (HttpFetchException e) {
+                log.error("Http fetch exception while fetching RSS subscription: " + subscription.getUrl() + ": " + e.getClass().getSimpleName());
+                subscription.setError("Http fetch: " + e.getMessage());
+                subscriptionsDAO.save(subscription);
+
+            } catch (FeedException e) {
+                log.error("Feed exception while parsing RSS subscription: " + subscription.getUrl() + ": " + e.getMessage());
+                subscription.setError("Feed exception: " + e.getMessage());
+                subscriptionsDAO.save(subscription);
+            }
+            // TODO record error condition
+        }
+
+        private void persistFeedItems(final FetchedFeed fetchedFeed) {
+            for (FeedItem feedItem : fetchedFeed.getFeedItems()) {
+                try {
+                    feedItem.setSubscriptionId(subscription.getId());
+                    feedItemDestination.add(feedItem);
+                } catch (FeeditemPersistanceException e) {
+                    log.error(e);
+                }
+            }
+        }
+
+        private Date getLatestItemDate(List<FeedItem> feedItems) {
+            Date latestItemDate = null;
+            for (FeedItem feedItem : feedItems) {
+                final Date feedItemDate = feedItem.getDate();
+                if (feedItemDate != null && (latestItemDate == null || feedItemDate.after(latestItemDate))) {
+                    latestItemDate = feedItemDate;
+                }
+            }
+            return latestItemDate;
+        }
+    }
+
+    private boolean isRssSubscription(Subscription subscription) {
+        return subscription.getId().contains("feed-");    // TODO implement better
+    }
+
 }
