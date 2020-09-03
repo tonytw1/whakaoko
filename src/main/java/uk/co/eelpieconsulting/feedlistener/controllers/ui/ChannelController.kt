@@ -1,6 +1,5 @@
 package uk.co.eelpieconsulting.feedlistener.controllers.ui
 
-import com.google.common.collect.Maps
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Controller
 import org.springframework.web.bind.annotation.GetMapping
@@ -43,10 +42,13 @@ class ChannelController @Autowired constructor(val usersDAO: UsersDAO,
         if (!subscriptionsForChannel.isEmpty()) {
             val totalCount = feedItemPopulator.populateFeedItems(username, channel, page, mv, "inbox", q)
             mv.addObject("inboxSize", totalCount)
-            val subscriptionCounts: MutableMap<String, Long> = Maps.newHashMap()
-            for (subscription in subscriptionsForChannel) {
-                subscriptionCounts[subscription.id] = feedItemDAO.getSubscriptionFeedItemsCount(subscription.id) // TODO slow on channels with many subscriptions - cache or index?
-            }
+
+            val subscriptionCounts = subscriptionsForChannel.map { subscription ->
+                // TODO slow on channels with many subscriptions - cache or index?
+                val subscriptionFeedItemsCount = feedItemDAO.getSubscriptionFeedItemsCount(subscription.id)
+                Pair(subscription.id, subscriptionFeedItemsCount)
+            }.toMap()
+
             mv.addObject("subscriptionCounts", subscriptionCounts)
         }
         return mv
