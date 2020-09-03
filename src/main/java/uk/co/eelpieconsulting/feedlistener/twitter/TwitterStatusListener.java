@@ -72,7 +72,8 @@ public class TwitterStatusListener implements StatusListener {
 	public void onStallWarning(StallWarning stallWarning) {
 		log.warn("Unimplemented stall warning: " + stallWarning.getMessage());	// TODO implement
 	}
-	
+
+	// TODO does twitter really not tell us why a tweet matched?
 	private List<Subscription> filterSubscriptionsMatchingThisTweet(List<TwitterTagSubscription> twitterSubscriptions, Status status) {
 		return twitterSubscriptions.stream().filter(subscription ->
 			status.getText().toLowerCase().contains(subscription.getTag().toLowerCase())
