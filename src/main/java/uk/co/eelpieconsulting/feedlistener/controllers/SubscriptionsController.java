@@ -156,6 +156,18 @@ public class SubscriptionsController {
     }
 
     @Timed(timingNotes = "")
+    @RequestMapping(value = "/subscriptions", method = RequestMethod.GET)
+    public ModelAndView all() {
+        try {
+            return new ModelAndView(viewFactory.getJsonView()).
+                    addObject("data", subscriptionsDAO.getAllSubscriptions());
+        } catch (Exception e) {
+            log.error(e);
+            throw(e);
+        }
+    }
+
+    @Timed(timingNotes = "")
     @RequestMapping(value = "/{username}/subscriptions/feeds", method = RequestMethod.POST)
     public ModelAndView addFeedSubscription(@PathVariable String username, @RequestParam String url, @RequestParam String channel) throws UnknownUserException {
         usersDAO.getByUsername(username);

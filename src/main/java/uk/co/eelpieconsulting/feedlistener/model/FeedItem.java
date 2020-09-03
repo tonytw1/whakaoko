@@ -5,7 +5,6 @@ import dev.morphia.annotations.*;
 import dev.morphia.utils.IndexDirection;
 import org.bson.types.ObjectId;
 import uk.co.eelpieconsulting.common.geo.model.LatLong;
-import uk.co.eelpieconsulting.common.geo.model.Place;
 import uk.co.eelpieconsulting.common.views.rss.RssFeedable;
 
 import java.io.Serializable;
@@ -36,7 +35,8 @@ public class FeedItem implements Serializable, RssFeedable {
     @Indexed(value = IndexDirection.DESC)        // TODO unused - because always used with subscription id?
     private Date date;
 
-    private Place place;
+    private uk.co.eelpieconsulting.feedlistener.model.Place place;
+
     private String imageUrl;
 
     @Indexed
@@ -47,7 +47,7 @@ public class FeedItem implements Serializable, RssFeedable {
     public FeedItem() {
     }
 
-    public FeedItem(String title, String url, String body, Date date, Place place, String imageUrl, String author) {
+    public FeedItem(String title, String url, String body, Date date, uk.co.eelpieconsulting.feedlistener.model.Place place, String imageUrl, String author) {
         this.title = title;
         this.url = url;
         this.body = body;
@@ -81,13 +81,16 @@ public class FeedItem implements Serializable, RssFeedable {
         return date;
     }
 
-    public Place getPlace() {
+    public uk.co.eelpieconsulting.feedlistener.model.Place getPlace() {
         return place;
     }
 
     @JsonIgnore
     public LatLong getLatLong() {
-        return place != null ? place.getLatLong() : null;
+        if (place != null && place.getLatLong() != null) {
+            return new uk.co.eelpieconsulting.common.geo.model.LatLong(place.getLatLong().getLatitude(), place.getLatLong().getLongitude());
+        }
+        return null;
     }
 
     public String getImageUrl() {

@@ -1,21 +1,17 @@
 package uk.co.eelpieconsulting.feedlistener.twitter;
 
+import com.google.common.base.Strings;
 import org.springframework.stereotype.Component;
-
 import twitter4j.GeoLocation;
 import twitter4j.MediaEntity;
 import twitter4j.Status;
-import uk.co.eelpieconsulting.common.geo.model.LatLong;
-import uk.co.eelpieconsulting.common.geo.model.Place;
 import uk.co.eelpieconsulting.feedlistener.model.FeedItem;
-
-import com.google.common.base.Strings;
 
 @Component
 public class TwitterFeedItemMapper {
 
 	public FeedItem createFeedItemFrom(Status status) {
-		final Place place = extractLocationFrom(status);				
+		final uk.co.eelpieconsulting.feedlistener.model.Place place = extractLocationFrom(status);
 		final String mediaUrl = extractImageUrl(status);
 		final String author = extractAuthorFrom(status);
 		return new FeedItem(extractHeadingFrom(status), extractUrlFrom(status), null, status.getCreatedAt(), place, mediaUrl, author);
@@ -36,12 +32,12 @@ public class TwitterFeedItemMapper {
 		return "https://twitter.com/" + status.getUser().getScreenName() + "/status/" + Long.toString(status.getId());
 	}
 
-	private Place extractLocationFrom(Status status) {
-		Place place = null;
+	private uk.co.eelpieconsulting.feedlistener.model.Place extractLocationFrom(Status status) {
+		uk.co.eelpieconsulting.feedlistener.model.Place place = null;
 		if (status.getGeoLocation() != null) {
 			final GeoLocation geoLocation = status.getGeoLocation();
-			LatLong latLong = new LatLong(geoLocation.getLatitude(), geoLocation.getLongitude());
-			place = new Place(null, latLong, null);	// TODO capture twitter location ids
+			uk.co.eelpieconsulting.feedlistener.model.LatLong latLong = new uk.co.eelpieconsulting.feedlistener.model.LatLong(geoLocation.getLatitude(), geoLocation.getLongitude());
+			place = new uk.co.eelpieconsulting.feedlistener.model.Place(null, latLong);	// TODO capture twitter location ids
 		}
 		return place;
 	}

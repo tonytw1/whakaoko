@@ -1,9 +1,11 @@
 package uk.co.eelpieconsulting.feedlistener.model;
 
+import dev.morphia.annotations.Entity;
 import org.apache.commons.codec.digest.DigestUtils;
 
 import uk.co.eelpieconsulting.common.geo.model.LatLong;
 
+@Entity("subscriptions")
 public class InstagramGeographySubscription extends InstagramSubscription {
 
 	private LatLong latLong;
