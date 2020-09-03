@@ -14,10 +14,10 @@ import uk.co.eelpieconsulting.feedlistener.daos.UsersDAO
 import uk.co.eelpieconsulting.feedlistener.model.Channel
 
 @Controller
-class SubscriptionsController @Autowired constructor(val usersDAO: UsersDAO, val channelsDAO: ChannelsDAO,
-                                                     val subscriptionsDAO: SubscriptionsDAO,
-                                                     val feedItemDAO: FeedItemDAO,
-                                                     val feedItemPopulator: FeedItemPopulator) {
+class SubscriptionsUIController @Autowired constructor(val usersDAO: UsersDAO, val channelsDAO: ChannelsDAO,
+                                                       val subscriptionsDAO: SubscriptionsDAO,
+                                                       val feedItemDAO: FeedItemDAO,
+                                                       val feedItemPopulator: FeedItemPopulator) {
 
     @GetMapping("/ui/{username}/subscriptions/new")
     fun newSubscriptionForm(@PathVariable username: String?): ModelAndView? {
