@@ -146,7 +146,6 @@
             <artifactId>aspectjweaver</artifactId>
             <version>1.7.0</version>
         </dependency>
-
         <dependency>
             <groupId>cglib</groupId>
             <artifactId>cglib</artifactId>
@@ -160,14 +159,12 @@
             <type>jar</type>
             <scope>compile</scope>
         </dependency>
-
         <dependency>
             <groupId>rome</groupId>
             <artifactId>media-rss</artifactId>
             <version>0.2.1</version>
             <type>jar</type>
         </dependency>
-
         <dependency>
             <groupId>org.geonames</groupId>
             <artifactId>georss-rome</artifactId>
@@ -193,11 +190,15 @@
             <artifactId>twitter4j-core</artifactId>
             <version>4.0.2</version>
         </dependency>
-
         <dependency>
             <groupId>org.twitter4j</groupId>
             <artifactId>twitter4j-stream</artifactId>
             <version>4.0.2</version>
+        </dependency>
+        <dependency>
+            <groupId>org.json</groupId>
+            <artifactId>json</artifactId>
+            <version>20090211</version>
         </dependency>
 
         <dependency>
@@ -268,12 +269,6 @@
         </dependency>
 
         <dependency>
-            <groupId>org.json</groupId>
-            <artifactId>json</artifactId>
-            <version>20090211</version>
-        </dependency>
-
-        <dependency>
             <groupId>org.quartz-scheduler</groupId>
             <artifactId>quartz</artifactId>
             <version>2.3.2</version>
@@ -307,7 +302,6 @@
             <version>4.8.2</version>
             <scope>test</scope>
         </dependency>
-
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-core</artifactId>
