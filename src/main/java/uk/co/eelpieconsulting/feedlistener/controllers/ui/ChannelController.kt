@@ -42,7 +42,6 @@ class ChannelController @Autowired constructor(val usersDAO: UsersDAO,
         if (!subscriptionsForChannel.isEmpty()) {
             val results = feedItemDAO.getChannelFeedItemsResult(username, channel, page, q, null)
             feedItemPopulator.populateFeedItems(results, mv, "inbox")
-            mv.addObject("inboxSize", results.totalCount)
 
             val subscriptionCounts = subscriptionsForChannel.map { subscription ->
                 // TODO slow on channels with many subscriptions - cache or index?

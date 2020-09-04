@@ -43,7 +43,6 @@ class SubscriptionsUIController @Autowired constructor(val usersDAO: UsersDAO, v
         feedItemPopulator.populateFeedItems(feedItemsResult, mv, "feedItems")
         mv.addObject("user", user)
                 .addObject("channel", channel).addObject("subscription", subscription)
-                .addObject("subscriptionSize", feedItemsResult.totalCount)  // TODO push into populate call?
         return mv
     }
 

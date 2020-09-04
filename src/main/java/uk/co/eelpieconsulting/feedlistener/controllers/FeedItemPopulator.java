@@ -16,6 +16,7 @@ public class FeedItemPopulator {
 
     public void populateFeedItems(FeedItemsResult feedItemsResult, ModelAndView mv, String field) {
         populate(mv, field, feedItemsResult.getFeedsItems());
+        mv.addObject("totalCount", feedItemsResult.getTotalCount());
     }
 
     private void populate(ModelAndView mv, String field, List<FeedItem> feedItems) {

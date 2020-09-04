@@ -28,7 +28,7 @@
 </td>
 <td>
 
-<h5>Inbox #if($inboxSize) ($inboxSize)#end</h5>
+<h5>Inbox #if($totalCount) ($totalCount)#end</h5>
 
 <a href="$urlBuilder.getChannelItemsUrl($currentUserService.currentUser, $channel.id)/items">JSON</a> | 
 <a href="$urlBuilder.getChannelItemsUrl($currentUserService.currentUser, $channel.id)/items?format=rss">RSS</a>
