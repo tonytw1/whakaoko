@@ -31,9 +31,10 @@ class SubscriptionsUIController @Autowired constructor(val usersDAO: UsersDAO, v
         val user = usersDAO.getByUsername(username)
         val subscription = subscriptionsDAO.getById(user.username, id) ?: throw RuntimeException("Invalid subscription")
 
-        var channel: Channel? = null
-        if (user.username != null && subscription.channelId != null) {
-            channel = channelsDAO.getById(subscription.username, subscription.channelId)
+        val channel = if (user.username != null && subscription.channelId != null) {
+            channelsDAO.getById(subscription.username, subscription.channelId)
+        } else {
+            null
         }
 
         val feedItemsResult = feedItemDAO.getSubscriptionFeedItems(subscription, page)
