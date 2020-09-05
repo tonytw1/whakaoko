@@ -10,7 +10,7 @@ abstract class WithSignedInUser(val currentUserService: CurrentUserService) {
     private val log = Logger.getLogger(WithSignedInUser::class.java)
 
     fun forCurrentUser(handler: (User) -> ModelAndView): ModelAndView? {
-        val user = currentUserService.getCurrentUserUser();
+        val user = currentUserService.getCurrentUserUser()
         if (user != null) {
             log.info("Generating page for user: " + user)
             return handler(user).addObject("user", user)

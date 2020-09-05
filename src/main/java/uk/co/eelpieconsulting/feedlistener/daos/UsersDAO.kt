@@ -7,7 +7,6 @@ import dev.morphia.query.Sort
 import dev.morphia.query.experimental.filters.Filters
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
-import uk.co.eelpieconsulting.feedlistener.exceptions.UnknownUserException
 import uk.co.eelpieconsulting.feedlistener.model.User
 
 @Component
@@ -24,11 +23,7 @@ class UsersDAO @Autowired constructor(val dataStoreFactory: DataStoreFactory){
     }
 
     fun getByUsername(username: String): User? {
-        val user = loadUserFromDatabase(username)
-        if (user != null) {
-            return user
-        }
-        throw UnknownUserException()
+        return loadUserFromDatabase(username);
     }
 
     @Synchronized
