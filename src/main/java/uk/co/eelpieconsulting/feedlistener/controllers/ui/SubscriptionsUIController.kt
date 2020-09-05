@@ -11,39 +11,49 @@ import uk.co.eelpieconsulting.feedlistener.daos.ChannelsDAO
 import uk.co.eelpieconsulting.feedlistener.daos.FeedItemDAO
 import uk.co.eelpieconsulting.feedlistener.daos.SubscriptionsDAO
 import uk.co.eelpieconsulting.feedlistener.daos.UsersDAO
-import uk.co.eelpieconsulting.feedlistener.model.Channel
+import uk.co.eelpieconsulting.feedlistener.model.User
 
 @Controller
 class SubscriptionsUIController @Autowired constructor(val usersDAO: UsersDAO, val channelsDAO: ChannelsDAO,
                                                        val subscriptionsDAO: SubscriptionsDAO,
                                                        val feedItemDAO: FeedItemDAO,
-                                                       val feedItemPopulator: FeedItemPopulator) {
+                                                       val feedItemPopulator: FeedItemPopulator,
+                                                       currentUserService: CurrentUserService) : WithSignedInUser(currentUserService) {
 
     @GetMapping("/ui/{username}/subscriptions/new")
     fun newSubscriptionForm(@PathVariable username: String?): ModelAndView? {
-        val user = usersDAO.getByUsername(username)
-        return ModelAndView("newSubscription").addObject("username", user.username).addObject("channels", channelsDAO.getChannels(user.username))
+        fun newChannelPrompt(user: User): ModelAndView {
+            return ModelAndView("newSubscription").
+            addObject("username", user.username).
+            addObject("channels", channelsDAO.getChannels(user.username))
+        }
+
+        return forCurrentUser(::newChannelPrompt)
     }
 
     @GetMapping("/ui/{username}/subscriptions/{id}")
-    fun subscription(@PathVariable username: String?, @PathVariable id: String?,
-                     @RequestParam(required = false) page: Int?): ModelAndView? {
-        val user = usersDAO.getByUsername(username)
-        val subscription = subscriptionsDAO.getById(user.username, id) ?: throw RuntimeException("Invalid subscription")
+    fun subscription(@PathVariable username: String?, @PathVariable id: String?, @RequestParam(required = false) page: Int?): ModelAndView? {
+        fun meh(user: User): ModelAndView {
+            val subscription = subscriptionsDAO.getById(user.username, id)
+                    ?: throw RuntimeException("Invalid subscription")
 
-        val channel = if (user.username != null && subscription.channelId != null) {
-            channelsDAO.getById(subscription.username, subscription.channelId)
-        } else {
-            null
+            val channel = if (user.username != null && subscription.channelId != null) {
+                channelsDAO.getById(subscription.username, subscription.channelId)
+            } else {
+                null
+            }
+
+            val feedItemsResult = feedItemDAO.getSubscriptionFeedItems(subscription, page)
+
+            val mv = ModelAndView("subscription")
+            feedItemPopulator.populateFeedItems(feedItemsResult, mv, "feedItems")
+            mv.addObject("user", user)
+                    .addObject("channel", channel).addObject("subscription", subscription)
+            return mv
         }
 
-        val feedItemsResult = feedItemDAO.getSubscriptionFeedItems(subscription, page)
-
-        val mv = ModelAndView("subscription")
-        feedItemPopulator.populateFeedItems(feedItemsResult, mv, "feedItems")
-        mv.addObject("user", user)
-                .addObject("channel", channel).addObject("subscription", subscription)
-        return mv
+        return forCurrentUser(::meh)
     }
+
 
 }
