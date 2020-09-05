@@ -8,6 +8,7 @@ import org.springframework.web.servlet.ModelAndView
 import uk.co.eelpieconsulting.feedlistener.credentials.CredentialService
 import uk.co.eelpieconsulting.feedlistener.daos.ChannelsDAO
 import uk.co.eelpieconsulting.feedlistener.daos.UsersDAO
+import uk.co.eelpieconsulting.feedlistener.model.User
 
 @Controller
 class UsersUIController @Autowired constructor(val usersDAO: UsersDAO, val channelsDAO: ChannelsDAO, val credentialService: CredentialService) {
@@ -19,11 +20,20 @@ class UsersUIController @Autowired constructor(val usersDAO: UsersDAO, val chann
 
     @GetMapping("/ui/{username}")
     fun userhome(@PathVariable username: String?): ModelAndView? {
-        usersDAO.getByUsername(username)
-        return ModelAndView("userhome").
-        addObject("channels", channelsDAO.getChannels(username)).
-        addObject("instagramCredentials", credentialService.hasInstagramAccessToken(username)).
-        addObject("twitterCredentials", credentialService.hasTwitterAccessToken(username))
+
+        fun usersHomepage(user: User): ModelAndView {
+            return ModelAndView("userhome").
+            addObject("channels", channelsDAO.getChannels(user.username)).
+            addObject("instagramCredentials", credentialService.hasInstagramAccessToken(user.username)).
+            addObject("twitterCredentials", credentialService.hasTwitterAccessToken(user.username))
+        }
+
+        val user = usersDAO.getByUsername(username)
+        if (user != null) {
+            return usersHomepage(user);
+        } else {
+            return null;
+        }
     }
 
 }
