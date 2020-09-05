@@ -3,14 +3,16 @@ package uk.co.eelpieconsulting.feedlistener.controllers
 import org.apache.log4j.Logger
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Controller
-import org.springframework.web.bind.annotation.*
+import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.servlet.ModelAndView
 import uk.co.eelpieconsulting.common.views.ViewFactory
 import uk.co.eelpieconsulting.feedlistener.daos.DataStoreFactory
 import uk.co.eelpieconsulting.feedlistener.daos.UsersDAO
 
 @Controller
-class UsersController  @Autowired constructor (val usersDAO: UsersDAO, val viewFactory: ViewFactory) {
+class UsersController @Autowired constructor(val usersDAO: UsersDAO, val viewFactory: ViewFactory) {
 
     private val log = Logger.getLogger(DataStoreFactory::class.java)
 
