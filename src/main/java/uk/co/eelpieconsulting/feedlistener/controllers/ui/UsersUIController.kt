@@ -7,13 +7,12 @@ import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.servlet.ModelAndView
 import uk.co.eelpieconsulting.feedlistener.credentials.CredentialService
 import uk.co.eelpieconsulting.feedlistener.daos.ChannelsDAO
-import uk.co.eelpieconsulting.feedlistener.daos.UsersDAO
 import uk.co.eelpieconsulting.feedlistener.model.User
 
 @Controller
-class UsersUIController @Autowired constructor(val usersDAO: UsersDAO, val channelsDAO: ChannelsDAO,
+class UsersUIController @Autowired constructor(val channelsDAO: ChannelsDAO,
                                                val credentialService: CredentialService,
-                                               val currentUserService: CurrentUserService) {
+                                               currentUserService: CurrentUserService) : WithSignedInUser(currentUserService) {
 
     @GetMapping("/ui/newuser")
     fun newUser(): ModelAndView? {
@@ -30,16 +29,6 @@ class UsersUIController @Autowired constructor(val usersDAO: UsersDAO, val chann
         addObject("channels", channelsDAO.getChannels(user.username)).
         addObject("instagramCredentials", credentialService.hasInstagramAccessToken(user.username)).
         addObject("twitterCredentials", credentialService.hasTwitterAccessToken(user.username))
-    }
-
-    private fun forCurrentUser(handler: (User) -> ModelAndView): ModelAndView? {
-        val user = currentUserService.getCurrentUserUser();
-        if (user != null) {
-            return handler(user)
-        } else {
-            // TODO redirect to signin
-            return null
-        }
     }
 
 }
