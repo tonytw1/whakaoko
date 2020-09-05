@@ -9,13 +9,19 @@ import javax.servlet.http.HttpServletRequest
 @Component
 class CurrentUserService @Autowired constructor(val request: HttpServletRequest, val usersDAO: UsersDAO) {
 
+    private val signedInUserAttribute = "signedInUser"
+
     fun getCurrentUserUser(): User? {
-        val username = request.session.getAttribute("user")
+        val username = request.session.getAttribute(signedInUserAttribute)
         if (username != null) {
             return usersDAO.getByUsername(username as String)
         } else {
             return null;
         }
+    }
+
+    fun setSignedInUser(user: User) {
+        request.getSession().setAttribute(signedInUserAttribute, user.username)
     }
 
 }
