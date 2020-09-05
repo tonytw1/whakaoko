@@ -20,7 +20,7 @@ class UsersController  @Autowired constructor (val usersDAO: UsersDAO, val viewF
     }
 
     @PostMapping("/users")
-    fun newUser(@RequestParam(value = "username", required = true) username: String?): ModelAndView? {
+    fun newUser(@RequestParam(value = "username", required = true) username: String): ModelAndView? {
         usersDAO.createUser(username)
         log.info("Created user: " + username)
         return ModelAndView(viewFactory.getJsonView()).addObject("data", "ok")
