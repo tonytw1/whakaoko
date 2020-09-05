@@ -1,4 +1,4 @@
-<form action="/$currentUserService.currentUser/channels" method="POST">
+<form action="/$user.username/channels" method="POST">
 	Name: <input name="name" />
 	<input type="submit" />
 </form>

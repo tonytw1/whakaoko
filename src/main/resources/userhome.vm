@@ -1,9 +1,9 @@
-<p><h4>whakaoko - $currentUserService.currentUser</h4>
+<p><h4>whakaoko - $user.username</h4>
 (verb) to listen to.</p>
 
 <h5>Channels</h5>
 
-<p><a href="$urlBuilder.getNewChannelUrl($currentUserService.currentUser)">New channel</a></p>
+<p><a href="$urlBuilder.getNewChannelUrl()">New channel</a></p>
 
 #if($channels && !$channels.isEmpty()) 
 	<ul>
@@ -18,10 +18,10 @@
 
 <h5>Subscriptions</h5>
 
-<p><a href="/ui/$currentUserService.currentUser/subscriptions/new">New subscription</a></p>
+<p><a href="/ui/subscriptions/new">New subscription</a></p>
 
 <hr/>
 <h5>Credentials</h5>
-<p>Linked Instagram account: $instagramCredentials - <a href="/instagram/authorise/$currentUserService.currentUser">Link</a></p>
-<p>Linked Twitter account: $twitterCredentials - <a href="/twitter/authorise/$currentUserService.currentUser">Link</a></p>
+<p>Linked Instagram account: $instagramCredentials - <a href="/instagram/authorise/$user.username">Link</a></p>
+<p>Linked Twitter account: $twitterCredentials - <a href="/twitter/authorise/$user.username">Link</a></p>
 <hr/>

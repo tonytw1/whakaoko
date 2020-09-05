@@ -7,7 +7,7 @@
 <tr valign="top">
 <td>
 
-<h5><a href="$urlBuilder.getUserUrl($user)">$user.username</a> / $channel.name</h5>
+<h5><a href="$urlBuilder.getUserUrl()">$user.username</a> / $channel.name</h5>
 
 #if($subscriptions && !$subscriptions.isEmpty()) 
 	<ul>
@@ -30,8 +30,8 @@
 
 <h5>Inbox #if($totalCount) ($totalCount)#end</h5>
 
-<a href="$urlBuilder.getChannelItemsUrl($currentUserService.currentUser, $channel.id)/items">JSON</a> | 
-<a href="$urlBuilder.getChannelItemsUrl($currentUserService.currentUser, $channel.id)/items?format=rss">RSS</a>
+<a href="$urlBuilder.getChannelItemsUrl($user.username, $channel.id)/items">JSON</a> |
+<a href="$urlBuilder.getChannelItemsUrl($user.username, $channel.id)/items?format=rss">RSS</a>
 
 #if(!$geotagged.isEmpty())
     #parse('includes/map.vm')

@@ -21,7 +21,7 @@ class ChannelsUIController @Autowired constructor(val usersDAO: UsersDAO,
                                                   val feedItemDAO: FeedItemDAO,
                                                   currentUserService: CurrentUserService) : WithSignedInUser(currentUserService) {
 
-    @GetMapping("/ui/{username}/channels/new")
+    @GetMapping("/ui/channels/new")
     fun newChannelForm(): ModelAndView? {
         fun newChannelPage(user: User): ModelAndView {
             return ModelAndView("newChannel")
@@ -30,17 +30,14 @@ class ChannelsUIController @Autowired constructor(val usersDAO: UsersDAO,
     }
 
 
-    @GetMapping("/ui/{username}/channels/{id}")
-    fun channel(@PathVariable username: String?,
-                @PathVariable id: String?,
+    @GetMapping("/ui/channels/{id}")
+    fun channel(@PathVariable id: String?,
                 @RequestParam(required = false) page: Int?,
                 @RequestParam(required = false) q: String?
     ): ModelAndView? {
-        val user = usersDAO.getByUsername(username)
-
         fun userChannelPage(user: User): ModelAndView {
             val channel = channelsDAO.getById(user.username, id)
-            val subscriptionsForChannel = subscriptionsDAO.getSubscriptionsForChannel(username, channel.id, null)
+            val subscriptionsForChannel = subscriptionsDAO.getSubscriptionsForChannel(user.username, channel.id, null)
 
             val mv = ModelAndView("channel").
             addObject("user", user).
@@ -48,7 +45,7 @@ class ChannelsUIController @Autowired constructor(val usersDAO: UsersDAO,
             addObject("subscriptions", subscriptionsForChannel)
 
             if (!subscriptionsForChannel.isEmpty()) {
-                val results = feedItemDAO.getChannelFeedItemsResult(username, channel, page, q, null)
+                val results = feedItemDAO.getChannelFeedItemsResult(user.username, channel, page, q, null)
                 feedItemPopulator.populateFeedItems(results, mv, "inbox")
 
                 val subscriptionCounts = subscriptionsForChannel.map { subscription ->

@@ -26,11 +26,11 @@ public class UrlBuilder {
 	}
 	
 	public String getSubscriptionUrl(Subscription subscription) {
-		return getBaseUrl() + "/ui/" + subscription.getUsername() + "/subscriptions/" + subscription.getId();
+		return getBaseUrl() + "/ui/" + "/subscriptions/" + subscription.getId();
 	}
 	
-	public String getSubscriptionUrl(String username, String subscriptionId) {
-		return getBaseUrl() + "/ui/" + username + "/subscriptions/" + subscriptionId;
+	public String getSubscriptionUrl(String subscriptionId) {
+		return getBaseUrl() + "/ui/" + "/subscriptions/" + subscriptionId;
 	}
 	
 	public String getDeleteSubscriptionUrl(Subscription subscription) {
@@ -46,15 +46,15 @@ public class UrlBuilder {
 	}
 	
 	public String getChannelUrl(Channel channel) {
-		return getBaseUrl() + "/ui/" + channel.getUsername() + "/channels/" + channel.getId();
+		return getBaseUrl() + "/ui/channels/" + channel.getId();
 	}
 
-	public String getUserUrl(User user) {
-		return getBaseUrl() + "/ui/" + user.getUsername();
+	public String getUserUrl() {
+		return getBaseUrl() + "/ui";
 	}
 	
-	public String getNewChannelUrl(String username) {
-		return getBaseUrl() + "/ui/" + username + "/channels/new";
+	public String getNewChannelUrl() {
+		return getBaseUrl() + "/ui/channels/new";
 	}
 	
 }

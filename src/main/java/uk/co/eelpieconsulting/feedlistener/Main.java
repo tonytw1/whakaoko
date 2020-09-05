@@ -21,7 +21,6 @@ import uk.co.eelpieconsulting.backports.VelocityViewResolver;
 import uk.co.eelpieconsulting.common.caching.MemcachedCache;
 import uk.co.eelpieconsulting.common.dates.DateFormatter;
 import uk.co.eelpieconsulting.common.http.HttpFetcher;
-import uk.co.eelpieconsulting.feedlistener.controllers.ui.CurrentUserService;
 import uk.co.eelpieconsulting.feedlistener.controllers.ui.SubscriptionLabelService;
 
 import java.io.IOException;
@@ -77,8 +76,7 @@ public class Main {
     }
 
     @Bean
-    public VelocityViewResolver velocityViewResolver(CurrentUserService currentUserService,
-                                                     DateFormatter dateFormatter,
+    public VelocityViewResolver velocityViewResolver(DateFormatter dateFormatter,
                                                      UrlBuilder urlBuilder,
                                                      SubscriptionLabelService subscriptionLabelService) {
         final VelocityViewResolver viewResolver = new VelocityViewResolver();
@@ -88,7 +86,6 @@ public class Main {
         viewResolver.setContentType("text/html;charset=UTF-8");
 
         final Map<String, Object> attributes = Maps.newHashMap();
-        attributes.put("currentUserService", currentUserService);
         attributes.put("dateFormatter", dateFormatter);
         attributes.put("urlBuilder", urlBuilder);
         attributes.put("subscriptionLabelService", subscriptionLabelService);    // TODO Indicates incomplete view model

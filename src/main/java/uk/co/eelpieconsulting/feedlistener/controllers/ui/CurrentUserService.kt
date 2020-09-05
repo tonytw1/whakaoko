@@ -7,16 +7,12 @@ import uk.co.eelpieconsulting.feedlistener.model.User
 import javax.servlet.http.HttpServletRequest
 
 @Component
-class CurrentUserService @Autowired constructor(val request: HttpServletRequest, val usersDAO: UsersDAO){
-
-    fun getCurrentUser(): String? {
-        return request.getRequestURI().split("/").toTypedArray().get(2)
-    }
+class CurrentUserService @Autowired constructor(val request: HttpServletRequest, val usersDAO: UsersDAO) {
 
     fun getCurrentUserUser(): User? {
-        val username = getCurrentUser()
+        val username = request.session.getAttribute("user")
         if (username != null) {
-            return usersDAO.getByUsername(username)
+            return usersDAO.getByUsername(username as String)
         } else {
             return null;
         }

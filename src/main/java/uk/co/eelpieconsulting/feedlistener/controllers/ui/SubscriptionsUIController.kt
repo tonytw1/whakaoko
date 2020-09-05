@@ -20,8 +20,8 @@ class SubscriptionsUIController @Autowired constructor(val usersDAO: UsersDAO, v
                                                        val feedItemPopulator: FeedItemPopulator,
                                                        currentUserService: CurrentUserService) : WithSignedInUser(currentUserService) {
 
-    @GetMapping("/ui/{username}/subscriptions/new")
-    fun newSubscriptionForm(@PathVariable username: String?): ModelAndView? {
+    @GetMapping("/ui/subscriptions/new")
+    fun newSubscriptionForm(): ModelAndView? {
         fun newChannelPrompt(user: User): ModelAndView {
             return ModelAndView("newSubscription").
             addObject("username", user.username).
@@ -31,8 +31,8 @@ class SubscriptionsUIController @Autowired constructor(val usersDAO: UsersDAO, v
         return forCurrentUser(::newChannelPrompt)
     }
 
-    @GetMapping("/ui/{username}/subscriptions/{id}")
-    fun subscription(@PathVariable username: String?, @PathVariable id: String?, @RequestParam(required = false) page: Int?): ModelAndView? {
+    @GetMapping("/ui/subscriptions/{id}")
+    fun subscription(@PathVariable id: String?, @RequestParam(required = false) page: Int?): ModelAndView? {
         fun meh(user: User): ModelAndView {
             val subscription = subscriptionsDAO.getById(user.username, id)
                     ?: throw RuntimeException("Invalid subscription")

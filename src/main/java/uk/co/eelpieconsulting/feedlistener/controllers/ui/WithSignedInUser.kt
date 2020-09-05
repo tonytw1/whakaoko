@@ -2,6 +2,7 @@ package uk.co.eelpieconsulting.feedlistener.controllers.ui
 
 import org.apache.log4j.Logger
 import org.springframework.web.servlet.ModelAndView
+import org.springframework.web.servlet.view.RedirectView
 import uk.co.eelpieconsulting.feedlistener.model.User
 
 abstract class WithSignedInUser(val currentUserService: CurrentUserService) {
@@ -12,10 +13,11 @@ abstract class WithSignedInUser(val currentUserService: CurrentUserService) {
         val user = currentUserService.getCurrentUserUser();
         if (user != null) {
             log.info("Generating page for user: " + user)
-            return handler(user)
+            return handler(user).addObject("user", user)
+
         } else {
-            // TODO redirect to signin
-            return null
+            log.info("No signed in user; redirecting to sign in.")
+            return ModelAndView(RedirectView("/signin"))
         }
     }
 

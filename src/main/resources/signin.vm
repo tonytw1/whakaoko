@@ -1,0 +1,5 @@
+Sign in
+
+<form action="/signin" method="POST">
+    <input name="username"/>
+</form>
