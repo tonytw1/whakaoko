@@ -11,7 +11,9 @@ import uk.co.eelpieconsulting.feedlistener.daos.UsersDAO
 import uk.co.eelpieconsulting.feedlistener.model.User
 
 @Controller
-class UsersUIController @Autowired constructor(val usersDAO: UsersDAO, val channelsDAO: ChannelsDAO, val credentialService: CredentialService) {
+class UsersUIController @Autowired constructor(val usersDAO: UsersDAO, val channelsDAO: ChannelsDAO,
+                                               val credentialService: CredentialService,
+                                               val currentUserService: CurrentUserService) {
 
     @GetMapping("/ui/newuser")
     fun newUser(): ModelAndView? {
@@ -20,19 +22,23 @@ class UsersUIController @Autowired constructor(val usersDAO: UsersDAO, val chann
 
     @GetMapping("/ui/{username}")
     fun userhome(@PathVariable username: String?): ModelAndView? {
+        return forCurrentUser(this::usersHomepage)
+    }
 
-        fun usersHomepage(user: User): ModelAndView {
-            return ModelAndView("userhome").
-            addObject("channels", channelsDAO.getChannels(user.username)).
-            addObject("instagramCredentials", credentialService.hasInstagramAccessToken(user.username)).
-            addObject("twitterCredentials", credentialService.hasTwitterAccessToken(user.username))
-        }
+    private fun usersHomepage(user: User): ModelAndView {
+        return ModelAndView("userhome").
+        addObject("channels", channelsDAO.getChannels(user.username)).
+        addObject("instagramCredentials", credentialService.hasInstagramAccessToken(user.username)).
+        addObject("twitterCredentials", credentialService.hasTwitterAccessToken(user.username))
+    }
 
-        val user = usersDAO.getByUsername(username)
+    private fun forCurrentUser(handler: (User) -> ModelAndView): ModelAndView? {
+        val user = currentUserService.getCurrentUserUser();
         if (user != null) {
-            return usersHomepage(user);
+            return handler(user)
         } else {
-            return null;
+            // TODO redirect to signin
+            return null
         }
     }
 
