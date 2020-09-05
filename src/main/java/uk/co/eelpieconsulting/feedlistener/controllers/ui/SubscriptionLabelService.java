@@ -18,6 +18,7 @@ public class SubscriptionLabelService {
         this.subscriptionsDAO = subscriptionsDAO;
     }
 
+    // TODO Why is this been called from the view!?
     public String label(String subscriptionId) {
         try {
             return subscriptionsDAO.getById(currentUserService.getCurrentUserUser().getUsername(), subscriptionId).getName();
