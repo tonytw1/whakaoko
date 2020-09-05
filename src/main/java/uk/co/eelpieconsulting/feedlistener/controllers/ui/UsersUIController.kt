@@ -21,14 +21,14 @@ class UsersUIController @Autowired constructor(val channelsDAO: ChannelsDAO,
 
     @GetMapping("/ui/{username}")
     fun userhome(@PathVariable username: String?): ModelAndView? {
-        return forCurrentUser(this::usersHomepage)
-    }
+        fun usersHomepage(user: User): ModelAndView {
+            return ModelAndView("userhome").
+            addObject("channels", channelsDAO.getChannels(user.username)).
+            addObject("instagramCredentials", credentialService.hasInstagramAccessToken(user.username)).
+            addObject("twitterCredentials", credentialService.hasTwitterAccessToken(user.username))
+        }
 
-    private fun usersHomepage(user: User): ModelAndView {
-        return ModelAndView("userhome").
-        addObject("channels", channelsDAO.getChannels(user.username)).
-        addObject("instagramCredentials", credentialService.hasInstagramAccessToken(user.username)).
-        addObject("twitterCredentials", credentialService.hasTwitterAccessToken(user.username))
+        return forCurrentUser(::usersHomepage)
     }
 
 }

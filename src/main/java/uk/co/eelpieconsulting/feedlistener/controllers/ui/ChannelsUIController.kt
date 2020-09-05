@@ -11,18 +11,24 @@ import uk.co.eelpieconsulting.feedlistener.daos.ChannelsDAO
 import uk.co.eelpieconsulting.feedlistener.daos.FeedItemDAO
 import uk.co.eelpieconsulting.feedlistener.daos.SubscriptionsDAO
 import uk.co.eelpieconsulting.feedlistener.daos.UsersDAO
+import uk.co.eelpieconsulting.feedlistener.model.User
 
 @Controller
 class ChannelsUIController @Autowired constructor(val usersDAO: UsersDAO,
                                                   val subscriptionsDAO: SubscriptionsDAO,
                                                   val feedItemPopulator: FeedItemPopulator,
                                                   val channelsDAO: ChannelsDAO,
-                                                  val feedItemDAO: FeedItemDAO) {
+                                                  val feedItemDAO: FeedItemDAO,
+                                                  currentUserService: CurrentUserService) : WithSignedInUser(currentUserService) {
 
     @GetMapping("/ui/{username}/channels/new")
     fun newChannelForm(): ModelAndView? {
-        return ModelAndView("newChannel")
+        fun newChannelPage(user: User): ModelAndView {
+            return ModelAndView("newChannel")
+        }
+        return forCurrentUser(::newChannelPage)
     }
+
 
     @GetMapping("/ui/{username}/channels/{id}")
     fun channel(@PathVariable username: String?,
@@ -31,27 +37,32 @@ class ChannelsUIController @Autowired constructor(val usersDAO: UsersDAO,
                 @RequestParam(required = false) q: String?
     ): ModelAndView? {
         val user = usersDAO.getByUsername(username)
-        val channel = channelsDAO.getById(user.username, id)
-        val subscriptionsForChannel = subscriptionsDAO.getSubscriptionsForChannel(username, channel.id, null)
 
-        val mv = ModelAndView("channel").
-        addObject("user", user).
-        addObject("channel", channel).
-        addObject("subscriptions", subscriptionsForChannel)
+        fun userChannelPage(user: User): ModelAndView {
+            val channel = channelsDAO.getById(user.username, id)
+            val subscriptionsForChannel = subscriptionsDAO.getSubscriptionsForChannel(username, channel.id, null)
 
-        if (!subscriptionsForChannel.isEmpty()) {
-            val results = feedItemDAO.getChannelFeedItemsResult(username, channel, page, q, null)
-            feedItemPopulator.populateFeedItems(results, mv, "inbox")
+            val mv = ModelAndView("channel").
+            addObject("user", user).
+            addObject("channel", channel).
+            addObject("subscriptions", subscriptionsForChannel)
 
-            val subscriptionCounts = subscriptionsForChannel.map { subscription ->
-                // TODO slow on channels with many subscriptions - cache or index?
-                val subscriptionFeedItemsCount = feedItemDAO.getSubscriptionFeedItemsCount(subscription.id)
-                Pair(subscription.id, subscriptionFeedItemsCount)
-            }.toMap()
+            if (!subscriptionsForChannel.isEmpty()) {
+                val results = feedItemDAO.getChannelFeedItemsResult(username, channel, page, q, null)
+                feedItemPopulator.populateFeedItems(results, mv, "inbox")
 
-            mv.addObject("subscriptionCounts", subscriptionCounts)
+                val subscriptionCounts = subscriptionsForChannel.map { subscription ->
+                    // TODO slow on channels with many subscriptions - cache or index?
+                    val subscriptionFeedItemsCount = feedItemDAO.getSubscriptionFeedItemsCount(subscription.id)
+                    Pair(subscription.id, subscriptionFeedItemsCount)
+                }.toMap()
+
+                mv.addObject("subscriptionCounts", subscriptionCounts)
+            }
+            return mv
         }
-        return mv
+
+        return forCurrentUser(::userChannelPage)
     }
 
 }
