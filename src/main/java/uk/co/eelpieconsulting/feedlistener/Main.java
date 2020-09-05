@@ -77,8 +77,7 @@ public class Main {
 
     @Bean
     public VelocityViewResolver velocityViewResolver(DateFormatter dateFormatter,
-                                                     UrlBuilder urlBuilder,
-                                                     SubscriptionLabelService subscriptionLabelService) {
+                                                     UrlBuilder urlBuilder) {
         final VelocityViewResolver viewResolver = new VelocityViewResolver();
         viewResolver.setCache(true);
         viewResolver.setPrefix("");
@@ -88,7 +87,6 @@ public class Main {
         final Map<String, Object> attributes = Maps.newHashMap();
         attributes.put("dateFormatter", dateFormatter);
         attributes.put("urlBuilder", urlBuilder);
-        attributes.put("subscriptionLabelService", subscriptionLabelService);    // TODO Indicates incomplete view model
         viewResolver.setAttributesMap(attributes);
         return viewResolver;
     }

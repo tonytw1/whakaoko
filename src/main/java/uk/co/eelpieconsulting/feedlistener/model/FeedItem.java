@@ -44,6 +44,9 @@ public class FeedItem implements Serializable, RssFeedable {
 
     private String author;
 
+    // Display only field
+    private String subscriptionName;
+
     public FeedItem() {
     }
 
@@ -130,6 +133,15 @@ public class FeedItem implements Serializable, RssFeedable {
 
     public void setSubscriptionId(String subscriptionId) {
         this.subscriptionId = subscriptionId;
+    }
+
+    @JsonIgnore
+    public String getSubscriptionName() {
+        return subscriptionName;
+    }
+
+    public void setSubscriptionName(String subscriptionName) {
+        this.subscriptionName = subscriptionName;
     }
 
     @Override
