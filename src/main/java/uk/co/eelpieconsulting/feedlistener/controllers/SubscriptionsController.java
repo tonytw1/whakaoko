@@ -84,7 +84,7 @@ public class SubscriptionsController {
                                           HttpServletResponse response) throws MongoException, UnknownSubscriptionException, UnknownUserException {
         usersDAO.getByUsername(username);
 
-        Subscription subscription = subscriptionsDAO.getById(username, id);
+        Subscription subscription = subscriptionsDAO.getById(id);
 
         ModelAndView mv = new ModelAndView(viewFactory.getJsonView());
         if (!Strings.isNullOrEmpty(format) && format.equals("rss")) {
@@ -104,7 +104,7 @@ public class SubscriptionsController {
     public ModelAndView reload(@PathVariable String username, @PathVariable String id) throws MongoException, UnknownSubscriptionException, UnknownUserException {
         usersDAO.getByUsername(username);
 
-        RssSubscription subscription = (RssSubscription) subscriptionsDAO.getById(username, id);
+        RssSubscription subscription = (RssSubscription) subscriptionsDAO.getById(id);
 
         log.info("Requesting reload of subscription: " + subscription.getName() + " / " + subscription.getUrl());
         rssPoller.run(subscription);
@@ -120,7 +120,7 @@ public class SubscriptionsController {
                                          @RequestParam(required = false) Integer page) throws MongoException, UnknownSubscriptionException, UnknownUserException {
         usersDAO.getByUsername(username);
 
-        Subscription subscription = subscriptionsDAO.getById(username, id);
+        Subscription subscription = subscriptionsDAO.getById(id);
 
         return new ModelAndView(viewFactory.getJsonView()).addObject("data", subscription);
     }
@@ -130,7 +130,7 @@ public class SubscriptionsController {
     public ModelAndView deleteSubscription(@PathVariable String username, @PathVariable String id) throws MongoException, HttpFetchException, UnknownSubscriptionException, UnknownUserException {
         usersDAO.getByUsername(username);
 
-        Subscription subscription = subscriptionsDAO.getById(username, id);
+        Subscription subscription = subscriptionsDAO.getById(id);
         if (subscription == null) {
             // TODO 404
             return null;

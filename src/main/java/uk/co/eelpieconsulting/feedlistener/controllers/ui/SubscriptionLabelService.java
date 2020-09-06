@@ -10,17 +10,15 @@ import uk.co.eelpieconsulting.feedlistener.daos.SubscriptionsDAO;
 public class SubscriptionLabelService {
 
     private final SubscriptionsDAO subscriptionsDAO;
-    private final CurrentUserService currentUserService;
 
     @Autowired
-    public SubscriptionLabelService(CurrentUserService currentUserService, SubscriptionsDAO subscriptionsDAO) {
-        this.currentUserService = currentUserService;
+    public SubscriptionLabelService(SubscriptionsDAO subscriptionsDAO) {
         this.subscriptionsDAO = subscriptionsDAO;
     }
 
     public String label(String subscriptionId) {
         try {
-            return subscriptionsDAO.getById(currentUserService.getCurrentUserUser().getUsername(), subscriptionId).getName();
+            return subscriptionsDAO.getById(subscriptionId).getName();
         } catch (UnknownSubscriptionException e) {
             return subscriptionId.toUpperCase();
         }

@@ -25,9 +25,9 @@ public class RssSubscriptionManager {
 		log.info("Requesting subscription to feed: " + url);
 		final RssSubscription newSubscription = new RssSubscription(url, channel, username);
 		
-		if (subscriptionsDAO.subscriptionExists(username, newSubscription.getId())) {
+		if (subscriptionsDAO.subscriptionExists(newSubscription.getId())) {
 			try {
-				return (RssSubscription) subscriptionsDAO.getById(username, newSubscription.getId());
+				return (RssSubscription) subscriptionsDAO.getById(newSubscription.getId());
 			} catch (UnknownSubscriptionException e) {
 				return newSubscription;
 			}

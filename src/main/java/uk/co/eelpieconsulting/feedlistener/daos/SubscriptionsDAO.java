@@ -67,9 +67,9 @@ public class SubscriptionsDAO {
         }
     }
 
-    public Subscription getById(String username, String id) throws UnknownSubscriptionException {
+    public Subscription getById(String id) throws UnknownSubscriptionException {
         try {
-            final Subscription subscription = dataStoreFactory.getDs().find(Subscription.class).filter(Filters.eq("username", username), Filters.eq("id", id)).first();
+            final Subscription subscription = dataStoreFactory.getDs().find(Subscription.class).filter(Filters.eq("id", id)).first();
             if (subscription == null) {
                 log.info("Subscription not found");
                 throw new UnknownSubscriptionException();
@@ -80,9 +80,9 @@ public class SubscriptionsDAO {
         }
     }
 
-    public boolean subscriptionExists(String username, String id) {
+    public boolean subscriptionExists(String id) {
         try {
-            getById(username, id);
+            getById(id);
             return true;
         } catch (UnknownSubscriptionException e) {
             return false;

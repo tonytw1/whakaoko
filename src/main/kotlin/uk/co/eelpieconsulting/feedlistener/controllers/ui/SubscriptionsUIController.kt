@@ -34,7 +34,7 @@ class SubscriptionsUIController @Autowired constructor(val usersDAO: UsersDAO, v
     @GetMapping("/ui/subscriptions/{id}")
     fun subscription(@PathVariable id: String?, @RequestParam(required = false) page: Int?): ModelAndView? {
         fun meh(user: User): ModelAndView {
-            val subscription = subscriptionsDAO.getById(user.username, id)
+            val subscription = subscriptionsDAO.getById(id)
                     ?: throw RuntimeException("Invalid subscription")
 
             val channel = if (user.username != null && subscription.channelId != null) {
