@@ -92,7 +92,7 @@ public class SubscriptionsDAO {
     public void delete(Subscription subscription) throws MongoException {
         log.info("Deleting subscription: " + subscription);
         final Datastore datastore = dataStoreFactory.getDs();
-        datastore.find(Subscription.class).filter(Filters.eq("id", subscription.getId())).first();
+        datastore.find(Subscription.class).filter(Filters.eq("id", subscription.getId())).delete();
     }
 
     public InstagramSubscription getByInstagramId(Long subscriptionId) throws MongoException {

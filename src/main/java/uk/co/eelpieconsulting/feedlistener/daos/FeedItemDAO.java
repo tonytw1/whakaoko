@@ -3,6 +3,7 @@ package uk.co.eelpieconsulting.feedlistener.daos;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.mongodb.MongoException;
+import dev.morphia.DeleteOptions;
 import dev.morphia.query.FindOptions;
 import dev.morphia.query.Query;
 import dev.morphia.query.Sort;
@@ -85,7 +86,7 @@ public class FeedItemDAO {
     }
 
     public void deleteSubscriptionFeedItems(Subscription subscription) throws MongoException {
-        dataStoreFactory.getDs().find(FeedItem.class).filter(Filters.eq("subscriptionId", subscription.getId())).delete();
+        dataStoreFactory.getDs().find(FeedItem.class).filter(Filters.eq("subscriptionId", subscription.getId())).delete(new DeleteOptions().multi(true));
     }
 
     @Timed(timingNotes = "")

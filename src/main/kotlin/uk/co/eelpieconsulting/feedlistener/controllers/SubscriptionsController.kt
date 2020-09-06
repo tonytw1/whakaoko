@@ -82,7 +82,7 @@ class SubscriptionsController @Autowired constructor(val usersDAO: UsersDAO, val
                 ?: // TODO 404
                 return null
 
-        // feedItemDAO.deleteSubscriptionFeedItems(subscription); TODO
+        feedItemDAO.deleteSubscriptionFeedItems(subscription)
         subscriptionsDAO.delete(subscription)
         if (subscription.id.startsWith("twitter")) {
             twitterListener.connect()
