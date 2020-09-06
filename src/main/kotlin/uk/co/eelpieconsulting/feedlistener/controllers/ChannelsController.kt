@@ -4,10 +4,7 @@ import com.google.common.base.Strings
 import org.apache.log4j.Logger
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Controller
-import org.springframework.web.bind.annotation.PathVariable
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RequestMethod
-import org.springframework.web.bind.annotation.RequestParam
+import org.springframework.web.bind.annotation.*
 import org.springframework.web.servlet.ModelAndView
 import org.springframework.web.servlet.view.RedirectView
 import uk.co.eelpieconsulting.common.views.ViewFactory
@@ -32,35 +29,33 @@ class ChannelsController @Autowired constructor(val usersDAO: UsersDAO, val chan
 
     private val X_TOTAL_COUNT = "X-Total-Count"
 
-    @RequestMapping(value = ["/{username}/channels"], method = [RequestMethod.GET])
+    @GetMapping("/{username}/channels")
     fun channelsJson(@PathVariable username: String): ModelAndView? {
         usersDAO.getByUsername(username)
         log.info("Channels for user: $username")
         return ModelAndView(viewFactory.getJsonView()).addObject("data", channelsDAO.getChannels(username))
     }
 
-    @RequestMapping(value = ["/{username}/channels/{id}"], method = [RequestMethod.GET])
+    @GetMapping("/{username}/channels/{id}")
     fun channel(@PathVariable username: String, @PathVariable id: String): ModelAndView? {
         usersDAO.getByUsername(username)
         val channel: Channel = channelsDAO.getById(username, id)
         return ModelAndView(viewFactory.getJsonView()).addObject("data", channel)
     }
 
-    @RequestMapping(value = ["/{username}/channels/{id}/subscriptions"], method = [RequestMethod.GET])
+    @GetMapping("/{username}/channels/{id}/subscriptions")
     fun channelSubscriptions(@PathVariable username: String, @PathVariable id: String, @RequestParam(required = false) url: String?): ModelAndView? {
         usersDAO.getByUsername(username)
         val channel: Channel = channelsDAO.getById(username, id)
         val subscriptionsForChannel: List<Subscription> = subscriptionsDAO.getSubscriptionsForChannel(username, channel.id, url)
-        val mv = ModelAndView(viewFactory.getJsonView())
-        mv.addObject("data", subscriptionsForChannel)
-        return mv
+        return ModelAndView(viewFactory.getJsonView()).addObject("data", subscriptionsForChannel)
     }
 
-    @RequestMapping(value = ["/{username}/channels/{id}/items"], method = [RequestMethod.GET])
+    @GetMapping("/{username}/channels/{id}/items")
     fun channelJson(@PathVariable username: String, @PathVariable id: String,
                     @RequestParam(required = false) page: Int?,
                     @RequestParam(required = false) pageSize: Int?,
-                    @RequestParam(required = false) format: String,
+                    @RequestParam(required = false) format: String?,
                     @RequestParam(required = false) q: String?,
                     response: HttpServletResponse): ModelAndView? {
         usersDAO.getByUsername(username)
@@ -76,7 +71,7 @@ class ChannelsController @Autowired constructor(val usersDAO: UsersDAO, val chan
         return mv
     }
 
-    @RequestMapping(value = ["/{username}/channels"], method = [RequestMethod.POST])
+    @RequestMapping("/{username}/channels")
     fun addChannel(@PathVariable username: String, @RequestParam name: String?): ModelAndView? {
         usersDAO.getByUsername(username)
         val newChannel = Channel(idBuilder.makeIdFor(name), name, username)
