@@ -37,7 +37,7 @@ public class FeedItemPopulator {
 
         List<FeedItem> withSubscriptionNames = cleanedFeedItems.map(
                 feedItem -> {
-                    String label = subscriptionLabelService.label(feedItem.getSubscriptionId());
+                    String label = subscriptionLabelService.labelForSubscription(feedItem.getSubscriptionId());
                     feedItem.setSubscriptionName(label);
                     return feedItem;
                 }
