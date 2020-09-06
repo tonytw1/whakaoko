@@ -3,6 +3,7 @@ package uk.co.eelpieconsulting.feedlistener;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.Ordered;
 import org.springframework.http.HttpStatus;
@@ -14,6 +15,8 @@ import uk.co.eelpieconsulting.common.views.ViewFactory;
 
 @Component
 public class ExceptionHandler implements HandlerExceptionResolver, Ordered  {
+
+	private final Logger log = Logger.getLogger(ExceptionHandler.class);
 
 	private final ViewFactory viewFactory;
 	
@@ -28,7 +31,8 @@ public class ExceptionHandler implements HandlerExceptionResolver, Ordered  {
             response.setStatus(HttpStatus.NOT_FOUND.value());
 			return new ModelAndView(viewFactory.getJsonView()).addObject("data", "Not found");
 		}
-		
+
+		log.error("Returing unexpected 500 error", e);
 		return new ModelAndView(viewFactory.getJsonView()).addObject("data", "500");
 	}
 
