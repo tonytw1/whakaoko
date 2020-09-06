@@ -70,7 +70,7 @@ class SubscriptionsController @Autowired constructor(val usersDAO: UsersDAO, val
     fun subscriptionJson(@PathVariable username: String, @PathVariable id: String,
                          @RequestParam(required = false) page: Int?): ModelAndView? {
         usersDAO.getByUsername(username)
-        val subscription: Subscription = subscriptionsDAO.getById(id)
+        val subscription = subscriptionsDAO.getById(id)
         return ModelAndView(viewFactory.getJsonView()).addObject("data", subscription)
     }
 
@@ -97,9 +97,8 @@ class SubscriptionsController @Autowired constructor(val usersDAO: UsersDAO, val
     @RequestMapping(value = ["/{username}/subscriptions"], method = [RequestMethod.GET])
     fun subscriptions(@PathVariable username: String, @RequestParam(required = false) url: String?): ModelAndView? {
         usersDAO.getByUsername(username)
-        val mv = ModelAndView(viewFactory.getJsonView())
-        mv.addObject("data", subscriptionsDAO.getSubscriptions(SubscriptionsDAO.LATEST_ITEM_DATE_DESCENDING, url))
-        return mv
+        return ModelAndView(viewFactory.getJsonView()).
+        addObject("data", subscriptionsDAO.getSubscriptions(SubscriptionsDAO.LATEST_ITEM_DATE_DESCENDING, url))
     }
 
     @Timed(timingNotes = "")
@@ -121,7 +120,7 @@ class SubscriptionsController @Autowired constructor(val usersDAO: UsersDAO, val
         subscriptionsDAO.add(subscription)
         log.info("Added subscription: $subscription")
         rssPoller.run(subscription)
-        return ModelAndView(RedirectView(urlBuilder.getSubscriptionUrl(subscription)))
+        return ModelAndView(viewFactory.getJsonView()).addObject("data", subscription)
     }
 
     @Timed(timingNotes = "")
