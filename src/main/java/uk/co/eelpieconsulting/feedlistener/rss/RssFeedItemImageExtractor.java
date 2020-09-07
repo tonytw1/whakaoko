@@ -1,22 +1,24 @@
 package uk.co.eelpieconsulting.feedlistener.rss;
 
-import java.net.MalformedURLException;
-import java.net.URL;
-
-import org.apache.log4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
 import com.google.common.base.Strings;
 import com.sun.syndication.feed.module.mediarss.MediaEntryModuleImpl;
 import com.sun.syndication.feed.module.mediarss.MediaModule;
 import com.sun.syndication.feed.module.mediarss.types.MediaContent;
 import com.sun.syndication.feed.synd.SyndEntry;
+import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.Set;
 
 @Component
 public class RssFeedItemImageExtractor {
 
     private static Logger log = Logger.getLogger(RssFeedItemImageExtractor.class);
+
+    private final Set<String> blockedUrlSnippets = Set.of("http://stats.wordpress.com", "gravatar.com/avatar", "share_save_171_16");
 
     private final RssFeedItemBodyExtractor rssFeedItemBodyExtractor;
     private final HtmlImageExtractor htmlImageExtractor;
@@ -37,7 +39,7 @@ public class RssFeedItemImageExtractor {
             for (int i = 0; i < mediaContents.length; i++) {
                 MediaContent mediaContent = mediaContents[i];
                 final boolean isImage = isImage(mediaContent);
-                if (isImage && !isBlackListed(mediaContent) && isBetterThanCurrentlySelected(mediaContent, selectedMediaContent)) {
+                if (isImage && !isBlockListed(mediaContent) && isBetterThanCurrentlySelected(mediaContent, selectedMediaContent)) {
                     selectedMediaContent = mediaContent;
                 }
             }
@@ -55,7 +57,7 @@ public class RssFeedItemImageExtractor {
             String imageSrc = htmlImageExtractor.extractImage(itemBody);
             if (!Strings.isNullOrEmpty(imageSrc)) {
                 imageSrc = ensureFullyQualifiedUrl(imageSrc, item.getLink());
-                if (imageSrc != null && !isBlackListedImageUrl(imageSrc)) {
+                if (imageSrc != null && !isBlockListedImageUrl(imageSrc)) {
                     return imageSrc;
                 }
             }
@@ -92,15 +94,15 @@ public class RssFeedItemImageExtractor {
         return null;
     }
 
-    private boolean isBlackListed(MediaContent mediaContent) {
+    private boolean isBlockListed(MediaContent mediaContent) {
         if (mediaContent.getReference() != null && mediaContent.getReference().toString() != null) {
-            return isBlackListedImageUrl(mediaContent.getReference().toString());
+            return isBlockListedImageUrl(mediaContent.getReference().toString());
         }
         return false;
     }
 
-    private boolean isBlackListedImageUrl(String url) {
-        return url.startsWith("http://stats.wordpress.com") && !url.contains("gravatar.com/avatar") && !url.contains("share_save_171_16");
+    private boolean isBlockListedImageUrl(String url) {
+        return blockedUrlSnippets.stream().anyMatch(url::contains);
     }
 
     private boolean isImage(MediaContent mediaContent) {
