@@ -44,7 +44,7 @@ public class FeedItemDAO {
                 log.info("Added: " + feedItem.getSubscriptionId() + ", " + feedItem.getTitle());
                 dataStoreFactory.getDs().save(feedItem);
             } else {
-                log.info("Skipping previously added: " + feedItem.getTitle());
+                log.debug("Skipping previously added: " + feedItem.getTitle());
             }
         } catch (Exception e) {
             throw new FeeditemPersistanceException(e);
