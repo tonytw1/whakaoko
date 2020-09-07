@@ -26,17 +26,6 @@ class UsersDAO @Autowired constructor(val dataStoreFactory: DataStoreFactory){
         return loadUserFromDatabase(username);
     }
 
-    @Synchronized
-    fun createUser(username: String) {
-        if (Strings.isNullOrEmpty(username)) {
-            throw RuntimeException("No username given")
-        }
-        if (loadUserFromDatabase(username) != null) {
-            throw RuntimeException("Username is not available")
-        }
-        save(User(username))
-    }
-
     fun save(user: User?) {
         dataStoreFactory.getDs().save(user)
     }
