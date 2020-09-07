@@ -16,7 +16,7 @@ import java.util.Set;
 @Component
 public class RssFeedItemImageExtractor {
 
-    private static Logger log = Logger.getLogger(RssFeedItemImageExtractor.class);
+    private final static Logger log = Logger.getLogger(RssFeedItemImageExtractor.class);
 
     private final Set<String> blockedUrlSnippets = Set.of("http://stats.wordpress.com", "gravatar.com/avatar", "share_save_171_16");
 
