@@ -80,7 +80,7 @@ public class RssFeedItemImageExtractor {
                 final String fullyQualifiedImageSrc = itemUrlUrl.getProtocol() + "://" + itemUrlUrl.getHost() + imageSrc;
 
                 final URL fullyQualifiedImageSrcUrl = new URL(fullyQualifiedImageSrc);
-                log.info("Referenced from root image src resolved to fully qualified url: " + fullyQualifiedImageSrcUrl.toExternalForm());
+                log.debug("Referenced from root image src resolved to fully qualified url: " + fullyQualifiedImageSrcUrl.toExternalForm());
                 return fullyQualifiedImageSrcUrl.toExternalForm();
 
             } catch (MalformedURLException e) {
