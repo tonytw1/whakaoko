@@ -88,16 +88,20 @@ public class RssPoller {
                 subscriptionsDAO.save(subscription);
 
             } catch (HttpFetchException e) {
-                log.error("Http fetch exception while fetching RSS subscription: " + subscription.getUrl() + ": " + e.getClass().getSimpleName());
+                log.warn("Http fetch exception while fetching RSS subscription: " + subscription.getUrl() + ": " + e.getClass().getSimpleName());
                 subscription.setError("Http fetch: " + e.getMessage());
                 subscriptionsDAO.save(subscription);
 
             } catch (FeedException e) {
-                log.error("Feed exception while parsing RSS subscription: " + subscription.getUrl() + ": " + e.getMessage());
+                log.warn("Feed exception while parsing RSS subscription: " + subscription.getUrl() + ": " + e.getMessage());
+                subscription.setError("Feed exception: " + e.getMessage());
+                subscriptionsDAO.save(subscription);
+
+            } catch (Exception e) {
+                log.error("Unexpected error while processing feed: " + subscription.getUrl() + ": " + e.getMessage());
                 subscription.setError("Feed exception: " + e.getMessage());
                 subscriptionsDAO.save(subscription);
             }
-            // TODO record error condition
         }
 
         private void persistFeedItems(final FetchedFeed fetchedFeed) {
