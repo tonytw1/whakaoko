@@ -68,15 +68,8 @@ public class RssFeedItemImageExtractor {
     }
 
     private String ensureFullyQualifiedUrl(final String imageSrc, String itemUrl) {
-        try {
-            URL imageSrcUrl = new URL(imageSrc);
-            return imageSrcUrl.toExternalForm();
-
-        } catch (MalformedURLException e) {
-        }
-
-        log.debug("Image src is not a url; attempting to fully qualify");
         if (imageSrc.startsWith("/")) {
+            log.debug("Image src looks like a relative url; attempting to fully qualify");
             try {
                 final URL itemUrlUrl = new URL(itemUrl);
                 final String fullyQualifiedImageSrc = itemUrlUrl.getProtocol() + "://" + itemUrlUrl.getHost() + imageSrc;
@@ -86,12 +79,20 @@ public class RssFeedItemImageExtractor {
                 return fullyQualifiedImageSrcUrl.toExternalForm();
 
             } catch (MalformedURLException e) {
-                log.warn("Item base url or generated referenced from root image src url is not well formed");
+                log.warn("Item base url or generated referenced from root image src url is not well formed; returning null");
+                return null;
+            }
+
+        } else {
+            try {
+                URL imageSrcUrl = new URL(imageSrc);
+                return imageSrcUrl.toExternalForm();
+
+            } catch (MalformedURLException e) {
+                log.debug("Returning null fully qualified image url for: " + imageSrc + " / " + itemUrl);
+                return null;
             }
         }
-
-        log.debug("Returning null fully qualified image url for: " + imageSrc + " / " + itemUrl);
-        return null;
     }
 
     private boolean isBlockListed(MediaContent mediaContent) {
