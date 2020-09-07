@@ -53,7 +53,7 @@ public class Main {
         ThreadPoolTaskExecutor taskExecutor = new ThreadPoolTaskExecutor();
         taskExecutor.setCorePoolSize(5);
         taskExecutor.setMaxPoolSize(10);
-        taskExecutor.setQueueCapacity(500);
+        taskExecutor.setQueueCapacity(5000);
         return taskExecutor;
     }
 
