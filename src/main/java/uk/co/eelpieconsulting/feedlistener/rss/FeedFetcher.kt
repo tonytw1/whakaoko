@@ -30,7 +30,7 @@ class FeedFetcher @Autowired constructor(private val httpFetcher: HttpFetcher,
 
     @Throws(HttpFetchException::class, FeedException::class)
     private fun loadSyndFeedWithFeedFetcher(feedUrl: String): SyndFeed {
-        log.info("Loading SyndFeed from url: " + feedUrl + " using http fetcher: " + httpFetcher.hashCode())    // TODO  confirm http fetcher is singleton then remove
+        log.info("Loading SyndFeed from url: " + feedUrl)
         rssFetchesCounter.increment()
         val fetchedBytes = httpFetcher.getBytes(feedUrl)
         rssFetchedBytesCounter.increment(fetchedBytes.size.toDouble())
