@@ -38,13 +38,15 @@ public class FeedItemDAO {
         this.subscriptionsDAO = subscriptionsDAO;
     }
 
-    public void add(FeedItem feedItem) {
+    public boolean add(FeedItem feedItem) {
         try {
             if (dataStoreFactory.getDs().find(FeedItem.class).filter(Filters.eq("url", feedItem.getUrl())).iterator().toList().isEmpty()) {    // TODO shouldn't need to read before every write - use an upsert?
                 log.info("Added: " + feedItem.getSubscriptionId() + ", " + feedItem.getTitle());
                 dataStoreFactory.getDs().save(feedItem);
+                return true;
             } else {
                 log.debug("Skipping previously added: " + feedItem.getTitle());
+                return false;
             }
         } catch (Exception e) {
             throw new FeeditemPersistanceException(e);

@@ -115,8 +115,9 @@ public class RssPoller {
             for (FeedItem feedItem : fetchedFeed.getFeedItems()) {
                 try {
                     feedItem.setSubscriptionId(subscription.getId());
-                    feedItemDAO.add(feedItem);
-                    rssAddedItems.increment();
+                    if (feedItemDAO.add(feedItem)) {
+                        rssAddedItems.increment();
+                    }
 
                 } catch (FeeditemPersistanceException e) {
                     log.error(e);
