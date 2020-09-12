@@ -39,11 +39,7 @@ class FeedFetcher @Autowired constructor(private val httpFetcher: HttpFetcher,
 
     private fun getFeedItemsFrom(syndfeed: SyndFeed): List<FeedItem> {
         return syndfeed.entries.iterator().asSequence().map { entry ->
-            if (entry is SyndEntry) {
-                rssFeedItemMapper.createFeedItemFrom(entry)
-            } else {
-                null
-            }
+            if (entry is SyndEntry) rssFeedItemMapper.createFeedItemFrom(entry) else null
         }.filterNotNull().toList()
     }
 }
