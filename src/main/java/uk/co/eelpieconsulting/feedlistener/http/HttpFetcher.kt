@@ -4,19 +4,16 @@ import com.github.kittinunf.fuel.httpGet
 import com.github.kittinunf.result.Result
 import org.apache.log4j.Logger
 
-class HttpFetcher(responseCharacterEncoding: String, userAgent: String, val timeout: Int) {
+class HttpFetcher(val userAgent: String, val timeout: Int) {
 
     private val log = Logger.getLogger(HttpFetcher::class.java)
 
-    private val httpFetcher: uk.co.eelpieconsulting.common.http.HttpFetcher =
-            uk.co.eelpieconsulting.common.http.HttpFetcher(responseCharacterEncoding, userAgent, timeout)
-
     fun getBytes(url: String): Pair<ByteArray, String?>? {
-        val (request, response, result) = url
-                .httpGet()
-                .response()
+        val (request, response, result) = url.httpGet().
+        timeout(timeout).header("User-Agent", userAgent).
+        response()
 
-        when(result) {
+        when (result) {
             is Result.Failure -> {
                 val ex = result.getException()
                 log.warn("Failed to fetch from url: " + url, ex)

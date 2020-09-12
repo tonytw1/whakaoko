@@ -45,7 +45,7 @@ public class Main {
 
     @Bean
     public HttpFetcher httpFetcher() {
-        return new HttpFetcher("UTF-8", "Whakaoko", 30000);
+        return new HttpFetcher("Whakaoko", 30000);
     }
 
     @Bean
