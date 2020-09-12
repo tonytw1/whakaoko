@@ -15,7 +15,9 @@
 	<p><span title="$subscription.lastRead">Last read: $dateFormatter.timeSince($subscription.lastRead)</span></p>
 #end
 
-<p>$!subscription.error</p>
+<p>ETag: $!subscription.etag</p>
+
+<p>Error: $!subscription.error</p>
 
 <a href="$urlBuilder.getSubscriptionItemsUrl($user.username, $subscription.id)/items">JSON</a> |
 <a href="$urlBuilder.getSubscriptionItemsUrl($user.username, $subscription.id)/items?format=rss">RSS</a>
