@@ -4,6 +4,8 @@ import com.google.common.collect.Lists;
 import com.sun.syndication.feed.synd.SyndEntry;
 import com.sun.syndication.feed.synd.SyndFeed;
 import com.sun.syndication.io.FeedException;
+import io.micrometer.core.instrument.Counter;
+import io.micrometer.core.instrument.MeterRegistry;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -23,11 +25,18 @@ public class FeedFetcher {
     private HttpFetcher httpFetcher;
     private FeedParser feedParser;
 
+    private final Counter rssFetchesCounter;
+    private final Counter rssFetchedBytesCounter;
+
     @Autowired
-    public FeedFetcher(RssFeedItemMapper rssFeedItemMapper, HttpFetcher httpFetcher, FeedParser feedParser) {
+    public FeedFetcher(RssFeedItemMapper rssFeedItemMapper, HttpFetcher httpFetcher, FeedParser feedParser,
+                       MeterRegistry meterRegistry) {
         this.rssFeedItemMapper = rssFeedItemMapper;
         this.httpFetcher = httpFetcher;
         this.feedParser = feedParser;
+
+        rssFetchesCounter = meterRegistry.counter("rss_fetches");
+        rssFetchedBytesCounter = meterRegistry.counter("rss_fetched_bytes");
     }
 
     public FetchedFeed fetchFeed(String url) throws HttpFetchException, FeedException {
@@ -38,7 +47,10 @@ public class FeedFetcher {
 
     private SyndFeed loadSyndFeedWithFeedFetcher(String feedUrl) throws HttpFetchException, FeedException {
         log.info("Loading SyndFeed from url: " + feedUrl + " using http fetcher: " + httpFetcher.hashCode());
-        return feedParser.parseSyndFeed(httpFetcher.getBytes(feedUrl));
+        rssFetchesCounter.increment();
+        byte[] fetchedBytes = httpFetcher.getBytes(feedUrl);
+        rssFetchedBytesCounter.increment(Double.valueOf(fetchedBytes.length));
+        return feedParser.parseSyndFeed(fetchedBytes);
     }
 
     @SuppressWarnings("unchecked")
