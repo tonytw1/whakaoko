@@ -25,8 +25,7 @@ class FeedFetcher @Autowired constructor(private val httpFetcher: HttpFetcher,
     @Throws(HttpFetchException::class, FeedException::class)
     fun fetchFeed(url: String): FetchedFeed? {
         val syndfeed = loadSyndFeedWithFeedFetcher(url)
-        val feedItems = getFeedItemsFrom(syndfeed)
-        return FetchedFeed(feedName = syndfeed.title, feedItems = feedItems) // TODO we'd like to be able to capture etag and other caching related headers
+        return FetchedFeed(feedName = syndfeed.title, feedItems = getFeedItemsFrom(syndfeed)) // TODO we'd like to be able to capture etag and other caching related headers
     }
 
     @Throws(HttpFetchException::class, FeedException::class)
