@@ -20,7 +20,7 @@ import uk.co.eelpieconsulting.backports.VelocityConfigurer;
 import uk.co.eelpieconsulting.backports.VelocityViewResolver;
 import uk.co.eelpieconsulting.common.caching.MemcachedCache;
 import uk.co.eelpieconsulting.common.dates.DateFormatter;
-import uk.co.eelpieconsulting.common.http.HttpFetcher;
+import uk.co.eelpieconsulting.feedlistener.http.HttpFetcher;
 
 import java.io.IOException;
 import java.util.Map;
@@ -46,6 +46,11 @@ public class Main {
     @Bean
     public HttpFetcher httpFetcher() {
         return new HttpFetcher("UTF-8", "Whakaoko", 30000);
+    }
+
+    @Bean
+    public uk.co.eelpieconsulting.common.http.HttpFetcher commonHttpFetcher() {
+        return new uk.co.eelpieconsulting.common.http.HttpFetcher ("UTF-8", "Whakaoko", 30000);
     }
 
     @Bean

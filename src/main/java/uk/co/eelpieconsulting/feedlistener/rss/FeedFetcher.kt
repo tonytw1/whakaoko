@@ -8,7 +8,7 @@ import org.apache.log4j.Logger
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
 import uk.co.eelpieconsulting.common.http.HttpFetchException
-import uk.co.eelpieconsulting.common.http.HttpFetcher
+import uk.co.eelpieconsulting.feedlistener.http.HttpFetcher
 import uk.co.eelpieconsulting.feedlistener.model.FeedItem
 
 @Component
