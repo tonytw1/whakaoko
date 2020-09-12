@@ -1,6 +1,8 @@
 package uk.co.eelpieconsulting.feedlistener.rss;
 
 import com.sun.syndication.io.FeedException;
+import io.micrometer.core.instrument.Counter;
+import io.micrometer.core.instrument.MeterRegistry;
 import org.apache.log4j.Logger;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,12 +30,17 @@ public class RssPoller {
     private final FeedItemDAO feedItemDestination;
     private final TaskExecutor taskExecutor;
 
+    private final Counter rssAddedItems;
+
     @Autowired
-    public RssPoller(SubscriptionsDAO subscriptionsDAO, FeedFetcher feedFetcher, FeedItemDAO feedItemDestination, TaskExecutor taskExecutor) {
+    public RssPoller(SubscriptionsDAO subscriptionsDAO, FeedFetcher feedFetcher, FeedItemDAO feedItemDestination,
+                     TaskExecutor taskExecutor, MeterRegistry meterRegistry) {
         this.subscriptionsDAO = subscriptionsDAO;
         this.feedFetcher = feedFetcher;
         this.feedItemDestination = feedItemDestination;
         this.taskExecutor = taskExecutor;
+
+        rssAddedItems = meterRegistry.counter("rss_added_items");
     }
 
     @Scheduled(fixedRate = 3600000, initialDelay = 300000)
@@ -109,6 +116,8 @@ public class RssPoller {
                 try {
                     feedItem.setSubscriptionId(subscription.getId());
                     feedItemDAO.add(feedItem);
+                    rssAddedItems.increment();
+
                 } catch (FeeditemPersistanceException e) {
                     log.error(e);
                 }
