@@ -59,13 +59,13 @@ public class RssPoller {
     private class ProcessFeedTask implements Runnable {
 
         private final FeedFetcher feedFetcher;
-        private final FeedItemDAO feedItemDestination;
+        private final FeedItemDAO feedItemDAO;
         private final RssSubscription subscription;
         private final SubscriptionsDAO subscriptionsDAO;
 
-        public ProcessFeedTask(FeedFetcher feedFetcher, FeedItemDAO feedItemDestination, SubscriptionsDAO subscriptionsDAO, RssSubscription subscription) {
+        public ProcessFeedTask(FeedFetcher feedFetcher, FeedItemDAO feedItemDAO, SubscriptionsDAO subscriptionsDAO, RssSubscription subscription) {
             this.feedFetcher = feedFetcher;
-            this.feedItemDestination = feedItemDestination;
+            this.feedItemDAO = feedItemDAO;
             this.subscription = subscription;
             this.subscriptionsDAO = subscriptionsDAO;
         }
@@ -108,7 +108,7 @@ public class RssPoller {
             for (FeedItem feedItem : fetchedFeed.getFeedItems()) {
                 try {
                     feedItem.setSubscriptionId(subscription.getId());
-                    feedItemDestination.add(feedItem);
+                    feedItemDAO.add(feedItem);
                 } catch (FeeditemPersistanceException e) {
                     log.error(e);
                 }

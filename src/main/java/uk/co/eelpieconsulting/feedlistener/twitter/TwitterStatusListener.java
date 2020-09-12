@@ -1,6 +1,5 @@
 package uk.co.eelpieconsulting.feedlistener.twitter;
 
-import com.google.common.collect.Lists;
 import org.apache.log4j.Logger;
 import twitter4j.StallWarning;
 import twitter4j.Status;
@@ -20,13 +19,13 @@ public class TwitterStatusListener implements StatusListener {
 	
 	private final static Logger log = Logger.getLogger(TwitterListener.class);
 
-	private final FeedItemDAO feedItemDestination;
+	private final FeedItemDAO feedItemDAO;
 	private final TwitterFeedItemMapper twitterFeedItemMapper;
 	private final SubscriptionsDAO subscriptionsDAO;	// TODO subscriptions dao is an odd pass in; list of subscriptions would be better?
 	private final String username;
 	
-	public TwitterStatusListener(FeedItemDAO feedItemDestination, TwitterFeedItemMapper twitterFeedItemMapper, SubscriptionsDAO subscriptionsDAO, String username) {
-		this.feedItemDestination = feedItemDestination;
+	public TwitterStatusListener(FeedItemDAO feedItemDAO, TwitterFeedItemMapper twitterFeedItemMapper, SubscriptionsDAO subscriptionsDAO, String username) {
+		this.feedItemDAO = feedItemDAO;
 		this.twitterFeedItemMapper = twitterFeedItemMapper;
 		this.subscriptionsDAO = subscriptionsDAO;
 		this.username = username;
@@ -44,7 +43,7 @@ public class TwitterStatusListener implements StatusListener {
 			subscriptionsDAO.save(subscription);
 			
 			try {
-				feedItemDestination.add(tweetFeedItem);
+				feedItemDAO.add(tweetFeedItem);
 			} catch (FeeditemPersistanceException e) {
 				log.error(e);
 			}			
