@@ -33,8 +33,12 @@ class FeedFetcher @Autowired constructor(private val httpFetcher: HttpFetcher,
         log.info("Loading SyndFeed from url: " + feedUrl)
         rssFetchesCounter.increment()
         val fetchedBytes = httpFetcher.getBytes(feedUrl)
-        rssFetchedBytesCounter.increment(fetchedBytes.size.toDouble())
-        return feedParser.parseSyndFeed(fetchedBytes)
+        if (fetchedBytes != null) {
+            rssFetchedBytesCounter.increment(fetchedBytes.size.toDouble())
+            return feedParser.parseSyndFeed(fetchedBytes)
+        } else {
+            throw HttpFetchException()  // TODO push out
+        }
     }
 
     private fun getFeedItemsFrom(syndfeed: SyndFeed): List<FeedItem> {
