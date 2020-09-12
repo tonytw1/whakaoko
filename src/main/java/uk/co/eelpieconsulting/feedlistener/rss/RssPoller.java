@@ -85,6 +85,7 @@ public class RssPoller {
             try {
                 final FetchedFeed fetchedFeed = feedFetcher.fetchFeed(subscription.getUrl());
                 log.info("Fetched feed: " + fetchedFeed.getFeedName());
+                log.info("Etag: " + fetchedFeed.getEtag());
 
                 persistFeedItems(fetchedFeed);
 

@@ -24,18 +24,20 @@ class FeedFetcher @Autowired constructor(private val httpFetcher: HttpFetcher,
 
     @Throws(HttpFetchException::class, FeedException::class)
     fun fetchFeed(url: String): FetchedFeed? {
-        val syndfeed = loadSyndFeedWithFeedFetcher(url)
-        return FetchedFeed(feedName = syndfeed.title, feedItems = getFeedItemsFrom(syndfeed)) // TODO we'd like to be able to capture etag and other caching related headers
+        val result = loadSyndFeedWithFeedFetcher(url)
+        val syndFeed = result.first
+        return FetchedFeed(feedName = syndFeed.title, feedItems = getFeedItemsFrom(syndFeed), etag = result.second) // TODO we'd like to be able to capture etag and other caching related headers
     }
 
     @Throws(HttpFetchException::class, FeedException::class)
-    private fun loadSyndFeedWithFeedFetcher(feedUrl: String): SyndFeed {
+    private fun loadSyndFeedWithFeedFetcher(feedUrl: String): Pair<SyndFeed, String?> {
         log.info("Loading SyndFeed from url: " + feedUrl)
         rssFetchesCounter.increment()
-        val fetchedBytes = httpFetcher.getBytes(feedUrl)
-        if (fetchedBytes != null) {
+        val result = httpFetcher.getBytes(feedUrl)
+        if (result != null) {
+            val fetchedBytes = result.first
             rssFetchedBytesCounter.increment(fetchedBytes.size.toDouble())
-            return feedParser.parseSyndFeed(fetchedBytes)
+            return Pair(feedParser.parseSyndFeed(fetchedBytes), result.second)
         } else {
             throw HttpFetchException()  // TODO push out
         }
