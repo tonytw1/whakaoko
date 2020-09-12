@@ -49,7 +49,7 @@ public class FeedFetcher {
         log.info("Loading SyndFeed from url: " + feedUrl + " using http fetcher: " + httpFetcher.hashCode());
         rssFetchesCounter.increment();
         byte[] fetchedBytes = httpFetcher.getBytes(feedUrl);
-        rssFetchedBytesCounter.increment(Double.valueOf(fetchedBytes.length));
+        rssFetchedBytesCounter.increment(fetchedBytes.length);
         return feedParser.parseSyndFeed(fetchedBytes);
     }
 
