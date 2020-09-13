@@ -36,6 +36,10 @@ public class UrlBuilder {
 	public String getDeleteSubscriptionUrl(Subscription subscription) {
 		return getBaseUrl() + "/" + subscription.getUsername() + "/subscriptions/" + subscription.getId() + "/delete";
 	}
+
+	public String getReadSubscriptionUrl(Subscription subscription) {
+		return getBaseUrl() + "/" + subscription.getUsername() + "/subscriptions/" + subscription.getId() + "/read";
+	}
 	
 	public String getSubscriptionItemsUrl(String username, String subscriptionId) {
 		return getBaseUrl() + "/" + username + "/subscriptions/" + subscriptionId;

@@ -11,6 +11,8 @@
 
 <p><a href="$urlBuilder.getDeleteSubscriptionUrl($subscription)">Delete</a></p>
 
+<p><a href="$urlBuilder.getReadSubscriptionUrl($subscription)">Read</a></p>
+
 #if($subscription.lastRead)
 	<p><span title="$subscription.lastRead">Last read: $dateFormatter.timeSince($subscription.lastRead)</span></p>
 #end

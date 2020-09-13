@@ -94,6 +94,8 @@ public class RssPoller {
                 subscription.setEtag(fetchedFeed.getEtag());
                 subscription.setLatestItemDate(getLatestItemDate(fetchedFeed.getFeedItems()));
                 subscriptionsDAO.save(subscription);
+                log.info("Completed feed fetch for: " + fetchedFeed.getFeedName() + "; saw " + fetchedFeed.getFeedItems().size() + " items");
+
 
             } catch (HttpFetchException e) {
                 log.warn("Http fetch exception while fetching RSS subscription: " + subscription.getUrl() + ": " + e.getClass().getSimpleName());
