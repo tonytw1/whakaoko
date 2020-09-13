@@ -1,5 +1,6 @@
 package uk.co.eelpieconsulting.feedlistener.rss;
 
+import com.google.common.base.Strings;
 import com.sun.syndication.io.FeedException;
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.MeterRegistry;
@@ -31,6 +32,8 @@ public class RssPoller {
     private final TaskExecutor taskExecutor;
 
     private final Counter rssAddedItems;
+    private final Counter rssSuccessesEtagged;
+    private final Counter rssSuccessesNotEtagged;
 
     @Autowired
     public RssPoller(SubscriptionsDAO subscriptionsDAO, FeedFetcher feedFetcher, FeedItemDAO feedItemDestination,
@@ -41,6 +44,8 @@ public class RssPoller {
         this.taskExecutor = taskExecutor;
 
         rssAddedItems = meterRegistry.counter("rss_added_items");
+        rssSuccessesEtagged = meterRegistry.counter("rss_successes", "etagged", "false");
+        rssSuccessesNotEtagged = meterRegistry.counter("rss_successes", "etagged", "true");
     }
 
     @Scheduled(fixedRate = 3600000, initialDelay = 300000)
@@ -86,6 +91,11 @@ public class RssPoller {
                 final FetchedFeed fetchedFeed = feedFetcher.fetchFeed(subscription.getUrl());
                 log.info("Fetched feed: " + fetchedFeed.getFeedName());
                 log.info("Etag: " + fetchedFeed.getEtag());
+                if (!Strings.isNullOrEmpty(fetchedFeed.getEtag())) {
+                    rssSuccessesEtagged.increment();
+                } else {
+                    rssSuccessesNotEtagged.increment();
+                }
 
                 persistFeedItems(fetchedFeed);
 
