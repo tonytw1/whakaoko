@@ -54,15 +54,13 @@ class SubscriptionsController @Autowired constructor(val usersDAO: UsersDAO, val
     }
 
     @Timed(timingNotes = "")
-    @GetMapping("/{username}/subscriptions/{id}/reload")
+    @GetMapping("/{username}/subscriptions/{id}/read")
     fun reload(@PathVariable username: String, @PathVariable id: String): ModelAndView? {
         usersDAO.getByUsername(username)
         val subscription = subscriptionsDAO.getById(id) as RssSubscription
         log.info("Requesting reload of subscription: " + subscription.name + " / " + subscription.url)
         rssPoller.run(subscription)
-        val mv = ModelAndView(viewFactory.getJsonView())
-        mv.addObject("data", "ok")
-        return mv
+        return ModelAndView(viewFactory.getJsonView()).addObject("data", "ok")
     }
 
     @Timed(timingNotes = "")
