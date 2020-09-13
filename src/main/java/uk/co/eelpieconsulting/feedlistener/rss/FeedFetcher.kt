@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component
 import uk.co.eelpieconsulting.common.http.HttpFetchException
 import uk.co.eelpieconsulting.feedlistener.http.HttpFetcher
 import uk.co.eelpieconsulting.feedlistener.model.FeedItem
+import com.github.kittinunf.result.Result
 
 @Component
 class FeedFetcher @Autowired constructor(private val httpFetcher: HttpFetcher,
@@ -23,23 +24,33 @@ class FeedFetcher @Autowired constructor(private val httpFetcher: HttpFetcher,
     private val rssFetchedBytesCounter = meterRegistry.counter("rss_fetched_bytes")
 
     @Throws(HttpFetchException::class, FeedException::class)
-    fun fetchFeed(url: String): FetchedFeed? {
+    fun fetchFeed(url: String): FetchedFeed {
         val result = loadSyndFeedWithFeedFetcher(url)
-        val syndFeed = result.first
-        return FetchedFeed(feedName = syndFeed.title, feedItems = getFeedItemsFrom(syndFeed), etag = result.second) // TODO we'd like to be able to capture etag and other caching related headers
+        when (result) {
+            is Result.Success -> {
+                val syndFeed = result.value.first
+                val fetchedFeed = FetchedFeed(feedName = syndFeed.title, feedItems = getFeedItemsFrom(syndFeed), etag = result.value.second)
+                return fetchedFeed
+            }
+            is Result.Failure -> {
+                throw(result.error)
+            }
+        }
     }
 
-    @Throws(HttpFetchException::class, FeedException::class)
-    private fun loadSyndFeedWithFeedFetcher(feedUrl: String): Pair<SyndFeed, String?> {
+    private fun loadSyndFeedWithFeedFetcher(feedUrl: String): Result<Pair<SyndFeed, String?>, Exception> {
         log.info("Loading SyndFeed from url: " + feedUrl)
         rssFetchesCounter.increment()
         val result = httpFetcher.getBytes(feedUrl)
-        if (result != null) {
-            val fetchedBytes = result.first
-            rssFetchedBytesCounter.increment(fetchedBytes.size.toDouble())
-            return Pair(feedParser.parseSyndFeed(fetchedBytes), result.second)
-        } else {
-            throw HttpFetchException()  // TODO push out
+        when (result) {
+            is Result.Success -> {
+                val fetchedBytes = result.value.first
+                rssFetchedBytesCounter.increment(fetchedBytes.size.toDouble())
+                return Result.Success(Pair(feedParser.parseSyndFeed(fetchedBytes), result.value.second))
+            }
+            is Result.Failure -> {
+                return Result.Failure(result.error)
+            }
         }
     }
 

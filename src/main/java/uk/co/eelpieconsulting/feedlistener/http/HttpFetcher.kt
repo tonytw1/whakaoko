@@ -8,7 +8,7 @@ class HttpFetcher(val userAgent: String, val timeout: Int) {
 
     private val log = Logger.getLogger(HttpFetcher::class.java)
 
-    fun getBytes(url: String): Pair<ByteArray, String?>? {
+    fun getBytes(url: String): Result<Pair<ByteArray, String?>, Exception> {
         val (request, response, result) = url.httpGet().
         timeout(timeout).header("User-Agent", userAgent).
         response()
@@ -17,11 +17,12 @@ class HttpFetcher(val userAgent: String, val timeout: Int) {
             is Result.Failure -> {
                 val ex = result.getException()
                 log.warn("Failed to fetch from url: " + url, ex)
-                return null
+                return Result.error(ex)
             }
             is Result.Success -> {
                 val etag = response.header("ETag").firstOrNull()
-                return Pair(result.get(), etag)
+                val value: Pair<ByteArray, String?> = Pair(result.get(), etag)
+                return Result.success(value)
             }
         }
     }
