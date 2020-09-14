@@ -46,7 +46,9 @@ class FeedFetcher @Autowired constructor(private val httpFetcher: HttpFetcher,
 
                 try {
                     val syndFeed = feedParser.parseSyndFeed(fetchedBytes)
-                    return Result.Success(Pair(syndFeed, result.value.second))
+                    val headers = result.value.second
+                    val etag = headers["ETag"].firstOrNull()
+                    return Result.Success(Pair(syndFeed, etag))
 
                 } catch (ex: Exception){
                     log.warn("Feed parsing error: " + ex.message)
