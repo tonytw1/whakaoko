@@ -60,7 +60,7 @@ class ChannelsController @Autowired constructor(val usersDAO: UsersDAO, val chan
                     response: HttpServletResponse): ModelAndView? {
         usersDAO.getByUsername(username)
         val channel: Channel = channelsDAO.getById(username, id)
-        var mv: ModelAndView? = ModelAndView(viewFactory.getJsonView())
+        var mv = ModelAndView(viewFactory.getJsonView())
         if (!Strings.isNullOrEmpty(format) && format == "rss") {    // TODO view factory could do this?
             mv = ModelAndView(viewFactory.getRssView(channel.name, urlBuilder.getChannelUrl(channel), ""))
         }

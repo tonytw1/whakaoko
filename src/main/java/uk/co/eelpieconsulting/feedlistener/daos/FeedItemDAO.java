@@ -26,11 +26,12 @@ import java.util.regex.Pattern;
 public class FeedItemDAO {
 
     private static final Sort[] DATE_DESCENDING_THEN_ID = {Sort.descending("date"), Sort.ascending("_id")};
+    private static final int MAX_FEED_ITEMS = 25;
 
     private static Logger log = Logger.getLogger(FeedItemDAO.class);
 
-    private DataStoreFactory dataStoreFactory;
-    private SubscriptionsDAO subscriptionsDAO;
+    private final DataStoreFactory dataStoreFactory;
+    private final SubscriptionsDAO subscriptionsDAO;
 
     @Autowired
     public FeedItemDAO(DataStoreFactory dataStoreFactory, SubscriptionsDAO subscriptionsDAO) {
@@ -61,16 +62,16 @@ public class FeedItemDAO {
 
     public FeedItemsResult getSubscriptionFeedItems(Subscription subscription, Integer page) {
         if (page != null) {
-            return getSubscriptionFeedItems(subscription.getId(), FeedItemPopulator.MAX_FEED_ITEMS, page);
+            return getSubscriptionFeedItems(subscription.getId(), MAX_FEED_ITEMS, page);
         } else {
-            return getSubscriptionFeedItems(subscription.getId(), FeedItemPopulator.MAX_FEED_ITEMS);
+            return getSubscriptionFeedItems(subscription.getId(), MAX_FEED_ITEMS);
         }
     }
 
     public FeedItemsResult getChannelFeedItemsResult(String username, Channel channel, Integer page, String q, Integer pageSize) {
-        final int pageSizeToUse = pageSize != null ? pageSize : FeedItemPopulator.MAX_FEED_ITEMS;
+        final int pageSizeToUse = pageSize != null ? pageSize : MAX_FEED_ITEMS;
         final int pageToUse = (page != null && page > 0) ? page : 1;
-        if (pageSizeToUse > FeedItemPopulator.MAX_FEED_ITEMS) {
+        if (pageSizeToUse > MAX_FEED_ITEMS) {
             throw new RuntimeException("Too many records requested");    // TODO use correct exception.
         }
 

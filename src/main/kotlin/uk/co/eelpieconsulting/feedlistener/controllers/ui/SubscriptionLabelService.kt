@@ -6,7 +6,8 @@ import uk.co.eelpieconsulting.feedlistener.UnknownSubscriptionException
 import uk.co.eelpieconsulting.feedlistener.daos.SubscriptionsDAO
 
 @Component
-class SubscriptionLabelService @Autowired constructor(val subscriptionsDAO: SubscriptionsDAO) {
+open class SubscriptionLabelService @Autowired constructor(val subscriptionsDAO: SubscriptionsDAO) {
+    // TODO open for mocking only
 
    fun labelForSubscription(subscriptionId: String): String? {
        return try {
