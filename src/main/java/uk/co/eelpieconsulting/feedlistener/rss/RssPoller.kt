@@ -22,6 +22,7 @@ import java.util.function.Consumer
 @Component
 class RssPoller @Autowired constructor(val subscriptionsDAO: SubscriptionsDAO, val taskExecutor: TaskExecutor,
                                        val feedFetcher: FeedFetcher, val feedItemDestination: FeedItemDAO,
+                                       val feedItemLatestDateFinder: FeedItemLatestDateFinder,
                                        meterRegistry: MeterRegistry) {
 
     private val log = Logger.getLogger(RssPoller::class.java)
@@ -68,7 +69,7 @@ class RssPoller @Autowired constructor(val subscriptionsDAO: SubscriptionsDAO, v
                 subscription.name = fetchedFeed.feedName
                 subscription.error = null
                 subscription.etag = fetchedFeed.etag
-                subscription.latestItemDate = getLatestItemDate(fetchedFeed.feedItems)
+                subscription.latestItemDate = feedItemLatestDateFinder.getLatestItemDate(fetchedFeed.feedItems)
                 subscriptionsDAO.save(subscription)
                 log.info("Completed feed fetch for: " + fetchedFeed.feedName + "; saw " + fetchedFeed.feedItems.size + " items")
 
@@ -99,17 +100,21 @@ class RssPoller @Autowired constructor(val subscriptionsDAO: SubscriptionsDAO, v
                 }
             }
         }
+    }
+}
 
-        private fun getLatestItemDate(feedItems: List<FeedItem>): Date? {
-            var latestItemDate: Date? = null
-            for (feedItem in feedItems) {   // TODO port to a stream operation
-                val feedItemDate = feedItem.date
-                if (feedItemDate != null && (latestItemDate == null || feedItemDate.after(latestItemDate))) {
-                    latestItemDate = feedItemDate
-                }
+@Component
+class FeedItemLatestDateFinder {
+
+    fun getLatestItemDate(feedItems: List<FeedItem>): Date? {
+        var latestItemDate: Date? = null
+        for (feedItem in feedItems) {   // TODO port to a stream operation
+            val feedItemDate = feedItem.date
+            if (feedItemDate != null && (latestItemDate == null || feedItemDate.after(latestItemDate))) {
+                latestItemDate = feedItemDate
             }
-            return latestItemDate
         }
+        return latestItemDate
     }
 
 }
