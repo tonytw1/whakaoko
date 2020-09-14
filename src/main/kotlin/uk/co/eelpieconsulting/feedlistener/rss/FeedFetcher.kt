@@ -22,43 +22,36 @@ class FeedFetcher @Autowired constructor(private val httpFetcher: HttpFetcher,
     private val rssFetchedBytesCounter = meterRegistry.counter("rss_fetched_bytes")
 
     fun fetchFeed(url: String): Result<FetchedFeed, Exception> {
-        val result = loadSyndFeedWithFeedFetcher(url)
-        when (result) {
-           is Result.Success -> {
-                val syndFeed = result.value.first
-                val fetchedFeed = FetchedFeed(feedName = syndFeed.title, feedItems = getFeedItemsFrom(syndFeed), etag = result.value.second)
-                return Result.success(fetchedFeed)
-            }
-            is Result.Failure -> {
-                return result
-            }
-        }
+        loadSyndFeedWithFeedFetcher(url).fold({ syndFeedAndEtag ->
+            val syndFeed = syndFeedAndEtag.first
+            val fetchedFeed = FetchedFeed(feedName = syndFeed.title, feedItems = getFeedItemsFrom(syndFeed), etag = syndFeedAndEtag.second)
+            return Result.success(fetchedFeed)
+        }, { ex ->
+            return Result.Failure(ex)
+        })
     }
 
     private fun loadSyndFeedWithFeedFetcher(feedUrl: String): Result<Pair<SyndFeed, String?>, Exception> {
         log.info("Loading SyndFeed from url: " + feedUrl)
         rssFetchesCounter.increment()
-        val result = httpFetcher.getBytes(feedUrl)
-        when (result) {
-            is Result.Success -> {
-                val fetchedBytes = result.value.first
-                rssFetchedBytesCounter.increment(fetchedBytes.size.toDouble())
 
-                try {
-                    val syndFeed = feedParser.parseSyndFeed(fetchedBytes)
-                    val headers = result.value.second
-                    val etag = headers["ETag"].firstOrNull()
-                    return Result.Success(Pair(syndFeed, etag))
+        httpFetcher.getBytes(feedUrl).fold({ httpResult ->
+            val fetchedBytes = httpResult.first
+            rssFetchedBytesCounter.increment(fetchedBytes.size.toDouble())
 
-                } catch (ex: Exception){
-                    log.warn("Feed parsing error: " + ex.message)
-                    return Result.error(ex)
-                }
+            try {
+                val syndFeed = feedParser.parseSyndFeed(fetchedBytes)
+                val headers = httpResult.second
+                val etag = headers["ETag"].firstOrNull()
+                return Result.Success(Pair(syndFeed, etag))
+
+            } catch (ex: Exception) {
+                log.warn("Feed parsing error: " + ex.message)
+                return Result.error(ex)
             }
-            is Result.Failure -> {
-                return Result.Failure(result.error)
-            }
-        }
+        }, { ex ->
+            return Result.Failure(ex)
+        })
     }
 
     private fun getFeedItemsFrom(syndfeed: SyndFeed): List<FeedItem> {
