@@ -108,14 +108,7 @@ class FeedItemLatestDateFinder {
 
     fun getLatestItemDate(feedItems: List<FeedItem>): Date? {
         // Map to dates; filter out nulls; return max
-        val max = feedItems.map { it.date }.filterNotNull().stream().max(Date::compareTo)
-
-        // TODO There is almost certainly a one liner for this.
-        if (max.isPresent) {
-            return max.get()
-        } else {
-            return null
-        }
+        return feedItems.map { it.date }.filterNotNull().stream().max(Date::compareTo).orElse(null)
     }
 
 }
