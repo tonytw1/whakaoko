@@ -1,7 +1,7 @@
 package uk.co.eelpieconsulting.feedlistener.rss
 
+import com.github.kittinunf.result.Result
 import com.google.common.base.Strings
-import com.sun.syndication.io.FeedException
 import io.micrometer.core.instrument.MeterRegistry
 import org.apache.log4j.Logger
 import org.joda.time.DateTime
@@ -10,7 +10,6 @@ import org.springframework.core.task.TaskExecutor
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor
 import org.springframework.stereotype.Component
-import uk.co.eelpieconsulting.common.http.HttpFetchException
 import uk.co.eelpieconsulting.feedlistener.daos.FeedItemDAO
 import uk.co.eelpieconsulting.feedlistener.daos.SubscriptionsDAO
 import uk.co.eelpieconsulting.feedlistener.exceptions.FeeditemPersistanceException
@@ -56,35 +55,34 @@ class RssPoller @Autowired constructor(val subscriptionsDAO: SubscriptionsDAO, v
             log.info("Processing feed: " + subscription + " from thread " + Thread.currentThread().id)
             subscription.lastRead = DateTime.now().toDate()
             subscriptionsDAO.save(subscription)
-            try {
-                val fetchedFeed = feedFetcher.fetchFeed(subscription.url)
-                log.info("Fetched feed: " + fetchedFeed.feedName)
-                log.info("Etag: " + fetchedFeed.etag)
-                if (!Strings.isNullOrEmpty(fetchedFeed.etag)) {
-                    rssSuccessesEtagged.increment()
-                } else {
-                    rssSuccessesNotEtagged.increment()
-                }
-                persistFeedItems(fetchedFeed)
-                subscription.name = fetchedFeed.feedName
-                subscription.error = null
-                subscription.etag = fetchedFeed.etag
-                subscription.latestItemDate = feedItemLatestDateFinder.getLatestItemDate(fetchedFeed.feedItems)
-                subscriptionsDAO.save(subscription)
-                log.info("Completed feed fetch for: " + fetchedFeed.feedName + "; saw " + fetchedFeed.feedItems.size + " items")
 
-            } catch (e: HttpFetchException) {
-                log.warn("Http fetch exception while fetching RSS subscription: " + subscription.url + ": " + e.javaClass.simpleName)
-                subscription.error = "Http fetch: " + e.message
-                subscriptionsDAO.save(subscription)
-            } catch (e: FeedException) {
-                log.warn("Feed exception while parsing RSS subscription: " + subscription.url + ": " + e.message)
-                subscription.error = "Feed exception: " + e.message
-                subscriptionsDAO.save(subscription)
-            } catch (e: Exception) {
-                log.error("Unexpected error while processing feed: " + subscription.url + ": " + e.message)
-                subscription.error = "Feed exception: " + e.message
-                subscriptionsDAO.save(subscription)
+            val result = feedFetcher.fetchFeed(subscription.url)
+            when (result) {
+                is Result.Success -> {
+                    val fetchedFeed = result.value
+                    log.info("Fetched feed: " + fetchedFeed.feedName)
+                    log.info("Etag: " + fetchedFeed.etag)
+                    if (!Strings.isNullOrEmpty(fetchedFeed.etag)) {
+                        rssSuccessesEtagged.increment()
+                    } else {
+                        rssSuccessesNotEtagged.increment()
+                    }
+                    persistFeedItems(fetchedFeed)
+                    subscription.name = fetchedFeed.feedName
+                    subscription.error = null
+                    subscription.etag = fetchedFeed.etag
+                    subscription.latestItemDate = feedItemLatestDateFinder.getLatestItemDate(fetchedFeed.feedItems)
+                    subscriptionsDAO.save(subscription)
+                    log.info("Completed feed fetch for: " + fetchedFeed.feedName + "; saw " + fetchedFeed.feedItems.size + " items")
+                }
+                is Result.Failure -> {
+                    val ex = result.error
+                    log.warn("Http fetch exception while fetching RSS subscription: " + subscription.url + ": " + ex.javaClass.simpleName)
+                    val errorMessage = ex.message
+                    log.info("Setting feed error to: " + errorMessage)
+                    subscription.error = "Http fetch: " + errorMessage
+                    subscriptionsDAO.save(subscription)
+                }
             }
         }
 

@@ -1,16 +1,14 @@
 package uk.co.eelpieconsulting.feedlistener.rss
 
+import com.github.kittinunf.result.Result
 import com.sun.syndication.feed.synd.SyndEntry
 import com.sun.syndication.feed.synd.SyndFeed
-import com.sun.syndication.io.FeedException
 import io.micrometer.core.instrument.MeterRegistry
 import org.apache.log4j.Logger
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
-import uk.co.eelpieconsulting.common.http.HttpFetchException
 import uk.co.eelpieconsulting.feedlistener.http.HttpFetcher
 import uk.co.eelpieconsulting.feedlistener.model.FeedItem
-import com.github.kittinunf.result.Result
 
 @Component
 class FeedFetcher @Autowired constructor(private val httpFetcher: HttpFetcher,
@@ -23,17 +21,16 @@ class FeedFetcher @Autowired constructor(private val httpFetcher: HttpFetcher,
     private val rssFetchesCounter = meterRegistry.counter("rss_fetches")
     private val rssFetchedBytesCounter = meterRegistry.counter("rss_fetched_bytes")
 
-    @Throws(HttpFetchException::class, FeedException::class)
-    fun fetchFeed(url: String): FetchedFeed {
+    fun fetchFeed(url: String): Result<FetchedFeed, Exception> {
         val result = loadSyndFeedWithFeedFetcher(url)
         when (result) {
-            is Result.Success -> {
+           is Result.Success -> {
                 val syndFeed = result.value.first
                 val fetchedFeed = FetchedFeed(feedName = syndFeed.title, feedItems = getFeedItemsFrom(syndFeed), etag = result.value.second)
-                return fetchedFeed
+                return Result.success(fetchedFeed)
             }
             is Result.Failure -> {
-                throw(result.error)
+                return result
             }
         }
     }
@@ -46,7 +43,15 @@ class FeedFetcher @Autowired constructor(private val httpFetcher: HttpFetcher,
             is Result.Success -> {
                 val fetchedBytes = result.value.first
                 rssFetchedBytesCounter.increment(fetchedBytes.size.toDouble())
-                return Result.Success(Pair(feedParser.parseSyndFeed(fetchedBytes), result.value.second))
+
+                try {
+                    val syndFeed = feedParser.parseSyndFeed(fetchedBytes)
+                    return Result.Success(Pair(syndFeed, result.value.second))
+
+                } catch (ex: Exception){
+                    log.warn("Feed parsing error: " + ex.message)
+                    return Result.error(ex)
+                }
             }
             is Result.Failure -> {
                 return Result.Failure(result.error)
