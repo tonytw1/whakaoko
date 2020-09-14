@@ -80,7 +80,7 @@ class RssPoller @Autowired constructor(val subscriptionsDAO: SubscriptionsDAO, v
                     log.warn("Http fetch exception while fetching RSS subscription: " + subscription.url + ": " + ex.javaClass.simpleName)
                     val errorMessage = ex.message
                     log.info("Setting feed error to: " + errorMessage)
-                    subscription.error = "Http fetch: " + errorMessage
+                    subscription.error = errorMessage
                     subscriptionsDAO.save(subscription)
                 }
             }
