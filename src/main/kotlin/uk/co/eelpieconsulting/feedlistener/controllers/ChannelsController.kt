@@ -39,15 +39,15 @@ class ChannelsController @Autowired constructor(val usersDAO: UsersDAO, val chan
     @GetMapping("/{username}/channels/{id}")
     fun channel(@PathVariable username: String, @PathVariable id: String): ModelAndView? {
         usersDAO.getByUsername(username)
-        val channel: Channel = channelsDAO.getById(username, id)
+        val channel = channelsDAO.getById(username, id)
         return ModelAndView(viewFactory.getJsonView()).addObject("data", channel)
     }
 
     @GetMapping("/{username}/channels/{id}/subscriptions")
     fun channelSubscriptions(@PathVariable username: String, @PathVariable id: String, @RequestParam(required = false) url: String?): ModelAndView? {
         usersDAO.getByUsername(username)
-        val channel: Channel = channelsDAO.getById(username, id)
-        val subscriptionsForChannel: List<Subscription> = subscriptionsDAO.getSubscriptionsForChannel(username, channel.id, url)
+        val channel = channelsDAO.getById(username, id)
+        val subscriptionsForChannel = subscriptionsDAO.getSubscriptionsForChannel(username, channel.id, url)
         return ModelAndView(viewFactory.getJsonView()).addObject("data", subscriptionsForChannel)
     }
 
@@ -59,12 +59,12 @@ class ChannelsController @Autowired constructor(val usersDAO: UsersDAO, val chan
                     @RequestParam(required = false) q: String?,
                     response: HttpServletResponse): ModelAndView? {
         usersDAO.getByUsername(username)
-        val channel: Channel = channelsDAO.getById(username, id)
+        val channel = channelsDAO.getById(username, id)
         var mv = ModelAndView(viewFactory.getJsonView())
         if (!Strings.isNullOrEmpty(format) && format == "rss") {    // TODO view factory could do this?
             mv = ModelAndView(viewFactory.getRssView(channel.name, urlBuilder.getChannelUrl(channel), ""))
         }
-        val results: FeedItemsResult = feedItemDAO.getChannelFeedItemsResult(username, channel, page, q, pageSize)
+        val results = feedItemDAO.getChannelFeedItemsResult(username, channel, page, q, pageSize)
         feedItemPopulator.populateFeedItems(results, mv, "data")
         val totalCount = results.totalCount
         response.addHeader(X_TOTAL_COUNT, java.lang.Long.toString(totalCount))

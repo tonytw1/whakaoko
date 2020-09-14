@@ -41,13 +41,13 @@ class SubscriptionsController @Autowired constructor(val usersDAO: UsersDAO, val
                           @RequestParam(required = false) format: String?,
                           response: HttpServletResponse): ModelAndView? {
         usersDAO.getByUsername(username)
-        val subscription: Subscription = subscriptionsDAO.getById(id)
+        val subscription = subscriptionsDAO.getById(id)
         var mv = ModelAndView(viewFactory.getJsonView())
         if (!Strings.isNullOrEmpty(format) && format == "rss") {
             val title = if (!Strings.isNullOrEmpty(subscription.name)) subscription.name else subscription.id
             mv = ModelAndView(viewFactory.getRssView(title, urlBuilder.getSubscriptionUrl(subscription), ""))
         }
-        val feedItemsResult: FeedItemsResult = feedItemDAO.getSubscriptionFeedItems(subscription, page)
+        val feedItemsResult = feedItemDAO.getSubscriptionFeedItems(subscription, page)
         feedItemPopulator.populateFeedItems(feedItemsResult, mv, "data")
         response.addHeader(X_TOTAL_COUNT, java.lang.Long.toString(feedItemsResult.totalCount))
         return mv
@@ -76,7 +76,7 @@ class SubscriptionsController @Autowired constructor(val usersDAO: UsersDAO, val
     @GetMapping("/{username}/subscriptions/{id}/delete") // TODO should be a HTTP DELETE
     fun deleteSubscription(@PathVariable username: String, @PathVariable id: String): ModelAndView? {
         usersDAO.getByUsername(username)
-        val subscription: Subscription = subscriptionsDAO.getById(id)
+        val subscription = subscriptionsDAO.getById(id)
                 ?: // TODO 404
                 return null
 
@@ -134,7 +134,7 @@ class SubscriptionsController @Autowired constructor(val usersDAO: UsersDAO, val
     fun addInstagramTagSubscription(@PathVariable username: String,
                                     @RequestParam tag: String, @RequestParam channel: String): ModelAndView? {
         log.info("Instagram tag")
-        val subscription: InstagramSubscription = instagramSubscriptionManager.requestInstagramTagSubscription(tag, channel, username)
+        val subscription = instagramSubscriptionManager.requestInstagramTagSubscription(tag, channel, username)
         subscriptionsDAO.add(subscription)
         return ModelAndView(RedirectView(urlBuilder.getBaseUrl()))
     }
@@ -147,7 +147,7 @@ class SubscriptionsController @Autowired constructor(val usersDAO: UsersDAO, val
                                     @RequestParam radius: Int,
                                     @RequestParam channel: String): ModelAndView? {
         val latLong = LatLong(latitude, longitude)
-        val instagramGeographySubscription: InstagramGeographySubscription = instagramSubscriptionManager.requestInstagramGeographySubscription(latLong, radius, channel, username)
+        val instagramGeographySubscription = instagramSubscriptionManager.requestInstagramGeographySubscription(latLong, radius, channel, username)
         log.info("Saving subscription: $instagramGeographySubscription")
         subscriptionsDAO.add(instagramGeographySubscription)
         return ModelAndView(RedirectView(urlBuilder.getBaseUrl()))
