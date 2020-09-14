@@ -107,14 +107,15 @@ class RssPoller @Autowired constructor(val subscriptionsDAO: SubscriptionsDAO, v
 class FeedItemLatestDateFinder {
 
     fun getLatestItemDate(feedItems: List<FeedItem>): Date? {
-        var latestItemDate: Date? = null
-        for (feedItem in feedItems) {   // TODO port to a stream operation
-            val feedItemDate = feedItem.date
-            if (feedItemDate != null && (latestItemDate == null || feedItemDate.after(latestItemDate))) {
-                latestItemDate = feedItemDate
-            }
+        // Map to dates; filter out nulls; return max
+        val max = feedItems.map { it.date }.filterNotNull().stream().max(Date::compareTo)
+
+        // TODO There is almost certainly a one liner for this.
+        if (max.isPresent) {
+            return max.get()
+        } else {
+            return null
         }
-        return latestItemDate
     }
 
 }

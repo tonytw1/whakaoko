@@ -8,9 +8,11 @@ import uk.co.eelpieconsulting.feedlistener.model.FeedItem
 
 class RssPollerTest {
 
+    private val feedItemLatestDateFinder = FeedItemLatestDateFinder()
+
     @Test
     fun canFindLatestFeedItemDateFromCollectionOfFeedItems() {
-        assertNull(FeedItemLatestDateFinder().getLatestItemDate(emptyList()))
+        assertNull(feedItemLatestDateFinder.getLatestItemDate(emptyList()))
 
         val recently = DateTime(2020, 1, 2, 3, 1, 1, 1)
         val mostRecent = DateTime(2020, 9, 8, 14, 1, 1, 1)
@@ -22,7 +24,7 @@ class RssPollerTest {
             FeedItem("title", "url", "body", date?.toDate(), null, null, null)
         }
 
-        val latestItemDate = FeedItemLatestDateFinder().getLatestItemDate(feedItems)
+        val latestItemDate = feedItemLatestDateFinder.getLatestItemDate(feedItems)
         assertEquals(mostRecent.toDate(), latestItemDate)
     }
 
