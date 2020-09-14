@@ -1,6 +1,5 @@
 package uk.co.eelpieconsulting.feedlistener.rss
 
-import com.github.kittinunf.result.Result
 import com.google.common.base.Strings
 import io.micrometer.core.instrument.MeterRegistry
 import org.apache.log4j.Logger
@@ -56,34 +55,31 @@ class RssPoller @Autowired constructor(val subscriptionsDAO: SubscriptionsDAO, v
             subscription.lastRead = DateTime.now().toDate()
             subscriptionsDAO.save(subscription)
 
-            val result = feedFetcher.fetchFeed(subscription.url)
-            when (result) {
-                is Result.Success -> {
-                    val fetchedFeed = result.value
-                    log.info("Fetched feed: " + fetchedFeed.feedName)
-                    log.info("Etag: " + fetchedFeed.etag)
-                    if (!Strings.isNullOrEmpty(fetchedFeed.etag)) {
-                        rssSuccessesEtagged.increment()
-                    } else {
-                        rssSuccessesNotEtagged.increment()
+            feedFetcher.fetchFeed(subscription.url).fold(
+                    { fetchedFeed ->
+                        log.info("Fetched feed: " + fetchedFeed.feedName)
+                        log.info("Etag: " + fetchedFeed.etag)
+                        if (!Strings.isNullOrEmpty(fetchedFeed.etag)) {
+                            rssSuccessesEtagged.increment()
+                        } else {
+                            rssSuccessesNotEtagged.increment()
+                        }
+                        persistFeedItems(fetchedFeed)
+                        subscription.name = fetchedFeed.feedName
+                        subscription.error = null
+                        subscription.etag = fetchedFeed.etag
+                        subscription.latestItemDate = feedItemLatestDateFinder.getLatestItemDate(fetchedFeed.feedItems)
+                        subscriptionsDAO.save(subscription)
+                        log.info("Completed feed fetch for: " + fetchedFeed.feedName + "; saw " + fetchedFeed.feedItems.size + " items")
+                    },
+                    { ex ->
+                        log.warn("Http fetch exception while fetching RSS subscription: " + subscription.url + ": " + ex.javaClass.simpleName)
+                        val errorMessage = ex.message
+                        log.info("Setting feed error to: " + errorMessage)
+                        subscription.error = errorMessage
+                        subscriptionsDAO.save(subscription)
                     }
-                    persistFeedItems(fetchedFeed)
-                    subscription.name = fetchedFeed.feedName
-                    subscription.error = null
-                    subscription.etag = fetchedFeed.etag
-                    subscription.latestItemDate = feedItemLatestDateFinder.getLatestItemDate(fetchedFeed.feedItems)
-                    subscriptionsDAO.save(subscription)
-                    log.info("Completed feed fetch for: " + fetchedFeed.feedName + "; saw " + fetchedFeed.feedItems.size + " items")
-                }
-                is Result.Failure -> {
-                    val ex = result.error
-                    log.warn("Http fetch exception while fetching RSS subscription: " + subscription.url + ": " + ex.javaClass.simpleName)
-                    val errorMessage = ex.message
-                    log.info("Setting feed error to: " + errorMessage)
-                    subscription.error = errorMessage
-                    subscriptionsDAO.save(subscription)
-                }
-            }
+            )
         }
 
         private fun persistFeedItems(fetchedFeed: FetchedFeed) {
