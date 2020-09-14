@@ -15,8 +15,6 @@ import uk.co.eelpieconsulting.feedlistener.daos.FeedItemDAO
 import uk.co.eelpieconsulting.feedlistener.daos.SubscriptionsDAO
 import uk.co.eelpieconsulting.feedlistener.daos.UsersDAO
 import uk.co.eelpieconsulting.feedlistener.model.Channel
-import uk.co.eelpieconsulting.feedlistener.model.FeedItemsResult
-import uk.co.eelpieconsulting.feedlistener.model.Subscription
 import javax.servlet.http.HttpServletResponse
 
 @Controller

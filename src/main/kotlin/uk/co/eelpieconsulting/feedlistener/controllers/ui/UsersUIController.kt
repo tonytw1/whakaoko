@@ -3,7 +3,6 @@ package uk.co.eelpieconsulting.feedlistener.controllers.ui
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Controller
 import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.servlet.ModelAndView
 import uk.co.eelpieconsulting.feedlistener.credentials.CredentialService
 import uk.co.eelpieconsulting.feedlistener.daos.ChannelsDAO
