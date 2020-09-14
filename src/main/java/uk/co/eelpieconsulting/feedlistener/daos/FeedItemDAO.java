@@ -12,7 +12,6 @@ import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import uk.co.eelpieconsulting.feedlistener.annotations.Timed;
-import uk.co.eelpieconsulting.feedlistener.controllers.FeedItemPopulator;
 import uk.co.eelpieconsulting.feedlistener.exceptions.FeeditemPersistanceException;
 import uk.co.eelpieconsulting.feedlistener.model.Channel;
 import uk.co.eelpieconsulting.feedlistener.model.FeedItem;
