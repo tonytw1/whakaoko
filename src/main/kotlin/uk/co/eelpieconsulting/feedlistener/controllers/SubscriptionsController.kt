@@ -103,7 +103,7 @@ class SubscriptionsController @Autowired constructor(val usersDAO: UsersDAO, val
     @GetMapping("/subscriptions")
     fun all(): ModelAndView? {
         return try {
-            ModelAndView(viewFactory.getJsonView()).addObject("data", subscriptionsDAO.getAllSubscriptions())
+            ModelAndView(viewFactory.getJsonView()).addObject("data", subscriptionsDAO.allSubscriptions())
         } catch (e: Exception) {
             log.error(e)
             throw e

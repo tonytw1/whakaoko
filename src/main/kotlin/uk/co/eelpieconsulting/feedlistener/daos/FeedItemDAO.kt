@@ -1,136 +1,127 @@
-package uk.co.eelpieconsulting.feedlistener.daos;
+package uk.co.eelpieconsulting.feedlistener.daos
 
-import com.google.common.base.Strings;
-import com.google.common.collect.Lists;
-import com.mongodb.MongoException;
-import dev.morphia.DeleteOptions;
-import dev.morphia.query.FindOptions;
-import dev.morphia.query.Query;
-import dev.morphia.query.Sort;
-import dev.morphia.query.experimental.filters.Filters;
-import org.apache.log4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-import uk.co.eelpieconsulting.feedlistener.annotations.Timed;
-import uk.co.eelpieconsulting.feedlistener.exceptions.FeeditemPersistanceException;
-import uk.co.eelpieconsulting.feedlistener.model.Channel;
-import uk.co.eelpieconsulting.feedlistener.model.FeedItem;
-import uk.co.eelpieconsulting.feedlistener.model.FeedItemsResult;
-import uk.co.eelpieconsulting.feedlistener.model.Subscription;
-
-import java.util.List;
-import java.util.regex.Pattern;
+import com.google.common.base.Strings
+import com.google.common.collect.Lists
+import com.mongodb.MongoException
+import dev.morphia.DeleteOptions
+import dev.morphia.query.FindOptions
+import dev.morphia.query.Query
+import dev.morphia.query.Sort
+import dev.morphia.query.experimental.filters.Filters
+import org.apache.log4j.Logger
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.stereotype.Component
+import uk.co.eelpieconsulting.feedlistener.annotations.Timed
+import uk.co.eelpieconsulting.feedlistener.exceptions.FeeditemPersistanceException
+import uk.co.eelpieconsulting.feedlistener.model.Channel
+import uk.co.eelpieconsulting.feedlistener.model.FeedItem
+import uk.co.eelpieconsulting.feedlistener.model.FeedItemsResult
+import uk.co.eelpieconsulting.feedlistener.model.Subscription
+import java.util.regex.Pattern
 
 @Component
-public class FeedItemDAO {
+class FeedItemDAO @Autowired constructor(private val dataStoreFactory: DataStoreFactory, private val subscriptionsDAO: SubscriptionsDAO) {
 
-    private static final Sort[] DATE_DESCENDING_THEN_ID = {Sort.descending("date"), Sort.ascending("_id")};
-    private static final int MAX_FEED_ITEMS = 25;
+    private val log = Logger.getLogger(FeedItemDAO::class.java)
 
-    private static Logger log = Logger.getLogger(FeedItemDAO.class);
+    private val DATE_DESCENDING_THEN_ID = arrayOf(Sort.descending("date"), Sort.ascending("_id"))
+    private val MAX_FEED_ITEMS = 25
 
-    private final DataStoreFactory dataStoreFactory;
-    private final SubscriptionsDAO subscriptionsDAO;
-
-    @Autowired
-    public FeedItemDAO(DataStoreFactory dataStoreFactory, SubscriptionsDAO subscriptionsDAO) {
-        this.dataStoreFactory = dataStoreFactory;
-        this.subscriptionsDAO = subscriptionsDAO;
-    }
-
-    public boolean add(FeedItem feedItem) {
-        try {
-            if (dataStoreFactory.getDs().find(FeedItem.class).filter(Filters.eq("url", feedItem.getUrl())).iterator().toList().isEmpty()) {    // TODO shouldn't need to read before every write - use an upsert?
-                log.info("Added: " + feedItem.getSubscriptionId() + ", " + feedItem.getTitle());
-                dataStoreFactory.getDs().save(feedItem);
-                return true;
+    fun add(feedItem: FeedItem): Boolean {
+        return try {
+            if (dataStoreFactory.ds.find(FeedItem::class.java).filter(Filters.eq("url", feedItem.url)).iterator().toList().isEmpty()) {    // TODO shouldn't need to read before every write - use an upsert?
+                log.info("Added: " + feedItem.subscriptionId + ", " + feedItem.title)
+                dataStoreFactory.ds.save(feedItem)
+                true
             } else {
-                log.debug("Skipping previously added: " + feedItem.getTitle());
-                return false;
+                log.debug("Skipping previously added: " + feedItem.title)
+                false
             }
-        } catch (Exception e) {
-            throw new FeeditemPersistanceException(e);
+        } catch (e: Exception) {
+            throw FeeditemPersistanceException(e)
         }
     }
 
-    public void addAll(List<FeedItem> feedItems) {
-        for (FeedItem feedItem : feedItems) {
-            add(feedItem);
+    fun addAll(feedItems: List<FeedItem>) {
+        for (feedItem in feedItems) {
+            add(feedItem)
         }
     }
 
-    public FeedItemsResult getSubscriptionFeedItems(Subscription subscription, Integer page) {
-        if (page != null) {
-            return getSubscriptionFeedItems(subscription.getId(), MAX_FEED_ITEMS, page);
+    fun getSubscriptionFeedItems(subscription: Subscription, page: Int?): FeedItemsResult {
+        return if (page != null) {
+            getSubscriptionFeedItems(subscription.id, MAX_FEED_ITEMS, page)
         } else {
-            return getSubscriptionFeedItems(subscription.getId(), MAX_FEED_ITEMS);
+            getSubscriptionFeedItems(subscription.id, MAX_FEED_ITEMS)
         }
     }
 
-    public FeedItemsResult getChannelFeedItemsResult(String username, Channel channel, Integer page, String q, Integer pageSize) {
-        final int pageSizeToUse = pageSize != null ? pageSize : MAX_FEED_ITEMS;
-        final int pageToUse = (page != null && page > 0) ? page : 1;
+    fun getChannelFeedItemsResult(username: String?, channel: Channel, page: Int?, q: String?, pageSize: Int?): FeedItemsResult {
+        val pageSizeToUse = pageSize ?: MAX_FEED_ITEMS
+        val pageToUse = if (page != null && page > 0) page else 1
         if (pageSizeToUse > MAX_FEED_ITEMS) {
-            throw new RuntimeException("Too many records requested");    // TODO use correct exception.
+            throw RuntimeException("Too many records requested") // TODO use correct exception.
         }
-
-        return !Strings.isNullOrEmpty(q) ? searchChannelFeedItems(channel.getId(), pageSizeToUse, pageToUse, username, q) :
-                getChannelFeedItems(channel.getId(), pageSizeToUse, pageToUse, username);
+        return if (!Strings.isNullOrEmpty(q)) searchChannelFeedItems(channel.id, pageSizeToUse, pageToUse, username, q) else getChannelFeedItems(channel.id, pageSizeToUse, pageToUse, username)
     }
 
-    private FeedItemsResult getSubscriptionFeedItems(String subscriptionId, int pageSize) throws MongoException {
-        return getSubscriptionFeedItems(subscriptionId, pageSize, 0);
-    }
-    private FeedItemsResult getSubscriptionFeedItems(String subscriptionId, int pageSize, int page) throws MongoException {
-        Query<FeedItem> query = subscriptionFeedItemsQuery(subscriptionId);
-        long totalItems = query.count();
-        return new FeedItemsResult(query.iterator(withPaginationFor(pageSize, page).sort(DATE_DESCENDING_THEN_ID)).toList(), totalItems);
+    @Throws(MongoException::class)
+    private fun getSubscriptionFeedItems(subscriptionId: String, pageSize: Int): FeedItemsResult {
+        return getSubscriptionFeedItems(subscriptionId, pageSize, 0)
     }
 
-    public void deleteSubscriptionFeedItems(Subscription subscription) throws MongoException {
-        dataStoreFactory.getDs().find(FeedItem.class).filter(Filters.eq("subscriptionId", subscription.getId())).delete(new DeleteOptions().multi(true));
+    @Throws(MongoException::class)
+    private fun getSubscriptionFeedItems(subscriptionId: String, pageSize: Int, page: Int): FeedItemsResult {
+        val query = subscriptionFeedItemsQuery(subscriptionId)
+        val totalItems = query.count()
+        return FeedItemsResult(query.iterator(withPaginationFor(pageSize, page).sort(*DATE_DESCENDING_THEN_ID)).toList(), totalItems)
     }
 
-    @Timed(timingNotes = "")
-    public long getSubscriptionFeedItemsCount(String subscriptionId) {
-        return subscriptionFeedItemsQuery(subscriptionId).count();
+    @Throws(MongoException::class)
+    fun deleteSubscriptionFeedItems(subscription: Subscription) {
+        dataStoreFactory.ds.find(FeedItem::class.java).filter(Filters.eq("subscriptionId", subscription.id)).delete(DeleteOptions().multi(true))
     }
 
     @Timed(timingNotes = "")
-    public FeedItemsResult getChannelFeedItems(String channelId, int pageSize, int page, String username) throws MongoException {
-        Query<FeedItem> query = channelFeedItemsQuery(username, channelId);
-        long totalCount = query.count();
-        return new FeedItemsResult(query.iterator(withPaginationFor(pageSize, page).sort(DATE_DESCENDING_THEN_ID)).toList(), totalCount);
+    fun getSubscriptionFeedItemsCount(subscriptionId: String): Long {
+        return subscriptionFeedItemsQuery(subscriptionId).count()
     }
 
     @Timed(timingNotes = "")
-    public FeedItemsResult searchChannelFeedItems(String channelId, int pageSize, int page, String username, String q) {
-        Query<FeedItem> query = channelFeedItemsQuery(username, channelId).filter(Filters.eq("title", Pattern.compile(q))); // TODO can eq be used with a patten?
-        return new FeedItemsResult(query.iterator(withPaginationFor(pageSize, page)).toList(), query.count());
+    @Throws(MongoException::class)
+    fun getChannelFeedItems(channelId: String, pageSize: Int, page: Int, username: String?): FeedItemsResult {
+        val query = channelFeedItemsQuery(username, channelId)
+        val totalCount = query.count()
+        return FeedItemsResult(query.iterator(withPaginationFor(pageSize, page).sort(*DATE_DESCENDING_THEN_ID)).toList(), totalCount)
     }
 
     @Timed(timingNotes = "")
-    private Query<FeedItem> channelFeedItemsQuery(String username, String channelId) {
-        final List<String> channelSubscriptionIds = Lists.newArrayList();
-        for (Subscription subscription : subscriptionsDAO.getSubscriptionsForChannel(username, channelId, null)) {
-            channelSubscriptionIds.add(subscription.getId());
+    fun searchChannelFeedItems(channelId: String, pageSize: Int, page: Int, username: String?, q: String?): FeedItemsResult {
+        val query = channelFeedItemsQuery(username, channelId).filter(Filters.eq("title", Pattern.compile(q))) // TODO can eq be used with a patten?
+        return FeedItemsResult(query.iterator(withPaginationFor(pageSize, page)).toList(), query.count())
+    }
+
+    @Timed(timingNotes = "")
+    private fun channelFeedItemsQuery(username: String?, channelId: String): Query<FeedItem> {
+        val channelSubscriptionIds: MutableList<String?> = Lists.newArrayList()
+        for (subscription in subscriptionsDAO.getSubscriptionsForChannel(username!!, channelId, null)) {
+            channelSubscriptionIds.add(subscription.id)
         }
-        return dataStoreFactory.getDs().find(FeedItem.class).filter(Filters.in("subscriptionId", channelSubscriptionIds));
+        return dataStoreFactory.ds.find(FeedItem::class.java).filter(Filters.`in`("subscriptionId", channelSubscriptionIds))
     }
 
-    private Query<FeedItem> subscriptionFeedItemsQuery(String subscriptionId) {
-        return dataStoreFactory.getDs().find(FeedItem.class).filter(Filters.eq("subscriptionId", subscriptionId));
+    private fun subscriptionFeedItemsQuery(subscriptionId: String): Query<FeedItem> {
+        return dataStoreFactory.ds.find(FeedItem::class.java).filter(Filters.eq("subscriptionId", subscriptionId))
     }
 
-    private FindOptions withPaginationFor(int pageSize, int page) {
-        return new FindOptions().limit(pageSize).skip(calculatePageOffset(pageSize, page));
+    private fun withPaginationFor(pageSize: Int, page: Int): FindOptions {
+        return FindOptions().limit(pageSize).skip(calculatePageOffset(pageSize, page))
     }
 
-    private int calculatePageOffset(int pageSize, int page) {
-        if (page > 0) {
-            return (page - 1) * pageSize;
-        }
-        return 0;
+    private fun calculatePageOffset(pageSize: Int, page: Int): Int {
+        return if (page > 0) {
+            (page - 1) * pageSize
+        } else 0
     }
 
 }

@@ -77,7 +77,7 @@ public class TwitterListener {
         TwitterStream twitterStream = twitterApiFactory.getStreamingApi(twitterAccessTokenForUser, twitterAccessSecretForUser);
         twitterStream.addListener(twitterListener);
 
-        filterTwitterStreamByTags(twitterStream, subscriptionsDAO.getTwitterSubscriptions());
+        filterTwitterStreamByTags(twitterStream, subscriptionsDAO.twitterSubscriptions());
         return twitterStream;
     }
 

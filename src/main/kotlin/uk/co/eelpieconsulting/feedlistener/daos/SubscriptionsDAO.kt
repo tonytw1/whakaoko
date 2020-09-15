@@ -1,149 +1,138 @@
-package uk.co.eelpieconsulting.feedlistener.daos;
+package uk.co.eelpieconsulting.feedlistener.daos
 
-import com.google.common.base.Strings;
-import com.google.common.collect.Lists;
-import com.mongodb.MongoException;
-import dev.morphia.Datastore;
-import dev.morphia.query.FindOptions;
-import dev.morphia.query.Query;
-import dev.morphia.query.Sort;
-import dev.morphia.query.experimental.filters.Filters;
-import org.apache.log4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-import uk.co.eelpieconsulting.feedlistener.UnknownSubscriptionException;
-import uk.co.eelpieconsulting.feedlistener.model.InstagramSubscription;
-import uk.co.eelpieconsulting.feedlistener.model.RssSubscription;
-import uk.co.eelpieconsulting.feedlistener.model.Subscription;
-import uk.co.eelpieconsulting.feedlistener.model.TwitterTagSubscription;
-
-import java.util.List;
-import java.util.stream.Collectors;
+import com.google.common.base.Strings
+import com.google.common.collect.Lists
+import com.mongodb.MongoException
+import dev.morphia.query.FindOptions
+import dev.morphia.query.Sort
+import dev.morphia.query.experimental.filters.Filters
+import org.apache.log4j.Logger
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.stereotype.Component
+import uk.co.eelpieconsulting.feedlistener.UnknownSubscriptionException
+import uk.co.eelpieconsulting.feedlistener.model.InstagramSubscription
+import uk.co.eelpieconsulting.feedlistener.model.RssSubscription
+import uk.co.eelpieconsulting.feedlistener.model.Subscription
+import uk.co.eelpieconsulting.feedlistener.model.TwitterTagSubscription
+import java.util.stream.Collectors
 
 @Component
-public class SubscriptionsDAO {
+class SubscriptionsDAO @Autowired constructor(private val dataStoreFactory: DataStoreFactory) {
 
-    private final static Logger log = Logger.getLogger(SubscriptionsDAO.class);
+    private val log = Logger.getLogger(SubscriptionsDAO::class.java)
 
-    public static final Sort LATEST_ITEM_DATE_DESCENDING = Sort.descending("latestItemDate");
-    public static final Sort LAST_READ_ASCENDING = Sort.ascending("lastRead");
-
-    private final DataStoreFactory dataStoreFactory;
-
-    @Autowired
-    public SubscriptionsDAO(DataStoreFactory dataStoreFactory) {
-        this.dataStoreFactory = dataStoreFactory;
-    }
-
-    public synchronized void add(Subscription subscription) {
+    @Synchronized
+    fun add(subscription: Subscription) {
         if (!subscriptionExists(subscription)) {
-            log.debug("Saving subscription");
-            save(subscription);
+            log.debug("Saving subscription")
+            save(subscription)
         } else {
-            log.debug("Not saving duplication subscription");
+            log.debug("Not saving duplication subscription")
         }
     }
 
-    public void save(Subscription subscription) {
+    fun save(subscription: Subscription) {
         try {
-            dataStoreFactory.getDs().save(subscription);
-        } catch (MongoException e) {
-            throw new RuntimeException(e);
+            dataStoreFactory.ds.save(subscription)
+        } catch (e: MongoException) {
+            throw RuntimeException(e)
         }
     }
 
-    public List<Subscription> getSubscriptions(Sort sort, String url) {
-        try {
-            Query<Subscription> query = dataStoreFactory.getDs().find(Subscription.class);
+    fun getSubscriptions(sort: Sort?, url: String?): List<Subscription> {
+        return try {
+            var query = dataStoreFactory.ds.find(Subscription::class.java)
             if (!Strings.isNullOrEmpty(url)) {
-                query = query.disableValidation().filter(Filters.eq("url", url));    // TODO subclasses to helping here Why is validation disabled?
+                query = query.disableValidation().filter(Filters.eq("url", url)) // TODO subclasses to helping here Why is validation disabled?
             }
-
-            List<Subscription> subscriptions = query.iterator(new FindOptions().sort(sort)).toList();
-            log.info("Loaded subscriptions: " + subscriptions.size());
-            return subscriptions;
-        } catch (MongoException e) {
-            throw new RuntimeException(e);
+            val subscriptions = query.iterator(FindOptions().sort(sort)).toList()
+            log.info("Loaded subscriptions: " + subscriptions.size)
+            subscriptions
+        } catch (e: MongoException) {
+            throw RuntimeException(e)
         }
     }
 
-    public Subscription getById(String id) throws UnknownSubscriptionException {
-        try {
-            final Subscription subscription = dataStoreFactory.getDs().find(Subscription.class).filter(Filters.eq("id", id)).first();
+    @Throws(UnknownSubscriptionException::class)
+    fun getById(id: String?): Subscription {
+        return try {
+            val subscription = dataStoreFactory.ds.find(Subscription::class.java).filter(Filters.eq("id", id)).first()
             if (subscription == null) {
-                log.info("Subscription not found");
-                throw new UnknownSubscriptionException();
+                log.info("Subscription not found")
+                throw UnknownSubscriptionException()
             }
-            return subscription;
-        } catch (MongoException e) {
-            throw new RuntimeException(e);
+            subscription
+        } catch (e: MongoException) {
+            throw RuntimeException(e)
         }
     }
 
-    public boolean subscriptionExists(String id) {
-        try {
-            getById(id);
-            return true;
-        } catch (UnknownSubscriptionException e) {
-            return false;
+    fun subscriptionExists(id: String?): Boolean {
+        return try {
+            getById(id)
+            true
+        } catch (e: UnknownSubscriptionException) {
+            false
         }
     }
 
-    public void delete(Subscription subscription) throws MongoException {
-        log.info("Deleting subscription: " + subscription);
-        final Datastore datastore = dataStoreFactory.getDs();
-        datastore.find(Subscription.class).filter(Filters.eq("id", subscription.getId())).delete();
+    @Throws(MongoException::class)
+    fun delete(subscription: Subscription) {
+        log.info("Deleting subscription: $subscription")
+        val datastore = dataStoreFactory.ds
+        datastore.find(Subscription::class.java).filter(Filters.eq("id", subscription.id)).delete()
     }
 
-    public InstagramSubscription getByInstagramId(Long subscriptionId) throws MongoException {
-        return dataStoreFactory.getDs().find(InstagramSubscription.class).filter(Filters.eq("subscriptionId", subscriptionId)).first();    // TODO subscriptionId is not a very clear field name
+    @Throws(MongoException::class)
+    fun getByInstagramId(subscriptionId: Long?): InstagramSubscription {
+        return dataStoreFactory.ds.find(InstagramSubscription::class.java).filter(Filters.eq("subscriptionId", subscriptionId)).first() // TODO subscriptionId is not a very clear field name
     }
 
-    public List<Subscription> getTwitterSubscriptions() {
-        final List<Subscription> subscriptions = Lists.newArrayList();
-        for (Subscription subscription : getSubscriptions(SubscriptionsDAO.LATEST_ITEM_DATE_DESCENDING, null)) {
-            if (subscription.getId().startsWith("twitter")) {
-                subscriptions.add(subscription);
+    fun twitterSubscriptions(): List<Subscription> {
+        val subscriptions: MutableList<Subscription> = Lists.newArrayList()
+        for (subscription in getSubscriptions(LATEST_ITEM_DATE_DESCENDING, null)) {
+            if (subscription.id.startsWith("twitter")) {
+                subscriptions.add(subscription)
             }
         }
-        return subscriptions;
+        return subscriptions
     }
 
-    public List<TwitterTagSubscription> getTwitterSubscriptionsFor(String username) {
-        List<TwitterTagSubscription> allTwitterSubscriptions = dataStoreFactory.getDs().find(TwitterTagSubscription.class).iterator().toList();
-        return allTwitterSubscriptions.stream().filter(subscription ->
-                username.equals(subscription.getUsername())
-        ).collect(Collectors.toList());
+    fun getTwitterSubscriptionsFor(username: String): List<TwitterTagSubscription> {
+        val allTwitterSubscriptions = dataStoreFactory.ds.find(TwitterTagSubscription::class.java).iterator().toList()
+        return allTwitterSubscriptions.stream().filter { subscription: TwitterTagSubscription -> username == subscription.username }.collect(Collectors.toList())
     }
 
-    public List<Subscription> getSubscriptionsForChannel(String username, String channelID, String url) throws MongoException {
-        log.info("Listing subscriptions for channel: " + username + " / " + channelID);
-        Query<Subscription> query = dataStoreFactory.getDs().find(Subscription.class).
-                filter(Filters.eq("username", username), Filters.eq("channelId", channelID));
-
+    @Throws(MongoException::class)
+    fun getSubscriptionsForChannel(username: String, channelID: String, url: String?): List<Subscription> {
+        log.info("Listing subscriptions for channel: $username / $channelID")
+        var query = dataStoreFactory.ds.find(Subscription::class.java).filter(Filters.eq("username", username), Filters.eq("channelId", channelID))
         if (!Strings.isNullOrEmpty(url)) {
-            query = query.disableValidation().filter(Filters.eq("url", url));    // TODO subclasses to helping here
+            query = query.disableValidation().filter(Filters.eq("url", url)) // TODO subclasses to helping here
         }
-
-        return query.iterator(new FindOptions().sort((LATEST_ITEM_DATE_DESCENDING))).toList();
+        return query.iterator(FindOptions().sort(LATEST_ITEM_DATE_DESCENDING)).toList()
     }
 
-    public List<RssSubscription> getAllRssSubscriptions() {
-        Query<RssSubscription> allRssSubscriptions = dataStoreFactory.getDs().find(RssSubscription.class);
-        return allRssSubscriptions.iterator().toList();   // TODO optimise for last read ordering
+    // TODO optimise for last read ordering
+    fun allRssSubscriptions(): List<RssSubscription> {
+        val allRssSubscriptions = dataStoreFactory.ds.find(RssSubscription::class.java)
+        return allRssSubscriptions.iterator().toList() // TODO optimise for last read ordering
     }
 
-    private boolean subscriptionExists(Subscription subscription) {
-        for (Subscription existingSubscription : getSubscriptions(LATEST_ITEM_DATE_DESCENDING, null)) {
-            if (existingSubscription.getId().equals(subscription.getId())) {
-                log.debug("Subscription exists: " + subscription);
-                return true;
+    private fun subscriptionExists(subscription: Subscription): Boolean {
+        for (existingSubscription in getSubscriptions(LATEST_ITEM_DATE_DESCENDING, null)) {
+            if (existingSubscription.id == subscription.id) {
+                log.debug("Subscription exists: $subscription")
+                return true
             }
         }
-        return false;
+        return false
     }
 
-    public List<Subscription> getAllSubscriptions() {
-        return dataStoreFactory.getDs().find(Subscription.class).iterator().toList();
+    fun allSubscriptions(): List<Subscription> = dataStoreFactory.ds.find(Subscription::class.java).iterator().toList()
+
+    companion object {
+        val LATEST_ITEM_DATE_DESCENDING = Sort.descending("latestItemDate")
+        val LAST_READ_ASCENDING = Sort.ascending("lastRead")
     }
 }
