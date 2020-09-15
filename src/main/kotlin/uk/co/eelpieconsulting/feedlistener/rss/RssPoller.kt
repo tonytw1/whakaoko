@@ -17,6 +17,7 @@ import uk.co.eelpieconsulting.feedlistener.model.FeedItem
 import uk.co.eelpieconsulting.feedlistener.model.RssSubscription
 import java.util.*
 import java.util.function.Consumer
+import com.github.kittinunf.result.Result
 
 @Component
 class RssPoller @Autowired constructor(val subscriptionsDAO: SubscriptionsDAO, val taskExecutor: TaskExecutor,
@@ -52,10 +53,36 @@ class RssPoller @Autowired constructor(val subscriptionsDAO: SubscriptionsDAO, v
     }
 
     private inner class ProcessFeedTask(private val feedFetcher: FeedFetcher, private val feedItemDAO: FeedItemDAO, private val subscriptionsDAO: SubscriptionsDAO, private val subscription: RssSubscription) : Runnable {
+
         override fun run() {
             log.info("Processing feed: " + subscription + " from thread " + Thread.currentThread().id)
             subscription.lastRead = DateTime.now().toDate()
             subscriptionsDAO.save(subscription)
+
+            fun fetchFullFeed(url: String): Result<Unit, Exception> {
+                feedFetcher.fetchFeed(subscription.url).fold(
+                        { fetchedFeed ->
+                            log.info("Fetched feed: " + fetchedFeed.feedName)
+                            log.info("Etag: " + fetchedFeed.etag)
+                            if (!Strings.isNullOrEmpty(fetchedFeed.etag)) {
+                                rssSuccessesEtagged.increment()
+                            } else {
+                                rssSuccessesNotEtagged.increment()
+                            }
+                            persistFeedItems(fetchedFeed)
+                            subscription.name = fetchedFeed.feedName
+                            subscription.latestItemDate = feedItemLatestDateFinder.getLatestItemDate(fetchedFeed.feedItems)
+                            log.info("Completed feed fetch for: " + fetchedFeed.feedName + "; saw " + fetchedFeed.feedItems.size + " items")
+
+                            subscriptionsDAO.save(subscription)
+                            subscription.etag = fetchedFeed.etag
+                            return Result.success(Unit)
+                        },
+                        { ex ->
+                            return Result.error(ex)
+                        }
+                )
+            }
 
             // If this feed has an etag we may be able to skip a full read this time
             if (subscription.etag != null) {
@@ -78,25 +105,13 @@ class RssPoller @Autowired constructor(val subscriptionsDAO: SubscriptionsDAO, v
                 })
             }
 
-            feedFetcher.fetchFeed(subscription.url).fold(
-                    { fetchedFeed ->
-                        log.info("Fetched feed: " + fetchedFeed.feedName)
-                        log.info("Etag: " + fetchedFeed.etag)
-                        if (!Strings.isNullOrEmpty(fetchedFeed.etag)) {
-                            rssSuccessesEtagged.increment()
-                        } else {
-                            rssSuccessesNotEtagged.increment()
-                        }
-                        persistFeedItems(fetchedFeed)
-                        subscription.name = fetchedFeed.feedName
+            fetchFullFeed(subscription.url).fold(
+                    { _ ->
                         subscription.error = null
-                        subscription.etag = fetchedFeed.etag
-                        subscription.latestItemDate = feedItemLatestDateFinder.getLatestItemDate(fetchedFeed.feedItems)
                         subscriptionsDAO.save(subscription)
-                        log.info("Completed feed fetch for: " + fetchedFeed.feedName + "; saw " + fetchedFeed.feedItems.size + " items")
-                    },
-                    { ex ->
-                        log.warn("Http fetch exception while fetching RSS subscription: " + subscription.url + ": " + ex.javaClass.simpleName)
+
+                    }, { ex ->
+                        log.warn("Exception while fetching RSS subscription: " + subscription.url + ": " + ex.javaClass.simpleName)
                         val errorMessage = ex.message
                         log.info("Setting feed error to: " + errorMessage)
                         subscription.error = errorMessage
