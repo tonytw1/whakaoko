@@ -12,6 +12,7 @@ import org.springframework.stereotype.Component
 import uk.co.eelpieconsulting.feedlistener.daos.FeedItemDAO
 import uk.co.eelpieconsulting.feedlistener.daos.SubscriptionsDAO
 import uk.co.eelpieconsulting.feedlistener.exceptions.FeeditemPersistanceException
+import uk.co.eelpieconsulting.feedlistener.http.HttpFetcher
 import uk.co.eelpieconsulting.feedlistener.model.FeedItem
 import uk.co.eelpieconsulting.feedlistener.model.RssSubscription
 import java.util.*
@@ -21,6 +22,7 @@ import java.util.function.Consumer
 class RssPoller @Autowired constructor(val subscriptionsDAO: SubscriptionsDAO, val taskExecutor: TaskExecutor,
                                        val feedFetcher: FeedFetcher, val feedItemDestination: FeedItemDAO,
                                        val feedItemLatestDateFinder: FeedItemLatestDateFinder,
+                                       val httpFetcher: HttpFetcher,
                                        meterRegistry: MeterRegistry) {
 
     private val log = Logger.getLogger(RssPoller::class.java)
@@ -54,6 +56,27 @@ class RssPoller @Autowired constructor(val subscriptionsDAO: SubscriptionsDAO, v
             log.info("Processing feed: " + subscription + " from thread " + Thread.currentThread().id)
             subscription.lastRead = DateTime.now().toDate()
             subscriptionsDAO.save(subscription)
+
+            // If this feed has an etag we may be able to skip a full read this time
+            if (subscription.etag != null) {
+                log.info("Checking feed etag before fetching")
+                httpFetcher.head(subscription.url).fold({ headers ->
+                    val currentEtag = headers["Etag"].stream().findFirst().orElse(null)
+                    if (currentEtag != null && currentEtag == subscription.etag) {
+                        log.info("Feed etag has no changed; skipping fetch")
+                        return
+                    }
+
+                }, { ex ->
+                    // TODO duplicated with below
+                    log.warn("Http fetch exception while fetching RSS subscription: " + subscription.url + ": " + ex.javaClass.simpleName)
+                    val errorMessage = ex.message
+                    log.info("Setting feed error to: " + errorMessage)
+                    subscription.error = errorMessage
+                    subscriptionsDAO.save(subscription)
+                    return
+                })
+            }
 
             feedFetcher.fetchFeed(subscription.url).fold(
                     { fetchedFeed ->
