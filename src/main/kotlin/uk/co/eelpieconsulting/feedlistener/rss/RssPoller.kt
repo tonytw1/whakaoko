@@ -59,7 +59,7 @@ class RssPoller @Autowired constructor(val subscriptionsDAO: SubscriptionsDAO, v
             subscription.lastRead = DateTime.now().toDate()
             subscriptionsDAO.save(subscription)
 
-            fun pollFeed(url: String, etag: String): Result<Unit, Exception> {
+            fun pollFeed(url: String, etag: String?): Result<Unit, Exception> {
                 // If this feed has an etag we may be able to skip a full read this time
                 if (etag != null) {
                     log.info("Checking feed etag before fetching: " + url)
