@@ -59,69 +59,64 @@ class RssPoller @Autowired constructor(val subscriptionsDAO: SubscriptionsDAO, v
             subscription.lastRead = DateTime.now().toDate()
             subscriptionsDAO.save(subscription)
 
-            fun fetchFullFeed(url: String): Result<Unit, Exception> {
-                feedFetcher.fetchFeed(subscription.url).fold(
-                        { fetchedFeed ->
-                            log.info("Fetched feed: " + fetchedFeed.feedName)
-                            log.info("Etag: " + fetchedFeed.etag)
-                            if (!Strings.isNullOrEmpty(fetchedFeed.etag)) {
-                                rssSuccessesEtagged.increment()
-                            } else {
-                                rssSuccessesNotEtagged.increment()
-                            }
-                            persistFeedItems(fetchedFeed)
-                            subscription.name = fetchedFeed.feedName
-                            subscription.latestItemDate = feedItemLatestDateFinder.getLatestItemDate(fetchedFeed.feedItems)
-                            log.info("Completed feed fetch for: " + fetchedFeed.feedName + "; saw " + fetchedFeed.feedItems.size + " items")
-
-                            subscriptionsDAO.save(subscription)
-                            subscription.etag = fetchedFeed.etag
+            fun pollFeed(url: String, etag: String): Result<Unit, Exception> {
+                // If this feed has an etag we may be able to skip a full read this time
+                if (etag != null) {
+                    log.info("Checking feed etag before fetching: " + url)
+                    httpFetcher.head(url).fold({ headers ->
+                        val currentEtag = headers["Etag"].stream().findFirst().orElse(null)
+                        if (currentEtag != null && currentEtag == etag) {
+                            log.info("Feed etag has not changed; skipping fetch")
                             return Result.success(Unit)
-                        },
-                        { ex ->
-                            return Result.error(ex)
                         }
+                    }, { ex ->
+                        return Result.error(ex)
+                    })
+                }
+
+                log.info("Fetching full feed: " + url)
+                feedFetcher.fetchFeed(subscription.url).fold(
+                    { fetchedFeed ->
+                        log.info("Fetched feed: " + fetchedFeed.feedName)
+                        log.info("Etag: " + fetchedFeed.etag)
+                        if (!Strings.isNullOrEmpty(fetchedFeed.etag)) {
+                            rssSuccessesEtagged.increment()
+                        } else {
+                            rssSuccessesNotEtagged.increment()
+                        }
+                        persistFeedItems(fetchedFeed.feedItems)
+                        subscription.name = fetchedFeed.feedName
+                        subscription.latestItemDate = feedItemLatestDateFinder.getLatestItemDate(fetchedFeed.feedItems)
+                        subscription.etag = fetchedFeed.etag
+                        subscriptionsDAO.save(subscription)
+                        log.info("Completed feed fetch for: " + fetchedFeed.feedName + "; saw " + fetchedFeed.feedItems.size + " items")
+
+                        return Result.success(Unit)
+                    },
+                    { ex ->
+                        return Result.error(ex)
+                    }
                 )
             }
 
-            // If this feed has an etag we may be able to skip a full read this time
-            if (subscription.etag != null) {
-                log.info("Checking feed etag before fetching")
-                httpFetcher.head(subscription.url).fold({ headers ->
-                    val currentEtag = headers["Etag"].stream().findFirst().orElse(null)
-                    if (currentEtag != null && currentEtag == subscription.etag) {
-                        log.info("Feed etag has no changed; skipping fetch")
-                        return
-                    }
-
-                }, { ex ->
-                    // TODO duplicated with below
-                    log.warn("Http fetch exception while fetching RSS subscription: " + subscription.url + ": " + ex.javaClass.simpleName)
-                    val errorMessage = ex.message
-                    log.info("Setting feed error to: " + errorMessage)
-                    subscription.error = errorMessage
-                    subscriptionsDAO.save(subscription)
-                    return
-                })
-            }
-
-            fetchFullFeed(subscription.url).fold(
-                    { _ ->
+            pollFeed(subscription.url, subscription.etag).fold(
+                    {
+                        log.info("Feed polled with no errors: " +  subscription.url)
                         subscription.error = null
                         subscriptionsDAO.save(subscription)
 
                     }, { ex ->
-                        log.warn("Exception while fetching RSS subscription: " + subscription.url + ": " + ex.javaClass.simpleName)
-                        val errorMessage = ex.message
-                        log.info("Setting feed error to: " + errorMessage)
-                        subscription.error = errorMessage
-                        subscriptionsDAO.save(subscription)
-                    }
+                log.warn("Exception while fetching RSS subscription: " + subscription.url + ": " + ex.javaClass.simpleName)
+                val errorMessage = ex.message
+                log.info("Setting feed error to: " + errorMessage)
+                subscription.error = errorMessage
+                subscriptionsDAO.save(subscription)
+            }
             )
         }
 
-        private fun persistFeedItems(fetchedFeed: FetchedFeed) {
-            for (feedItem in fetchedFeed.feedItems) {
+        private fun persistFeedItems(feedItems: List<FeedItem>) {
+            for (feedItem in feedItems) {
                 try {
                     feedItem.subscriptionId = subscription.id
                     if (feedItemDAO.add(feedItem)) {
