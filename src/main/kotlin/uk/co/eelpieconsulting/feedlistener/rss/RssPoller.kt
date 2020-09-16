@@ -100,18 +100,18 @@ class RssPoller @Autowired constructor(val subscriptionsDAO: SubscriptionsDAO, v
             }
 
             pollFeed(subscription.url, subscription.etag).fold(
-                    {
-                        log.info("Feed polled with no errors: " +  subscription.url)
-                        subscription.error = null
-                        subscriptionsDAO.save(subscription)
+                {
+                    log.info("Feed polled with no errors: " +  subscription.url)
+                    subscription.error = null
+                    subscriptionsDAO.save(subscription)
 
-                    }, { ex ->
-                log.warn("Exception while fetching RSS subscription: " + subscription.url + ": " + ex.javaClass.simpleName)
-                val errorMessage = ex.message
-                log.info("Setting feed error to: " + errorMessage)
-                subscription.error = errorMessage
-                subscriptionsDAO.save(subscription)
-            }
+                }, { ex ->
+                    log.warn("Exception while fetching RSS subscription: " + subscription.url + ": " + ex.javaClass.simpleName)
+                    val errorMessage = ex.message
+                    log.info("Setting feed error to: " + errorMessage)
+                    subscription.error = errorMessage
+                    subscriptionsDAO.save(subscription)
+                }
             )
         }
 

@@ -21,7 +21,7 @@ class FeedFetcher @Autowired constructor(private val httpFetcher: HttpFetcher,
     private val rssFetchesCounter = meterRegistry.counter("rss_fetches")
     private val rssFetchedBytesCounter = meterRegistry.counter("rss_fetched_bytes")
 
-    fun fetchFeed(url: String): Result<FetchedFeed, Exception> {
+    fun fetchFeed(url: String): Result<FetchedFeed, Exception> { // TODO This Result interface requires an exception on the right =(
         loadSyndFeedWithFeedFetcher(url).fold({ syndFeedAndEtag ->
             val syndFeed = syndFeedAndEtag.first
             val fetchedFeed = FetchedFeed(feedName = syndFeed.title, feedItems = getFeedItemsFrom(syndFeed), etag = syndFeedAndEtag.second)
