@@ -19,7 +19,10 @@
 
 <p>ETag: $!subscription.etag</p>
 
-<p>Error: $!subscription.error</p>
+<p>
+    Error: $!subscription.error<br/>
+    Http status: $!subscription.httpStatus
+</p>
 
 <a href="$urlBuilder.getSubscriptionItemsUrl($user.username, $subscription.id)/items">JSON</a> |
 <a href="$urlBuilder.getSubscriptionItemsUrl($user.username, $subscription.id)/items?format=rss">RSS</a>

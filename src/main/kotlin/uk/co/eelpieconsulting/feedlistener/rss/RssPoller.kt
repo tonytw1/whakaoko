@@ -59,7 +59,7 @@ class RssPoller @Autowired constructor(val subscriptionsDAO: SubscriptionsDAO, v
             subscription.lastRead = DateTime.now().toDate()
             subscriptionsDAO.save(subscription)
 
-            fun pollFeed(url: String, etag: String?): Result<Unit, Exception> {
+            fun pollFeed(url: String, etag: String?): Result<Unit, FeedFetchingException> {
                 // If this feed has an etag we may be able to skip a full read this time
                 if (etag != null) {
                     log.info("Checking feed etag before fetching: " + url)
@@ -70,7 +70,7 @@ class RssPoller @Autowired constructor(val subscriptionsDAO: SubscriptionsDAO, v
                             return Result.success(Unit)
                         }
                     }, { ex ->
-                        return Result.error(ex)
+                        return Result.error(FeedFetchingException(message = ex.message!!))  // TODO status code
                     })
                 }
 
@@ -88,6 +88,7 @@ class RssPoller @Autowired constructor(val subscriptionsDAO: SubscriptionsDAO, v
                         subscription.name = fetchedFeed.feedName
                         subscription.latestItemDate = feedItemLatestDateFinder.getLatestItemDate(fetchedFeed.feedItems)
                         subscription.etag = fetchedFeed.etag
+                        subscription.httpStatus = null
                         subscriptionsDAO.save(subscription)
                         log.info("Completed feed fetch for: " + fetchedFeed.feedName + "; saw " + fetchedFeed.feedItems.size + " items")
 
@@ -108,8 +109,9 @@ class RssPoller @Autowired constructor(val subscriptionsDAO: SubscriptionsDAO, v
                 }, { ex ->
                     log.warn("Exception while fetching RSS subscription: " + subscription.url + ": " + ex.javaClass.simpleName)
                     val errorMessage = ex.message
-                    log.info("Setting feed error to: " + errorMessage)
+                    log.info("Setting feed error to: " + errorMessage + "; http status: "  + ex.httpStatus)
                     subscription.error = errorMessage
+                    subscription.httpStatus = ex.httpStatus
                     subscriptionsDAO.save(subscription)
                 }
             )

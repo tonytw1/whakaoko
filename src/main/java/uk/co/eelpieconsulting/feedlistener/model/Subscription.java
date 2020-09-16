@@ -19,6 +19,7 @@ public abstract class Subscription {
     private String id, name, username;  
     private Date lastRead, latestItemDate;
     private String error, etag;
+    private Integer httpStatus;
   
     @Indexed
     private String channelId;
@@ -87,6 +88,14 @@ public abstract class Subscription {
 		this.etag = etag;
 	}
 
+	public Integer getHttpStatus() {
+		return httpStatus;
+	}
+
+	public void setHttpStatus(Integer httpStatus) {
+		this.httpStatus = httpStatus;
+	}
+
 	@Override
 	public String toString() {
 		return "Subscription{" +
@@ -98,8 +107,8 @@ public abstract class Subscription {
 				", latestItemDate=" + latestItemDate +
 				", error='" + error + '\'' +
 				", etag='" + etag + '\'' +
+				", httpStatus=" + httpStatus +
 				", channelId='" + channelId + '\'' +
 				'}';
 	}
-	
 }

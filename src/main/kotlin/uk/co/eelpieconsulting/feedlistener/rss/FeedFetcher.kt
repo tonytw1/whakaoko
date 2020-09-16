@@ -21,7 +21,7 @@ class FeedFetcher @Autowired constructor(private val httpFetcher: HttpFetcher,
     private val rssFetchesCounter = meterRegistry.counter("rss_fetches")
     private val rssFetchedBytesCounter = meterRegistry.counter("rss_fetched_bytes")
 
-    fun fetchFeed(url: String): Result<FetchedFeed, Exception> { // TODO This Result interface requires an exception on the right =(
+    fun fetchFeed(url: String): Result<FetchedFeed, FeedFetchingException> { // TODO This Result interface requires an exception on the right =(
         loadSyndFeedWithFeedFetcher(url).fold({ syndFeedAndEtag ->
             val syndFeed = syndFeedAndEtag.first
             val fetchedFeed = FetchedFeed(feedName = syndFeed.title, feedItems = getFeedItemsFrom(syndFeed), etag = syndFeedAndEtag.second)
@@ -31,7 +31,7 @@ class FeedFetcher @Autowired constructor(private val httpFetcher: HttpFetcher,
         })
     }
 
-    private fun loadSyndFeedWithFeedFetcher(feedUrl: String): Result<Pair<SyndFeed, String?>, Exception> {
+    private fun loadSyndFeedWithFeedFetcher(feedUrl: String): Result<Pair<SyndFeed, String?>, FeedFetchingException> {
         log.info("Loading SyndFeed from url: " + feedUrl)
         rssFetchesCounter.increment()
 
@@ -47,11 +47,11 @@ class FeedFetcher @Autowired constructor(private val httpFetcher: HttpFetcher,
 
             } catch (ex: Exception) {
                 log.warn("Feed parsing error: " + ex.message)
-                return Result.error(ex)
+                return Result.error(FeedFetchingException(message = ex.message!!, httpStatus = httpResult.status))
             }
         }, { fuelError ->
             // TODO Pass up http status code if available
-            return Result.Failure(fuelError)
+            return Result.Failure(FeedFetchingException(message = fuelError.message!!, fuelError.response.statusCode))
         })
     }
 
@@ -61,3 +61,5 @@ class FeedFetcher @Autowired constructor(private val httpFetcher: HttpFetcher,
         }.filterNotNull().toList()
     }
 }
+
+class FeedFetchingException(message: String, val httpStatus: Int? = null): Exception(message)
