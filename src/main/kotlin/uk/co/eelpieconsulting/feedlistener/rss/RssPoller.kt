@@ -120,7 +120,7 @@ class RssPoller @Autowired constructor(val subscriptionsDAO: SubscriptionsDAO, v
         }
 
         private fun persistFeedItems(feedItems: List<FeedItem>) {
-            for (feedItem in feedItems) {
+            feedItems.forEach { feedItem ->
                 try {
                     feedItem.subscriptionId = subscription.id
                     if (feedItemDAO.add(feedItem)) {
@@ -131,6 +131,7 @@ class RssPoller @Autowired constructor(val subscriptionsDAO: SubscriptionsDAO, v
                 }
             }
         }
+
     }
 }
 
