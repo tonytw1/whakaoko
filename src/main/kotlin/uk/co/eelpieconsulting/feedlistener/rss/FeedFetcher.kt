@@ -8,6 +8,7 @@ import org.apache.log4j.Logger
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
 import uk.co.eelpieconsulting.feedlistener.http.HttpFetcher
+import uk.co.eelpieconsulting.feedlistener.http.HttpResult
 import uk.co.eelpieconsulting.feedlistener.model.FeedItem
 
 @Component
@@ -21,17 +22,23 @@ class FeedFetcher @Autowired constructor(private val httpFetcher: HttpFetcher,
     private val rssFetchesCounter = meterRegistry.counter("rss_fetches")
     private val rssFetchedBytesCounter = meterRegistry.counter("rss_fetched_bytes")
 
-    fun fetchFeed(url: String): Result<FetchedFeed, FeedFetchingException> { // TODO This Result interface requires an exception on the right =(
-        loadSyndFeedWithFeedFetcher(url).fold({ syndFeedAndEtag ->
-            val syndFeed = syndFeedAndEtag.first
-            val fetchedFeed = FetchedFeed(feedName = syndFeed.title, feedItems = getFeedItemsFrom(syndFeed), etag = syndFeedAndEtag.second)
+    fun fetchFeed(url: String): Result<FetchedFeed, FeedFetchingException> {
+        loadSyndFeedWithFeedFetcher(url).fold({ syndFeedAndHttpResult ->
+            val syndFeed = syndFeedAndHttpResult.first
+            val httpResult = syndFeedAndHttpResult.second
+
+            val headers = httpResult.headers
+            val etag = headers["ETag"].firstOrNull()
+
+            val fetchedFeed = FetchedFeed(feedName = syndFeed.title, feedItems = getFeedItemsFrom(syndFeed), etag = etag, httpStatus = httpResult.status)
             return Result.success(fetchedFeed)
+
         }, { ex ->
             return Result.Failure(ex)
         })
     }
 
-    private fun loadSyndFeedWithFeedFetcher(feedUrl: String): Result<Pair<SyndFeed, String?>, FeedFetchingException> {
+    private fun loadSyndFeedWithFeedFetcher(feedUrl: String): Result<Pair<SyndFeed, HttpResult>, FeedFetchingException> {
         log.info("Loading SyndFeed from url: " + feedUrl)
         rssFetchesCounter.increment()
 
@@ -41,16 +48,13 @@ class FeedFetcher @Autowired constructor(private val httpFetcher: HttpFetcher,
 
             try {
                 val syndFeed = feedParser.parseSyndFeed(fetchedBytes)
-                val headers = httpResult.headers
-                val etag = headers["ETag"].firstOrNull()
-                return Result.Success(Pair(syndFeed, etag))
+                return Result.Success(Pair(syndFeed, httpResult))
 
             } catch (ex: Exception) {
                 log.warn("Feed parsing error: " + ex.message)
                 return Result.error(FeedFetchingException(message = ex.message!!, httpStatus = httpResult.status))
             }
         }, { fuelError ->
-            // TODO Pass up http status code if available
             return Result.Failure(FeedFetchingException(message = fuelError.message!!, fuelError.response.statusCode))
         })
     }

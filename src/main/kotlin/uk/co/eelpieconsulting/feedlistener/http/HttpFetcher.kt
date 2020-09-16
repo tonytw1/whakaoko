@@ -11,7 +11,7 @@ class HttpFetcher(val userAgent: String, val timeout: Int) {
 
     private val log = Logger.getLogger(HttpFetcher::class.java)
 
-    fun head(url: String): Result<Headers, Exception>  { //  TODO status code
+    fun head(url: String): Result<Pair<Headers, Int>, FuelError>  {
         val (request, response, result) = url.httpHead().
         timeout(timeout).header("User-Agent", userAgent).
         response()
@@ -23,7 +23,8 @@ class HttpFetcher(val userAgent: String, val timeout: Int) {
                 return Result.error(ex)
             }
             is Result.Success -> {
-                return Result.success(response.headers)
+                log.info("Head response code is: " + response.statusCode)
+                return Result.success(Pair(response.headers, response.statusCode))
             }
         }
     }

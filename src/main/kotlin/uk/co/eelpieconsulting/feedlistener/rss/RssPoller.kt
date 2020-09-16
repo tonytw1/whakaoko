@@ -63,14 +63,17 @@ class RssPoller @Autowired constructor(val subscriptionsDAO: SubscriptionsDAO, v
                 // If this feed has an etag we may be able to skip a full read this time
                 if (etag != null) {
                     log.info("Checking feed etag before fetching: " + url)
-                    httpFetcher.head(url).fold({ headers ->
-                        val currentEtag = headers["Etag"].stream().findFirst().orElse(null)
+                    httpFetcher.head(url).fold({ httpResult ->
+                        val currentEtag = httpResult.first["Etag"].stream().findFirst().orElse(null)
                         if (currentEtag != null && currentEtag == etag) {
                             log.info("Feed etag has not changed; skipping fetch")
+                            subscription.httpStatus = httpResult.second
+                            subscription.error = null
+                            subscriptionsDAO.save(subscription)
                             return Result.success(Unit)
                         }
                     }, { ex ->
-                        return Result.error(FeedFetchingException(message = ex.message!!))  // TODO status code
+                        return Result.error(FeedFetchingException(message = ex.message!!, httpStatus = ex.response.statusCode))
                     })
                 }
 
@@ -88,7 +91,8 @@ class RssPoller @Autowired constructor(val subscriptionsDAO: SubscriptionsDAO, v
                         subscription.name = fetchedFeed.feedName
                         subscription.latestItemDate = feedItemLatestDateFinder.getLatestItemDate(fetchedFeed.feedItems)
                         subscription.etag = fetchedFeed.etag
-                        subscription.httpStatus = null
+                        subscription.httpStatus = fetchedFeed.httpStatus
+                        subscription.error = null
                         subscriptionsDAO.save(subscription)
                         log.info("Completed feed fetch for: " + fetchedFeed.feedName + "; saw " + fetchedFeed.feedItems.size + " items")
 
@@ -103,8 +107,6 @@ class RssPoller @Autowired constructor(val subscriptionsDAO: SubscriptionsDAO, v
             pollFeed(subscription.url, subscription.etag).fold(
                 {
                     log.info("Feed polled with no errors: " +  subscription.url)
-                    subscription.error = null
-                    subscriptionsDAO.save(subscription)
 
                 }, { ex ->
                     log.warn("Exception while fetching RSS subscription: " + subscription.url + ": " + ex.javaClass.simpleName)
