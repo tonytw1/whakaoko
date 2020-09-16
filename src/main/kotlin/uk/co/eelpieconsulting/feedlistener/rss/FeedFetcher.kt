@@ -36,12 +36,12 @@ class FeedFetcher @Autowired constructor(private val httpFetcher: HttpFetcher,
         rssFetchesCounter.increment()
 
         httpFetcher.getBytes(feedUrl).fold({ httpResult ->
-            val fetchedBytes = httpResult.first
+            val fetchedBytes = httpResult.bytes
             rssFetchedBytesCounter.increment(fetchedBytes.size.toDouble())
 
             try {
                 val syndFeed = feedParser.parseSyndFeed(fetchedBytes)
-                val headers = httpResult.second
+                val headers = httpResult.headers
                 val etag = headers["ETag"].firstOrNull()
                 return Result.Success(Pair(syndFeed, etag))
 

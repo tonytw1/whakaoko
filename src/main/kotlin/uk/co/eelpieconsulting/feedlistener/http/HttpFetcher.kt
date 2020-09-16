@@ -27,7 +27,7 @@ class HttpFetcher(val userAgent: String, val timeout: Int) {
         }
     }
 
-    fun getBytes(url: String): Result<Pair<ByteArray, Headers>, Exception> {
+    fun getBytes(url: String): Result<HttpResult, Exception> {
         val (request, response, result) = url.httpGet().
         timeout(timeout).header("User-Agent", userAgent).
         response()
@@ -39,9 +39,12 @@ class HttpFetcher(val userAgent: String, val timeout: Int) {
                 return Result.error(ex)
             }
             is Result.Success -> {
-                return Result.success(Pair(result.get(), response.headers))
+                val httpResult = HttpResult(bytes = result.get(), status = response.statusCode, headers = response.headers)
+                return Result.success(httpResult)
             }
         }
     }
 
 }
+
+class HttpResult(val bytes: ByteArray, val status: Int, val headers: Headers)
