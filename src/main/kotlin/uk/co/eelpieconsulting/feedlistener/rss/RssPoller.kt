@@ -1,5 +1,6 @@
 package uk.co.eelpieconsulting.feedlistener.rss
 
+import com.github.kittinunf.result.Result
 import com.google.common.base.Strings
 import io.micrometer.core.instrument.MeterRegistry
 import org.apache.log4j.Logger
@@ -15,9 +16,9 @@ import uk.co.eelpieconsulting.feedlistener.exceptions.FeeditemPersistanceExcepti
 import uk.co.eelpieconsulting.feedlistener.http.HttpFetcher
 import uk.co.eelpieconsulting.feedlistener.model.FeedItem
 import uk.co.eelpieconsulting.feedlistener.model.RssSubscription
+import uk.co.eelpieconsulting.feedlistener.model.Subscription
 import java.util.*
 import java.util.function.Consumer
-import com.github.kittinunf.result.Result
 
 @Component
 class RssPoller @Autowired constructor(val subscriptionsDAO: SubscriptionsDAO, val taskExecutor: TaskExecutor,
@@ -59,7 +60,7 @@ class RssPoller @Autowired constructor(val subscriptionsDAO: SubscriptionsDAO, v
             subscription.lastRead = DateTime.now().toDate()
             subscriptionsDAO.save(subscription)
 
-            fun pollFeed(url: String, etag: String?): Result<Unit, FeedFetchingException> {
+            fun pollFeed(url: String, etag: String?): Result<Subscription, FeedFetchingException> {
                 // If this feed has an etag we may be able to skip a full read this time
                 if (etag != null) {
                     log.info("Checking feed etag before fetching: " + url)
@@ -69,8 +70,7 @@ class RssPoller @Autowired constructor(val subscriptionsDAO: SubscriptionsDAO, v
                             log.info("Feed etag has not changed; skipping fetch")
                             subscription.httpStatus = httpResult.second
                             subscription.error = null
-                            subscriptionsDAO.save(subscription)
-                            return Result.success(Unit)
+                            return Result.success(subscription)
                         }
                     }, { ex ->
                         return Result.error(FeedFetchingException(message = ex.message!!, httpStatus = ex.response.statusCode))
@@ -93,10 +93,9 @@ class RssPoller @Autowired constructor(val subscriptionsDAO: SubscriptionsDAO, v
                         subscription.etag = fetchedFeed.etag
                         subscription.httpStatus = fetchedFeed.httpStatus
                         subscription.error = null
-                        subscriptionsDAO.save(subscription)
-                        log.info("Completed feed fetch for: " + fetchedFeed.feedName + "; saw " + fetchedFeed.feedItems.size + " items")
 
-                        return Result.success(Unit)
+                        log.info("Completed feed fetch for: " + fetchedFeed.feedName + "; saw " + fetchedFeed.feedItems.size + " items")
+                        return Result.success(subscription)
                     },
                     { ex ->
                         return Result.error(ex)
@@ -105,7 +104,8 @@ class RssPoller @Autowired constructor(val subscriptionsDAO: SubscriptionsDAO, v
             }
 
             pollFeed(subscription.url, subscription.etag).fold(
-                {
+                {updatedSubscription ->
+                    subscriptionsDAO.save(updatedSubscription)
                     log.info("Feed polled with no errors: " +  subscription.url)
 
                 }, { ex ->
