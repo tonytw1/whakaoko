@@ -1,5 +1,6 @@
 package uk.co.eelpieconsulting.feedlistener.http
 
+import com.github.kittinunf.fuel.core.FuelError
 import com.github.kittinunf.fuel.core.Headers
 import com.github.kittinunf.fuel.httpGet
 import com.github.kittinunf.fuel.httpHead
@@ -27,22 +28,18 @@ class HttpFetcher(val userAgent: String, val timeout: Int) {
         }
     }
 
-    fun getBytes(url: String): Result<HttpResult, Exception> {
+    fun getBytes(url: String): Result<HttpResult, FuelError> {
         val (request, response, result) = url.httpGet().
-        timeout(timeout).header("User-Agent", userAgent).
-        response()
+        timeout(timeout).header("User-Agent", userAgent).response()
 
-        when (result) {
-            is Result.Failure -> {
-                val ex = result.getException()
-                log.warn("Failed to fetch from url: " + url, ex)
-                return Result.error(ex)
-            }
-            is Result.Success -> {
-                val httpResult = HttpResult(bytes = result.get(), status = response.statusCode, headers = response.headers)
-                return Result.success(httpResult)
-            }
-        }
+        result.fold({ bytes ->
+            val httpResult = HttpResult(bytes = bytes, status = response.statusCode, headers = response.headers)
+            return Result.success(httpResult)
+
+        }, { fuelError ->
+            log.warn("Failed to fetch from url: " + url + "; status code was: " + fuelError.response.statusCode, fuelError)
+            return Result.error(fuelError)
+        })
     }
 
 }

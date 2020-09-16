@@ -49,8 +49,9 @@ class FeedFetcher @Autowired constructor(private val httpFetcher: HttpFetcher,
                 log.warn("Feed parsing error: " + ex.message)
                 return Result.error(ex)
             }
-        }, { ex ->
-            return Result.Failure(ex)
+        }, { fuelError ->
+            // TODO Pass up http status code if available
+            return Result.Failure(fuelError)
         })
     }
 
