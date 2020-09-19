@@ -33,7 +33,7 @@ class SubscriptionsDAO @Autowired constructor(private val dataStoreFactory: Data
 
     fun save(subscription: Subscription) {
         try {
-            dataStoreFactory.ds.save(subscription)
+            dataStoreFactory.get().save(subscription)
         } catch (e: MongoException) {
             throw RuntimeException(e)
         }
@@ -41,7 +41,7 @@ class SubscriptionsDAO @Autowired constructor(private val dataStoreFactory: Data
 
     fun getSubscriptions(sort: Sort?, url: String?): List<Subscription> {
         return try {
-            var query = dataStoreFactory.ds.find(Subscription::class.java)
+            var query = dataStoreFactory.get().find(Subscription::class.java)
             if (!Strings.isNullOrEmpty(url)) {
                 query = query.disableValidation().filter(Filters.eq("url", url)) // TODO subclasses to helping here Why is validation disabled?
             }
@@ -56,7 +56,7 @@ class SubscriptionsDAO @Autowired constructor(private val dataStoreFactory: Data
     @Throws(UnknownSubscriptionException::class)
     fun getById(id: String?): Subscription {
         return try {
-            val subscription = dataStoreFactory.ds.find(Subscription::class.java).filter(Filters.eq("id", id)).first()
+            val subscription = dataStoreFactory.get().find(Subscription::class.java).filter(Filters.eq("id", id)).first()
             if (subscription == null) {
                 log.info("Subscription not found")
                 throw UnknownSubscriptionException()
@@ -79,13 +79,12 @@ class SubscriptionsDAO @Autowired constructor(private val dataStoreFactory: Data
     @Throws(MongoException::class)
     fun delete(subscription: Subscription) {
         log.info("Deleting subscription: $subscription")
-        val datastore = dataStoreFactory.ds
-        datastore.find(Subscription::class.java).filter(Filters.eq("id", subscription.id)).delete()
+        dataStoreFactory.get().find(Subscription::class.java).filter(Filters.eq("id", subscription.id)).delete()
     }
 
     @Throws(MongoException::class)
     fun getByInstagramId(subscriptionId: Long?): InstagramSubscription {
-        return dataStoreFactory.ds.find(InstagramSubscription::class.java).filter(Filters.eq("subscriptionId", subscriptionId)).first() // TODO subscriptionId is not a very clear field name
+        return dataStoreFactory.get().find(InstagramSubscription::class.java).filter(Filters.eq("subscriptionId", subscriptionId)).first() // TODO subscriptionId is not a very clear field name
     }
 
     fun twitterSubscriptions(): List<Subscription> {
@@ -99,14 +98,14 @@ class SubscriptionsDAO @Autowired constructor(private val dataStoreFactory: Data
     }
 
     fun getTwitterSubscriptionsFor(username: String): List<TwitterTagSubscription> {
-        val allTwitterSubscriptions = dataStoreFactory.ds.find(TwitterTagSubscription::class.java).iterator().toList()
+        val allTwitterSubscriptions = dataStoreFactory.get().find(TwitterTagSubscription::class.java).iterator().toList()
         return allTwitterSubscriptions.stream().filter { subscription: TwitterTagSubscription -> username == subscription.username }.collect(Collectors.toList())
     }
 
     @Throws(MongoException::class)
     fun getSubscriptionsForChannel(username: String, channelID: String, url: String?): List<Subscription> {
         log.info("Listing subscriptions for channel: $username / $channelID")
-        var query = dataStoreFactory.ds.find(Subscription::class.java).filter(Filters.eq("username", username), Filters.eq("channelId", channelID))
+        var query = dataStoreFactory.get().find(Subscription::class.java).filter(Filters.eq("username", username), Filters.eq("channelId", channelID))
         if (!Strings.isNullOrEmpty(url)) {
             query = query.disableValidation().filter(Filters.eq("url", url)) // TODO subclasses to helping here
         }
@@ -115,7 +114,7 @@ class SubscriptionsDAO @Autowired constructor(private val dataStoreFactory: Data
 
     // TODO optimise for last read ordering
     fun allRssSubscriptions(): List<RssSubscription> {
-        val allRssSubscriptions = dataStoreFactory.ds.find(RssSubscription::class.java)
+        val allRssSubscriptions = dataStoreFactory.get().find(RssSubscription::class.java)
         return allRssSubscriptions.iterator().toList() // TODO optimise for last read ordering
     }
 
@@ -129,7 +128,7 @@ class SubscriptionsDAO @Autowired constructor(private val dataStoreFactory: Data
         return false
     }
 
-    fun allSubscriptions(): List<Subscription> = dataStoreFactory.ds.find(Subscription::class.java).iterator().toList()
+    fun allSubscriptions(): List<Subscription> = dataStoreFactory.get().find(Subscription::class.java).iterator().toList()
 
     companion object {
         val LATEST_ITEM_DATE_DESCENDING = Sort.descending("latestItemDate")

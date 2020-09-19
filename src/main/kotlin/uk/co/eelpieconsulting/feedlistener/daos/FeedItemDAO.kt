@@ -29,9 +29,9 @@ class FeedItemDAO @Autowired constructor(private val dataStoreFactory: DataStore
 
     fun add(feedItem: FeedItem): Boolean {
         return try {
-            if (dataStoreFactory.ds.find(FeedItem::class.java).filter(Filters.eq("url", feedItem.url)).iterator().toList().isEmpty()) {    // TODO shouldn't need to read before every write - use an upsert?
+            if (dataStoreFactory.get().find(FeedItem::class.java).filter(Filters.eq("url", feedItem.url)).iterator().toList().isEmpty()) {    // TODO shouldn't need to read before every write - use an upsert?
                 log.info("Added: " + feedItem.subscriptionId + ", " + feedItem.title)
-                dataStoreFactory.ds.save(feedItem)
+                dataStoreFactory.get().save(feedItem)
                 true
             } else {
                 log.debug("Skipping previously added: " + feedItem.title)
@@ -79,7 +79,7 @@ class FeedItemDAO @Autowired constructor(private val dataStoreFactory: DataStore
 
     @Throws(MongoException::class)
     fun deleteSubscriptionFeedItems(subscription: Subscription) {
-        dataStoreFactory.ds.find(FeedItem::class.java).filter(Filters.eq("subscriptionId", subscription.id)).delete(DeleteOptions().multi(true))
+        dataStoreFactory.get().find(FeedItem::class.java).filter(Filters.eq("subscriptionId", subscription.id)).delete(DeleteOptions().multi(true))
     }
 
     @Timed(timingNotes = "")
@@ -107,11 +107,11 @@ class FeedItemDAO @Autowired constructor(private val dataStoreFactory: DataStore
         for (subscription in subscriptionsDAO.getSubscriptionsForChannel(username!!, channelId, null)) {
             channelSubscriptionIds.add(subscription.id)
         }
-        return dataStoreFactory.ds.find(FeedItem::class.java).filter(Filters.`in`("subscriptionId", channelSubscriptionIds))
+        return dataStoreFactory.get().find(FeedItem::class.java).filter(Filters.`in`("subscriptionId", channelSubscriptionIds))
     }
 
     private fun subscriptionFeedItemsQuery(subscriptionId: String): Query<FeedItem> {
-        return dataStoreFactory.ds.find(FeedItem::class.java).filter(Filters.eq("subscriptionId", subscriptionId))
+        return dataStoreFactory.get().find(FeedItem::class.java).filter(Filters.eq("subscriptionId", subscriptionId))
     }
 
     private fun withPaginationFor(pageSize: Int, page: Int): FindOptions {

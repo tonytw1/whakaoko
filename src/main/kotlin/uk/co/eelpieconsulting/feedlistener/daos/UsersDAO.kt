@@ -15,7 +15,7 @@ class UsersDAO @Autowired constructor(val dataStoreFactory: DataStoreFactory){
 
     fun getUsers(): List<User?>? {
         return try {
-            dataStoreFactory.getDs().find(User::class.java).iterator(FindOptions().sort(this.USERNAME_ASCENDING)).toList()
+            dataStoreFactory.get().find(User::class.java).iterator(FindOptions().sort(this.USERNAME_ASCENDING)).toList()
         } catch (e: MongoException) {
             throw RuntimeException(e)
         }
@@ -26,12 +26,12 @@ class UsersDAO @Autowired constructor(val dataStoreFactory: DataStoreFactory){
     }
 
     fun save(user: User?) {
-        dataStoreFactory.getDs().save(user)
+        dataStoreFactory.get().save(user)
     }
 
     private fun loadUserFromDatabase(username: String): User? {
         return try {
-            dataStoreFactory.getDs().find(User::class.java).filter(Filters.eq("username", username)).first()
+            dataStoreFactory.get().find(User::class.java).filter(Filters.eq("username", username)).first()
         } catch (e: MongoException) {
             throw RuntimeException(e)
         }
