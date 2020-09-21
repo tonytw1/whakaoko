@@ -1,63 +1,50 @@
-package uk.co.eelpieconsulting.feedlistener.rss;
+package uk.co.eelpieconsulting.feedlistener.rss
 
-import com.google.common.base.Strings;
-import com.sun.syndication.feed.module.georss.GeoRSSModule;
-import com.sun.syndication.feed.module.georss.GeoRSSUtils;
-import com.sun.syndication.feed.synd.SyndEntry;
-import org.apache.commons.lang.StringEscapeUtils;
-import org.apache.log4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-import uk.co.eelpieconsulting.common.html.HtmlCleaner;
-import uk.co.eelpieconsulting.feedlistener.model.FeedItem;
-
-import java.util.Date;
+import com.google.common.base.Strings
+import com.sun.syndication.feed.module.georss.GeoRSSUtils
+import com.sun.syndication.feed.synd.SyndEntry
+import org.apache.commons.lang.StringEscapeUtils
+import org.apache.log4j.Logger
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.stereotype.Component
+import uk.co.eelpieconsulting.common.html.HtmlCleaner
+import uk.co.eelpieconsulting.feedlistener.model.FeedItem
+import uk.co.eelpieconsulting.feedlistener.model.LatLong
+import uk.co.eelpieconsulting.feedlistener.model.Place
 
 @Component
-public class RssFeedItemMapper {
+class RssFeedItemMapper @Autowired constructor(private val rssFeedItemImageExtractor: RssFeedItemImageExtractor,
+                                               private val rssFeedItemBodyExtractor: RssFeedItemBodyExtractor,
+                                               private val cachingUrlResolverService: CachingUrlResolverService,
+                                               private val urlCleaner: UrlCleaner) {
 
-    private static Logger log = Logger.getLogger(RssFeedItemMapper.class);
+    private val log = Logger.getLogger(RssFeedItemMapper::class.java)
 
-    private final RssFeedItemImageExtractor rssFeedItemImageExtractor;
-    private final RssFeedItemBodyExtractor rssFeedItemBodyExtractor;
-    private final CachingUrlResolverService cachingUrlResolverService;
-    private final UrlCleaner urlCleaner;
-
-    @Autowired
-    public RssFeedItemMapper(RssFeedItemImageExtractor rssFeedItemImageExtractor, RssFeedItemBodyExtractor rssFeedItemBodyExtractor,
-                             CachingUrlResolverService cachingUrlResolverService, UrlCleaner urlCleaner) {
-        this.rssFeedItemImageExtractor = rssFeedItemImageExtractor;
-        this.rssFeedItemBodyExtractor = rssFeedItemBodyExtractor;
-        this.cachingUrlResolverService = cachingUrlResolverService;
-        this.urlCleaner = urlCleaner;
+    fun createFeedItemFrom(syndEntry: SyndEntry): FeedItem {
+        val place = extractLocationFrom(syndEntry)
+        val imageUrl = rssFeedItemImageExtractor.extractImageFrom(syndEntry)
+        val body = HtmlCleaner().stripHtml(StringEscapeUtils.unescapeHtml(rssFeedItemBodyExtractor.extractBody(syndEntry)))
+        val date = if (syndEntry.publishedDate != null) syndEntry.publishedDate else syndEntry.updatedDate
+        return FeedItem(syndEntry.title, extractUrl(syndEntry), body, date, place, imageUrl, null)
     }
 
-    public FeedItem createFeedItemFrom(final SyndEntry syndEntry) {
-        final uk.co.eelpieconsulting.feedlistener.model.Place place = extractLocationFrom(syndEntry);
-        final String imageUrl = rssFeedItemImageExtractor.extractImageFrom(syndEntry);
-        final String body = new HtmlCleaner().stripHtml(StringEscapeUtils.unescapeHtml(rssFeedItemBodyExtractor.extractBody(syndEntry)));
-        final Date date = syndEntry.getPublishedDate() != null ? syndEntry.getPublishedDate() : syndEntry.getUpdatedDate();
-        final FeedItem feedItem = new FeedItem(syndEntry.getTitle(), extractUrl(syndEntry), body, date, place, imageUrl, null);
-        return feedItem;
-    }
-
-    private String extractUrl(final SyndEntry syndEntry) {
-        final String url = syndEntry.getLink();
-        if (Strings.isNullOrEmpty(url)) {
-            return null;
+    private fun extractUrl(syndEntry: SyndEntry): String? {
+        val url = syndEntry.link
+        return if (!Strings.isNullOrEmpty(url)) {
+            urlCleaner.cleanSubmittedItemUrl(cachingUrlResolverService.resolveUrl(url))
+        } else {
+            null
         }
-
-        return urlCleaner.cleanSubmittedItemUrl(cachingUrlResolverService.resolveUrl(url));
     }
 
-    private uk.co.eelpieconsulting.feedlistener.model.Place extractLocationFrom(SyndEntry syndEntry) {
-        final GeoRSSModule geoModule = (GeoRSSModule) GeoRSSUtils.getGeoRSS(syndEntry);
-        if (geoModule != null && geoModule.getPosition() != null) {
-            final uk.co.eelpieconsulting.feedlistener.model.LatLong latLong = new uk.co.eelpieconsulting.feedlistener.model.LatLong(geoModule.getPosition().getLatitude(), geoModule.getPosition().getLongitude());
-            log.debug("Rss item '" + syndEntry.getTitle() + "' has position information: " + latLong);
-            return new uk.co.eelpieconsulting.feedlistener.model.Place(null, latLong);
+    private fun extractLocationFrom(syndEntry: SyndEntry): Place? {
+        val geoModule = GeoRSSUtils.getGeoRSS(syndEntry)
+        if (geoModule != null && geoModule.position != null) {
+            val latLong = LatLong(geoModule.position.latitude, geoModule.position.longitude)
+            log.debug("Rss item '" + syndEntry.title + "' has position information: " + latLong)
+            return Place(null, latLong)
         }
-        return null;
+        return null
     }
 
 }
