@@ -70,7 +70,7 @@ class ChannelsController @Autowired constructor(val usersDAO: UsersDAO, val chan
     }
 
     @RequestMapping("/{username}/channels")
-    fun addChannel(@PathVariable username: String, @RequestParam name: String): ModelAndView? {
+    fun addChannel(@PathVariable username: String, @RequestParam name: String?): ModelAndView? {
         usersDAO.getByUsername(username)
         val newChannel = Channel(idBuilder.makeIdFor(name), name, username)
         channelsDAO.add(username, newChannel)
