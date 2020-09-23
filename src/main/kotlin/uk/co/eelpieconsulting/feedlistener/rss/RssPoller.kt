@@ -88,13 +88,15 @@ class RssPoller @Autowired constructor(val subscriptionsDAO: SubscriptionsDAO, v
                             rssSuccessesNotEtagged.increment()
                         }
                         persistFeedItems(fetchedFeed.feedItems)
+
+                        val latestItemDate = feedItemLatestDateFinder.getLatestItemDate(fetchedFeed.feedItems)
                         subscription.name = fetchedFeed.feedName
-                        subscription.latestItemDate = feedItemLatestDateFinder.getLatestItemDate(fetchedFeed.feedItems)
+                        subscription.latestItemDate = latestItemDate
                         subscription.etag = fetchedFeed.etag
                         subscription.httpStatus = fetchedFeed.httpStatus
                         subscription.error = null
 
-                        log.info("Completed feed fetch for: " + fetchedFeed.feedName + "; saw " + fetchedFeed.feedItems.size + " items")
+                        log.info("Completed feed fetch for: " + fetchedFeed.feedName + "; saw " + fetchedFeed.feedItems.size + " items. Latest feed item date was: " + latestItemDate)
                         return Result.success(subscription)
                     },
                     { ex ->
