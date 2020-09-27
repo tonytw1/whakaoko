@@ -25,7 +25,7 @@ class RssFeedItemMapper @Autowired constructor(private val rssFeedItemImageExtra
         val imageUrl = rssFeedItemImageExtractor.extractImageFrom(syndEntry)
         val body = HtmlCleaner().stripHtml(StringEscapeUtils.unescapeHtml(rssFeedItemBodyExtractor.extractBody(syndEntry)))
         val date = if (syndEntry.publishedDate != null) syndEntry.publishedDate else syndEntry.updatedDate
-        return FeedItem(syndEntry.title, extractUrl(syndEntry), body, date, place, imageUrl, null)
+        return FeedItem(syndEntry.title, extractUrl(syndEntry), body, date, place, imageUrl, null, null)
     }
 
     private fun extractUrl(syndEntry: SyndEntry): String? {

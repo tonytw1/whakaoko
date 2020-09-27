@@ -39,6 +39,7 @@ public class TwitterStatusListener implements StatusListener {
 		for (Subscription subscription : subscriptionsMatchingThisTweet) {
 			final FeedItem tweetFeedItem = twitterFeedItemMapper.createFeedItemFrom(status);
 			tweetFeedItem.setSubscriptionId(subscription.getId());	// TODO should we be duplicating tweets like this?
+			tweetFeedItem.setChannelId(subscription.getChannelId());
 			subscription.setLatestItemDate(status.getCreatedAt());
 			subscriptionsDAO.save(subscription);
 			

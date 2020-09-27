@@ -45,7 +45,7 @@ class ChannelsUIController @Autowired constructor(val usersDAO: UsersDAO,
             addObject("subscriptions", subscriptionsForChannel)
 
             if (!subscriptionsForChannel.isEmpty()) {
-                val results = feedItemDAO.getChannelFeedItemsResult(user.username, channel, page, q, null)
+                val results = feedItemDAO.getChannelFeedItemsResult(channel, page, q, null)
                 feedItemPopulator.populateFeedItems(results, mv, "inbox")
 
                 val subscriptionCounts = subscriptionsForChannel.map { subscription ->

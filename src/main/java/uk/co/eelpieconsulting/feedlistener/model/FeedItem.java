@@ -42,6 +42,9 @@ public class FeedItem implements Serializable, RssFeedable {
     @Indexed
     private String subscriptionId;
 
+    @Indexed
+    private String channelId;
+
     private String author;
 
     // Display only field
@@ -50,7 +53,10 @@ public class FeedItem implements Serializable, RssFeedable {
     public FeedItem() {
     }
 
-    public FeedItem(String title, String url, String body, Date date, uk.co.eelpieconsulting.feedlistener.model.Place place, String imageUrl, String author) {
+    public FeedItem(String title, String url, String body,
+                    Date date, uk.co.eelpieconsulting.feedlistener.model.Place place,
+                    String imageUrl, String author,
+                    String channelId) {
         this.title = title;
         this.url = url;
         this.body = body;
@@ -58,6 +64,7 @@ public class FeedItem implements Serializable, RssFeedable {
         this.place = place;
         this.imageUrl = imageUrl;
         this.author = author;
+        this.channelId = channelId;
     }
 
     public String getId() {
@@ -144,12 +151,28 @@ public class FeedItem implements Serializable, RssFeedable {
         this.subscriptionName = subscriptionName;
     }
 
-    @Override
-    public String toString() {
-        return "FeedItem [body=" + body + ", date=" + date + ", imageUrl="
-                + imageUrl + ", objectId=" + objectId + ", place=" + place
-                + ", subscriptionId=" + subscriptionId + ", title=" + title
-                + ", url=" + url + "]";
+    public String getChannelId() {
+        return channelId;
     }
 
+    public void setChannelId(String channelId) {
+        this.channelId = channelId;
+    }
+
+    @Override
+    public String toString() {
+        return "FeedItem{" +
+                "objectId=" + objectId +
+                ", title='" + title + '\'' +
+                ", url='" + url + '\'' +
+                ", body='" + body + '\'' +
+                ", date=" + date +
+                ", place=" + place +
+                ", imageUrl='" + imageUrl + '\'' +
+                ", subscriptionId='" + subscriptionId + '\'' +
+                ", channelId='" + channelId + '\'' +
+                ", author='" + author + '\'' +
+                ", subscriptionName='" + subscriptionName + '\'' +
+                '}';
+    }
 }

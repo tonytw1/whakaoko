@@ -17,6 +17,7 @@ import uk.co.eelpieconsulting.feedlistener.model.Channel
 import uk.co.eelpieconsulting.feedlistener.model.FeedItem
 import uk.co.eelpieconsulting.feedlistener.model.FeedItemsResult
 import uk.co.eelpieconsulting.feedlistener.model.Subscription
+import java.util.*
 import java.util.regex.Pattern
 
 @Component
@@ -24,9 +25,15 @@ class FeedItemDAO @Autowired constructor(private val dataStoreFactory: DataStore
 
     private val log = Logger.getLogger(FeedItemDAO::class.java)
 
+    private val CHANNEL_ID = "channelId"
     private val SUBSCRIPTION_ID = "subscriptionId"
     private val DATE_DESCENDING_THEN_ID = arrayOf(Sort.descending("date"), Sort.ascending("_id"))
     private val MAX_FEED_ITEMS = 25
+
+    fun before(date: Date): MutableList<FeedItem>? {
+        val query = dataStoreFactory.get().find(FeedItem::class.java).filter(Filters.lt("date", date));
+        return query.iterator(FindOptions().limit(100).sort(*DATE_DESCENDING_THEN_ID)).toList()
+    }
 
     fun add(feedItem: FeedItem): Boolean {
         return try {
@@ -44,6 +51,10 @@ class FeedItemDAO @Autowired constructor(private val dataStoreFactory: DataStore
         }
     }
 
+    fun update(feedItem: FeedItem) {
+        dataStoreFactory.get().save(feedItem)
+    }
+
     fun addAll(feedItems: List<FeedItem>) {
         for (feedItem in feedItems) {
             add(feedItem)
@@ -58,7 +69,7 @@ class FeedItemDAO @Autowired constructor(private val dataStoreFactory: DataStore
         }
     }
 
-    fun getChannelFeedItemsResult(username: String?, channel: Channel, page: Int?, q: String?, pageSize: Int?): FeedItemsResult {
+    fun getChannelFeedItemsResult(channel: Channel, page: Int?, q: String?, pageSize: Int?): FeedItemsResult {
         val pageSizeToUse = pageSize ?: MAX_FEED_ITEMS
         val pageToUse = if (page != null && page > 0) page else 1
         if (pageSizeToUse > MAX_FEED_ITEMS) {
@@ -109,7 +120,7 @@ class FeedItemDAO @Autowired constructor(private val dataStoreFactory: DataStore
         for (subscription in subscriptionsDAO.getSubscriptionsForChannel(channelId, null)) {
             channelSubscriptionIds.add(subscription.id)
         }
-        return dataStoreFactory.get().find(FeedItem::class.java).filter(Filters.`in`(SUBSCRIPTION_ID, channelSubscriptionIds))
+        return dataStoreFactory.get().find(FeedItem::class.java).filter(Filters.eq(CHANNEL_ID, channelId))
     }
 
     private fun subscriptionFeedItemsQuery(subscriptionId: String): Query<FeedItem> {

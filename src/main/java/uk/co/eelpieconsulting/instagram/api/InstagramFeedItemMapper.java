@@ -59,7 +59,7 @@ public class InstagramFeedItemMapper {
 			}
 		}
 		
-		return new FeedItem(caption, url, null, createdTime.toDate(), place, imageUrl, author);
+		return new FeedItem(caption, url, null, createdTime.toDate(), place, imageUrl, author, null);
 	}
 	
 }

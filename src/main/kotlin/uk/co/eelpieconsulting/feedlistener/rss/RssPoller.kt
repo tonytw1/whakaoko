@@ -125,6 +125,7 @@ class RssPoller @Autowired constructor(val subscriptionsDAO: SubscriptionsDAO, v
             feedItems.forEach { feedItem ->
                 try {
                     feedItem.subscriptionId = subscription.id   // TODO This isn't in an obvious location
+                    feedItem.channelId = subscription.channelId
                     if (feedItemDAO.add(feedItem)) {
                         rssAddedItems.increment()
                     }

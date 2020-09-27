@@ -2,6 +2,7 @@ package uk.co.eelpieconsulting.feedlistener.controllers
 
 import com.google.common.base.Strings
 import org.apache.log4j.Logger
+import org.joda.time.DateTime
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Controller
 import org.springframework.web.bind.annotation.*
@@ -62,7 +63,7 @@ class ChannelsController @Autowired constructor(val usersDAO: UsersDAO, val chan
         if (!Strings.isNullOrEmpty(format) && format == "rss") {    // TODO view factory could do this?
             mv = ModelAndView(viewFactory.getRssView(channel.name, urlBuilder.getChannelUrl(channel), ""))
         }
-        val results = feedItemDAO.getChannelFeedItemsResult(username, channel, page, q, pageSize)
+        val results = feedItemDAO.getChannelFeedItemsResult(channel, page, q, pageSize)
         feedItemPopulator.populateFeedItems(results, mv, "data")
         val totalCount = results.totalCount
         response.addHeader(X_TOTAL_COUNT, java.lang.Long.toString(totalCount))
@@ -75,6 +76,24 @@ class ChannelsController @Autowired constructor(val usersDAO: UsersDAO, val chan
         val newChannel = Channel(idBuilder.makeIdFor(name), name, username)
         channelsDAO.add(username, newChannel)
         return ModelAndView(RedirectView(urlBuilder.getChannelUrl(newChannel)))
+    }
+
+    @RequestMapping("/backfill")
+    fun backfill(): ModelAndView? {
+        var before = feedItemDAO.before(DateTime.now().toDate())
+        while (before != null && before.isNotEmpty()) {
+            before.forEach { i ->
+                val subscriptionId = i.subscriptionId;
+                val byId = subscriptionsDAO.getById(subscriptionId);
+                val channelId = byId.channelId
+                log.info(i.date)
+                i.channelId = channelId;
+                feedItemDAO.update(i)
+            }
+            val date = before.last().date
+            before = feedItemDAO.before(date)
+        }
+        return null
     }
 
 }

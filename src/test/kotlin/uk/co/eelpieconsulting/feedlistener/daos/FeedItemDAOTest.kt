@@ -1,6 +1,7 @@
 package uk.co.eelpieconsulting.feedlistener.daos
 
 import junit.framework.Assert.assertEquals
+import org.joda.time.DateTime
 import org.junit.Test
 import uk.co.eelpieconsulting.feedlistener.model.Channel
 import uk.co.eelpieconsulting.feedlistener.model.FeedItem
@@ -14,23 +15,25 @@ class FeedItemDAOTest {
     val dataStoreFactory = DataStoreFactory("mongodb://localhost:27017", mongoDatabase);
     val subscriptionsDAO = SubscriptionsDAO(dataStoreFactory);
     val feedItemDAO = FeedItemDAO(dataStoreFactory, subscriptionsDAO)
+    val channelsDAO = ChannelsDAO(dataStoreFactory)
 
     @Test
     fun canFetchSubscriptionFeedItems() {
-        val subscription = testSubscription()
-        subscriptionsDAO.add(subscription);
+            val subscription = testSubscription()
+            subscriptionsDAO.add(subscription);
 
-        val feedItem = testFeedItemFor(subscription)
-        feedItemDAO.add(feedItem);
+            val feedItem = testFeedItemFor(subscription)
+            feedItemDAO.add(feedItem);
 
-        val reloaded = feedItemDAO.getSubscriptionFeedItems(subscription, 1);
-        assertEquals(1, reloaded.totalCount);
-        assertEquals(feedItem.url, reloaded.feedsItems.first().url);
+            val reloaded = feedItemDAO.getSubscriptionFeedItems(subscription, 1);
+            assertEquals(1, reloaded.totalCount);
+            assertEquals(feedItem.url, reloaded.feedsItems.first().url);
+
     }
 
     @Test
     fun canFetchChannelFeedItems() {
-        val channel = Channel();
+        val channel = Channel()
         channel.id = UUID.randomUUID().toString()
 
         val subscription = testSubscription(channel)
@@ -56,8 +59,9 @@ class FeedItemDAOTest {
 
     private fun testFeedItemFor(subscription: RssSubscription): FeedItem {
         val url = "http://localhost/" + UUID.randomUUID().toString();
-        val feedItem = FeedItem(UUID.randomUUID().toString(), url, null, null, null, null, null);
+        val feedItem = FeedItem(UUID.randomUUID().toString(), url, null, DateTime.now().toDate(), null, null, null, null);
         feedItem.subscriptionId = subscription.id
+        feedItem.channelId = subscription.channelId
         return feedItem
     }
 

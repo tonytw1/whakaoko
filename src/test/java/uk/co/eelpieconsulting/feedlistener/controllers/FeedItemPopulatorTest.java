@@ -14,7 +14,7 @@ public class FeedItemPopulatorTest {
     @Test
     public void canCorrectForExcessivelyEscapedInputFeeds() {
         final String incorrectlyEscapedHeadline = "St John&#39;s Bar, 5 Cable Street, Te Aro, Wellington";
-        FeedItem feedItem = new FeedItem(incorrectlyEscapedHeadline, null, null, null, null, null, null);
+        FeedItem feedItem = new FeedItem(incorrectlyEscapedHeadline, null, null, null, null, null, null, null);
 
         FeedItem fixed = new FeedItemPopulator(subscriptionLabelService).overlyUnescape(feedItem);
 
