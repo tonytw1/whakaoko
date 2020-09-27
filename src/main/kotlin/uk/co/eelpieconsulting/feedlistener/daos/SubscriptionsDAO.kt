@@ -103,9 +103,9 @@ class SubscriptionsDAO @Autowired constructor(private val dataStoreFactory: Data
     }
 
     @Throws(MongoException::class)
-    fun getSubscriptionsForChannel(username: String, channelID: String, url: String?): List<Subscription> {
-        log.info("Listing subscriptions for channel: $username / $channelID")
-        var query = dataStoreFactory.get().find(Subscription::class.java).filter(Filters.eq("username", username), Filters.eq("channelId", channelID))
+    fun getSubscriptionsForChannel(channelID: String, url: String?): List<Subscription> {
+        log.info("Listing subscriptions for channel: $channelID")
+        var query = dataStoreFactory.get().find(Subscription::class.java).filter(Filters.eq("channelId", channelID))
         if (!Strings.isNullOrEmpty(url)) {
             query = query.disableValidation().filter(Filters.eq("url", url)) // TODO subclasses to helping here
         }

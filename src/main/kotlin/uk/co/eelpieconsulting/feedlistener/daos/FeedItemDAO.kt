@@ -64,7 +64,7 @@ class FeedItemDAO @Autowired constructor(private val dataStoreFactory: DataStore
         if (pageSizeToUse > MAX_FEED_ITEMS) {
             throw RuntimeException("Too many records requested") // TODO use correct exception.
         }
-        return if (!Strings.isNullOrEmpty(q)) searchChannelFeedItems(channel.id, pageSizeToUse, pageToUse, username, q) else getChannelFeedItems(channel.id, pageSizeToUse, pageToUse, username)
+        return if (!Strings.isNullOrEmpty(q)) searchChannelFeedItems(channel.id, pageSizeToUse, pageToUse, q) else getChannelFeedItems(channel.id, pageSizeToUse, pageToUse)
     }
 
     @Throws(MongoException::class)
@@ -91,22 +91,22 @@ class FeedItemDAO @Autowired constructor(private val dataStoreFactory: DataStore
 
     @Timed(timingNotes = "")
     @Throws(MongoException::class)
-    fun getChannelFeedItems(channelId: String, pageSize: Int, page: Int, username: String?): FeedItemsResult {
-        val query = channelFeedItemsQuery(username, channelId)
+    fun getChannelFeedItems(channelId: String, pageSize: Int, page: Int): FeedItemsResult {
+        val query = channelFeedItemsQuery(channelId)
         val totalCount = query.count()
         return FeedItemsResult(query.iterator(withPaginationFor(pageSize, page).sort(*DATE_DESCENDING_THEN_ID)).toList(), totalCount)
     }
 
     @Timed(timingNotes = "")
-    fun searchChannelFeedItems(channelId: String, pageSize: Int, page: Int, username: String?, q: String?): FeedItemsResult {
-        val query = channelFeedItemsQuery(username, channelId).filter(Filters.eq("title", Pattern.compile(q))) // TODO can eq be used with a patten?
+    fun searchChannelFeedItems(channelId: String, pageSize: Int, page: Int, q: String?): FeedItemsResult {
+        val query = channelFeedItemsQuery(channelId).filter(Filters.eq("title", Pattern.compile(q))) // TODO can eq be used with a patten?
         return FeedItemsResult(query.iterator(withPaginationFor(pageSize, page)).toList(), query.count())
     }
 
     @Timed(timingNotes = "")
-    private fun channelFeedItemsQuery(username: String?, channelId: String): Query<FeedItem> {
+    private fun channelFeedItemsQuery(channelId: String): Query<FeedItem> {
         val channelSubscriptionIds: MutableList<String?> = Lists.newArrayList()
-        for (subscription in subscriptionsDAO.getSubscriptionsForChannel(username!!, channelId, null)) {
+        for (subscription in subscriptionsDAO.getSubscriptionsForChannel(channelId, null)) {
             channelSubscriptionIds.add(subscription.id)
         }
         return dataStoreFactory.get().find(FeedItem::class.java).filter(Filters.`in`(SUBSCRIPTION_ID, channelSubscriptionIds))
