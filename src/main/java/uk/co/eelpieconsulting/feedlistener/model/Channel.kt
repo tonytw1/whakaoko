@@ -18,8 +18,4 @@ class Channel {
         this.name = name
         this.username = username
     }
-
-    override fun toString(): String {
-        return "Channel [id=$id, name=$name, username=$username]"
-    }
 }
