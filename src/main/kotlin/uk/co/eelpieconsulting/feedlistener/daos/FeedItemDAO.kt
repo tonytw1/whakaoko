@@ -63,9 +63,9 @@ class FeedItemDAO @Autowired constructor(private val dataStoreFactory: DataStore
 
     fun getSubscriptionFeedItems(subscription: Subscription, page: Int?): FeedItemsResult {
         return if (page != null) {
-            getSubscriptionFeedItems(subscription.id, MAX_FEED_ITEMS, page)
+            getSubscriptionFeedItems(subscription.id!!, MAX_FEED_ITEMS, page)
         } else {
-            getSubscriptionFeedItems(subscription.id, MAX_FEED_ITEMS)
+            getSubscriptionFeedItems(subscription.id!!, MAX_FEED_ITEMS)
         }
     }
 

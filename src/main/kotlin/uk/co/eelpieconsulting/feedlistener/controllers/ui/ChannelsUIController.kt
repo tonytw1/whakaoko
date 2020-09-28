@@ -50,7 +50,7 @@ class ChannelsUIController @Autowired constructor(val usersDAO: UsersDAO,
 
                 val subscriptionCounts = subscriptionsForChannel.map { subscription ->
                     // TODO slow on channels with many subscriptions - cache or index?
-                    val subscriptionFeedItemsCount = feedItemDAO.getSubscriptionFeedItemsCount(subscription.id)
+                    val subscriptionFeedItemsCount = feedItemDAO.getSubscriptionFeedItemsCount(subscription.id!!)
                     Pair(subscription.id, subscriptionFeedItemsCount)
                 }.toMap()
 

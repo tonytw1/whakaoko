@@ -90,7 +90,7 @@ class SubscriptionsDAO @Autowired constructor(private val dataStoreFactory: Data
     fun twitterSubscriptions(): List<Subscription> {
         val subscriptions: MutableList<Subscription> = Lists.newArrayList()
         for (subscription in getSubscriptions(LATEST_ITEM_DATE_DESCENDING, null)) {
-            if (subscription.id.startsWith("twitter")) {
+            if (subscription.id!!.startsWith("twitter")) {
                 subscriptions.add(subscription)
             }
         }

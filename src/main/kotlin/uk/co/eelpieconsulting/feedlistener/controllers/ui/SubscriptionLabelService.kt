@@ -11,7 +11,7 @@ open class SubscriptionLabelService @Autowired constructor(val subscriptionsDAO:
 
    fun labelForSubscription(subscriptionId: String): String? {
        return try {
-           subscriptionsDAO.getById(subscriptionId).getName()
+           subscriptionsDAO.getById(subscriptionId).name
        } catch (e: UnknownSubscriptionException) {
            subscriptionId.toUpperCase()
        }

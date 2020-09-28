@@ -82,10 +82,10 @@ class SubscriptionsController @Autowired constructor(val usersDAO: UsersDAO, val
 
         feedItemDAO.deleteSubscriptionFeedItems(subscription)
         subscriptionsDAO.delete(subscription)
-        if (subscription.id.startsWith("twitter")) {
+        if (subscription.id!!.startsWith("twitter")) {
             twitterListener.connect()
         }
-        if (subscription.id.startsWith("instagram")) {
+        if (subscription.id!!.startsWith("instagram")) {
             instagramSubscriptionManager.requestUnsubscribeFrom((subscription as InstagramSubscription).subscriptionId)
         }
         return ModelAndView(viewFactory.getJsonView()).addObject("data", "ok")
