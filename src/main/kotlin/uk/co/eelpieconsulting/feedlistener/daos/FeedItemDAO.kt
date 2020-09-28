@@ -75,7 +75,7 @@ class FeedItemDAO @Autowired constructor(private val dataStoreFactory: DataStore
         if (pageSizeToUse > MAX_FEED_ITEMS) {
             throw RuntimeException("Too many records requested") // TODO use correct exception.
         }
-        return if (!Strings.isNullOrEmpty(q)) searchChannelFeedItems(channel.id, pageSizeToUse, pageToUse, q) else getChannelFeedItems(channel.id, pageSizeToUse, pageToUse)
+        return if (!Strings.isNullOrEmpty(q)) searchChannelFeedItems(channel.id!!, pageSizeToUse, pageToUse, q) else getChannelFeedItems(channel.id!!, pageSizeToUse, pageToUse)
     }
 
     @Throws(MongoException::class)
