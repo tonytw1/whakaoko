@@ -11,6 +11,7 @@ import uk.co.eelpieconsulting.common.html.HtmlCleaner
 import uk.co.eelpieconsulting.feedlistener.model.FeedItem
 import uk.co.eelpieconsulting.feedlistener.model.LatLong
 import uk.co.eelpieconsulting.feedlistener.model.Place
+import uk.co.eelpieconsulting.feedlistener.model.Subscription
 
 @Component
 class RssFeedItemMapper @Autowired constructor(private val rssFeedItemImageExtractor: RssFeedItemImageExtractor,
@@ -20,12 +21,12 @@ class RssFeedItemMapper @Autowired constructor(private val rssFeedItemImageExtra
 
     private val log = Logger.getLogger(RssFeedItemMapper::class.java)
 
-    fun createFeedItemFrom(syndEntry: SyndEntry): FeedItem {
+    fun createFeedItemFrom(syndEntry: SyndEntry, subscription: Subscription): FeedItem {
         val place = extractLocationFrom(syndEntry)
         val imageUrl = rssFeedItemImageExtractor.extractImageFrom(syndEntry)
         val body = HtmlCleaner().stripHtml(StringEscapeUtils.unescapeHtml(rssFeedItemBodyExtractor.extractBody(syndEntry)))
         val date = if (syndEntry.publishedDate != null) syndEntry.publishedDate else syndEntry.updatedDate
-        return FeedItem(syndEntry.title, extractUrl(syndEntry), body, date, place, imageUrl, null, null)
+        return FeedItem(syndEntry.title, extractUrl(syndEntry), body, date, place, imageUrl, null, subscription.id, subscription.channelId)
     }
 
     private fun extractUrl(syndEntry: SyndEntry): String? {

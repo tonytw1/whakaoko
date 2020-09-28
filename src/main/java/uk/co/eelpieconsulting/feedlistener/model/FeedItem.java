@@ -56,6 +56,7 @@ public class FeedItem implements Serializable, RssFeedable {
     public FeedItem(String title, String url, String body,
                     Date date, uk.co.eelpieconsulting.feedlistener.model.Place place,
                     String imageUrl, String author,
+                    String subscriptionId,
                     String channelId) {
         this.title = title;
         this.url = url;
@@ -64,6 +65,7 @@ public class FeedItem implements Serializable, RssFeedable {
         this.place = place;
         this.imageUrl = imageUrl;
         this.author = author;
+        this.subscriptionId = subscriptionId;
         this.channelId = channelId;
     }
 

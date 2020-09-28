@@ -59,9 +59,7 @@ class FeedItemDAOTest {
 
     private fun testFeedItemFor(subscription: RssSubscription): FeedItem {
         val url = "http://localhost/" + UUID.randomUUID().toString();
-        val feedItem = FeedItem(UUID.randomUUID().toString(), url, null, DateTime.now().toDate(), null, null, null, null);
-        feedItem.subscriptionId = subscription.id
-        feedItem.channelId = subscription.channelId
+        val feedItem = FeedItem(UUID.randomUUID().toString(), url, null, DateTime.now().toDate(), null, null, null, subscription.id, subscription.channelId);
         return feedItem
     }
 

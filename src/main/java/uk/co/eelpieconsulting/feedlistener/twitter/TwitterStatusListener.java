@@ -37,7 +37,7 @@ public class TwitterStatusListener implements StatusListener {
 		List<TwitterTagSubscription> usersTwitterSubscriptions = subscriptionsDAO.getTwitterSubscriptionsFor(username);	// TODO dao hint in each tweet =(
 		final List<Subscription> subscriptionsMatchingThisTweet = filterSubscriptionsMatchingThisTweet(usersTwitterSubscriptions, status);
 		for (Subscription subscription : subscriptionsMatchingThisTweet) {
-			final FeedItem tweetFeedItem = twitterFeedItemMapper.createFeedItemFrom(status);
+			final FeedItem tweetFeedItem = twitterFeedItemMapper.createFeedItemFrom(status, subscription);
 			tweetFeedItem.setSubscriptionId(subscription.getId());	// TODO should we be duplicating tweets like this?
 			tweetFeedItem.setChannelId(subscription.getChannelId());
 			subscription.setLatestItemDate(status.getCreatedAt());

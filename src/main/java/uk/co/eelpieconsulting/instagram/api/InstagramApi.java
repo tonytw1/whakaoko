@@ -1,9 +1,6 @@
 package uk.co.eelpieconsulting.instagram.api;
 
-import java.io.UnsupportedEncodingException;
-import java.util.List;
-import java.util.UUID;
-
+import com.google.common.collect.Lists;
 import org.apache.http.HttpEntity;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
@@ -14,20 +11,19 @@ import org.apache.log4j.Logger;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import uk.co.eelpieconsulting.common.geo.model.LatLong;
 import uk.co.eelpieconsulting.common.http.HttpBadRequestException;
 import uk.co.eelpieconsulting.common.http.HttpFetchException;
 import uk.co.eelpieconsulting.common.http.HttpFetcher;
-import uk.co.eelpieconsulting.common.http.HttpForbiddenException;
-import uk.co.eelpieconsulting.common.http.HttpNotFoundException;
 import uk.co.eelpieconsulting.feedlistener.model.FeedItem;
 import uk.co.eelpieconsulting.feedlistener.model.InstagramGeographySubscription;
 import uk.co.eelpieconsulting.feedlistener.model.InstagramTagSubscription;
 
-import com.google.common.collect.Lists;
+import java.io.UnsupportedEncodingException;
+import java.util.List;
+import java.util.UUID;
 
 @Component
 public class InstagramApi {
@@ -49,7 +45,7 @@ public class InstagramApi {
         this.mapper = new InstagramFeedItemMapper();
     }
 
-    public InstagramTagSubscription createTagSubscription(String tag, String clientId, String clientSecret, String callbackUrl, String channelId, String username) throws HttpNotFoundException, HttpBadRequestException, HttpForbiddenException, HttpFetchException, UnsupportedEncodingException, JSONException {
+    public InstagramTagSubscription createTagSubscription(String tag, String clientId, String clientSecret, String callbackUrl, String channelId, String username) throws HttpFetchException, UnsupportedEncodingException, JSONException {
         final List<NameValuePair> nameValuePairs = commonSubscriptionFields(clientId, clientSecret, callbackUrl);
         nameValuePairs.add(new BasicNameValuePair("object", "tag"));
         nameValuePairs.add(new BasicNameValuePair("object_id", tag));
@@ -71,7 +67,7 @@ public class InstagramApi {
         }
     }
 
-    public InstagramGeographySubscription createGeographySubscription(LatLong latLong, int radius, String clientId, String clientSecret, String callbackUrl, String channelId, String username) throws UnsupportedEncodingException, HttpNotFoundException, HttpBadRequestException, HttpForbiddenException, HttpFetchException, JSONException {
+    public InstagramGeographySubscription createGeographySubscription(LatLong latLong, int radius, String clientId, String clientSecret, String callbackUrl, String channelId, String username) throws UnsupportedEncodingException, HttpFetchException, JSONException {
         final List<NameValuePair> nameValuePairs = commonSubscriptionFields(clientId, clientSecret, callbackUrl);
         nameValuePairs.add(new BasicNameValuePair("object", "geography"));
         nameValuePairs.add(new BasicNameValuePair("lat", Double.toString(latLong.getLatitude())));
@@ -96,26 +92,26 @@ public class InstagramApi {
         }
     }
 
-    public String getSubscriptions(String clientId, String clientSecret) throws HttpNotFoundException, HttpBadRequestException, HttpForbiddenException, HttpFetchException {
+    public String getSubscriptions(String clientId, String clientSecret) throws HttpFetchException {
         return httpFetcher.get(INSTAGRAM_API_V1_SUBSCRIPTIONS + "?client_secret=" + clientSecret + "&client_id=" + clientId);
     }
 
-    public void deleteAllSubscriptions(String clientId, String clientSecret) throws HttpNotFoundException, HttpBadRequestException, HttpForbiddenException, HttpFetchException {
+    public void deleteAllSubscriptions(String clientId, String clientSecret) throws HttpFetchException {
         HttpDelete delete = new HttpDelete(INSTAGRAM_API_V1_SUBSCRIPTIONS + "?client_secret=" + clientSecret + "&object=all&client_id=" + clientId);
         log.info("Delete all response: " + httpFetcher.delete(delete));
     }
 
-    public void deleteSubscription(long id, String clientId, String clientSecret) throws HttpNotFoundException, HttpBadRequestException, HttpForbiddenException, HttpFetchException {
+    public void deleteSubscription(long id, String clientId, String clientSecret) throws HttpFetchException {
         HttpDelete delete = new HttpDelete(INSTAGRAM_API_V1_SUBSCRIPTIONS + "?client_secret=" + clientSecret + "&id=" + Long.toString(id) + "&client_id=" + clientId);
         log.info("Delete subscription response; " + httpFetcher.delete(delete));
     }
 
-    public List<FeedItem> getRecentMediaForTag(String tag, String accessToken) throws HttpNotFoundException, HttpBadRequestException, HttpForbiddenException, HttpFetchException, JSONException {
+    public List<FeedItem> getRecentMediaForTag(String tag, String accessToken) throws HttpFetchException, JSONException {
         final String response = httpFetcher.get("https://api.instagram.com/v1/tags/" + tag + "/media/recent" + "?access_token=" + accessToken);
         return parseFeedItems(response);
     }
 
-    public List<FeedItem> getRecentMediaForGeography(long geoId, String clientId) throws HttpNotFoundException, HttpBadRequestException, HttpForbiddenException, HttpFetchException, JSONException {
+    public List<FeedItem> getRecentMediaForGeography(long geoId, String clientId) throws HttpFetchException, JSONException {
         final String response = httpFetcher.get("https://api.instagram.com/v1/geographies/" + geoId + "/media/recent" + "?client_id=" + clientId);
         return parseFeedItems(response);
     }
@@ -124,7 +120,7 @@ public class InstagramApi {
         return INSTAGRAM_API_AUTHORIZE + "?client_id=" + clientId + "&redirect_uri=" + redirectUrl + "&response_type=code";
     }
 
-    public String getAccessToken(String clientId, String clientSecret, String code, String redirectUrl) throws HttpNotFoundException, HttpForbiddenException, HttpFetchException, JSONException, UnsupportedEncodingException {
+    public String getAccessToken(String clientId, String clientSecret, String code, String redirectUrl) throws HttpFetchException, JSONException, UnsupportedEncodingException {
         final HttpPost post = new HttpPost(INSTAGRAM_API_ACCESS_TOKEN);
         final List<NameValuePair> nameValuePairs = Lists.newArrayList();
         nameValuePairs.add(new BasicNameValuePair("client_id", clientId));

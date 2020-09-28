@@ -105,7 +105,7 @@ public class InstagramCallbackController {
         Date latestItemDate = null;
         for (FeedItem feedItem : recentMedia) {
             feedItem.setSubscriptionId(subscription.getId());
-
+            feedItem.setChannelId(subscription.getChannelId());
             final Date feedItemDate = feedItem.getDate();
             if (feedItemDate != null && (latestItemDate == null || feedItemDate.after(latestItemDate))) {
                 latestItemDate = feedItemDate;

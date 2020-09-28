@@ -10,6 +10,8 @@ import org.springframework.stereotype.Component
 import uk.co.eelpieconsulting.feedlistener.http.HttpFetcher
 import uk.co.eelpieconsulting.feedlistener.http.HttpResult
 import uk.co.eelpieconsulting.feedlistener.model.FeedItem
+import uk.co.eelpieconsulting.feedlistener.model.RssSubscription
+import uk.co.eelpieconsulting.feedlistener.model.Subscription
 
 @Component
 class FeedFetcher @Autowired constructor(private val httpFetcher: HttpFetcher,
@@ -22,15 +24,15 @@ class FeedFetcher @Autowired constructor(private val httpFetcher: HttpFetcher,
     private val rssFetchesCounter = meterRegistry.counter("rss_fetches")
     private val rssFetchedBytesCounter = meterRegistry.counter("rss_fetched_bytes")
 
-    fun fetchFeed(url: String): Result<FetchedFeed, FeedFetchingException> {
-        loadSyndFeedWithFeedFetcher(url).fold({ syndFeedAndHttpResult ->
+    fun fetchFeed(subscription: RssSubscription): Result<FetchedFeed, FeedFetchingException> {
+        loadSyndFeedWithFeedFetcher(subscription.url).fold({ syndFeedAndHttpResult ->
             val syndFeed = syndFeedAndHttpResult.first
             val httpResult = syndFeedAndHttpResult.second
 
             val headers = httpResult.headers
             val etag = headers["ETag"].firstOrNull()
 
-            val fetchedFeed = FetchedFeed(feedName = syndFeed.title, feedItems = getFeedItemsFrom(syndFeed), etag = etag, httpStatus = httpResult.status)
+            val fetchedFeed = FetchedFeed(feedName = syndFeed.title, feedItems = getFeedItemsFrom(syndFeed, subscription), etag = etag, httpStatus = httpResult.status)
             return Result.success(fetchedFeed)
 
         }, { ex ->
@@ -59,9 +61,9 @@ class FeedFetcher @Autowired constructor(private val httpFetcher: HttpFetcher,
         })
     }
 
-    private fun getFeedItemsFrom(syndfeed: SyndFeed): List<FeedItem> {
+    private fun getFeedItemsFrom(syndfeed: SyndFeed, subscription: Subscription): List<FeedItem> {
         return syndfeed.entries.iterator().asSequence().map { entry ->
-            if (entry is SyndEntry) rssFeedItemMapper.createFeedItemFrom(entry) else null
+            if (entry is SyndEntry) rssFeedItemMapper.createFeedItemFrom(entry, subscription) else null
         }.filterNotNull().toList()
     }
 }

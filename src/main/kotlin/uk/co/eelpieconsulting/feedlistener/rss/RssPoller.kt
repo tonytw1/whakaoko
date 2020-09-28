@@ -78,7 +78,7 @@ class RssPoller @Autowired constructor(val subscriptionsDAO: SubscriptionsDAO, v
                 }
 
                 log.info("Fetching full feed: " + url)
-                feedFetcher.fetchFeed(subscription.url).fold(
+                feedFetcher.fetchFeed(subscription).fold(
                     { fetchedFeed ->
                         log.info("Fetched feed: " + fetchedFeed.feedName)
                         log.info("Etag: " + fetchedFeed.etag)
@@ -124,8 +124,6 @@ class RssPoller @Autowired constructor(val subscriptionsDAO: SubscriptionsDAO, v
         private fun persistFeedItems(feedItems: List<FeedItem>) {
             feedItems.forEach { feedItem ->
                 try {
-                    feedItem.subscriptionId = subscription.id   // TODO This isn't in an obvious location
-                    feedItem.channelId = subscription.channelId
                     if (feedItemDAO.add(feedItem)) {
                         rssAddedItems.increment()
                     }
