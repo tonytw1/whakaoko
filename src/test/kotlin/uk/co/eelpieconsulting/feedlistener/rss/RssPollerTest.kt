@@ -18,10 +18,10 @@ class RssPollerTest {
         val mostRecent = DateTime(2020, 9, 8, 14, 1, 1, 1)
         val longAgo = DateTime(1980, 9, 8, 14, 1, 1, 1)
 
-        val feedItemDates = listOf(recently, null, mostRecent, longAgo, null)
+        val feedItemDates = listOf(recently, mostRecent, longAgo)
         val feedItems = feedItemDates.map { date ->
             // TODO this can be minimised when we move FeedItem to a Kotlin class
-            FeedItem("title", "url", "body", date?.toDate(), null, null, null, null, null)
+            FeedItem("title", "url", "body", date!!.toDate(), null, null, null, null, null)
         }
 
         val latestItemDate = feedItemLatestDateFinder.getLatestItemDate(feedItems)

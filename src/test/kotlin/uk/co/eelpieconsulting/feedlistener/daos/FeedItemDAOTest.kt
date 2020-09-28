@@ -17,7 +17,7 @@ class FeedItemDAOTest {
     val feedItemDAO = FeedItemDAO(dataStoreFactory, subscriptionsDAO)
     val channelsDAO = ChannelsDAO(dataStoreFactory)
 
-    //@Test
+    @Test
     fun canFetchSubscriptionFeedItems() {
         val channel = Channel()
         channel.id = UUID.randomUUID().toString()
@@ -32,7 +32,7 @@ class FeedItemDAOTest {
         assertEquals(feedItem.url, reloaded.feedsItems.first().url);
     }
 
-    //@Test
+    @Test
     fun canFetchChannelFeedItems() {
         val channel = Channel()
         channel.id = UUID.randomUUID().toString()

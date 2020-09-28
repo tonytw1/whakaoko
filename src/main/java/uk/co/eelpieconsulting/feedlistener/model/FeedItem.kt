@@ -1,180 +1,103 @@
-package uk.co.eelpieconsulting.feedlistener.model;
+package uk.co.eelpieconsulting.feedlistener.model
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import dev.morphia.annotations.*;
-import dev.morphia.utils.IndexDirection;
-import org.bson.types.ObjectId;
-import uk.co.eelpieconsulting.common.geo.model.LatLong;
-import uk.co.eelpieconsulting.common.views.rss.RssFeedable;
-
-import java.io.Serializable;
-import java.util.Date;
-
-import static dev.morphia.utils.IndexType.DESC;
+import com.fasterxml.jackson.annotation.JsonIgnore
+import dev.morphia.annotations.*
+import dev.morphia.utils.IndexDirection
+import dev.morphia.utils.IndexType
+import org.bson.types.ObjectId
+import uk.co.eelpieconsulting.common.geo.model.LatLong
+import uk.co.eelpieconsulting.common.views.rss.RssFeedable
+import java.io.Serializable
+import java.util.*
 
 @Entity("feeditems")
-@Indexes({
-        @Index(fields = {@Field(value = "date", type = DESC), @Field(value = "_id")}),
-        @Index(fields = {@Field(value = "subscriptionId"), @Field(value = "date", type = DESC), @Field(value = "_id")}),
-})
-
-public class FeedItem implements Serializable, RssFeedable {
-
-    private static final long serialVersionUID = 1L;
+@Indexes(Index(fields = [Field(value = "date", type = IndexType.DESC), Field(value = "_id")]), Index(fields = [Field(value = "subscriptionId"), Field(value = "date", type = IndexType.DESC), Field(value = "_id")]))
+class FeedItem : Serializable, RssFeedable {
 
     @Id
-    ObjectId objectId;
+    var objectId: ObjectId? = null
 
-    private String title;
-
-    @Indexed
-    private String url;
-
-    private String body;
-
-    @Indexed(value = IndexDirection.DESC)        // TODO unused - because always used with subscription id?
-    private Date date;
-
-    private uk.co.eelpieconsulting.feedlistener.model.Place place;
-
-    private String imageUrl;
+    var title: String? = null
+        private set
 
     @Indexed
-    private String subscriptionId;
+    var url: String? = null
+
+    var body: String? = null
+        private set
+
+    @Indexed(value = IndexDirection.DESC)
+    private lateinit var date: Date      // TODO unused - because always used with subscription id?
+    override fun getDate(): Date {
+        return date
+    }
+
+    var place: Place? = null
+        private set
+    private var imageUrl: String? = null
 
     @Indexed
-    private String channelId;
+    var subscriptionId: String? = null
 
-    private String author;
+    @Indexed
+    var channelId: String? = null
+    private var author: String? = null
 
     // Display only field
-    private String subscriptionName;
+    @get:JsonIgnore
+    var subscriptionName: String? = null
 
-    public FeedItem() {
+    constructor() {}
+    constructor(title: String?, url: String?, body: String?,
+                date: Date, place: Place?,
+                imageUrl: String?, author: String?,
+                subscriptionId: String?,
+                channelId: String?) {
+        this.title = title
+        this.url = url
+        this.body = body
+        this.date = date
+        this.place = place
+        this.imageUrl = imageUrl
+        this.author = author
+        this.subscriptionId = subscriptionId
+        this.channelId = channelId
     }
 
-    public FeedItem(String title, String url, String body,
-                    Date date, uk.co.eelpieconsulting.feedlistener.model.Place place,
-                    String imageUrl, String author,
-                    String subscriptionId,
-                    String channelId) {
-        this.title = title;
-        this.url = url;
-        this.body = body;
-        this.date = date;
-        this.place = place;
-        this.imageUrl = imageUrl;
-        this.author = author;
-        this.subscriptionId = subscriptionId;
-        this.channelId = channelId;
+    val id: String?
+        get() = url
+
+    @JsonIgnore
+    override fun getLatLong(): LatLong? {
+        return if (place != null && place!!.latLong != null) {
+            LatLong(place!!.latLong.latitude, place!!.latLong.longitude)
+        } else null
     }
 
-    public String getId() {
-        return getGUID();
+    override fun getImageUrl(): String? {
+        return imageUrl
     }
 
-    private String getGUID() {
-        return url;
-    }
+    val isGeoTagged: Boolean
+        get() = place != null
 
-    public String getTitle() {
-        return title;
-    }
-
-    public String getUrl() {
-        return url;
-    }
-
-    public String getBody() {
-        return body;
-    }
-
-    public Date getDate() {
-        return date;
-    }
-
-    public uk.co.eelpieconsulting.feedlistener.model.Place getPlace() {
-        return place;
+    override fun getAuthor(): String? {
+        return author
     }
 
     @JsonIgnore
-    public LatLong getLatLong() {
-        if (place != null && place.getLatLong() != null) {
-            return new uk.co.eelpieconsulting.common.geo.model.LatLong(place.getLatLong().getLatitude(), place.getLatLong().getLongitude());
-        }
-        return null;
-    }
-
-    public String getImageUrl() {
-        return imageUrl;
-    }
-
-    public boolean isGeoTagged() {
-        return place != null;
-    }
-
-    @Override
-    public String getAuthor() {
-        return author;
-    }
-
-    @Override
-    @JsonIgnore
-    public String getDescription() {
-        return body;
-    }
-
-    @Override
-    @JsonIgnore
-    public String getHeadline() {
-        return title;
-    }
-
-    @Override
-    @JsonIgnore
-    public String getWebUrl() {
-        return url;
-    }
-
-    public String getSubscriptionId() {
-        return subscriptionId;
-    }
-
-    public void setSubscriptionId(String subscriptionId) {
-        this.subscriptionId = subscriptionId;
+    override fun getDescription(): String? {
+        return body
     }
 
     @JsonIgnore
-    public String getSubscriptionName() {
-        return subscriptionName;
+    override fun getHeadline(): String? {
+        return title
     }
 
-    public void setSubscriptionName(String subscriptionName) {
-        this.subscriptionName = subscriptionName;
+    @JsonIgnore
+    override fun getWebUrl(): String {
+        return url!!
     }
 
-    public String getChannelId() {
-        return channelId;
-    }
-
-    public void setChannelId(String channelId) {
-        this.channelId = channelId;
-    }
-
-    @Override
-    public String toString() {
-        return "FeedItem{" +
-                "objectId=" + objectId +
-                ", title='" + title + '\'' +
-                ", url='" + url + '\'' +
-                ", body='" + body + '\'' +
-                ", date=" + date +
-                ", place=" + place +
-                ", imageUrl='" + imageUrl + '\'' +
-                ", subscriptionId='" + subscriptionId + '\'' +
-                ", channelId='" + channelId + '\'' +
-                ", author='" + author + '\'' +
-                ", subscriptionName='" + subscriptionName + '\'' +
-                '}';
-    }
 }

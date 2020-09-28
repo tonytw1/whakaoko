@@ -3,6 +3,7 @@ package uk.co.eelpieconsulting.feedlistener.twitter;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.when;
 
+import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -38,6 +39,7 @@ public class TwitterFeedItemMapperTest {
     public void canExtractTweetTextAsTitle() throws Exception {
         when(status.getUser()).thenReturn(user).thenReturn(user);
         when(status.getText()).thenReturn("Upto 140 characters of stuff");
+        when(status.getCreatedAt()).thenReturn(DateTime.now().toDate());
 
         FeedItem feedItem = new TwitterFeedItemMapper().createFeedItemFrom(status, twitterSubscription);
 
@@ -49,6 +51,7 @@ public class TwitterFeedItemMapperTest {
         when(status.getId()).thenReturn(439216399400304640L);
         when(user.getScreenName()).thenReturn("RowtownCmmnty");
         when(status.getUser()).thenReturn(user).thenReturn(user);
+        when(status.getCreatedAt()).thenReturn(DateTime.now().toDate());
 
         FeedItem feedItem = new TwitterFeedItemMapper().createFeedItemFrom(status, twitterSubscription);
 
@@ -58,6 +61,7 @@ public class TwitterFeedItemMapperTest {
     @Test
     public void canExtractUserScreenNameFromTweet() throws Exception {
         when(status.getUser()).thenReturn(user).thenReturn(user);
+        when(status.getCreatedAt()).thenReturn(DateTime.now().toDate());
 
         FeedItem feedItem = twitterFeedItemMapper.createFeedItemFrom(status, twitterSubscription);
 

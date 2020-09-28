@@ -1,5 +1,6 @@
 package uk.co.eelpieconsulting.feedlistener.controllers;
 
+import org.joda.time.DateTime;
 import org.junit.Test;
 import org.mockito.Mockito;
 import uk.co.eelpieconsulting.feedlistener.controllers.ui.SubscriptionLabelService;
@@ -14,7 +15,7 @@ public class FeedItemPopulatorTest {
     @Test
     public void canCorrectForExcessivelyEscapedInputFeeds() {
         final String incorrectlyEscapedHeadline = "St John&#39;s Bar, 5 Cable Street, Te Aro, Wellington";
-        FeedItem feedItem = new FeedItem(incorrectlyEscapedHeadline, null, null, null, null, null, null, null, null);
+        FeedItem feedItem = new FeedItem(incorrectlyEscapedHeadline, null, null, DateTime.now().toDate(), null, null, null, null, null);
 
         FeedItem fixed = new FeedItemPopulator(subscriptionLabelService).overlyUnescape(feedItem);
 

@@ -37,7 +37,7 @@ class FeedItemDAO @Autowired constructor(private val dataStoreFactory: DataStore
 
     fun add(feedItem: FeedItem): Boolean {
         return try {
-            val existingFeeditemFromSameSubscription = dataStoreFactory.get().find(FeedItem::class.java).filter(Filters.eq("url", feedItem.url), Filters.eq(SUBSCRIPTION_ID, feedItem.subscriptionId))
+            val existingFeeditemFromSameSubscription = dataStoreFactory.get().find(FeedItem::class.java).filter(Filters.eq("url", feedItem.url!!), Filters.eq(SUBSCRIPTION_ID, feedItem.subscriptionId))
             if (existingFeeditemFromSameSubscription.iterator().toList().isEmpty()) {    // TODO shouldn't need to read before every write - use an upsert?
                 log.info("Added: " + feedItem.subscriptionId + ", " + feedItem.title)
                 dataStoreFactory.get().save(feedItem)
