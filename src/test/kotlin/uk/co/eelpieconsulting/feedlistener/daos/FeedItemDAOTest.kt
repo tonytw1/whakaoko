@@ -19,16 +19,17 @@ class FeedItemDAOTest {
 
     @Test
     fun canFetchSubscriptionFeedItems() {
-            val subscription = testSubscription()
-            subscriptionsDAO.add(subscription);
+        val channel = Channel()
+        channel.id = UUID.randomUUID().toString()
+        val subscription = testSubscription(channel)
+        subscriptionsDAO.add(subscription);
 
-            val feedItem = testFeedItemFor(subscription)
-            feedItemDAO.add(feedItem);
+        val feedItem = testFeedItemFor(subscription)
+        feedItemDAO.add(feedItem);
 
-            val reloaded = feedItemDAO.getSubscriptionFeedItems(subscription, 1);
-            assertEquals(1, reloaded.totalCount);
-            assertEquals(feedItem.url, reloaded.feedsItems.first().url);
-
+        val reloaded = feedItemDAO.getSubscriptionFeedItems(subscription, 1);
+        assertEquals(1, reloaded.totalCount);
+        assertEquals(feedItem.url, reloaded.feedsItems.first().url);
     }
 
     @Test
@@ -50,10 +51,10 @@ class FeedItemDAOTest {
         assertEquals(2, reloaded.totalCount);
     }
 
-    private fun testSubscription(channel: Channel? = null): RssSubscription {
-        val subscription = RssSubscription();
+    private fun testSubscription(channel: Channel): RssSubscription {
+        val subscription = RssSubscription()
         subscription.id = UUID.randomUUID().toString()
-        subscription.channelId = channel?.id
+        subscription.channelId = channel.id
         return subscription
     }
 

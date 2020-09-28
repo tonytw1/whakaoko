@@ -13,9 +13,9 @@ abstract class Subscription {
     @Id
     var objectId: ObjectId? = null
 
-    var id: String? = null
+    lateinit var id: String
     var name: String? = null
-    var username: String? = null
+    lateinit var username: String
     var lastRead: Date? = null
     var latestItemDate: Date? = null
     var error: String? = null
@@ -23,6 +23,6 @@ abstract class Subscription {
     var httpStatus: Int? = null
 
     @Indexed
-    var channelId: String? = null
+    lateinit var channelId: String
 
 }

@@ -14,6 +14,8 @@ import twitter4j.User;
 import uk.co.eelpieconsulting.feedlistener.model.FeedItem;
 import uk.co.eelpieconsulting.feedlistener.model.TwitterTagSubscription;
 
+import java.util.UUID;
+
 public class TwitterFeedItemMapperTest {
 
     @Mock
@@ -22,7 +24,7 @@ public class TwitterFeedItemMapperTest {
     private User user;
 
     private TwitterFeedItemMapper twitterFeedItemMapper = new TwitterFeedItemMapper();
-    private TwitterTagSubscription twitterSubscription = new TwitterTagSubscription();
+    private TwitterTagSubscription twitterSubscription = new TwitterTagSubscription(UUID.randomUUID().toString(), "", "");
 
     @Before
     public void setup() {
