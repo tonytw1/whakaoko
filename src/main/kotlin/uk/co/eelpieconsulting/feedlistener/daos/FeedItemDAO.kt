@@ -43,7 +43,7 @@ class FeedItemDAO @Autowired constructor(private val dataStoreFactory: DataStore
                 dataStoreFactory.get().save(feedItem)
                 true
             } else {
-                log.info("Skipping previously added: " + feedItem.title)
+                log.debug("Skipping previously added: " + feedItem.title)
                 false
             }
         } catch (e: Exception) {
