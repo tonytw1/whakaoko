@@ -49,7 +49,7 @@ class FeedItemPopulator @Autowired constructor(val subscriptionLabelService: Sub
     }
 
     private fun geoTagged(feedItems: List<FeedItem>): List<FeedItem> {
-        return feedItems.filter { it.isGeoTagged }.toList()
+        return feedItems.filter { it.isGeoTagged() }.toList()
     }
 
 }

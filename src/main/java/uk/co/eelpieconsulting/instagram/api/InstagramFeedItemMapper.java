@@ -7,6 +7,8 @@ import org.json.JSONObject;
 import uk.co.eelpieconsulting.feedlistener.model.FeedItem;
 import uk.co.eelpieconsulting.feedlistener.model.Subscription;
 
+import java.util.UUID;
+
 public class InstagramFeedItemMapper {
 
     private final static Logger log = Logger.getLogger(InstagramFeedItemMapper.class);
@@ -60,7 +62,7 @@ public class InstagramFeedItemMapper {
             }
         }
 
-        return new FeedItem(caption, url, null, createdTime.toDate(), place, imageUrl, author, null, null);
+        return new FeedItem(caption, url, null, createdTime.toDate(), place, imageUrl, author, UUID.randomUUID().toString(), UUID.randomUUID().toString());
     }
 
 }

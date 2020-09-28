@@ -21,12 +21,17 @@ class RssFeedItemMapper @Autowired constructor(private val rssFeedItemImageExtra
 
     private val log = Logger.getLogger(RssFeedItemMapper::class.java)
 
-    fun createFeedItemFrom(syndEntry: SyndEntry, subscription: Subscription): FeedItem {
+    fun createFeedItemFrom(syndEntry: SyndEntry, subscription: Subscription): FeedItem? {
         val place = extractLocationFrom(syndEntry)
         val imageUrl = rssFeedItemImageExtractor.extractImageFrom(syndEntry)
         val body = HtmlCleaner().stripHtml(StringEscapeUtils.unescapeHtml(rssFeedItemBodyExtractor.extractBody(syndEntry)))
         val date = if (syndEntry.publishedDate != null) syndEntry.publishedDate else syndEntry.updatedDate
-        return FeedItem(syndEntry.title, extractUrl(syndEntry), body, date, place, imageUrl, null, subscription.id, subscription.channelId)
+        val url = extractUrl(syndEntry)
+        if (url != null) {
+            return FeedItem(syndEntry.title, url, body, date, place, imageUrl, null, subscription.id, subscription.channelId)
+        } else {
+            return null
+        }
     }
 
     private fun extractUrl(syndEntry: SyndEntry): String? {

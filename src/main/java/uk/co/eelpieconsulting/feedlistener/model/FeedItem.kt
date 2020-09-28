@@ -12,47 +12,52 @@ import java.util.*
 
 @Entity("feeditems")
 @Indexes(Index(fields = [Field(value = "date", type = IndexType.DESC), Field(value = "_id")]), Index(fields = [Field(value = "subscriptionId"), Field(value = "date", type = IndexType.DESC), Field(value = "_id")]))
-class FeedItem : Serializable, RssFeedable {
+class FeedItem : RssFeedable {
 
     @Id
     var objectId: ObjectId? = null
 
     var title: String? = null
-        private set
 
     @Indexed
-    var url: String? = null
+    lateinit var url: String
 
     var body: String? = null
-        private set
 
-    @Indexed(value = IndexDirection.DESC)
-    private lateinit var date: Date      // TODO unused - because always used with subscription id?
+    private lateinit var date: Date
     override fun getDate(): Date {
         return date
     }
 
     var place: Place? = null
-        private set
+
     private var imageUrl: String? = null
 
     @Indexed
-    var subscriptionId: String? = null
+    lateinit var subscriptionId: String
 
     @Indexed
-    var channelId: String? = null
+    lateinit var channelId: String
+
     private var author: String? = null
+    override fun getAuthor(): String {
+        return author.orEmpty()
+    }
 
     // Display only field
     @get:JsonIgnore
     var subscriptionName: String? = null
 
     constructor() {}
-    constructor(title: String?, url: String?, body: String?,
-                date: Date, place: Place?,
-                imageUrl: String?, author: String?,
-                subscriptionId: String?,
-                channelId: String?) {
+    constructor(title: String?,
+                url: String,
+                body: String?,
+                date: Date,
+                place: Place?,
+                imageUrl: String?,
+                author: String?,
+                subscriptionId: String,
+                channelId: String) {
         this.title = title
         this.url = url
         this.body = body
@@ -74,17 +79,11 @@ class FeedItem : Serializable, RssFeedable {
         } else null
     }
 
-    override fun getImageUrl(): String? {
-        return imageUrl
+    fun isGeoTagged(): Boolean {
+        return place != null
     }
 
-    val isGeoTagged: Boolean
-        get() = place != null
-
-    override fun getAuthor(): String? {
-        return author
-    }
-
+    // RSS interface methods
     @JsonIgnore
     override fun getDescription(): String? {
         return body
@@ -95,9 +94,13 @@ class FeedItem : Serializable, RssFeedable {
         return title
     }
 
+    override fun getImageUrl(): String? {
+        return imageUrl
+    }
+
     @JsonIgnore
     override fun getWebUrl(): String {
-        return url!!
+        return url
     }
 
 }

@@ -6,6 +6,8 @@ import org.mockito.Mockito;
 import uk.co.eelpieconsulting.feedlistener.controllers.ui.SubscriptionLabelService;
 import uk.co.eelpieconsulting.feedlistener.model.FeedItem;
 
+import java.util.UUID;
+
 import static org.junit.Assert.assertEquals;
 
 public class FeedItemPopulatorTest {
@@ -15,7 +17,8 @@ public class FeedItemPopulatorTest {
     @Test
     public void canCorrectForExcessivelyEscapedInputFeeds() {
         final String incorrectlyEscapedHeadline = "St John&#39;s Bar, 5 Cable Street, Te Aro, Wellington";
-        FeedItem feedItem = new FeedItem(incorrectlyEscapedHeadline, null, null, DateTime.now().toDate(), null, null, null, null, null);
+        FeedItem feedItem = new FeedItem(incorrectlyEscapedHeadline, "http://localhost", null, DateTime.now().toDate(), null, null, null,
+                UUID.randomUUID().toString(), UUID.randomUUID().toString());
 
         FeedItem fixed = new FeedItemPopulator(subscriptionLabelService).overlyUnescape(feedItem);
 

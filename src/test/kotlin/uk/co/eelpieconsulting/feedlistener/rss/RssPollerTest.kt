@@ -5,6 +5,7 @@ import org.joda.time.DateTime
 import org.junit.Assert.assertNull
 import org.junit.Test
 import uk.co.eelpieconsulting.feedlistener.model.FeedItem
+import java.util.*
 
 class RssPollerTest {
 
@@ -21,7 +22,8 @@ class RssPollerTest {
         val feedItemDates = listOf(recently, mostRecent, longAgo)
         val feedItems = feedItemDates.map { date ->
             // TODO this can be minimised when we move FeedItem to a Kotlin class
-            FeedItem("title", "url", "body", date!!.toDate(), null, null, null, null, null)
+            FeedItem("title", "url", "body", date!!.toDate(), null, null, null,
+                    UUID.randomUUID().toString(), UUID.randomUUID().toString())
         }
 
         val latestItemDate = feedItemLatestDateFinder.getLatestItemDate(feedItems)
