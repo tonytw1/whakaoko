@@ -37,7 +37,7 @@ class ChannelsUIController @Autowired constructor(val usersDAO: UsersDAO,
     ): ModelAndView? {
         fun userChannelPage(user: User): ModelAndView {
             val channel = channelsDAO.getById(user.username, id)
-            val subscriptionsForChannel = subscriptionsDAO.getSubscriptionsForChannel(channel.id!!, null)
+            val subscriptionsForChannel = subscriptionsDAO.getSubscriptionsForChannel(channel.id, null)
 
             val mv = ModelAndView("channel").
             addObject("user", user).

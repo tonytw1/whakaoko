@@ -8,12 +8,12 @@ import org.bson.types.ObjectId
 class Channel {
     @Id
     var objectId: ObjectId? = null
-    var id: String? = null
-    var name: String? = null
-    var username: String? = null
+    lateinit var id: String
+    lateinit var name: String
+    lateinit var username: String
 
     constructor() {}
-    constructor(id: String?, name: String?, username: String?) {
+    constructor(id: String, name: String, username: String) {
         this.id = id
         this.name = name
         this.username = username

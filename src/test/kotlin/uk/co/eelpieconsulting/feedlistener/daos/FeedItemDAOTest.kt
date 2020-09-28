@@ -46,7 +46,7 @@ class FeedItemDAOTest {
         val anotherFeedItem = testFeedItemFor(anotherSubscription)
         feedItemDAO.add(anotherFeedItem);
 
-        val reloaded = feedItemDAO.getChannelFeedItems(channelId = channel.id!!, 10, 1);
+        val reloaded = feedItemDAO.getChannelFeedItems(channelId = channel.id, 10, 1);
         assertEquals(2, reloaded.totalCount);
     }
 

@@ -46,7 +46,7 @@ class ChannelsController @Autowired constructor(val usersDAO: UsersDAO, val chan
     fun channelSubscriptions(@PathVariable username: String, @PathVariable id: String, @RequestParam(required = false) url: String?): ModelAndView? {
         usersDAO.getByUsername(username)
         val channel = channelsDAO.getById(username, id)
-        val subscriptionsForChannel = subscriptionsDAO.getSubscriptionsForChannel(channel.id!!, url)
+        val subscriptionsForChannel = subscriptionsDAO.getSubscriptionsForChannel(channel.id, url)
         return ModelAndView(viewFactory.getJsonView()).addObject("data", subscriptionsForChannel)
     }
 
@@ -71,7 +71,7 @@ class ChannelsController @Autowired constructor(val usersDAO: UsersDAO, val chan
     }
 
     @RequestMapping("/{username}/channels")
-    fun addChannel(@PathVariable username: String, @RequestParam name: String?): ModelAndView? {
+    fun addChannel(@PathVariable username: String, @RequestParam name: String): ModelAndView? {
         usersDAO.getByUsername(username)
         val newChannel = Channel(idBuilder.makeIdFor(name), name, username)
         channelsDAO.add(username, newChannel)
