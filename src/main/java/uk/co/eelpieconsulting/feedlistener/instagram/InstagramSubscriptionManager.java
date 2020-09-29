@@ -58,7 +58,7 @@ public class InstagramSubscriptionManager {
         return subscription;
     }
 
-    public void requestUnsubscribeFrom(long id) throws HttpNotFoundException, HttpBadRequestException, HttpForbiddenException, HttpFetchException {
+    public void requestUnsubscribeFrom(long id) throws HttpFetchException {
         log.info("Unsubscribing from instagram: " + id);
         instagramApi.deleteSubscription(id, credentialService.getInstagramClientId(), credentialService.getInstagramClientSecret());
     }

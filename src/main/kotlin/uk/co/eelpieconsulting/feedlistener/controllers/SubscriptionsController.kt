@@ -86,7 +86,7 @@ class SubscriptionsController @Autowired constructor(private val usersDAO: Users
                 return null
 
         feedItemDAO.deleteSubscriptionFeedItems(subscription)
-        subscriptionsDAO.delete(subscription)
+        subscriptionsDAO.delete(subscription)   // TODO not idempotent in this position
         val isTwitterSubscription = subscription.id.startsWith("twitter")   // TODO No magic values!
         if (isTwitterSubscription) {
             twitterListener.connect()

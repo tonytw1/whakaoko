@@ -2,14 +2,14 @@ package uk.co.eelpieconsulting.feedlistener.controllers
 
 import org.junit.Test
 import org.mockito.Mockito
-import org.mockito.Mockito.`when`
-import org.mockito.Mockito.verify
+import org.mockito.Mockito.*
 import uk.co.eelpieconsulting.common.views.ViewFactory
 import uk.co.eelpieconsulting.feedlistener.UrlBuilder
 import uk.co.eelpieconsulting.feedlistener.daos.FeedItemDAO
 import uk.co.eelpieconsulting.feedlistener.daos.SubscriptionsDAO
 import uk.co.eelpieconsulting.feedlistener.daos.UsersDAO
 import uk.co.eelpieconsulting.feedlistener.instagram.InstagramSubscriptionManager
+import uk.co.eelpieconsulting.feedlistener.model.InstagramTagSubscription
 import uk.co.eelpieconsulting.feedlistener.model.RssSubscription
 import uk.co.eelpieconsulting.feedlistener.rss.RssPoller
 import uk.co.eelpieconsulting.feedlistener.rss.RssSubscriptionManager
@@ -45,12 +45,35 @@ class SubscriptionsControllerTest {
 
     @Test
     fun reloadShouldImmediatelyRepollRSSSubscription() {
-        val subscription = RssSubscription("http://localhost/feed", "a-channel", "a-user");
+        val subscription = RssSubscription("http://localhost/feed", "a-channel", "a-user")
         `when`(subscriptionsDAO.getById(subscription.id)).thenReturn(subscription)
 
         subscriptionsController.reload("a-user", subscription.id);
 
         verify(rssPoller).run(subscription);
+    }
+
+    @Test
+    fun deletingASubscriptionShouldRemoveThatSubscriptionsFeedItems() {
+        val subscription = RssSubscription("http://localhost/feed", "a-channel", "a-user")
+        `when`(subscriptionsDAO.getById(subscription.id)).thenReturn(subscription)
+
+        subscriptionsController.deleteSubscription("a-user", subscription.id)
+
+        verify(feedItemDAO).deleteSubscriptionFeedItems(subscription)
+        verifyNoInteractions(instagramSubscriptionManager)
+        verifyNoInteractions(twitterSubscriptionManager)
+    }
+
+    @Test
+    fun deletingAnInstagramSubscriptionShouldtUnsubscribeFromInstagram() {
+        val instagramTagSubscription = InstagramTagSubscription("something", 123L, "", "");
+
+        `when`(subscriptionsDAO.getById(instagramTagSubscription.id)).thenReturn(instagramTagSubscription)
+
+        subscriptionsController.deleteSubscription("a-user", instagramTagSubscription.id)
+
+        verify(instagramSubscriptionManager).requestUnsubscribeFrom(instagramTagSubscription.subscriptionId)
     }
 
 }
