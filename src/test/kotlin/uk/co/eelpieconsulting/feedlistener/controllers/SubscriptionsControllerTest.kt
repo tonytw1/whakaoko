@@ -18,17 +18,17 @@ import uk.co.eelpieconsulting.feedlistener.twitter.TwitterSubscriptionManager
 
 class SubscriptionsControllerTest {
 
-    private val usersDAO = Mockito.mock(UsersDAO::class.java)
-    private val subscriptionsDAO = Mockito.mock(SubscriptionsDAO::class.java)
-    private val feedItemPopulator = Mockito.mock(FeedItemPopulator::class.java)
-    private val feedItemDAO = Mockito.mock(FeedItemDAO::class.java)
-    private val viewFactory = Mockito.mock(ViewFactory::class.java)
-    private val urlBuilder = Mockito.mock(UrlBuilder::class.java)
-    private val rssSubscriptionManager = Mockito.mock(RssSubscriptionManager::class.java)
-    private val rssPoller = Mockito.mock(RssPoller::class.java)
-    private val twitterSubscriptionManager = Mockito.mock(TwitterSubscriptionManager::class.java)
-    private val instagramSubscriptionManager = Mockito.mock(InstagramSubscriptionManager::class.java)
-    private val twitterListener = Mockito.mock(TwitterListener::class.java)
+    private val usersDAO = mock(UsersDAO::class.java)
+    private val subscriptionsDAO = mock(SubscriptionsDAO::class.java)
+    private val feedItemPopulator = mock(FeedItemPopulator::class.java)
+    private val feedItemDAO = mock(FeedItemDAO::class.java)
+    private val viewFactory = mock(ViewFactory::class.java)
+    private val urlBuilder = mock(UrlBuilder::class.java)
+    private val rssSubscriptionManager = mock(RssSubscriptionManager::class.java)
+    private val rssPoller = mock(RssPoller::class.java)
+    private val twitterSubscriptionManager = mock(TwitterSubscriptionManager::class.java)
+    private val instagramSubscriptionManager = mock(InstagramSubscriptionManager::class.java)
+    private val twitterListener = mock(TwitterListener::class.java)
 
     val subscriptionsController = SubscriptionsController(usersDAO,
             subscriptionsDAO,
@@ -66,7 +66,7 @@ class SubscriptionsControllerTest {
     }
 
     @Test
-    fun deletingAnInstagramSubscriptionShouldtUnsubscribeFromInstagram() {
+    fun deletingAnInstagramSubscriptionShouldUnsubscribeFromInstagram() {
         val instagramTagSubscription = InstagramTagSubscription("something", 123L, "", "");
 
         `when`(subscriptionsDAO.getById(instagramTagSubscription.id)).thenReturn(instagramTagSubscription)

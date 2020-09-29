@@ -85,16 +85,18 @@ class SubscriptionsController @Autowired constructor(private val usersDAO: Users
                 ?: // TODO 404
                 return null
 
+        when(subscription) {
+            is InstagramSubscription -> {
+                instagramSubscriptionManager.requestUnsubscribeFrom(subscription.subscriptionId)
+            }
+            is TwitterTagSubscription -> {
+                twitterListener.connect()
+            }
+        }
+
         feedItemDAO.deleteSubscriptionFeedItems(subscription)
-        subscriptionsDAO.delete(subscription)   // TODO not idempotent in this position
-        val isTwitterSubscription = subscription.id.startsWith("twitter")   // TODO No magic values!
-        if (isTwitterSubscription) {
-            twitterListener.connect()
-        }
-        val isInstagramSubscription = subscription.id.startsWith("instagram")
-        if (isInstagramSubscription) {
-            instagramSubscriptionManager.requestUnsubscribeFrom((subscription as InstagramSubscription).subscriptionId)
-        }
+        subscriptionsDAO.delete(subscription)
+
         return ModelAndView(viewFactory.getJsonView()).addObject("data", "ok")
     }
 
