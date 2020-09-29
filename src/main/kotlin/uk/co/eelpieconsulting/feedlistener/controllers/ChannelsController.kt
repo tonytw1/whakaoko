@@ -10,6 +10,7 @@ import org.springframework.web.servlet.ModelAndView
 import org.springframework.web.servlet.view.RedirectView
 import uk.co.eelpieconsulting.common.views.ViewFactory
 import uk.co.eelpieconsulting.feedlistener.IdBuilder
+import uk.co.eelpieconsulting.feedlistener.UnknownSubscriptionException
 import uk.co.eelpieconsulting.feedlistener.UrlBuilder
 import uk.co.eelpieconsulting.feedlistener.daos.ChannelsDAO
 import uk.co.eelpieconsulting.feedlistener.daos.FeedItemDAO
@@ -84,11 +85,20 @@ class ChannelsController @Autowired constructor(val usersDAO: UsersDAO, val chan
         while (before != null && before.isNotEmpty()) {
             before.forEach { i ->
                 val subscriptionId = i.subscriptionId;
-                val byId = subscriptionsDAO.getById(subscriptionId);
-                val channelId = byId.channelId
-                log.info(i.date)
-                i.channelId = channelId;
-                feedItemDAO.update(i)
+                if (subscriptionId != null) {
+                    try {
+                        val byId = subscriptionsDAO.getById(subscriptionId);
+                        val channelId = byId.channelId
+                        log.info(i.date)
+                        i.channelId = channelId;
+                        feedItemDAO.update(i)
+                    } catch (u: UnknownSubscriptionException) {
+                        log.warn("Uknown subscription: " + i.subscriptionId)
+                    }
+
+                } else {
+                    log.warn("Feed item with no subscription id: " + i.id)
+                }
             }
             val date = before.last().date
             before = feedItemDAO.before(date)

@@ -34,10 +34,10 @@ class FeedItem : RssFeedable {
     private var imageUrl: String? = null
 
     @Indexed
-    lateinit var subscriptionId: String
+    var subscriptionId: String? = null
 
     @Indexed
-    lateinit var channelId: String
+    var channelId: String? = null
 
     private var author: String? = null
     override fun getAuthor(): String {
@@ -56,8 +56,8 @@ class FeedItem : RssFeedable {
                 place: Place?,
                 imageUrl: String?,
                 author: String?,
-                subscriptionId: String,
-                channelId: String) {
+                subscriptionId: String?,
+                channelId: String?) {
         this.title = title
         this.url = url
         this.body = body
