@@ -35,7 +35,7 @@ class ChannelsUIController @Autowired constructor(val usersDAO: UsersDAO,
                 @RequestParam(required = false) page: Int?,
                 @RequestParam(required = false) q: String?
     ): ModelAndView? {
-        fun userChannelPage(user: User): ModelAndView {
+        fun userChannelPage(user: User): ModelAndView? {
             val channel = channelsDAO.getById(id)
             if (channel != null) {
                 val subscriptionsForChannel = subscriptionsDAO.getSubscriptionsForChannel(channel.id, null)
@@ -55,8 +55,9 @@ class ChannelsUIController @Autowired constructor(val usersDAO: UsersDAO,
                     mv.addObject("subscriptionCounts", subscriptionCounts)
                 }
                 return mv
+
             } else {
-                throw RuntimeException()    // TODO 404
+                return null
             }
         }
 

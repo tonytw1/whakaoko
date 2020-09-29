@@ -34,11 +34,8 @@ class SubscriptionsUIController @Autowired constructor(val usersDAO: UsersDAO, v
 
     @GetMapping("/ui/subscriptions/{id}")
     fun subscription(@PathVariable id: String?, @RequestParam(required = false) page: Int?): ModelAndView? {
-        fun meh(user: User): ModelAndView {
-            val subscription = subscriptionsDAO.getById(id)
-            if (subscription == null) {
-                throw RuntimeException() // TOOD 404
-            }
+        fun meh(user: User): ModelAndView? {
+            val subscription = subscriptionsDAO.getById(id) ?: return null
 
             val subscriptionChannel = channelsDAO.getById(subscription.channelId)
             val feedItemsResult = feedItemDAO.getSubscriptionFeedItems(subscription, page)

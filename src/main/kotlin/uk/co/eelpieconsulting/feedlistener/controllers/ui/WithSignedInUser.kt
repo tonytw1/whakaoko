@@ -9,11 +9,16 @@ abstract class WithSignedInUser(val currentUserService: CurrentUserService) {
 
     private val log = Logger.getLogger(WithSignedInUser::class.java)
 
-    fun forCurrentUser(handler: (User) -> ModelAndView): ModelAndView? {
+    fun forCurrentUser(handler: (User) -> ModelAndView?): ModelAndView? {
         val user = currentUserService.getCurrentUserUser()
         if (user != null) {
             log.info("Generating page for user: " + user)
-            return handler(user).addObject("user", user)
+            val mv = handler(user)
+            if (mv != null) {
+                return mv.addObject("user", user)
+            } else {
+                return null // TODO 404
+            }
 
         } else {
             log.info("No signed in user; redirecting to sign in.")
