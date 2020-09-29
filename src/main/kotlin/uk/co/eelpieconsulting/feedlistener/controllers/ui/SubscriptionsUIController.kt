@@ -12,6 +12,7 @@ import uk.co.eelpieconsulting.feedlistener.daos.FeedItemDAO
 import uk.co.eelpieconsulting.feedlistener.daos.SubscriptionsDAO
 import uk.co.eelpieconsulting.feedlistener.daos.UsersDAO
 import uk.co.eelpieconsulting.feedlistener.model.User
+import java.lang.RuntimeException
 
 @Controller
 class SubscriptionsUIController @Autowired constructor(val usersDAO: UsersDAO, val channelsDAO: ChannelsDAO,
@@ -35,7 +36,9 @@ class SubscriptionsUIController @Autowired constructor(val usersDAO: UsersDAO, v
     fun subscription(@PathVariable id: String?, @RequestParam(required = false) page: Int?): ModelAndView? {
         fun meh(user: User): ModelAndView {
             val subscription = subscriptionsDAO.getById(id)
-                    ?: throw RuntimeException("Invalid subscription")
+            if (subscription == null) {
+                throw RuntimeException(); // TOOD 404
+            }
 
             val channel = if (user.username != null && subscription.channelId != null) {
                 channelsDAO.getById(subscription.username, subscription.channelId)

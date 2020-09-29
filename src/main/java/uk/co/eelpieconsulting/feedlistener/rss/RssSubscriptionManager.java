@@ -12,7 +12,7 @@ import uk.co.eelpieconsulting.feedlistener.model.Subscription;
 @Component
 public class RssSubscriptionManager {
 	
-	private static Logger log = Logger.getLogger(RssSubscriptionManager.class);
+	private static final Logger log = Logger.getLogger(RssSubscriptionManager.class);
 	
 	private final SubscriptionsDAO subscriptionsDAO;
 	
@@ -24,12 +24,10 @@ public class RssSubscriptionManager {
 	public RssSubscription requestFeedSubscription(String url, String channel, String username) {
 		log.info("Requesting subscription to feed: " + url);
 		final RssSubscription newSubscription = new RssSubscription(url, channel, username);
-		
 		if (subscriptionsDAO.subscriptionExists(newSubscription.getId())) {
-			try {
-				return (RssSubscription) subscriptionsDAO.getById(newSubscription.getId());
-			} catch (UnknownSubscriptionException e) {
-				return newSubscription;
+			RssSubscription existingSubscription = subscriptionsDAO.getByRssSubscriptionById(newSubscription.getId());
+			if (existingSubscription != null) {
+				return existingSubscription;
 			}
 		}
 		return newSubscription;

@@ -46,26 +46,37 @@ class SubscriptionsController @Autowired constructor(private val usersDAO: Users
                           @RequestParam(required = false) format: String?,
                           response: HttpServletResponse): ModelAndView? {
         usersDAO.getByUsername(username)
+
         val subscription = subscriptionsDAO.getById(id)
-        var mv = ModelAndView(viewFactory.getJsonView())
-        if (!Strings.isNullOrEmpty(format) && format == "rss") {
-            val title = if (!Strings.isNullOrEmpty(subscription.name)) subscription.name else subscription.id
-            mv = ModelAndView(viewFactory.getRssView(title, urlBuilder.getSubscriptionUrl(subscription), ""))
+        if (subscription != null) {
+            var mv = ModelAndView(viewFactory.getJsonView())
+            if (!Strings.isNullOrEmpty(format) && format == "rss") {
+                val title = if (!Strings.isNullOrEmpty(subscription.name)) subscription.name else subscription.id
+                mv = ModelAndView(viewFactory.getRssView(title, urlBuilder.getSubscriptionUrl(subscription), ""))
+            }
+            val feedItemsResult = feedItemDAO.getSubscriptionFeedItems(subscription, page)
+            feedItemPopulator.populateFeedItems(feedItemsResult, mv, "data")
+            response.addHeader(X_TOTAL_COUNT, java.lang.Long.toString(feedItemsResult.totalCount))
+            return mv
+
+        } else {
+            return null  // TODO 404
         }
-        val feedItemsResult = feedItemDAO.getSubscriptionFeedItems(subscription, page)
-        feedItemPopulator.populateFeedItems(feedItemsResult, mv, "data")
-        response.addHeader(X_TOTAL_COUNT, java.lang.Long.toString(feedItemsResult.totalCount))
-        return mv
     }
 
     @Timed(timingNotes = "")
     @GetMapping("/{username}/subscriptions/{id}/read")
     fun reload(@PathVariable username: String, @PathVariable id: String): ModelAndView? {
         usersDAO.getByUsername(username)
-        val subscription = subscriptionsDAO.getById(id) as RssSubscription
-        log.info("Requesting reload of subscription: " + subscription.name + " / " + subscription.url)
-        rssPoller.run(subscription)
-        return ModelAndView(viewFactory.getJsonView()).addObject("data", "ok")
+        val subscription = subscriptionsDAO.getByRssSubscriptionById(id)
+        if (subscription != null) {
+            log.info("Requesting reload of subscription: " + subscription.name + " / " + subscription.url)
+            rssPoller.run(subscription)
+            return ModelAndView(viewFactory.getJsonView()).addObject("data", "ok")
+
+        } else {
+            return null // TODO 404
+        }
     }
 
     @Timed(timingNotes = "")
@@ -74,7 +85,11 @@ class SubscriptionsController @Autowired constructor(private val usersDAO: Users
                          @RequestParam(required = false) page: Int?): ModelAndView? {
         usersDAO.getByUsername(username)
         val subscription = subscriptionsDAO.getById(id)
-        return ModelAndView(viewFactory.getJsonView()).addObject("data", subscription)
+        if (subscription != null) {
+            return ModelAndView(viewFactory.getJsonView()).addObject("data", subscription)
+        } else {
+            return null  // TODO 404
+        }
     }
 
     @Timed(timingNotes = "")
@@ -82,8 +97,9 @@ class SubscriptionsController @Autowired constructor(private val usersDAO: Users
     fun deleteSubscription(@PathVariable username: String, @PathVariable id: String): ModelAndView? {
         usersDAO.getByUsername(username)
         val subscription = subscriptionsDAO.getById(id)
-                ?: // TODO 404
-                return null
+        if (subscription == null) {
+            return null // TODO 404
+        }
 
         when(subscription) {
             is InstagramSubscription -> {

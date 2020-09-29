@@ -1,7 +1,6 @@
 package uk.co.eelpieconsulting.feedlistener.controllers
 
 import org.junit.Test
-import org.mockito.Mockito
 import org.mockito.Mockito.*
 import uk.co.eelpieconsulting.common.views.ViewFactory
 import uk.co.eelpieconsulting.feedlistener.UrlBuilder
@@ -46,11 +45,11 @@ class SubscriptionsControllerTest {
     @Test
     fun reloadShouldImmediatelyRepollRSSSubscription() {
         val subscription = RssSubscription("http://localhost/feed", "a-channel", "a-user")
-        `when`(subscriptionsDAO.getById(subscription.id)).thenReturn(subscription)
+        `when`(subscriptionsDAO.getByRssSubscriptionById(subscription.id)).thenReturn(subscription)
 
-        subscriptionsController.reload("a-user", subscription.id);
+        subscriptionsController.reload("a-user", subscription.id)
 
-        verify(rssPoller).run(subscription);
+        verify(rssPoller).run(subscription)
     }
 
     @Test
@@ -67,7 +66,7 @@ class SubscriptionsControllerTest {
 
     @Test
     fun deletingAnInstagramSubscriptionShouldUnsubscribeFromInstagram() {
-        val instagramTagSubscription = InstagramTagSubscription("something", 123L, "", "");
+        val instagramTagSubscription = InstagramTagSubscription("something", 123L, "", "")
 
         `when`(subscriptionsDAO.getById(instagramTagSubscription.id)).thenReturn(instagramTagSubscription)
 

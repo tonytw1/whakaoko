@@ -53,27 +53,15 @@ class SubscriptionsDAO @Autowired constructor(private val dataStoreFactory: Data
         }
     }
 
-    @Throws(UnknownSubscriptionException::class)
-    fun getById(id: String?): Subscription {
-        return try {
-            val subscription = dataStoreFactory.get().find(Subscription::class.java).filter(Filters.eq("id", id)).first()
-            if (subscription == null) {
-                log.info("Subscription not found")
-                throw UnknownSubscriptionException()
-            }
-            subscription
-        } catch (e: MongoException) {
-            throw RuntimeException(e)
-        }
+    fun getById(id: String?): Subscription? {
+        return dataStoreFactory.get().find(Subscription::class.java).filter(Filters.eq("id", id)).first()
     }
 
+    fun getByRssSubscriptionById(id: String?): RssSubscription? {
+        return dataStoreFactory.get().find(RssSubscription::class.java).filter(Filters.eq("id", id)).first()
+    }
     fun subscriptionExists(id: String?): Boolean {
-        return try {
-            getById(id)
-            true
-        } catch (e: UnknownSubscriptionException) {
-            false
-        }
+        return getById(id) != null
     }
 
     @Throws(MongoException::class)
