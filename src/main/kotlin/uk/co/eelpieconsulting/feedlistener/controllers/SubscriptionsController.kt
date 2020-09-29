@@ -23,12 +23,17 @@ import uk.co.eelpieconsulting.feedlistener.twitter.TwitterSubscriptionManager
 import javax.servlet.http.HttpServletResponse
 
 @Controller
-class SubscriptionsController @Autowired constructor(val usersDAO: UsersDAO, val subscriptionsDAO: SubscriptionsDAO,
-                                                     val feedItemPopulator: FeedItemPopulator, val feedItemDAO: FeedItemDAO, val viewFactory: ViewFactory,
-                                                     val urlBuilder: UrlBuilder, val rssSubscriptionManager: RssSubscriptionManager,
-                                                     val rssPoller: RssPoller,
-                                                     val twitterSubscriptionManager: TwitterSubscriptionManager,
-                                                     val instagramSubscriptionManager: InstagramSubscriptionManager, val twitterListener: TwitterListener) {
+class SubscriptionsController @Autowired constructor(private val usersDAO: UsersDAO,
+                                                     private val subscriptionsDAO: SubscriptionsDAO,
+                                                     private val feedItemPopulator: FeedItemPopulator,
+                                                     private val feedItemDAO: FeedItemDAO,
+                                                     private val viewFactory: ViewFactory,
+                                                     private val urlBuilder: UrlBuilder,
+                                                     private val rssSubscriptionManager: RssSubscriptionManager,
+                                                     private val rssPoller: RssPoller,
+                                                     private val twitterSubscriptionManager: TwitterSubscriptionManager,
+                                                     private val instagramSubscriptionManager: InstagramSubscriptionManager,
+                                                     private val twitterListener: TwitterListener) {
 
     private val log = Logger.getLogger(ChannelsController::class.java)
 
@@ -97,8 +102,7 @@ class SubscriptionsController @Autowired constructor(val usersDAO: UsersDAO, val
     @RequestMapping(value = ["/{username}/subscriptions"], method = [RequestMethod.GET])
     fun subscriptions(@PathVariable username: String, @RequestParam(required = false) url: String?): ModelAndView? {
         usersDAO.getByUsername(username)
-        return ModelAndView(viewFactory.getJsonView()).
-        addObject("data", subscriptionsDAO.getSubscriptions(SubscriptionsDAO.LATEST_ITEM_DATE_DESCENDING, url))
+        return ModelAndView(viewFactory.getJsonView()).addObject("data", subscriptionsDAO.getSubscriptions(SubscriptionsDAO.LATEST_ITEM_DATE_DESCENDING, url))
     }
 
     @Timed(timingNotes = "")
