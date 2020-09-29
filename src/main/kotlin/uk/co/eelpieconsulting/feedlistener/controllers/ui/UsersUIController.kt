@@ -16,7 +16,7 @@ class UsersUIController @Autowired constructor(val channelsDAO: ChannelsDAO,
                                                response: HttpServletResponse) : WithSignedInUser(currentUserService, response) {
 
     @GetMapping("/ui/newuser")
-    fun newUser(): ModelAndView? {
+    fun newUser(): ModelAndView {
         return ModelAndView("newUser")
     }
 
