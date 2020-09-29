@@ -37,21 +37,17 @@ class SubscriptionsUIController @Autowired constructor(val usersDAO: UsersDAO, v
         fun meh(user: User): ModelAndView {
             val subscription = subscriptionsDAO.getById(id)
             if (subscription == null) {
-                throw RuntimeException(); // TOOD 404
+                throw RuntimeException() // TOOD 404
             }
 
-            val channel = if (user.username != null && subscription.channelId != null) {
-                channelsDAO.getById(subscription.username, subscription.channelId)
-            } else {
-                null
-            }
-
+            val subscriptionChannel = channelsDAO.getById(subscription.channelId)
             val feedItemsResult = feedItemDAO.getSubscriptionFeedItems(subscription, page)
 
             val mv = ModelAndView("subscription")
             feedItemPopulator.populateFeedItems(feedItemsResult, mv, "feedItems")
             mv.addObject("user", user)
-                    .addObject("channel", channel).addObject("subscription", subscription)
+                    .addObject("channel", subscriptionChannel)
+                    .addObject("subscription", subscription)
             return mv
         }
 

@@ -40,16 +40,20 @@ class ChannelsController @Autowired constructor(val usersDAO: UsersDAO, val chan
     @GetMapping("/{username}/channels/{id}")
     fun channel(@PathVariable username: String, @PathVariable id: String): ModelAndView? {
         usersDAO.getByUsername(username)
-        val channel = channelsDAO.getById(username, id)
+        val channel = channelsDAO.getById(id)
         return ModelAndView(viewFactory.getJsonView()).addObject("data", channel)
     }
 
     @GetMapping("/{username}/channels/{id}/subscriptions")
     fun channelSubscriptions(@PathVariable username: String, @PathVariable id: String, @RequestParam(required = false) url: String?): ModelAndView? {
         usersDAO.getByUsername(username)
-        val channel = channelsDAO.getById(username, id)
-        val subscriptionsForChannel = subscriptionsDAO.getSubscriptionsForChannel(channel.id, url)
-        return ModelAndView(viewFactory.getJsonView()).addObject("data", subscriptionsForChannel)
+        val channel = channelsDAO.getById(id)
+        if (channel != null) {
+            val subscriptionsForChannel = subscriptionsDAO.getSubscriptionsForChannel(channel.id, url)
+            return ModelAndView(viewFactory.getJsonView()).addObject("data", subscriptionsForChannel)
+        } else {
+            return null // TODO 404
+        }
     }
 
     @GetMapping("/{username}/channels/{id}/items")
@@ -60,16 +64,21 @@ class ChannelsController @Autowired constructor(val usersDAO: UsersDAO, val chan
                     @RequestParam(required = false) q: String?,
                     response: HttpServletResponse): ModelAndView? {
         usersDAO.getByUsername(username)
-        val channel = channelsDAO.getById(username, id)
-        var mv = ModelAndView(viewFactory.getJsonView())
-        if (!Strings.isNullOrEmpty(format) && format == "rss") {    // TODO view factory could do this?
-            mv = ModelAndView(viewFactory.getRssView(channel.name, urlBuilder.getChannelUrl(channel), ""))
+
+        val channel = channelsDAO.getById(id)
+        if (channel != null) {
+            var mv = ModelAndView(viewFactory.getJsonView())
+            if (!Strings.isNullOrEmpty(format) && format == "rss") {    // TODO view factory could do this?
+                mv = ModelAndView(viewFactory.getRssView(channel.name, urlBuilder.getChannelUrl(channel), ""))
+            }
+            val results = feedItemDAO.getChannelFeedItemsResult(channel, page, q, pageSize)
+            feedItemPopulator.populateFeedItems(results, mv, "data")
+            val totalCount = results.totalCount
+            response.addHeader(X_TOTAL_COUNT, java.lang.Long.toString(totalCount))
+            return mv
+        } else {
+            return null // TODO 404
         }
-        val results = feedItemDAO.getChannelFeedItemsResult(channel, page, q, pageSize)
-        feedItemPopulator.populateFeedItems(results, mv, "data")
-        val totalCount = results.totalCount
-        response.addHeader(X_TOTAL_COUNT, java.lang.Long.toString(totalCount))
-        return mv
     }
 
     @RequestMapping("/{username}/channels")

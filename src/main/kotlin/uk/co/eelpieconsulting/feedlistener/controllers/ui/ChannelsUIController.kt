@@ -31,32 +31,33 @@ class ChannelsUIController @Autowired constructor(val usersDAO: UsersDAO,
 
 
     @GetMapping("/ui/channels/{id}")
-    fun channel(@PathVariable id: String?,
+    fun channel(@PathVariable id: String,
                 @RequestParam(required = false) page: Int?,
                 @RequestParam(required = false) q: String?
     ): ModelAndView? {
         fun userChannelPage(user: User): ModelAndView {
-            val channel = channelsDAO.getById(user.username, id)
-            val subscriptionsForChannel = subscriptionsDAO.getSubscriptionsForChannel(channel.id, null)
+            val channel = channelsDAO.getById(id)
+            if (channel != null) {
+                val subscriptionsForChannel = subscriptionsDAO.getSubscriptionsForChannel(channel.id, null)
 
-            val mv = ModelAndView("channel").
-            addObject("user", user).
-            addObject("channel", channel).
-            addObject("subscriptions", subscriptionsForChannel)
+                val mv = ModelAndView("channel").addObject("user", user).addObject("channel", channel).addObject("subscriptions", subscriptionsForChannel)
 
-            if (!subscriptionsForChannel.isEmpty()) {
-                val results = feedItemDAO.getChannelFeedItemsResult(channel, page, q, null)
-                feedItemPopulator.populateFeedItems(results, mv, "inbox")
+                if (!subscriptionsForChannel.isEmpty()) {
+                    val results = feedItemDAO.getChannelFeedItemsResult(channel, page, q, null)
+                    feedItemPopulator.populateFeedItems(results, mv, "inbox")
 
-                val subscriptionCounts = subscriptionsForChannel.map { subscription ->
-                    // TODO slow on channels with many subscriptions - cache or index?
-                    val subscriptionFeedItemsCount = feedItemDAO.getSubscriptionFeedItemsCount(subscription.id!!)
-                    Pair(subscription.id, subscriptionFeedItemsCount)
-                }.toMap()
+                    val subscriptionCounts = subscriptionsForChannel.map { subscription ->
+                        // TODO slow on channels with many subscriptions - cache or index?
+                        val subscriptionFeedItemsCount = feedItemDAO.getSubscriptionFeedItemsCount(subscription.id)
+                        Pair(subscription.id, subscriptionFeedItemsCount)
+                    }.toMap()
 
-                mv.addObject("subscriptionCounts", subscriptionCounts)
+                    mv.addObject("subscriptionCounts", subscriptionCounts)
+                }
+                return mv
+            } else {
+                throw RuntimeException()    // TODO 404
             }
-            return mv
         }
 
         return forCurrentUser(::userChannelPage)

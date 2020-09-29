@@ -21,12 +21,8 @@ class ChannelsDAO @Autowired constructor(val dataStoreFactory: DataStoreFactory)
         }
     }
 
-    fun getById(username: String?, id: String?): Channel {
-        return try {
-            dataStoreFactory.get().find<Channel>(Channel::class.java).filter(Filters.eq("id", id), Filters.eq("username", username)).first()
-        } catch (e: MongoException) {
-            throw RuntimeException(e)   // TODO
-        }
+    fun getById(id: String): Channel? {
+        return dataStoreFactory.get().find<Channel>(Channel::class.java).filter(Filters.eq("id", id)).first()
     }
 
     @Synchronized
