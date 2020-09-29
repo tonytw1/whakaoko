@@ -22,7 +22,7 @@ class RssPollerTest {
         val feedItemDates = listOf(recently, mostRecent, longAgo)
         val feedItems = feedItemDates.map { date ->
             // TODO this can be minimised when we move FeedItem to a Kotlin class
-            FeedItem("title", "url", "body", date!!.toDate(), null, null, null,
+            FeedItem("title", "url", "body", date.toDate(), null, null, null,
                     UUID.randomUUID().toString(), UUID.randomUUID().toString())
         }
 

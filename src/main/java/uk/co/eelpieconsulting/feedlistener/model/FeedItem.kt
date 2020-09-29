@@ -2,12 +2,10 @@ package uk.co.eelpieconsulting.feedlistener.model
 
 import com.fasterxml.jackson.annotation.JsonIgnore
 import dev.morphia.annotations.*
-import dev.morphia.utils.IndexDirection
 import dev.morphia.utils.IndexType
 import org.bson.types.ObjectId
 import uk.co.eelpieconsulting.common.geo.model.LatLong
 import uk.co.eelpieconsulting.common.views.rss.RssFeedable
-import java.io.Serializable
 import java.util.*
 
 @Entity("feeditems")
@@ -34,10 +32,10 @@ class FeedItem : RssFeedable {
     private var imageUrl: String? = null
 
     @Indexed
-    var subscriptionId: String? = null
+    lateinit var subscriptionId: String
 
     @Indexed
-    var channelId: String? = null
+    lateinit var channelId: String
 
     private var author: String? = null
     override fun getAuthor(): String {
@@ -56,8 +54,8 @@ class FeedItem : RssFeedable {
                 place: Place?,
                 imageUrl: String?,
                 author: String?,
-                subscriptionId: String?,
-                channelId: String?) {
+                subscriptionId: String,
+                channelId: String) {
         this.title = title
         this.url = url
         this.body = body
