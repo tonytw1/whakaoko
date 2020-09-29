@@ -12,6 +12,7 @@ import uk.co.eelpieconsulting.feedlistener.daos.FeedItemDAO
 import uk.co.eelpieconsulting.feedlistener.daos.SubscriptionsDAO
 import uk.co.eelpieconsulting.feedlistener.daos.UsersDAO
 import uk.co.eelpieconsulting.feedlistener.model.User
+import javax.servlet.http.HttpServletResponse
 
 @Controller
 class ChannelsUIController @Autowired constructor(val usersDAO: UsersDAO,
@@ -19,7 +20,8 @@ class ChannelsUIController @Autowired constructor(val usersDAO: UsersDAO,
                                                   val feedItemPopulator: FeedItemPopulator,
                                                   val channelsDAO: ChannelsDAO,
                                                   val feedItemDAO: FeedItemDAO,
-                                                  currentUserService: CurrentUserService) : WithSignedInUser(currentUserService) {
+                                                  currentUserService: CurrentUserService,
+                                                  response: HttpServletResponse) : WithSignedInUser(currentUserService, response) {
 
     @GetMapping("/ui/channels/new")
     fun newChannelForm(): ModelAndView? {

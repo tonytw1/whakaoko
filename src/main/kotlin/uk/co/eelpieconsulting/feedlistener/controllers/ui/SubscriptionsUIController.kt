@@ -13,13 +13,15 @@ import uk.co.eelpieconsulting.feedlistener.daos.SubscriptionsDAO
 import uk.co.eelpieconsulting.feedlistener.daos.UsersDAO
 import uk.co.eelpieconsulting.feedlistener.model.User
 import java.lang.RuntimeException
+import javax.servlet.http.HttpServletResponse
 
 @Controller
 class SubscriptionsUIController @Autowired constructor(val usersDAO: UsersDAO, val channelsDAO: ChannelsDAO,
                                                        val subscriptionsDAO: SubscriptionsDAO,
                                                        val feedItemDAO: FeedItemDAO,
                                                        val feedItemPopulator: FeedItemPopulator,
-                                                       currentUserService: CurrentUserService) : WithSignedInUser(currentUserService) {
+                                                       currentUserService: CurrentUserService,
+                                                       response: HttpServletResponse) : WithSignedInUser(currentUserService, response) {
 
     @GetMapping("/ui/subscriptions/new")
     fun newSubscriptionForm(): ModelAndView? {

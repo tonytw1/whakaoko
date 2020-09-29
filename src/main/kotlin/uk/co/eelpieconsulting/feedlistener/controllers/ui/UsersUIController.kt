@@ -7,11 +7,13 @@ import org.springframework.web.servlet.ModelAndView
 import uk.co.eelpieconsulting.feedlistener.credentials.CredentialService
 import uk.co.eelpieconsulting.feedlistener.daos.ChannelsDAO
 import uk.co.eelpieconsulting.feedlistener.model.User
+import javax.servlet.http.HttpServletResponse
 
 @Controller
 class UsersUIController @Autowired constructor(val channelsDAO: ChannelsDAO,
                                                val credentialService: CredentialService,
-                                               currentUserService: CurrentUserService) : WithSignedInUser(currentUserService) {
+                                               currentUserService: CurrentUserService,
+                                               response: HttpServletResponse) : WithSignedInUser(currentUserService, response) {
 
     @GetMapping("/ui/newuser")
     fun newUser(): ModelAndView? {
@@ -26,7 +28,6 @@ class UsersUIController @Autowired constructor(val channelsDAO: ChannelsDAO,
             addObject("instagramCredentials", credentialService.hasInstagramAccessToken(user.username)).
             addObject("twitterCredentials", credentialService.hasTwitterAccessToken(user.username))
         }
-
         return forCurrentUser(::usersHomepage)
     }
 

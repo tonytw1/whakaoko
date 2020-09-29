@@ -1,11 +1,14 @@
 package uk.co.eelpieconsulting.feedlistener.controllers.ui
 
 import org.apache.log4j.Logger
+import org.springframework.http.HttpStatus
 import org.springframework.web.servlet.ModelAndView
 import org.springframework.web.servlet.view.RedirectView
 import uk.co.eelpieconsulting.feedlistener.model.User
+import javax.servlet.http.HttpServletResponse
 
-abstract class WithSignedInUser(val currentUserService: CurrentUserService) {
+
+abstract class WithSignedInUser(val currentUserService: CurrentUserService, val response: HttpServletResponse) {
 
     private val log = Logger.getLogger(WithSignedInUser::class.java)
 
@@ -17,7 +20,8 @@ abstract class WithSignedInUser(val currentUserService: CurrentUserService) {
             if (mv != null) {
                 return mv.addObject("user", user)
             } else {
-                return null // TODO 404
+                response.sendError(HttpStatus.NOT_FOUND.value())
+                return null
             }
 
         } else {
