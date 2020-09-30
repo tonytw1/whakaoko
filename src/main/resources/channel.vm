@@ -13,7 +13,7 @@
 	<ul>
  	#foreach($subscription in $subscriptions) 
  		<li><a href="$urlBuilder.getSubscriptionUrl($subscription)">#if($subscription.name)$subscription.name#else$subscription.url#end</a> 
- 		#if($subscriptionCounts.get($subscription.id) > 0) ($subscriptionCounts.get($subscription.id))#end
+ 		#if($subscription.itemCount > 0) ($subscription.itemCount)#end
  		#if($subscription.latestItemDate)
 	 		<br/>
 	 		<span title="$subscription.latestItemDate">$dateFormatter.timeSince($subscription.latestItemDate)

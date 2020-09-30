@@ -89,8 +89,12 @@ class RssPoller @Autowired constructor(val subscriptionsDAO: SubscriptionsDAO, v
                         }
                         persistFeedItems(fetchedFeed.feedItems)
 
+                        // TODO needs to be a common concern with all subscriptions types; ie Twitter etc
+                        val itemCount = feedItemDAO.getSubscriptionFeedItemsCount(subscription.id)
                         val latestItemDate = feedItemLatestDateFinder.getLatestItemDate(fetchedFeed.feedItems)
+
                         subscription.name = fetchedFeed.feedName
+                        subscription.itemCount = itemCount
                         subscription.latestItemDate = latestItemDate
                         subscription.etag = fetchedFeed.etag
                         subscription.httpStatus = fetchedFeed.httpStatus
