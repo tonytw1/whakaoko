@@ -26,27 +26,27 @@ public class UrlBuilder {
 	}
 	
 	public String getSubscriptionUrl(Subscription subscription) {
-		return getBaseUrl() + "/ui/" + "/subscriptions/" + subscription.getId();
+		return getBaseUrl() + "/ui/subscriptions/" + subscription.getId();
 	}
 	
 	public String getSubscriptionUrl(String subscriptionId) {
-		return getBaseUrl() + "/ui/" + "/subscriptions/" + subscriptionId;
+		return getBaseUrl() + "/ui/subscriptions/" + subscriptionId;
 	}
 	
 	public String getDeleteSubscriptionUrl(Subscription subscription) {
-		return getBaseUrl() + "/" + subscription.getUsername() + "/subscriptions/" + subscription.getId() + "/delete";
+		return getBaseUrl() + "/subscriptions/" + subscription.getId() + "/delete";
 	}
 
 	public String getReadSubscriptionUrl(Subscription subscription) {
 		return getBaseUrl() + "/" + subscription.getUsername() + "/subscriptions/" + subscription.getId() + "/read";
 	}
 	
-	public String getSubscriptionItemsUrl(String username, String subscriptionId) {
-		return getBaseUrl() + "/" + username + "/subscriptions/" + subscriptionId;
+	public String getSubscriptionItemsUrl(String subscriptionId) {
+		return getBaseUrl() + "/subscriptions/" + subscriptionId;
 	}
 	
-	public String getChannelItemsUrl(String username, String channelId) {
-		return getBaseUrl() + "/" + username + "/channels/" + channelId;
+	public String getChannelItemsUrl(String channelId) {
+		return getBaseUrl() + "/channels/" + channelId;
 	}
 	
 	public String getChannelUrl(Channel channel) {

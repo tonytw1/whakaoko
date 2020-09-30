@@ -37,16 +37,15 @@ class ChannelsController @Autowired constructor(val usersDAO: UsersDAO, val chan
         return ModelAndView(viewFactory.getJsonView()).addObject("data", channelsDAO.getChannels(username))
     }
 
-    @GetMapping("/{username}/channels/{id}")
+    @GetMapping("/channels/{id}")
     fun channel(@PathVariable username: String, @PathVariable id: String): ModelAndView? {
         usersDAO.getByUsername(username)
         val channel = channelsDAO.getById(id)
         return ModelAndView(viewFactory.getJsonView()).addObject("data", channel)
     }
 
-    @GetMapping("/{username}/channels/{id}/subscriptions")
-    fun channelSubscriptions(@PathVariable username: String, @PathVariable id: String, @RequestParam(required = false) url: String?): ModelAndView? {
-        usersDAO.getByUsername(username)
+    @GetMapping("/channels/{id}/subscriptions")
+    fun channelSubscriptions(@PathVariable id: String, @RequestParam(required = false) url: String?): ModelAndView? {
         val channel = channelsDAO.getById(id)
         if (channel != null) {
             val subscriptionsForChannel = subscriptionsDAO.getSubscriptionsForChannel(channel.id, url)
@@ -56,15 +55,13 @@ class ChannelsController @Autowired constructor(val usersDAO: UsersDAO, val chan
         }
     }
 
-    @GetMapping("/{username}/channels/{id}/items")
-    fun channelJson(@PathVariable username: String, @PathVariable id: String,
+    @GetMapping("/channels/{id}/items")
+    fun channelJson(@PathVariable id: String,
                     @RequestParam(required = false) page: Int?,
                     @RequestParam(required = false) pageSize: Int?,
                     @RequestParam(required = false) format: String?,
                     @RequestParam(required = false) q: String?,
                     response: HttpServletResponse): ModelAndView? {
-        usersDAO.getByUsername(username)
-
         val channel = channelsDAO.getById(id)
         if (channel != null) {
             var mv = ModelAndView(viewFactory.getJsonView())

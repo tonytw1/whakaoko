@@ -26,8 +26,8 @@
     Http status: $!subscription.httpStatus
 </p>
 
-<a href="$urlBuilder.getSubscriptionItemsUrl($user.username, $subscription.id)/items">JSON</a> |
-<a href="$urlBuilder.getSubscriptionItemsUrl($user.username, $subscription.id)/items?format=rss">RSS</a>
+<a href="$urlBuilder.getSubscriptionItemsUrl($subscription.id)/items">JSON</a> |
+<a href="$urlBuilder.getSubscriptionItemsUrl($subscription.id)/items?format=rss">RSS</a>
 
 #if(!$geotagged.isEmpty())
     #parse('includes/map.vm')

@@ -47,7 +47,7 @@ class SubscriptionsControllerTest {
         val subscription = RssSubscription("http://localhost/feed", "a-channel", "a-user")
         `when`(subscriptionsDAO.getByRssSubscriptionById(subscription.id)).thenReturn(subscription)
 
-        subscriptionsController.reload("a-user", subscription.id)
+        subscriptionsController.reload(subscription.id)
 
         verify(rssPoller).run(subscription)
     }

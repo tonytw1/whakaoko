@@ -40,13 +40,11 @@ class SubscriptionsController @Autowired constructor(private val usersDAO: Users
     private val X_TOTAL_COUNT = "X-Total-Count"
 
     @Timed(timingNotes = "")
-    @GetMapping("/{username}/subscriptions/{id}/items")
-    fun subscriptionItems(@PathVariable username: String, @PathVariable id: String,
+    @GetMapping("/subscriptions/{id}/items")
+    fun subscriptionItems(@PathVariable id: String,
                           @RequestParam(required = false) page: Int?,
                           @RequestParam(required = false) format: String?,
                           response: HttpServletResponse): ModelAndView? {
-        usersDAO.getByUsername(username)
-
         val subscription = subscriptionsDAO.getById(id)
         if (subscription != null) {
             var mv = ModelAndView(viewFactory.getJsonView())
@@ -65,9 +63,8 @@ class SubscriptionsController @Autowired constructor(private val usersDAO: Users
     }
 
     @Timed(timingNotes = "")
-    @GetMapping("/{username}/subscriptions/{id}/read")
-    fun reload(@PathVariable username: String, @PathVariable id: String): ModelAndView? {
-        usersDAO.getByUsername(username)
+    @GetMapping("/subscriptions/{id}/read")
+    fun reload(@PathVariable id: String): ModelAndView? {
         val subscription = subscriptionsDAO.getByRssSubscriptionById(id)
         if (subscription != null) {
             log.info("Requesting reload of subscription: " + subscription.name + " / " + subscription.url)
@@ -80,10 +77,9 @@ class SubscriptionsController @Autowired constructor(private val usersDAO: Users
     }
 
     @Timed(timingNotes = "")
-    @GetMapping("/{username}/subscriptions/{id}")
-    fun subscriptionJson(@PathVariable username: String, @PathVariable id: String,
+    @GetMapping("/subscriptions/{id}")
+    fun subscriptionJson(@PathVariable id: String,
                          @RequestParam(required = false) page: Int?): ModelAndView? {
-        usersDAO.getByUsername(username)
         val subscription = subscriptionsDAO.getById(id)
         if (subscription != null) {
             return ModelAndView(viewFactory.getJsonView()).addObject("data", subscription)
@@ -93,9 +89,8 @@ class SubscriptionsController @Autowired constructor(private val usersDAO: Users
     }
 
     @Timed(timingNotes = "")
-    @GetMapping("/{username}/subscriptions/{id}/delete") // TODO should be a HTTP DELETE
+    @GetMapping("/subscriptions/{id}/delete") // TODO should be a HTTP DELETE
     fun deleteSubscription(@PathVariable username: String, @PathVariable id: String): ModelAndView? {
-        usersDAO.getByUsername(username)
         val subscription = subscriptionsDAO.getById(id)
         if (subscription == null) {
             return null // TODO 404
@@ -119,8 +114,7 @@ class SubscriptionsController @Autowired constructor(private val usersDAO: Users
     @Timed(timingNotes = "")
     @RequestMapping(value = ["/{username}/subscriptions"], method = [RequestMethod.GET])
     fun subscriptions(@PathVariable username: String, @RequestParam(required = false) url: String?): ModelAndView? {
-        usersDAO.getByUsername(username)
-        return ModelAndView(viewFactory.getJsonView()).addObject("data", subscriptionsDAO.getSubscriptions(SubscriptionsDAO.LATEST_ITEM_DATE_DESCENDING, url))
+        return ModelAndView(viewFactory.getJsonView()).addObject("data", subscriptionsDAO.getSubscriptions(SubscriptionsDAO.LATEST_ITEM_DATE_DESCENDING, url))  // TODO should be by username
     }
 
     @Timed(timingNotes = "")
