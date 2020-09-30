@@ -112,17 +112,6 @@ class SubscriptionsController @Autowired constructor(private val usersDAO: Users
     }
 
     @Timed(timingNotes = "")
-    @GetMapping("/subscriptions")
-    fun all(): ModelAndView? {
-        return try {
-            ModelAndView(viewFactory.getJsonView()).addObject("data", subscriptionsDAO.allSubscriptions())
-        } catch (e: Exception) {
-            log.error(e)
-            throw e
-        }
-    }
-
-    @Timed(timingNotes = "")
     @PostMapping("/{username}/subscriptions/feeds")
     fun addFeedSubscription(@PathVariable username: String, @RequestParam url: String, @RequestParam channel: String): ModelAndView? {
         usersDAO.getByUsername(username)
