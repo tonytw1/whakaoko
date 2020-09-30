@@ -112,12 +112,6 @@ class SubscriptionsController @Autowired constructor(private val usersDAO: Users
     }
 
     @Timed(timingNotes = "")
-    @RequestMapping(value = ["/{username}/subscriptions"], method = [RequestMethod.GET])
-    fun subscriptions(@PathVariable username: String, @RequestParam(required = false) url: String?): ModelAndView? {
-        return ModelAndView(viewFactory.getJsonView()).addObject("data", subscriptionsDAO.getSubscriptions(SubscriptionsDAO.LATEST_ITEM_DATE_DESCENDING, url))  // TODO should be by username
-    }
-
-    @Timed(timingNotes = "")
     @GetMapping("/subscriptions")
     fun all(): ModelAndView? {
         return try {
