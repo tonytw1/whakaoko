@@ -10,4 +10,5 @@ public class IdBuilderTest {
     public void canGenerateHumanReadableIdFromText() {
         assertEquals("the-quick-brown-fox", new IdBuilder().makeIdFor("The quick, brown fox."));
     }
+
 }
