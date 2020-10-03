@@ -48,14 +48,13 @@ class FeedFetcher @Autowired constructor(private val httpFetcher: HttpFetcher,
             val fetchedBytes = httpResult.bytes
             rssFetchedBytesCounter.increment(fetchedBytes.size.toDouble())
 
-            try {
-                val syndFeed = feedParser.parseSyndFeed(fetchedBytes)
-                return Result.Success(Pair(syndFeed, httpResult))
-
-            } catch (ex: Exception) {
+            return feedParser.parseSyndFeed(fetchedBytes).fold({ syndFeed ->
+                Result.success(Pair(syndFeed, httpResult))
+            }, { ex ->
                 log.warn("Feed parsing error: " + ex.message)
-                return Result.error(FeedFetchingException(message = ex.message!!, httpStatus = httpResult.status))
-            }
+                Result.error(FeedFetchingException(message = ex.message!!, httpStatus = httpResult.status))
+            })
+
         }, { fuelError ->
             return Result.Failure(FeedFetchingException(message = fuelError.message!!, fuelError.response.statusCode))
         })

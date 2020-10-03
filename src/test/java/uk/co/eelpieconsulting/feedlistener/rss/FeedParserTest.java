@@ -1,5 +1,6 @@
 package uk.co.eelpieconsulting.feedlistener.rss;
 
+import com.github.kittinunf.result.Result;
 import com.sun.syndication.feed.synd.SyndEntry;
 import com.sun.syndication.feed.synd.SyndFeed;
 import org.apache.commons.io.IOUtils;
@@ -12,35 +13,37 @@ import static org.junit.Assert.assertEquals;
 
 public class FeedParserTest {
 
+    private final FeedParser feedParser = new FeedParser();
+
     @Test
     public void canParseFeedBytesIntoSyndFeed() throws Exception {
         String input = IOUtils.toString(new FileInputStream(this.getClass().getClassLoader().getResource("wcc-news.xml").getFile()));
 
-        SyndFeed syndFeed = new FeedParser().parseSyndFeed(input.getBytes());
+        Result<SyndFeed, Exception> result = feedParser.parseSyndFeed(input.getBytes());
 
-        assertEquals("Wellington City Council - News", syndFeed.getTitle());
+        assertEquals("Wellington City Council - News", result.get().getTitle());
     }
 
     @Test
     public void needToStripNBSPFromMalformedFeeds() throws Exception {
         String input = IOUtils.toString(new FileInputStream(this.getClass().getClassLoader().getResource("vinnies-news.xml").getFile()));
 
-        SyndFeed syndFeed = new FeedParser().parseSyndFeed(input.getBytes());
+        Result<SyndFeed, Exception> result = feedParser.parseSyndFeed(input.getBytes());
 
-        assertEquals("Latest News - St Vincent de Paul Society Wellington", syndFeed.getTitle());
+        assertEquals("Latest News - St Vincent de Paul Society Wellington", result.get().getTitle());
     }
 
     @Test
     public void whatsUpWithCricketWellingtonsFeed() throws Exception {
         String input = IOUtils.toString(new FileInputStream(this.getClass().getClassLoader().getResource("cricketwellington.xml").getFile()));
 
-        SyndFeed syndFeed = new FeedParser().parseSyndFeed(input.getBytes());
+        Result<SyndFeed, Exception> result = feedParser.parseSyndFeed(input.getBytes());
 
-        assertEquals("Cricket Wellington", syndFeed.getTitle());
-        assertEquals(50, syndFeed.getEntries().size());
+        assertEquals("Cricket Wellington", result.get().getTitle());
+        assertEquals(50, result.get().getEntries().size());
 
 
-        final Iterator<SyndEntry> feedItemsIterator = syndFeed.getEntries().iterator();
+        final Iterator<SyndEntry> feedItemsIterator = result.get().getEntries().iterator();
         SyndEntry next = feedItemsIterator.next();
 
         assertEquals("Big names return for Firebirds", next.getTitle());

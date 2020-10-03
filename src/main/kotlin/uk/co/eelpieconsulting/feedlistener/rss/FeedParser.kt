@@ -1,5 +1,6 @@
 package uk.co.eelpieconsulting.feedlistener.rss
 
+import com.github.kittinunf.result.Result
 import com.sun.syndication.feed.synd.SyndFeed
 import com.sun.syndication.io.FeedException
 import com.sun.syndication.io.ParsingFeedException
@@ -8,51 +9,59 @@ import org.apache.commons.io.IOUtils
 import org.springframework.stereotype.Component
 import org.xml.sax.InputSource
 import java.io.ByteArrayInputStream
-import java.io.InputStream
 
 @Component
 class FeedParser {
     @Throws(FeedException::class)
-    fun parseSyndFeed(bytes: ByteArray): SyndFeed {
-        val cleaned = cleanLeadingWhitespace(bytes)
-        return try {
-            parse(cleaned)
-        } catch (p: ParsingFeedException) {
-            if (p.message!!.contains("The entity \"nbsp\" was referenced, but not declared.")) {
-                val withOutNbsp = String(bytes).replace("\\&nbsp;".toRegex(), " ").toByteArray()
-                parse(withOutNbsp)
-            } else if (p.message!!.contains("Invalid XML: Error on line 1: Content is not allowed in prolog")) {
-                val withUtf8 = String(bytes).replace("utf-16".toRegex(), "utf-8").toByteArray()
-                parse(withUtf8)
-            } else {
-                throw p
+    fun parseSyndFeed(bytes: ByteArray): Result<SyndFeed, Exception> {
+        val cleaned = cleanLeadingWhitespace(bytes) // Some feeds have breaking whitespace before the XML
+
+        // Attempt to parse feed
+        val parsingResult = parse(cleaned)
+
+        return parsingResult.fold({ syndFeed ->
+            // If successful return the feed
+            parsingResult
+
+        }, { ex ->
+            // Attempt to recover from malformed feed specific parsing errors
+            when (ex) {
+                is ParsingFeedException -> {
+                    if (ex.message!!.contains("The entity \"nbsp\" was referenced, but not declared.")) {
+                        val withOutNbsp = String(bytes).replace("\\&nbsp;".toRegex(), " ").toByteArray()
+                        parse(withOutNbsp)
+                    } else if (ex.message!!.contains("Invalid XML: Error on line 1: Content is not allowed in prolog")) {
+                        val withUtf8 = String(bytes).replace("utf-16".toRegex(), "utf-8").toByteArray()
+                        parse(withUtf8)
+                    } else {
+                        parsingResult
+                    }
+                }
+                else -> parsingResult
             }
-        }
+        })
     }
 
-    @Throws(FeedException::class)
-    private fun parse(bytes: ByteArray): SyndFeed {
-        val byteArrayInputStream: InputStream = ByteArrayInputStream(bytes)
+    private fun parse(bytes: ByteArray): Result<SyndFeed, Exception> {
+        val byteArrayInputStream = ByteArrayInputStream(bytes)
         val inputStream = InputSource(byteArrayInputStream)
         return try {
             val syndFeedInput = SyndFeedInput(false)
             val syndFeed = syndFeedInput.build(inputStream)
             IOUtils.closeQuietly(byteArrayInputStream)
-            syndFeed
+            Result.success(syndFeed)
+
         } catch (e: FeedException) {
             IOUtils.closeQuietly(byteArrayInputStream)
-            throw e
+            Result.Failure(e)
         }
     }
 
     private fun cleanLeadingWhitespace(bytes: ByteArray): ByteArray {
-        return try {
-            val string = String(bytes)
-            if (string.trim { it <= ' ' } == string) {
-                bytes
-            } else string.trim { it <= ' ' }.toByteArray()
-        } catch (e: Exception) {
-            throw RuntimeException(e)
-        }
+        val string = String(bytes)
+        return if (string.trim { it <= ' ' } == string) {
+            bytes
+        } else string.trim { it <= ' ' }.toByteArray()
     }
+
 }
