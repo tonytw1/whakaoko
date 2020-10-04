@@ -1,12 +1,8 @@
 package uk.co.eelpieconsulting.feedlistener.rss.images;
 
-import com.sun.syndication.feed.module.mediarss.MediaEntryModuleImpl;
 import com.sun.syndication.feed.module.mediarss.MediaModule;
-import com.sun.syndication.feed.module.mediarss.types.MediaContent;
-import com.sun.syndication.feed.module.mediarss.types.UrlReference;
 import com.sun.syndication.feed.synd.SyndEntry;
 import org.junit.Test;
-import uk.co.eelpieconsulting.feedlistener.rss.RssFeedItemBodyExtractor;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
@@ -18,19 +14,17 @@ public class RssFeedItemImageExtractorTest {
     private static final String FULLY_QUALIFIED_IMAGE_URL = "http://www.localhost/images/test.jpg";
     private static final String IMAGE_PATH = "/images/test.jpg";
 
-    private RssFeedItemBodyExtractor rssFeedItemBodyExtractor = mock(RssFeedItemBodyExtractor.class);
-    private BodyHtmlImageExtractor htmlImageExtractor = mock(BodyHtmlImageExtractor.class);
+    private BodyHtmlImageExtractor bodyHtmlImageExtractor = mock(BodyHtmlImageExtractor.class);
 
 
     private SyndEntry itemWithImageInHtmlBody = mock(SyndEntry.class);
 
-    private RssFeedItemImageExtractor extractor = new RssFeedItemImageExtractor(rssFeedItemBodyExtractor, htmlImageExtractor, new MediaModuleImageExtractor());
+    private RssFeedItemImageExtractor extractor = new RssFeedItemImageExtractor(bodyHtmlImageExtractor, new MediaModuleImageExtractor());
 
     @Test
     public void shouldExtractFirstImageFromHtmlItemBodyIfAvailable() throws Exception {
         when(itemWithImageInHtmlBody.getModule(MediaModule.URI)).thenReturn(null);
-        when(rssFeedItemBodyExtractor.extractBody(itemWithImageInHtmlBody)).thenReturn(HTML_CONTAINING_IMAGE_TAG);
-        when(htmlImageExtractor.extractImage(HTML_CONTAINING_IMAGE_TAG)).thenReturn(FULLY_QUALIFIED_IMAGE_URL);
+        when(bodyHtmlImageExtractor.extractImageFrom(itemWithImageInHtmlBody)).thenReturn(FULLY_QUALIFIED_IMAGE_URL);
 
         final String imageUrl = extractor.extractImageFrom(itemWithImageInHtmlBody);
 
@@ -41,8 +35,7 @@ public class RssFeedItemImageExtractorTest {
     public void shouldExtendReferencedFromTheRootImagesFoundInHtmlIntoFullyQualifiedUrlsBasedOnTheItemUrl() throws Exception {
         when(itemWithImageInHtmlBody.getLink()).thenReturn("http://www.localhost/posts/123");
         when(itemWithImageInHtmlBody.getModule(MediaModule.URI)).thenReturn(null);
-        when(rssFeedItemBodyExtractor.extractBody(itemWithImageInHtmlBody)).thenReturn(HTML_CONTAINING_IMAGE_TAG);
-        when(htmlImageExtractor.extractImage(HTML_CONTAINING_IMAGE_TAG)).thenReturn(IMAGE_PATH);
+        when(bodyHtmlImageExtractor.extractImageFrom(itemWithImageInHtmlBody)).thenReturn(IMAGE_PATH);
 
         final String imageUrl = extractor.extractImageFrom(itemWithImageInHtmlBody);
 
