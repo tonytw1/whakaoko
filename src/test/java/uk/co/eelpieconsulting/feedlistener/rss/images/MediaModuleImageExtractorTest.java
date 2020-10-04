@@ -21,7 +21,7 @@ public class MediaModuleImageExtractorTest {
     private MediaModuleImageExtractor extractor = new MediaModuleImageExtractor();
 
     @Test
-    public void shouldExtractUrlOfFullyQualifidedMediaRssImageElements() throws Exception {
+    public void shouldExtractUrlOfFullyQualifiedMediaRssImageElements() throws Exception {
         MediaContent image = new MediaContent(new UrlReference(FULLY_QUALIFIED_IMAGE_URL));
         MediaContent[] mediaContents = {image};
 
