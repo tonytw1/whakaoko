@@ -1,21 +1,16 @@
 package uk.co.eelpieconsulting.feedlistener.rss.images;
 
-import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.when;
-
-import org.junit.Before;
-import org.junit.Test;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-
 import com.sun.syndication.feed.module.mediarss.MediaEntryModuleImpl;
 import com.sun.syndication.feed.module.mediarss.MediaModule;
 import com.sun.syndication.feed.module.mediarss.types.MediaContent;
 import com.sun.syndication.feed.module.mediarss.types.UrlReference;
 import com.sun.syndication.feed.synd.SyndEntry;
+import org.junit.Test;
 import uk.co.eelpieconsulting.feedlistener.rss.RssFeedItemBodyExtractor;
-import uk.co.eelpieconsulting.feedlistener.rss.images.HtmlImageExtractor;
-import uk.co.eelpieconsulting.feedlistener.rss.images.RssFeedItemImageExtractor;
+
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class RssFeedItemImageExtractorTest {
 
@@ -23,25 +18,14 @@ public class RssFeedItemImageExtractorTest {
     private static final String FULLY_QUALIFIED_IMAGE_URL = "http://www.localhost/images/test.jpg";
     private static final String IMAGE_PATH = "/images/test.jpg";
 
-    @Mock
-    private RssFeedItemBodyExtractor rssFeedItemBodyExtractor;
-    @Mock
-    private HtmlImageExtractor htmlImageExtractor;
+    private RssFeedItemBodyExtractor rssFeedItemBodyExtractor = mock(RssFeedItemBodyExtractor.class);
+    private HtmlImageExtractor htmlImageExtractor = mock(HtmlImageExtractor.class);
 
-    @Mock
-    private SyndEntry itemWithImage;
-    @Mock
-    private SyndEntry itemWithImageInHtmlBody;
-    @Mock
-    private MediaEntryModuleImpl mediaModuleWithImage;
+    private SyndEntry itemWithImage = mock(SyndEntry.class);
+    private SyndEntry itemWithImageInHtmlBody = mock(SyndEntry.class);
+    private MediaEntryModuleImpl mediaModuleWithImage = mock(MediaEntryModuleImpl.class);
 
-    private RssFeedItemImageExtractor extractor;
-
-    @Before
-    public void setup() {
-        MockitoAnnotations.initMocks(this);
-        this.extractor = new RssFeedItemImageExtractor(rssFeedItemBodyExtractor, htmlImageExtractor);
-    }
+    private RssFeedItemImageExtractor extractor = new RssFeedItemImageExtractor(rssFeedItemBodyExtractor, htmlImageExtractor);
 
     @Test
     public void shouldExtractUrlOfFullyQualifidedMediaRssImageElements() throws Exception {
