@@ -21,24 +21,10 @@ public class RssFeedItemImageExtractorTest {
     private RssFeedItemBodyExtractor rssFeedItemBodyExtractor = mock(RssFeedItemBodyExtractor.class);
     private BodyHtmlImageExtractor htmlImageExtractor = mock(BodyHtmlImageExtractor.class);
 
-    private SyndEntry itemWithImage = mock(SyndEntry.class);
+
     private SyndEntry itemWithImageInHtmlBody = mock(SyndEntry.class);
-    private MediaEntryModuleImpl mediaModuleWithImage = mock(MediaEntryModuleImpl.class);
 
-    private RssFeedItemImageExtractor extractor = new RssFeedItemImageExtractor(rssFeedItemBodyExtractor, htmlImageExtractor);
-
-    @Test
-    public void shouldExtractUrlOfFullyQualifidedMediaRssImageElements() throws Exception {
-        MediaContent image = new MediaContent(new UrlReference(FULLY_QUALIFIED_IMAGE_URL));
-        MediaContent[] mediaContents = {image};
-
-        when(itemWithImage.getModule(MediaModule.URI)).thenReturn(mediaModuleWithImage);
-        when(mediaModuleWithImage.getMediaContents()).thenReturn(mediaContents);
-
-        final String imageUrl = extractor.extractImageFrom(itemWithImage);
-
-        assertEquals(FULLY_QUALIFIED_IMAGE_URL, imageUrl);
-    }
+    private RssFeedItemImageExtractor extractor = new RssFeedItemImageExtractor(rssFeedItemBodyExtractor, htmlImageExtractor, new MediaModuleImageExtractor());
 
     @Test
     public void shouldExtractFirstImageFromHtmlItemBodyIfAvailable() throws Exception {
