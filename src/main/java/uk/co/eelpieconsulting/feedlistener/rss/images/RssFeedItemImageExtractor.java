@@ -23,36 +23,22 @@ public class RssFeedItemImageExtractor {
 
     private final RssFeedItemBodyExtractor rssFeedItemBodyExtractor;
     private final BodyHtmlImageExtractor bodyHtmlImageExtractor;
+    private final MediaModuleImageExtractor mediaModuleImageExtractor;
 
     @Autowired
-    public RssFeedItemImageExtractor(RssFeedItemBodyExtractor rssFeedItemBodyExtractor, BodyHtmlImageExtractor bodyHtmlImageExtractor) {
+    public RssFeedItemImageExtractor(RssFeedItemBodyExtractor rssFeedItemBodyExtractor, BodyHtmlImageExtractor bodyHtmlImageExtractor,
+                                     MediaModuleImageExtractor mediaModuleImageExtractor) {
         this.rssFeedItemBodyExtractor = rssFeedItemBodyExtractor;
         this.bodyHtmlImageExtractor = bodyHtmlImageExtractor;
+        this.mediaModuleImageExtractor = mediaModuleImageExtractor;
     }
 
     public String extractImageFrom(SyndEntry item) {
         // Look for an RSS media module image; if that fails try to extract an image from the HTML body.
-        final MediaEntryModuleImpl mediaModule = (MediaEntryModuleImpl) item.getModule(MediaModule.URI);
-        if (mediaModule != null) {
-            log.debug("Media module found for item: " + item.getTitle());
-
-            final MediaContent[] mediaContents = mediaModule.getMediaContents();
-            MediaContent selectedMediaContent = null;
-            for (int i = 0; i < mediaContents.length; i++) {
-                MediaContent mediaContent = mediaContents[i];
-                final boolean isImage = isImage(mediaContent);
-                if (isImage && !isBlockListed(mediaContent) && isBetterThanCurrentlySelected(mediaContent, selectedMediaContent)) {
-                    selectedMediaContent = mediaContent;
-                }
-            }
-
-            if (selectedMediaContent != null) {
-                log.debug("Took image reference from MediaContent: " + selectedMediaContent.getReference().toString());
-                return selectedMediaContent.getReference().toString();
-            }
-
+        String mediaModuleImage = mediaModuleImageExtractor.extractImageFromMediaModule(item);
+        if (mediaModuleImage != null) {
+            return mediaModuleImage;
         }
-
         // Look for img srcs in html content
         final String itemBody = rssFeedItemBodyExtractor.extractBody(item);
         if (!Strings.isNullOrEmpty(itemBody)) {
@@ -97,29 +83,8 @@ public class RssFeedItemImageExtractor {
         }
     }
 
-    private boolean isBlockListed(MediaContent mediaContent) {
-        if (mediaContent.getReference() != null && mediaContent.getReference().toString() != null) {
-            return isBlockListedImageUrl(mediaContent.getReference().toString());
-        }
-        return false;
-    }
-
     private boolean isBlockListedImageUrl(String url) {
         return blockedUrlSnippets.stream().anyMatch(url::contains);
-    }
-
-    private boolean isImage(MediaContent mediaContent) {
-        final boolean hasTypeJpegAttribute = mediaContent.getType() != null && mediaContent.getType().equals("image/jpeg");
-        final boolean isJpegUrl = mediaContent.getReference() != null && mediaContent.getReference().toString().contains(".jpg");
-        // TODO Wordpress looks to use medium="image"
-        return mediaContent.getReference() != null && (hasTypeJpegAttribute || isJpegUrl);
-    }
-
-    private boolean isBetterThanCurrentlySelected(MediaContent mediaContent, MediaContent selectedMediaContent) {
-        if (selectedMediaContent == null) {
-            return true;
-        }
-        return mediaContent.getWidth() != null && mediaContent.getWidth() > selectedMediaContent.getWidth();
     }
 
 }
