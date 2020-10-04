@@ -22,15 +22,16 @@ public class RssFeedItemImageExtractor {
     private final Set<String> blockedUrlSnippets = Set.of("http://stats.wordpress.com", "gravatar.com/avatar", "share_save_171_16");
 
     private final RssFeedItemBodyExtractor rssFeedItemBodyExtractor;
-    private final HtmlImageExtractor htmlImageExtractor;
+    private final BodyHtmlImageExtractor bodyHtmlImageExtractor;
 
     @Autowired
-    public RssFeedItemImageExtractor(RssFeedItemBodyExtractor rssFeedItemBodyExtractor, HtmlImageExtractor htmlImageExtractor) {
+    public RssFeedItemImageExtractor(RssFeedItemBodyExtractor rssFeedItemBodyExtractor, BodyHtmlImageExtractor bodyHtmlImageExtractor) {
         this.rssFeedItemBodyExtractor = rssFeedItemBodyExtractor;
-        this.htmlImageExtractor = htmlImageExtractor;
+        this.bodyHtmlImageExtractor = bodyHtmlImageExtractor;
     }
 
     public String extractImageFrom(SyndEntry item) {
+        // Look for an RSS media module image; if that fails try to extract an image from the HTML body.
         final MediaEntryModuleImpl mediaModule = (MediaEntryModuleImpl) item.getModule(MediaModule.URI);
         if (mediaModule != null) {
             log.debug("Media module found for item: " + item.getTitle());
@@ -55,7 +56,7 @@ public class RssFeedItemImageExtractor {
         // Look for img srcs in html content
         final String itemBody = rssFeedItemBodyExtractor.extractBody(item);
         if (!Strings.isNullOrEmpty(itemBody)) {
-            String imageSrc = htmlImageExtractor.extractImage(itemBody);
+            String imageSrc = bodyHtmlImageExtractor.extractImage(itemBody);
             if (!Strings.isNullOrEmpty(imageSrc)) {
                 imageSrc = ensureFullyQualifiedUrl(imageSrc, item.getLink());
                 if (imageSrc != null && !isBlockListedImageUrl(imageSrc)) {

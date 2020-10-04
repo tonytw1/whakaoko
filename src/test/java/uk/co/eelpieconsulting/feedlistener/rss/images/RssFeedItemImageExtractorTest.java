@@ -19,7 +19,7 @@ public class RssFeedItemImageExtractorTest {
     private static final String IMAGE_PATH = "/images/test.jpg";
 
     private RssFeedItemBodyExtractor rssFeedItemBodyExtractor = mock(RssFeedItemBodyExtractor.class);
-    private HtmlImageExtractor htmlImageExtractor = mock(HtmlImageExtractor.class);
+    private BodyHtmlImageExtractor htmlImageExtractor = mock(BodyHtmlImageExtractor.class);
 
     private SyndEntry itemWithImage = mock(SyndEntry.class);
     private SyndEntry itemWithImageInHtmlBody = mock(SyndEntry.class);
