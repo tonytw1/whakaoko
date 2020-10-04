@@ -1,4 +1,4 @@
-package uk.co.eelpieconsulting.feedlistener.rss;
+package uk.co.eelpieconsulting.feedlistener.rss.images;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.when;
@@ -13,6 +13,9 @@ import com.sun.syndication.feed.module.mediarss.MediaModule;
 import com.sun.syndication.feed.module.mediarss.types.MediaContent;
 import com.sun.syndication.feed.module.mediarss.types.UrlReference;
 import com.sun.syndication.feed.synd.SyndEntry;
+import uk.co.eelpieconsulting.feedlistener.rss.RssFeedItemBodyExtractor;
+import uk.co.eelpieconsulting.feedlistener.rss.images.HtmlImageExtractor;
+import uk.co.eelpieconsulting.feedlistener.rss.images.RssFeedItemImageExtractor;
 
 public class RssFeedItemImageExtractorTest {
 

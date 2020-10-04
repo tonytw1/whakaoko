@@ -1,4 +1,4 @@
-package uk.co.eelpieconsulting.feedlistener.rss;
+package uk.co.eelpieconsulting.feedlistener.rss.images;
 
 import org.apache.log4j.Logger;
 import org.htmlparser.NodeFilter;

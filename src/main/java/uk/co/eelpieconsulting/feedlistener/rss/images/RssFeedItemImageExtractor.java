@@ -1,4 +1,4 @@
-package uk.co.eelpieconsulting.feedlistener.rss;
+package uk.co.eelpieconsulting.feedlistener.rss.images;
 
 import com.google.common.base.Strings;
 import com.sun.syndication.feed.module.mediarss.MediaEntryModuleImpl;
@@ -8,6 +8,7 @@ import com.sun.syndication.feed.synd.SyndEntry;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import uk.co.eelpieconsulting.feedlistener.rss.RssFeedItemBodyExtractor;
 
 import java.net.MalformedURLException;
 import java.net.URL;

@@ -12,6 +12,7 @@ import uk.co.eelpieconsulting.feedlistener.model.FeedItem
 import uk.co.eelpieconsulting.feedlistener.model.LatLong
 import uk.co.eelpieconsulting.feedlistener.model.Place
 import uk.co.eelpieconsulting.feedlistener.model.Subscription
+import uk.co.eelpieconsulting.feedlistener.rss.images.RssFeedItemImageExtractor
 
 @Component
 class RssFeedItemMapper @Autowired constructor(private val rssFeedItemImageExtractor: RssFeedItemImageExtractor,
