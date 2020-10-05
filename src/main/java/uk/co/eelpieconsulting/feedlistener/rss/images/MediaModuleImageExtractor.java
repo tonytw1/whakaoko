@@ -20,8 +20,7 @@ public class MediaModuleImageExtractor {
 
             final MediaContent[] mediaContents = mediaModule.getMediaContents();
             MediaContent selectedMediaContent = null;
-            for (int i = 0; i < mediaContents.length; i++) {
-                MediaContent mediaContent = mediaContents[i];
+            for (MediaContent mediaContent : mediaContents) {
                 final boolean isImage = isImage(mediaContent);
                 if (isImage && !isBlockListed(mediaContent) && isBetterThanCurrentlySelected(mediaContent, selectedMediaContent)) {
                     selectedMediaContent = mediaContent;
