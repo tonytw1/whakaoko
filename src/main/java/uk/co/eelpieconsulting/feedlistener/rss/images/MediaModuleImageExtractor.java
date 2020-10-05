@@ -6,11 +6,16 @@ import com.sun.syndication.feed.module.mediarss.types.MediaContent;
 import com.sun.syndication.feed.synd.SyndEntry;
 import org.apache.log4j.Logger;
 
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Stream;
 
 public class MediaModuleImageExtractor {
 
     private final static Logger log = Logger.getLogger(MediaModuleImageExtractor.class);
+
     private final Set<String> blockedUrlSnippets = Set.of("http://stats.wordpress.com", "gravatar.com/avatar", "share_save_171_16");
 
     public String extractImageFromMediaModule(SyndEntry item) {
@@ -18,20 +23,20 @@ public class MediaModuleImageExtractor {
         if (mediaModule != null) {
             log.debug("Media module found for item: " + item.getTitle());
 
-            final MediaContent[] mediaContents = mediaModule.getMediaContents();
-            MediaContent selectedMediaContent = null;
-            for (MediaContent mediaContent : mediaContents) {
-                final boolean isImage = isImage(mediaContent);
-                if (isImage && !isBlockListed(mediaContent) && isBetterThanCurrentlySelected(mediaContent, selectedMediaContent)) {
-                    selectedMediaContent = mediaContent;
-                }
-            }
+            final Stream<MediaContent> mediaContents = Arrays.stream(mediaModule.getMediaContents());
 
-            if (selectedMediaContent != null) {
-                log.debug("Took image reference from MediaContent: " + selectedMediaContent.getReference().toString());
-                return selectedMediaContent.getReference().toString();
-            }
+            Comparator<MediaContent> latestImageFirst = Comparator.comparing(MediaContent::getWidth);
+            Stream<MediaContent> nonBlockListedImages = mediaContents.
+                    filter(this::isImage).
+                    filter(image -> !isBlockListed(image)).
+                    sorted(latestImageFirst);   // prefer the latest available image TODO test coverage required
 
+            Optional<MediaContent> first = nonBlockListedImages.findFirst();
+            if (first.isPresent()) {
+                String choosenImage = first.get().getReference().toString();
+                log.debug("Took image reference from MediaContent: " + choosenImage);
+                return choosenImage;
+            }
         }
         return null;
     }
@@ -43,21 +48,8 @@ public class MediaModuleImageExtractor {
         return mediaContent.getReference() != null && (hasTypeJpegAttribute || isJpegUrl);
     }
 
-    private boolean isBetterThanCurrentlySelected(MediaContent mediaContent, MediaContent selectedMediaContent) {
-        if (selectedMediaContent == null) {
-            return true;
-        }
-        return mediaContent.getWidth() != null && mediaContent.getWidth() > selectedMediaContent.getWidth();
-    }
-
     private boolean isBlockListed(MediaContent mediaContent) {
-        if (mediaContent.getReference() != null && mediaContent.getReference().toString() != null) {
-            return isBlockListedImageUrl(mediaContent.getReference().toString());
-        }
-        return false;
-    }
-    private boolean isBlockListedImageUrl(String url) { // TODO duplication
-        return blockedUrlSnippets.stream().anyMatch(url::contains);
+        return blockedUrlSnippets.stream().anyMatch(mediaContent.getReference().toString()::contains);
     }
 
 }
