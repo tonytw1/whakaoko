@@ -16,7 +16,7 @@ public class MediaModuleImageExtractor {
 
     private final static Logger log = Logger.getLogger(MediaModuleImageExtractor.class);
 
-    private final Set<String> blockedUrlSnippets = Set.of("http://stats.wordpress.com", "gravatar.com/avatar", "share_save_171_16");
+    private final Set<String> blockedUrlSnippets = Set.of("http://stats.wordpress.com", "gravatar.com/avatar", "share_save_171_16");    // TODO push up
 
     public String extractImageFromMediaModule(SyndEntry item) {
         final MediaEntryModuleImpl mediaModule = (MediaEntryModuleImpl) item.getModule(MediaModule.URI);
