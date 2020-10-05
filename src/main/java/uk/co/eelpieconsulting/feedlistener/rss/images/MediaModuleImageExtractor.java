@@ -5,6 +5,7 @@ import com.sun.syndication.feed.module.mediarss.MediaModule;
 import com.sun.syndication.feed.module.mediarss.types.MediaContent;
 import com.sun.syndication.feed.synd.SyndEntry;
 import org.apache.log4j.Logger;
+import org.springframework.stereotype.Component;
 
 import java.util.Arrays;
 import java.util.Comparator;
@@ -12,6 +13,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Stream;
 
+@Component
 public class MediaModuleImageExtractor {
 
     private final static Logger log = Logger.getLogger(MediaModuleImageExtractor.class);
