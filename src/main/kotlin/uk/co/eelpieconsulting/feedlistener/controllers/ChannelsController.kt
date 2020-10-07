@@ -86,4 +86,31 @@ class ChannelsController @Autowired constructor(val usersDAO: UsersDAO, val chan
         return ModelAndView(RedirectView(urlBuilder.getChannelUrl(newChannel)))
     }
 
+    @RequestMapping("/backfill")
+    fun backfill(): ModelAndView? {
+        var before = feedItemDAO.before(DateTime.now().toDate())
+        while (before != null && before.isNotEmpty()) {
+            before.forEach { i ->
+                val subscriptionId = i.subscriptionId;
+                if (subscriptionId != null) {
+                    try {
+                        val byId = subscriptionsDAO.getById(subscriptionId);
+                        val channelId = byId.channelId
+                        log.info(i.date)
+                        i.channelId = channelId;
+                        feedItemDAO.update(i)
+                    } catch (u: UnknownSubscriptionException) {
+                        log.warn("Uknown subscription: " + i.subscriptionId)
+                    }
+
+                } else {
+                    log.warn("Feed item with no subscription id: " + i.id + " / " + subscriptionId)
+                }
+            }
+            val date = before.last().date
+            before = feedItemDAO.before(date)
+        }
+        return null
+    }
+
 }
