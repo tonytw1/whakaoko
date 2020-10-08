@@ -2,6 +2,7 @@ package uk.co.eelpieconsulting.feedlistener.controllers
 
 import com.google.common.base.Strings
 import org.apache.log4j.Logger
+import org.joda.time.DateTime
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Controller
 import org.springframework.web.bind.annotation.GetMapping
@@ -93,13 +94,13 @@ class ChannelsController @Autowired constructor(val usersDAO: UsersDAO, val chan
             before.forEach { i ->
                 val subscriptionId = i.subscriptionId;
                 if (subscriptionId != null) {
-                    try {
-                        val byId = subscriptionsDAO.getById(subscriptionId);
+                    val byId = subscriptionsDAO.getById(subscriptionId);
+                    if (byId != null) {
                         val channelId = byId.channelId
                         log.info(i.date)
                         i.channelId = channelId;
                         feedItemDAO.update(i)
-                    } catch (u: UnknownSubscriptionException) {
+                    } else {
                         log.warn("Uknown subscription: " + i.subscriptionId)
                     }
 
