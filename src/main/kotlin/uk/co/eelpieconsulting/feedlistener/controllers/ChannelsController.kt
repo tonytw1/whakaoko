@@ -89,7 +89,7 @@ class ChannelsController @Autowired constructor(val usersDAO: UsersDAO, val chan
 
     @RequestMapping("/backfill")
     fun backfill(): ModelAndView? {
-        var watermark = DateTime.now().toDate()
+        var watermark = DateTime.now().plusMonths(6).toDate()
         var feedItems = feedItemDAO.before(watermark)
         while (feedItems != null && feedItems.isNotEmpty()) {
             log.info("Backfilling feeditems before: " + watermark)
