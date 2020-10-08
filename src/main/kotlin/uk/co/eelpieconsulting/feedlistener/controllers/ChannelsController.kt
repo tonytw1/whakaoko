@@ -89,28 +89,27 @@ class ChannelsController @Autowired constructor(val usersDAO: UsersDAO, val chan
 
     @RequestMapping("/backfill")
     fun backfill(): ModelAndView? {
-        var before = feedItemDAO.before(DateTime.now().toDate())
-        while (before != null && before.isNotEmpty()) {
-            before.forEach { i ->
-                val subscriptionId = i.subscriptionId;
-                if (subscriptionId != null) {
-                    val byId = subscriptionsDAO.getById(subscriptionId);
-                    if (byId != null) {
-                        val channelId = byId.channelId
-                        log.info(i.date)
-                        i.channelId = channelId;
-                        feedItemDAO.update(i)
-                    } else {
-                        log.warn("Uknown subscription: " + i.subscriptionId)
-                    }
+        var watermark = DateTime.now().toDate()
+        var feedItems = feedItemDAO.before(watermark)
+        while (feedItems != null && feedItems.isNotEmpty()) {
+            feedItems.forEach { i ->
+                log.info("Backfilling feeditems before: " + watermark)
 
+                val subscriptionId = i.subscriptionId;
+                val byId = subscriptionsDAO.getById(subscriptionId);
+                if (byId != null) {
+                    val channelId = byId.channelId
+                    i.channelId = channelId;
+                    feedItemDAO.update(i)
                 } else {
-                    log.warn("Feed item with no subscription id: " + i.id + " / " + subscriptionId)
+                    log.warn("Uknown subscription: " + i.subscriptionId)
                 }
             }
-            val date = before.last().date
-            before = feedItemDAO.before(date)
+            watermark = feedItems.last().date
+            feedItems = feedItemDAO.before(watermark)
         }
+
+        log.info("Backfill finished")
         return null
     }
 
