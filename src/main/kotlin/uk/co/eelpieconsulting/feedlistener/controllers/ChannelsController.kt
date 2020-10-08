@@ -92,9 +92,8 @@ class ChannelsController @Autowired constructor(val usersDAO: UsersDAO, val chan
         var watermark = DateTime.now().toDate()
         var feedItems = feedItemDAO.before(watermark)
         while (feedItems != null && feedItems.isNotEmpty()) {
+            log.info("Backfilling feeditems before: " + watermark)
             feedItems.forEach { i ->
-                log.info("Backfilling feeditems before: " + watermark)
-
                 val subscriptionId = i.subscriptionId;
                 val byId = subscriptionsDAO.getById(subscriptionId);
                 if (byId != null) {
