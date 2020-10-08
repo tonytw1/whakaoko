@@ -32,7 +32,7 @@ class FeedItemDAO @Autowired constructor(private val dataStoreFactory: DataStore
 
     fun before(date: Date): MutableList<FeedItem>? {
         val query = dataStoreFactory.get().find(FeedItem::class.java).filter(Filters.lt("date", date));
-        return query.iterator(FindOptions().limit(100).sort(*DATE_DESCENDING_THEN_ID)).toList()
+        return query.iterator(FindOptions().limit(1000).sort(*DATE_DESCENDING_THEN_ID)).toList()
     }
 
     fun add(feedItem: FeedItem): Boolean {
