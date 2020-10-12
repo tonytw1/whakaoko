@@ -18,7 +18,7 @@
             #else
                 <p>No channels.</p>
             #end
-            <p><a href="$urlBuilder.getNewChannelUrl()">New channel</a></p>
+            <p><a href="$urlBuilder.getNewChannelUrl()"><button type="button" class="btn btn-primary">New channel</button></a></p>
             <hr/>
         </div>
     </div>
