@@ -1,17 +1,23 @@
-#if($feedItem.author.isNotEmpty()) @$feedItem.author - #end <a href="$feedItem.url">#if($feedItem.title) $!feedItem.title#else$feedItem.url#end</a>
-#if($feedItem.date)<br/><span title="$feedItem.date">$dateFormatter.timeSince($feedItem.date)</span>#end
-#if(!$subscription)
-    from <a href="$urlBuilder.getSubscriptionUrl($feedItem.subscriptionId)">$feedItem.subscriptionName</a>
-#end
+<div class="row">
+    <div class="container">
+        <p>
+            #if($feedItem.author.isNotEmpty()) @$feedItem.author - #end <a href="$feedItem.url">#if($feedItem.title) $!feedItem.title#else$feedItem.url#end</a>
+            #if($feedItem.date)<br/><span title="$feedItem.date">$dateFormatter.timeSince($feedItem.date)</span>#end
+            #if(!$subscription)
+                from <a href="$urlBuilder.getSubscriptionUrl($feedItem.subscriptionId)">$feedItem.subscriptionName</a>
+            #end
+        </p>
+        #if($feedItem.place && $feedItem.latLong)
+            <p>$feedItem.place.latLong.longitude, $feedItem.place.latLong.latitude</p>
+        #end
+        #if($feedItem.imageUrl)
+            <p><a href="$feedItem.url"><img class="img-fluid" src="$feedItem.imageUrl"></a></p>
+        #end
+        <p>$!feedItem.body</p>
+        <hr/>
+    </div>
+</div>
 
-#if($feedItem.imageUrl) <br/>
-    <a href="$feedItem.url"><img class="img-fluid" src="$feedItem.imageUrl"></a>
-#end
-<br/>$!feedItem.body
-
-#if($feedItem.place)
-    <p>$feedItem.place</p>
-#end
 
 
 

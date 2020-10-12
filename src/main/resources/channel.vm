@@ -21,7 +21,7 @@
                 #end
                 </ul>
             #else
-                <p>No current subscriptions.</p>
+                <p>No current subscriptions</p>
             #end
             <p><a href="/ui/subscriptions/new">New subscription</a></p>
         </div>

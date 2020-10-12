@@ -15,21 +15,28 @@
                 <a href="$urlBuilder.getSubscriptionItemsUrl($subscription.id)/items">JSON</a> |
                 <a href="$urlBuilder.getSubscriptionItemsUrl($subscription.id)/items?format=rss">RSS</a>
             </p>
-            <p><a href="$urlBuilder.getDeleteSubscriptionUrl($subscription)">Delete</a></p>
-            <p><a href="$urlBuilder.getReadSubscriptionUrl($subscription)">Read</a></p>
+
+            #if($subscription.error)
+                <div class="alert alert-danger" role="alert">
+                   Error: $!subscription.error<br/>
+                    Http status: $!subscription.httpStatus
+                </div>
+            #end
+
+            <p> <a href="$urlBuilder.getReadSubscriptionUrl($subscription)"><button type="button" class="btn btn-primary">Read</button></a>
+                <a href="$urlBuilder.getDeleteSubscriptionUrl($subscription)"><button type="button" class="btn btn-danger">Delete</button></a></p>
 
             #if($subscription.lastRead)
                 <p><span title="$subscription.lastRead">Last read: $dateFormatter.timeSince($subscription.lastRead)</span></p>
             #end
+
             #if($subscription.latestItemDate)
                 <p>Latest item date: $dateFormatter.timeSince($subscription.latestItemDate)</p>
             #end
-            <p>ETag: $!subscription.etag</p>
-
-            <p>
-                Error: $!subscription.error<br/>
-                Http status: $!subscription.httpStatus
-            </p>
+            #if($subscription.etag)
+               <p>ETag: $subscription.etag</p>
+            #end
+            <hr/>
         </div>
     </div>
 
