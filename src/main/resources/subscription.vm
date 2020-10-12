@@ -54,18 +54,7 @@
                     </div>
                 </div>
             #end
-
-            #if($feedItems && !$feedItems.isEmpty())
-                #foreach($feedItem in $feedItems)
-                    <div class="row">
-                        <div class="container">
-                            #parse('includes/feeditem.vm')
-                        </div>
-                    </div>
-                #end
-            #else
-                <p>No items from this subscription.</p>
-            #end
+            #parse('includes/feeditems.vm')
         </div>
     </div>
 </div>

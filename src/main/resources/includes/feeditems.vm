@@ -1,0 +1,11 @@
+#if($feedItems && !$feedItems.isEmpty())
+    #foreach($feedItem in $feedItems)
+        <div class="row">
+            <div class="container">
+                #parse('includes/feeditem.vm')
+            </div>
+        </div>
+    #end
+#else
+    <p>No feed items.</p>
+#end
