@@ -1,64 +1,63 @@
 #parse('includes/header.vm')
+<div class="container">
+    <p><h4>whakaoko</h4>
+    (verb) to listen to.</p>
+</div>
+<div class="container">
+    <div class="container">
+        <h5><a href="$urlBuilder.getUserUrl()">$user.username</a> / $channel.name</h5>
+    </div>
 
-<p><h4>whakaoko</h4>
-(verb) to listen to.</p>
+    <div class="container">
 
-<table>
-<tr valign="top">
-<td>
+        <div class="container">
+            #if($subscriptions && !$subscriptions.isEmpty())
+                <ul>
+                #foreach($subscription in $subscriptions)
+                    <li><a href="$urlBuilder.getSubscriptionUrl($subscription)">#if($subscription.name)$subscription.name#else$subscription.url#end</a>
+                    #if($subscription.itemCount > 0) ($subscription.itemCount)#end
+                    #if($subscription.latestItemDate)
+                        <br/>
+                        <span title="$subscription.latestItemDate">$dateFormatter.timeSince($subscription.latestItemDate)
+                    #end
+                    </li>
+                #end
+                </ul>
+            #else
+                <p>No current subscriptions.</p>
+            #end
+        </div>
+        <div class="container">
+            <h5>Inbox #if($totalCount) ($totalCount)#end</h5>
 
-<h5><a href="$urlBuilder.getUserUrl()">$user.username</a> / $channel.name</h5>
+            <a href="$urlBuilder.getChannelItemsUrl($channel.id)/items">JSON</a> |
+            <a href="$urlBuilder.getChannelItemsUrl($channel.id)/items?format=rss">RSS</a>
 
-#if($subscriptions && !$subscriptions.isEmpty()) 
-	<ul>
- 	#foreach($subscription in $subscriptions) 
- 		<li><a href="$urlBuilder.getSubscriptionUrl($subscription)">#if($subscription.name)$subscription.name#else$subscription.url#end</a> 
- 		#if($subscription.itemCount > 0) ($subscription.itemCount)#end
- 		#if($subscription.latestItemDate)
-	 		<br/>
-	 		<span title="$subscription.latestItemDate">$dateFormatter.timeSince($subscription.latestItemDate)
-		#end
- 		</li>
- 	#end
- 	</ul>
-#else
-	<p>No current subscriptions.</p>
-#end
+            #if(!$geotagged.isEmpty())
+                #parse('includes/map.vm')
+                #foreach($feedItem in $geotagged)
+                    <script>
+                        var marker = L.marker([${feedItem.place.latLong.latitude}, ${feedItem.place.latLong.longitude}]).addTo(map).bindPopup("$feedItem.title");
+                        markers.push(marker);
+                    </script>
+                #end
+            #end
 
-</td>
-<td>
-
-<h5>Inbox #if($totalCount) ($totalCount)#end</h5>
-
-<a href="$urlBuilder.getChannelItemsUrl($channel.id)/items">JSON</a> |
-<a href="$urlBuilder.getChannelItemsUrl($channel.id)/items?format=rss">RSS</a>
-
-#if(!$geotagged.isEmpty())
-    #parse('includes/map.vm')
-    #foreach($feedItem in $geotagged)
-        <script>
-            var marker = L.marker([${feedItem.place.latLong.latitude}, ${feedItem.place.latLong.longitude}]).addTo(map).bindPopup("$feedItem.title");
-            markers.push(marker);
-        </script>
-    #end
-#end
-
-#if($inbox && !$inbox.isEmpty()) 
-	<ul>
- 	#foreach($feedItem in $inbox)
- 		#parse('includes/feeditem.vm')
- 	#end
- 	</ul>
-#else
-	<p>Inbox currently empty.</p>
-#end
-
-</td>
-</tr>
-</table>
+            #if($inbox && !$inbox.isEmpty())
+                <ul>
+                #foreach($feedItem in $inbox)
+                    #parse('includes/feeditem.vm')
+                #end
+                </ul>
+            #else
+                <p>Inbox currently empty.</p>
+            #end
+        </div>
+    </div>
+</div>
 
 <script>
-	map.fitBounds(new L.featureGroup(markers).getBounds());
+    map.fitBounds(new L.featureGroup(markers).getBounds());
 </script>
 
 #parse('includes/footer.vm')
