@@ -5,7 +5,7 @@
 #end
 
 #if($feedItem.imageUrl) <br/>
-    <a href="$feedItem.url"><img src="$feedItem.imageUrl" border="0"></a>
+    <a href="$feedItem.url"><img class="img-fluid" src="$feedItem.imageUrl"></a>
 #end
 <br/>$!feedItem.body
 
