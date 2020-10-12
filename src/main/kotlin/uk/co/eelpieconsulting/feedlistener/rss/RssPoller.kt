@@ -93,7 +93,10 @@ class RssPoller @Autowired constructor(val subscriptionsDAO: SubscriptionsDAO, v
                         val itemCount = feedItemDAO.getSubscriptionFeedItemsCount(subscription.id)
                         val latestItemDate = feedItemLatestDateFinder.getLatestItemDate(fetchedFeed.feedItems)
 
-                        subscription.name = fetchedFeed.feedName
+                        // Backfill the subscription name with the feed title if not already set
+                        if (Strings.isNullOrEmpty(subscription.name)) {
+                            subscription.name = fetchedFeed.feedName
+                        }
                         subscription.itemCount = itemCount
                         subscription.latestItemDate = latestItemDate
                         subscription.etag = fetchedFeed.etag
