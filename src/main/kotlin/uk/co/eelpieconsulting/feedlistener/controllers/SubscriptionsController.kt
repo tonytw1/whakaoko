@@ -88,6 +88,23 @@ class SubscriptionsController @Autowired constructor(private val usersDAO: Users
         }
     }
 
+    @PutMapping("/subscriptions/{id}")
+    fun subscriptionUpdate(@PathVariable id: String,
+                         @RequestBody update: SubscriptionUpdateRequest): ModelAndView? {
+        val subscription = subscriptionsDAO.getById(id)
+        if (subscription != null) {
+            log.debug("Got subscription update request: " + update);
+            if (update.name != null) {
+                subscription.name = update.name
+                subscriptionsDAO.save(subscription)
+                log.info("Updated subscription: " + subscription)
+            }
+            return ModelAndView(viewFactory.getJsonView()).addObject("data", subscription)
+        } else {
+            return null  // TODO 404
+        }
+    }
+
     @Timed(timingNotes = "")
     @GetMapping("/subscriptions/{id}/delete") // TODO should be a HTTP DELETE
     fun deleteSubscription(@PathVariable username: String, @PathVariable id: String): ModelAndView? {
