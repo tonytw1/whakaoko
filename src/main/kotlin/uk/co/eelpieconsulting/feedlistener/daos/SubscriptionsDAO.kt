@@ -21,6 +21,9 @@ class SubscriptionsDAO @Autowired constructor(private val dataStoreFactory: Data
 
     private val log = Logger.getLogger(SubscriptionsDAO::class.java)
 
+    private val LATEST_ITEM_DATE_DESCENDING = Sort.descending("latestItemDate")
+    private val LAST_READ_ASCENDING = Sort.ascending("lastRead")
+
     @Synchronized
     fun add(subscription: Subscription) {
         if (!subscriptionExists(subscription)) {
@@ -118,8 +121,4 @@ class SubscriptionsDAO @Autowired constructor(private val dataStoreFactory: Data
 
     fun allSubscriptions(): List<Subscription> = dataStoreFactory.get().find(Subscription::class.java).iterator().toList()
 
-    companion object {
-        val LATEST_ITEM_DATE_DESCENDING = Sort.descending("latestItemDate")
-        val LAST_READ_ASCENDING = Sort.ascending("lastRead")
-    }
 }
