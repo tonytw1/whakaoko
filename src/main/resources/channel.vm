@@ -3,7 +3,13 @@
     #parse('includes/heading.vm')
     <div class="row">
         <div class="container">
-            <h5><a href="$urlBuilder.getUserUrl()">$user.username</a> / $channel.name</h5>
+            <div class="float-right">
+                <a href="$urlBuilder.getChannelItemsUrl($channel.id)/items">JSON</a> |
+                <a href="$urlBuilder.getChannelItemsUrl($channel.id)/items?format=rss">RSS</a>
+            </div>
+            <h5><a href="$urlBuilder.getUserUrl()">$user.username</a> / $channel.name
+            #if($totalCount) ($totalCount)#end
+            </h5>
         </div>
     </div>
     <div class="row">
@@ -26,11 +32,6 @@
             <p><a href="/ui/subscriptions/new">New subscription</a></p>
         </div>
         <div class="col">
-            <h5>Inbox #if($totalCount) ($totalCount)#end</h5>
-
-            <a href="$urlBuilder.getChannelItemsUrl($channel.id)/items">JSON</a> |
-            <a href="$urlBuilder.getChannelItemsUrl($channel.id)/items?format=rss">RSS</a>
-
             #if(!$geotagged.isEmpty())
                 #parse('includes/map.vm')
                 #foreach($feedItem in $geotagged)

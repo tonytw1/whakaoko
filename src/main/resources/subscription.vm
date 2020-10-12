@@ -3,6 +3,10 @@
     #parse('includes/heading.vm')
     <div class="row">
         <div class="container">
+            <div class="float-right">
+                <a href="$urlBuilder.getSubscriptionItemsUrl($subscription.id)/items">JSON</a> |
+                <a href="$urlBuilder.getSubscriptionItemsUrl($subscription.id)/items?format=rss">RSS</a>
+            </div>
             <h5><a href="$urlBuilder.getUserUrl()">$user.username</a> /
             <a href="$urlBuilder.getChannelUrl($channel)">$channel.name</a> /
             #if($subscription.name)$subscription.name#else$subscription.url#end #if($totalCount > 0) ($totalCount) #end</h5>
@@ -11,11 +15,6 @@
     <div class="row">
         <div class="container">
             <code><a href="$subscription.url">$subscription.url</a></code>
-            <p>
-                <a href="$urlBuilder.getSubscriptionItemsUrl($subscription.id)/items">JSON</a> |
-                <a href="$urlBuilder.getSubscriptionItemsUrl($subscription.id)/items?format=rss">RSS</a>
-            </p>
-
             #if($subscription.error)
                 <div class="alert alert-danger" role="alert">
                    Error: $!subscription.error<br/>
