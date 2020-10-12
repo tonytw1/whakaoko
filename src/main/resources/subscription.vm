@@ -1,56 +1,67 @@
 #parse('includes/header.vm')
 <div class="container">
-    <p><h4>whakaoko</h4>
-    (verb) to listen to.</p>
-</div>
-<div class="container">
-    <h5><a href="$urlBuilder.getUserUrl()">$user.username</a> /
-    <a href="$urlBuilder.getChannelUrl($channel)">$channel.name</a> /
-    #if($subscription.name)$subscription.name#else$subscription.url#end #if($totalCount > 0) ($totalCount) #end</h5>
+    #parse('includes/heading.vm')
+    <div class="row">
+        <div class="container">
+            <h5><a href="$urlBuilder.getUserUrl()">$user.username</a> /
+            <a href="$urlBuilder.getChannelUrl($channel)">$channel.name</a> /
+            #if($subscription.name)$subscription.name#else$subscription.url#end #if($totalCount > 0) ($totalCount) #end</h5>
+        </div>
+    </div>
+    <div class="row">
+        <div class="container">
+            <code><a href="$subscription.url">$subscription.url</a></code>
+            <p>
+                <a href="$urlBuilder.getSubscriptionItemsUrl($subscription.id)/items">JSON</a> |
+                <a href="$urlBuilder.getSubscriptionItemsUrl($subscription.id)/items?format=rss">RSS</a>
+            </p>
+            <p><a href="$urlBuilder.getDeleteSubscriptionUrl($subscription)">Delete</a></p>
+            <p><a href="$urlBuilder.getReadSubscriptionUrl($subscription)">Read</a></p>
 
-    <code><a href="$subscription.url">$subscription.url</a></code>
-
-    <p><a href="$urlBuilder.getDeleteSubscriptionUrl($subscription)">Delete</a></p>
-
-    <p><a href="$urlBuilder.getReadSubscriptionUrl($subscription)">Read</a></p>
-
-    #if($subscription.lastRead)
-        <p><span title="$subscription.lastRead">Last read: $dateFormatter.timeSince($subscription.lastRead)</span></p>
-    #end
-    #if($subscription.latestItemDate)
-        <p>Latest item date: $dateFormatter.timeSince($subscription.latestItemDate)</p>
-    #end
-    <p>ETag: $!subscription.etag</p>
-
-    <p>
-        Error: $!subscription.error<br/>
-        Http status: $!subscription.httpStatus
-    </p>
-
-    <a href="$urlBuilder.getSubscriptionItemsUrl($subscription.id)/items">JSON</a> |
-    <a href="$urlBuilder.getSubscriptionItemsUrl($subscription.id)/items?format=rss">RSS</a>
-</div>
-
-<div class="container">
-    #if(!$geotagged.isEmpty())
-        #parse('includes/map.vm')
-        #foreach($feedItem in $geotagged)
-            <script>
-                var marker = L.marker([${feedItem.place.latLong.latitude}, ${feedItem.place.latLong.longitude}]).addTo(map).bindPopup("$feedItem.title");
-                markers.push(marker);
-            </script>
-        #end
-    #end
-
-    #if($feedItems && !$feedItems.isEmpty())
-        <ul>
-            #foreach($feedItem in $feedItems)
-                #parse('includes/feeditem.vm')
+            #if($subscription.lastRead)
+                <p><span title="$subscription.lastRead">Last read: $dateFormatter.timeSince($subscription.lastRead)</span></p>
             #end
-        </ul>
-    #else
-        <p>No items from this subscription.</p>
-    #end
+            #if($subscription.latestItemDate)
+                <p>Latest item date: $dateFormatter.timeSince($subscription.latestItemDate)</p>
+            #end
+            <p>ETag: $!subscription.etag</p>
+
+            <p>
+                Error: $!subscription.error<br/>
+                Http status: $!subscription.httpStatus
+            </p>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="container">
+            #if(!$geotagged.isEmpty())
+                <div class="row">
+                    <div class="container">
+                        #parse('includes/map.vm')
+                        #foreach($feedItem in $geotagged)
+                            <script>
+                                var marker = L.marker([${feedItem.place.latLong.latitude}, ${feedItem.place.latLong.longitude}]).addTo(map).bindPopup("$feedItem.title");
+                                markers.push(marker);
+                            </script>
+                        #end
+                    </div>
+                </div>
+            #end
+
+            #if($feedItems && !$feedItems.isEmpty())
+                #foreach($feedItem in $feedItems)
+                    <div class="row">
+                        <div class="container">
+                            #parse('includes/feeditem.vm')
+                        </div>
+                    </div>
+                #end
+            #else
+                <p>No items from this subscription.</p>
+            #end
+        </div>
+    </div>
 </div>
 
 <script>

@@ -1,31 +1,34 @@
 #parse('includes/header.vm')
 <div class="container">
-    <p><h4>whakaoko</h4>
-    (verb) to listen to.</p>
+    #parse('includes/heading.vm')
+    <div class="row">
+        <div class="container">
+            <h5><a href="$urlBuilder.getUserUrl()">$user.username</a></h5>
+        </div>
+    </div>
 
-    <h5>Channels</h5>
-
-    <p><a href="$urlBuilder.getNewChannelUrl()">New channel</a></p>
-
-    #if($channels && !$channels.isEmpty())
-        <ul>
-        #foreach($channel in $channels)
-            <li><a href="$urlBuilder.getChannelUrl($channel)">$!channel.name</a>
-            </li>
-        #end
-        </ul>
-    #else
-        <p>No channels.</p>
-    #end
-
-    <h5>Subscriptions</h5>
-
-    <p><a href="/ui/subscriptions/new">New subscription</a></p>
-
-    <hr/>
-    <h5>Credentials</h5>
-    <p>Linked Instagram account: $instagramCredentials - <a href="/instagram/authorise/$user.username">Link</a></p>
-    <p>Linked Twitter account: $twitterCredentials - <a href="/twitter/authorise/$user.username">Link</a></p>
-    <hr/>
+    <div class="row">
+        <div class="container">
+            #if($channels && !$channels.isEmpty())
+                <ul>
+                    #foreach($channel in $channels)
+                        <li><a href="$urlBuilder.getChannelUrl($channel)">$!channel.name</a></li>
+                    #end
+                </ul>
+            #else
+                <p>No channels.</p>
+            #end
+            <p><a href="$urlBuilder.getNewChannelUrl()">New channel</a></p>
+            <hr/>
+        </div>
+    </div>
+    <div class="row">
+        <div class="container">
+            <h5>Credentials</h5>
+            <p>Linked Instagram account: $instagramCredentials - <a href="/instagram/authorise/$user.username">Link</a></p>
+            <p>Linked Twitter account: $twitterCredentials - <a href="/twitter/authorise/$user.username">Link</a></p>
+            <hr/>
+        </div>
+    </div>
 </div>
 #parse('includes/footer.vm')
