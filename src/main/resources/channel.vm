@@ -42,8 +42,8 @@
                 #end
             #end
 
-            #if($inbox && !$inbox.isEmpty())
-                #foreach($feedItem in $inbox)
+            #if($feedItems && !$feedItems.isEmpty())
+                #foreach($feedItem in $feedItems)
                     <div class="row">
                         <div class="container">
                             #parse('includes/feeditem.vm')
@@ -51,7 +51,7 @@
                     </div>
                 #end
             #else
-                <p>Inbox currently empty.</p>
+                <p>No feed items.</p>
             #end
         </div>
     </div>

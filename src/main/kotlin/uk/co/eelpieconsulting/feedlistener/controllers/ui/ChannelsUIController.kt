@@ -46,7 +46,7 @@ class ChannelsUIController @Autowired constructor(val usersDAO: UsersDAO,
 
                 if (!subscriptionsForChannel.isEmpty()) {
                     val results = feedItemDAO.getChannelFeedItemsResult(channel, page, q, null)
-                    feedItemPopulator.populateFeedItems(results, mv, "inbox")
+                    feedItemPopulator.populateFeedItems(results, mv, "feedItems")
                 }
                 return mv
 
