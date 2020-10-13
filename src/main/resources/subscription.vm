@@ -4,8 +4,8 @@
     <div class="row">
         <div class="container">
             <div class="float-right">
-                <a href="$urlBuilder.getSubscriptionItemsUrl($subscription.id)/items">JSON</a> |
-                <a href="$urlBuilder.getSubscriptionItemsUrl($subscription.id)/items?format=rss">RSS</a>
+                <a href="$urlBuilder.getSubscriptionItemsUrl($subscription)">JSON</a> |
+                <a href="$urlBuilder.getSubscriptionItemsUrl($subscription)?format=rss">RSS</a>
             </div>
             <h5><a href="$urlBuilder.getUserUrl()">$user.username</a> /
             <a href="$urlBuilder.getChannelUrl($channel)">$channel.name</a> /

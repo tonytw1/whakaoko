@@ -1,5 +1,6 @@
 package uk.co.eelpieconsulting.feedlistener;
 
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -34,19 +35,19 @@ public class UrlBuilder {
     }
 
     public String getDeleteSubscriptionUrl(Subscription subscription) {
-        return getBaseUrl() + "/subscriptions/" + subscription.getId() + "/delete";
+        return subscriptionUrl(subscription) + "/delete";
     }
 
     public String getReadSubscriptionUrl(Subscription subscription) {
-        return getBaseUrl() + "/" + subscription.getUsername() + "/subscriptions/" + subscription.getId() + "/read";
+        return subscriptionUrl(subscription) + "/read";
     }
 
-    public String getSubscriptionItemsUrl(String subscriptionId) {
-        return getBaseUrl() + "/subscriptions/" + subscriptionId;
+    public String getSubscriptionItemsUrl(Subscription subscription) {
+        return subscriptionUrl(subscription) + "/items";
     }
 
-    public String getChannelItemsUrl(String channelId) {
-        return getBaseUrl() + "/channels/" + channelId;
+    public String getChannelItemsUrl(Channel channel) {
+        return getBaseUrl() + "/channels/" + channel.id + "/items";
     }
 
     public String getChannelUrl(Channel channel) {
@@ -61,4 +62,7 @@ public class UrlBuilder {
         return getBaseUrl() + "/ui/channels/new";
     }
 
+    private String subscriptionUrl(Subscription subscription) {
+        return getBaseUrl() + "/subscriptions/" + subscription.getId();
+    }
 }
