@@ -1,5 +1,20 @@
-Sign in
-
-<form action="/signin" method="POST">
-    <input name="username"/>
-</form>
+#parse('includes/header.vm')
+<div class="container">
+    #parse('includes/heading.vm')
+    <div class="row">
+        <div class="col">
+            <form action="/signin" method="POST" class="form-horizontal" accept-charset="UTF-8">
+                <div class="form-group">
+                    <label for="username" class="control-label">Username</label>
+                    <input type="text" class="form-control" name="username" placeholder="Username" value="$!username">
+                </div>
+                <div class="control-group">
+                    <div class="controls">
+                        <input type="submit" name="login" value="Sign in" class="btn btn-primary" />
+                    </div>
+                </div>
+            </form>
+         </div>
+    </div>
+</div>
+#parse('includes/footer.vm')
