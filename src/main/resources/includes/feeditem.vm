@@ -1,7 +1,7 @@
 <div class="row">
     <div class="container">
         <p>
-            #if($feedItem.author.isNotEmpty()) @$feedItem.author - #end <a href="$feedItem.url">#if($feedItem.title) $!feedItem.title#else$feedItem.url#end</a>
+            #if($feedItem.author.isNotEmpty()) @$feedItem.author - #end <a href="$feedItem.url" target="_blank">#if($feedItem.title) $!feedItem.title#else$feedItem.url#end</a>
             #if($feedItem.date)<br/><span title="$feedItem.date">$dateFormatter.timeSince($feedItem.date)</span>#end
             #if(!$subscription)
                 from <a href="$urlBuilder.getSubscriptionUrl($feedItem.subscriptionId)">$feedItem.subscriptionName</a>
