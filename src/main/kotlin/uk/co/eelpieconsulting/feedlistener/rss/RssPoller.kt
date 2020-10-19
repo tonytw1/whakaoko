@@ -26,8 +26,8 @@ class RssPoller @Autowired constructor(val subscriptionsDAO: SubscriptionsDAO, v
                                        val feedFetcher: FeedFetcher, val feedItemDestination: FeedItemDAO,
                                        val feedItemLatestDateFinder: FeedItemLatestDateFinder,
                                        val httpFetcher: HttpFetcher,
-                                       meterRegistry: MeterRegistry,
-                                       classifier: Classifier) {
+                                       val classifier: Classifier,
+                                       meterRegistry: MeterRegistry) {
 
     private val log = Logger.getLogger(RssPoller::class.java)
 
@@ -81,55 +81,55 @@ class RssPoller @Autowired constructor(val subscriptionsDAO: SubscriptionsDAO, v
 
                 log.info("Fetching full feed: " + url)
                 feedFetcher.fetchFeed(subscription).fold(
-                    { fetchedFeed ->
-                        log.info("Fetched feed: " + fetchedFeed.feedName)
-                        log.info("Etag: " + fetchedFeed.etag)
-                        if (!Strings.isNullOrEmpty(fetchedFeed.etag)) {
-                            rssSuccessesEtagged.increment()
-                        } else {
-                            rssSuccessesNotEtagged.increment()
+                        { fetchedFeed ->
+                            log.info("Fetched feed: " + fetchedFeed.feedName)
+                            log.info("Etag: " + fetchedFeed.etag)
+                            if (!Strings.isNullOrEmpty(fetchedFeed.etag)) {
+                                rssSuccessesEtagged.increment()
+                            } else {
+                                rssSuccessesNotEtagged.increment()
+                            }
+                            persistFeedItems(fetchedFeed.feedItems)
+
+                            // TODO needs to be a common concern with all subscriptions types; ie Twitter etc
+                            val itemCount = feedItemDAO.getSubscriptionFeedItemsCount(subscription.id)
+                            val latestItemDate = feedItemLatestDateFinder.getLatestItemDate(fetchedFeed.feedItems)
+
+                            // Backfill the subscription name with the feed title if not already set
+                            if (Strings.isNullOrEmpty(subscription.name)) {
+                                subscription.name = fetchedFeed.feedName
+                            }
+                            subscription.itemCount = itemCount
+                            subscription.latestItemDate = latestItemDate
+                            subscription.etag = fetchedFeed.etag
+                            subscription.httpStatus = fetchedFeed.httpStatus
+                            subscription.error = null
+
+                            log.info("Completed feed fetch for: " + fetchedFeed.feedName + "; saw " + fetchedFeed.feedItems.size + " items. Latest feed item date was: " + latestItemDate)
+                            return Result.success(subscription)
+                        },
+                        { ex ->
+                            return Result.error(ex)
                         }
-                        persistFeedItems(fetchedFeed.feedItems)
-
-                        // TODO needs to be a common concern with all subscriptions types; ie Twitter etc
-                        val itemCount = feedItemDAO.getSubscriptionFeedItemsCount(subscription.id)
-                        val latestItemDate = feedItemLatestDateFinder.getLatestItemDate(fetchedFeed.feedItems)
-
-                        // Backfill the subscription name with the feed title if not already set
-                        if (Strings.isNullOrEmpty(subscription.name)) {
-                            subscription.name = fetchedFeed.feedName
-                        }
-                        subscription.itemCount = itemCount
-                        subscription.latestItemDate = latestItemDate
-                        subscription.etag = fetchedFeed.etag
-                        subscription.httpStatus = fetchedFeed.httpStatus
-                        subscription.error = null
-
-                        log.info("Completed feed fetch for: " + fetchedFeed.feedName + "; saw " + fetchedFeed.feedItems.size + " items. Latest feed item date was: " + latestItemDate)
-                        return Result.success(subscription)
-                    },
-                    { ex ->
-                        return Result.error(ex)
-                    }
                 )
             }
 
             pollFeed(subscription.url, subscription.etag).fold(
-                {updatedSubscription ->
-                    val classificationFor = classifier.classify(subscription)
-                    subscription.classification = classificationFor
+                    { updatedSubscription ->
+                        val classificationFor = classifier.classify(subscription)
+                        subscription.classification = classificationFor
 
-                    subscriptionsDAO.save(updatedSubscription)
-                    log.info("Feed polled with no errors: " +  subscription.url)
+                        subscriptionsDAO.save(updatedSubscription)
+                        log.info("Feed polled with no errors: " + subscription.url)
 
-                }, { ex ->
-                    log.warn("Exception while fetching RSS subscription: " + subscription.url + ": " + ex.javaClass.simpleName)
-                    val errorMessage = ex.message
-                    log.info("Setting feed error to: " + errorMessage + "; http status: "  + ex.httpStatus)
-                    subscription.error = errorMessage
-                    subscription.httpStatus = ex.httpStatus
-                    subscriptionsDAO.save(subscription)
-                }
+                    }, { ex ->
+                log.warn("Exception while fetching RSS subscription: " + subscription.url + ": " + ex.javaClass.simpleName)
+                val errorMessage = ex.message
+                log.info("Setting feed error to: " + errorMessage + "; http status: " + ex.httpStatus)
+                subscription.error = errorMessage
+                subscription.httpStatus = ex.httpStatus
+                subscriptionsDAO.save(subscription)
+            }
             )
         }
 
