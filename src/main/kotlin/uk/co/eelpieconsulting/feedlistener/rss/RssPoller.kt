@@ -17,6 +17,7 @@ import uk.co.eelpieconsulting.feedlistener.http.HttpFetcher
 import uk.co.eelpieconsulting.feedlistener.model.FeedItem
 import uk.co.eelpieconsulting.feedlistener.model.RssSubscription
 import uk.co.eelpieconsulting.feedlistener.model.Subscription
+import uk.co.eelpieconsulting.feedlistener.rss.classification.Classifier
 import java.util.*
 import java.util.function.Consumer
 
@@ -25,7 +26,8 @@ class RssPoller @Autowired constructor(val subscriptionsDAO: SubscriptionsDAO, v
                                        val feedFetcher: FeedFetcher, val feedItemDestination: FeedItemDAO,
                                        val feedItemLatestDateFinder: FeedItemLatestDateFinder,
                                        val httpFetcher: HttpFetcher,
-                                       meterRegistry: MeterRegistry) {
+                                       meterRegistry: MeterRegistry,
+                                       classifier: Classifier) {
 
     private val log = Logger.getLogger(RssPoller::class.java)
 
@@ -114,6 +116,9 @@ class RssPoller @Autowired constructor(val subscriptionsDAO: SubscriptionsDAO, v
 
             pollFeed(subscription.url, subscription.etag).fold(
                 {updatedSubscription ->
+                    val classificationFor = classifier.classify(subscription)
+                    subscription.classification = classificationFor
+
                     subscriptionsDAO.save(updatedSubscription)
                     log.info("Feed polled with no errors: " +  subscription.url)
 

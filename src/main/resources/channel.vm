@@ -23,6 +23,7 @@
                         <br/>
                         <span title="$subscription.latestItemDate">$dateFormatter.timeSince($subscription.latestItemDate)
                     #end
+                    ($subscription.classification)
                     </li>
                 #end
                 </ul>
