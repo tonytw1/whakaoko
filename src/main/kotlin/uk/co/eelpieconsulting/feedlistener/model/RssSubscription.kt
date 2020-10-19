@@ -7,7 +7,7 @@ import org.apache.commons.codec.digest.DigestUtils
 class RssSubscription : Subscription {
 
     lateinit var url: String
-    lateinit var classification: String
+    var classification: String? = null
 
     constructor() {}
     constructor(url: String, channelId: String, username: String) {
