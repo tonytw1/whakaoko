@@ -1,4 +1,4 @@
-package uk.co.eelpieconsulting.feedlistener.controllers.ui
+package uk.co.eelpieconsulting.feedlistener.controllers
 
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
@@ -13,6 +13,7 @@ class CurrentUserService @Autowired constructor(val request: HttpServletRequest,
 
     fun getCurrentUserUser(): User? {
         val username = request.session.getAttribute(signedInUserAttribute)
+        println(username)
         if (username != null) {
             return usersDAO.getByUsername(username as String)
         } else {
