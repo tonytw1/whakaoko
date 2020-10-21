@@ -12,13 +12,18 @@ class CurrentUserService @Autowired constructor(val request: HttpServletRequest,
     private val signedInUserAttribute = "signedInUser"
 
     fun getCurrentUserUser(): User? {
-        val username = request.session.getAttribute(signedInUserAttribute)
-        println(username)
-        if (username != null) {
-            return usersDAO.getByUsername(username as String)
-        } else {
-            return null;
+        // UI sessions have the signed in user on the session
+        val sessionUsername = request.session.getAttribute(signedInUserAttribute)
+        if (sessionUsername != null) {
+            return usersDAO.getByUsername(sessionUsername as String)
         }
+
+        // API clients will have some sort of token on each request
+        val headerUsername = request.getHeader(signedInUserAttribute)
+        if (headerUsername != null) {
+            return usersDAO.getByUsername(headerUsername as String)
+        }
+        return null;
     }
 
     fun setSignedInUser(user: User) {
