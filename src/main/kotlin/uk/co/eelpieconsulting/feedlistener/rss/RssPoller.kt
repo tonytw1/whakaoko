@@ -124,7 +124,6 @@ class RssPoller @Autowired constructor(val subscriptionsDAO: SubscriptionsDAO, v
                 log.info("Setting feed error to: " + errorMessage + "; http status: " + ex.httpStatus)
                 subscription.error = errorMessage
                 subscription.httpStatus = ex.httpStatus
-
             }
             )
 
