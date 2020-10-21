@@ -15,6 +15,7 @@
     <div class="row">
         <div class="container">
             <code><a href="$subscription.url">$subscription.url</a></code>
+            <p>#parse('includes/classification.vm')</p>
             #if($subscription.error)
                 <div class="alert alert-danger" role="alert">
                    Error: $!subscription.error<br/>
