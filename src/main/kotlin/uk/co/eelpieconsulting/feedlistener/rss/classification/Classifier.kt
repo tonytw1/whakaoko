@@ -7,7 +7,7 @@ import uk.co.eelpieconsulting.feedlistener.model.RssSubscription
 class Classifier {
 
     fun classify(subscription: RssSubscription): String? {
-        if (subscription.httpStatus == 200 || subscription.error == null) {
+        if (subscription.httpStatus == 200 && subscription.error == null) {
             return "ok"
         }
         if (subscription.httpStatus == 404) {

@@ -116,9 +116,7 @@ class RssPoller @Autowired constructor(val subscriptionsDAO: SubscriptionsDAO, v
 
             pollFeed(subscription.url, subscription.etag).fold(
                     { updatedSubscription ->
-                        val classificationFor = classifier.classify(subscription)
-                        subscription.classification = classificationFor
-
+                        subscription.classification = classifier.classify(subscription)
                         subscriptionsDAO.save(updatedSubscription)
                         log.info("Feed polled with no errors: " + subscription.url)
 
@@ -128,6 +126,7 @@ class RssPoller @Autowired constructor(val subscriptionsDAO: SubscriptionsDAO, v
                 log.info("Setting feed error to: " + errorMessage + "; http status: " + ex.httpStatus)
                 subscription.error = errorMessage
                 subscription.httpStatus = ex.httpStatus
+                subscription.classification = classifier.classify(subscription)
                 subscriptionsDAO.save(subscription)
             }
             )
