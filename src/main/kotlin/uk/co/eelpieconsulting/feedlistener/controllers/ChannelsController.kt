@@ -2,7 +2,6 @@ package uk.co.eelpieconsulting.feedlistener.controllers
 
 import com.google.common.base.Strings
 import org.apache.log4j.Logger
-import org.joda.time.DateTime
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Controller
 import org.springframework.web.bind.annotation.GetMapping
@@ -85,31 +84,6 @@ class ChannelsController @Autowired constructor(val usersDAO: UsersDAO, val chan
         val newChannel = Channel(idBuilder.makeIdFor(name), name, username)
         channelsDAO.add(username, newChannel)
         return ModelAndView(RedirectView(urlBuilder.getChannelUrl(newChannel)))
-    }
-
-    @RequestMapping("/backfill")
-    fun backfill(): ModelAndView? {
-        var watermark = DateTime.now().plusMonths(6).toDate()
-        var feedItems = feedItemDAO.before(watermark)
-        while (feedItems != null && feedItems.isNotEmpty()) {
-            log.info("Backfilling feeditems before: " + watermark)
-            feedItems.forEach { i ->
-                val subscriptionId = i.subscriptionId;
-                val byId = subscriptionsDAO.getById(subscriptionId);
-                if (byId != null) {
-                    val channelId = byId.channelId
-                    i.channelId = channelId;
-                    feedItemDAO.update(i)
-                } else {
-                    log.warn("Uknown subscription: " + i.subscriptionId)
-                }
-            }
-            watermark = feedItems.last().date
-            feedItems = feedItemDAO.before(watermark)
-        }
-
-        log.info("Backfill finished")
-        return null
     }
 
 }
