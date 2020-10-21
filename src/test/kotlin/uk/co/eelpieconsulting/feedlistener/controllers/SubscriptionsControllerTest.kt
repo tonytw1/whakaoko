@@ -2,6 +2,7 @@ package uk.co.eelpieconsulting.feedlistener.controllers
 
 import org.junit.Test
 import org.mockito.Mockito.*
+import org.springframework.mock.web.MockHttpServletResponse
 import uk.co.eelpieconsulting.common.views.ViewFactory
 import uk.co.eelpieconsulting.feedlistener.UrlBuilder
 import uk.co.eelpieconsulting.feedlistener.daos.FeedItemDAO
@@ -28,6 +29,7 @@ class SubscriptionsControllerTest {
     private val twitterSubscriptionManager = mock(TwitterSubscriptionManager::class.java)
     private val instagramSubscriptionManager = mock(InstagramSubscriptionManager::class.java)
     private val twitterListener = mock(TwitterListener::class.java)
+    private val currentUserService = mock(CurrentUserService::class.java)
 
     val subscriptionsController = SubscriptionsController(usersDAO,
             subscriptionsDAO,
@@ -39,7 +41,9 @@ class SubscriptionsControllerTest {
             rssPoller,
             twitterSubscriptionManager,
             instagramSubscriptionManager,
-            twitterListener
+            twitterListener,
+            currentUserService,
+            MockHttpServletResponse()
     )
 
     @Test
