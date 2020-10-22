@@ -25,6 +25,14 @@ class UsersDAO @Autowired constructor(val dataStoreFactory: DataStoreFactory){
         return loadUserFromDatabase(username);
     }
 
+    fun getByAccessToken(token: String): User? {
+        return try {
+            dataStoreFactory.get().find(User::class.java).filter(Filters.eq("accessToken", token)).first()
+        } catch (e: MongoException) {
+            throw RuntimeException(e)
+        }
+    }
+
     fun save(user: User?) {
         dataStoreFactory.get().save(user)
     }

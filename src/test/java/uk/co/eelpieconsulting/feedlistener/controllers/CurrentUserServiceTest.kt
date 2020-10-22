@@ -25,10 +25,10 @@ class CurrentUserServiceTest {
     }
 
     @Test
-    fun currentUserCanBeSpecifiedInHeaderOnApiRequests() {
+    fun currentUserCanBeSpecifiedInByBearerTokenOnApiRequests() {
         val request = MockHttpServletRequest()
-        request.addHeader("signedInUser", "a-user")
-        `when`(usersDAO.getByUsername("a-user")).thenReturn(user)
+        request.addHeader("Authorization", "Bearer some-token")
+        `when`(usersDAO.getByAccessToken("some-token")).thenReturn(user)
 
         val currentUser = CurrentUserService(request, usersDAO).getCurrentUserUser()
 
