@@ -62,6 +62,7 @@ public class User {
         this.twitterAccessSecret = twitterAccessSecret;
     }
 
+    @JsonIgnore
     public String getAccessToken() {
         return accessToken;
     }
