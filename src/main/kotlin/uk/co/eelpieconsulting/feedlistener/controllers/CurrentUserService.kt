@@ -18,7 +18,7 @@ class CurrentUserService @Autowired constructor(val request: HttpServletRequest,
             return usersDAO.getByUsername(sessionUsername as String)
         }
 
-        // API clients set a beaer token on each request
+        // API clients set a bearer token on each request
         val authorizationHeader = request.getHeader("Authorization")
         if (authorizationHeader != null) {
             val bearerPrefix = "Bearer "
