@@ -25,7 +25,7 @@
     <div class="row">
         <div class="container">
             <h5>Credentials</h5>
-            <p>Access token: !$user.accessToken</p> - <a href="/generate-access-token">Generate</a>
+            <p>Access token: $!user.accessToken - <a href="/generate-access-token">Generate</a>
             <p>Linked Instagram account: $instagramCredentials - <a href="/instagram/authorise/$user.username">Link</a></p>
             <p>Linked Twitter account: $twitterCredentials - <a href="/twitter/authorise/$user.username">Link</a></p>
             <hr/>
