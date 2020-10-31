@@ -11,6 +11,7 @@ import uk.co.eelpieconsulting.feedlistener.daos.UsersDAO
 import uk.co.eelpieconsulting.feedlistener.instagram.InstagramSubscriptionManager
 import uk.co.eelpieconsulting.feedlistener.model.InstagramTagSubscription
 import uk.co.eelpieconsulting.feedlistener.model.RssSubscription
+import uk.co.eelpieconsulting.feedlistener.model.User
 import uk.co.eelpieconsulting.feedlistener.rss.RssPoller
 import uk.co.eelpieconsulting.feedlistener.rss.RssSubscriptionManager
 import uk.co.eelpieconsulting.feedlistener.twitter.TwitterListener
@@ -48,6 +49,7 @@ class SubscriptionsControllerTest {
 
     @Test
     fun reloadShouldImmediatelyRepollRSSSubscription() {
+        `when`(currentUserService.getCurrentUserUser()).thenReturn(User())
         val subscription = RssSubscription("http://localhost/feed", "a-channel", "a-user")
         `when`(subscriptionsDAO.getByRssSubscriptionById(subscription.id)).thenReturn(subscription)
 
@@ -58,6 +60,7 @@ class SubscriptionsControllerTest {
 
     @Test
     fun deletingASubscriptionShouldRemoveThatSubscriptionsFeedItems() {
+        `when`(currentUserService.getCurrentUserUser()).thenReturn(User())
         val subscription = RssSubscription("http://localhost/feed", "a-channel", "a-user")
         `when`(subscriptionsDAO.getById(subscription.id)).thenReturn(subscription)
 
@@ -70,6 +73,7 @@ class SubscriptionsControllerTest {
 
     @Test
     fun deletingAnInstagramSubscriptionShouldUnsubscribeFromInstagram() {
+        `when`(currentUserService.getCurrentUserUser()).thenReturn(User())
         val instagramTagSubscription = InstagramTagSubscription("something", 123L, "", "")
 
         `when`(subscriptionsDAO.getById(instagramTagSubscription.id)).thenReturn(instagramTagSubscription)
