@@ -1,10 +1,8 @@
 package uk.co.eelpieconsulting.feedlistener.twitter;
 
 import org.joda.time.DateTime;
-import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 import twitter4j.MediaEntity;
 import twitter4j.Status;
 import twitter4j.User;
@@ -14,21 +12,19 @@ import uk.co.eelpieconsulting.feedlistener.model.TwitterTagSubscription;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 public class TwitterFeedItemMapperTest {
 
-    @Mock
-    private Status status;
-    @Mock
-    private User user;
+    private static Status status = mock(Status.class);
+    private static User user = mock(User.class);
 
     private TwitterFeedItemMapper twitterFeedItemMapper = new TwitterFeedItemMapper();
     private TwitterTagSubscription twitterSubscription = new TwitterTagSubscription(UUID.randomUUID().toString(), "", "");
 
-    @BeforeEach
-    public void setup() {
-        MockitoAnnotations.initMocks(this);
+    @BeforeAll
+    public static void setup() {
         MediaEntity[] array = new MediaEntity[0];
         when(status.getMediaEntities()).thenReturn(array);
         when(user.getScreenName()).thenReturn("atwitteruser");
