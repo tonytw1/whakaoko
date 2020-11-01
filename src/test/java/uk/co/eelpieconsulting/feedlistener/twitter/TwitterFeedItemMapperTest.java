@@ -1,14 +1,10 @@
 package uk.co.eelpieconsulting.feedlistener.twitter;
 
-import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.when;
-
 import org.joda.time.DateTime;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-
 import twitter4j.MediaEntity;
 import twitter4j.Status;
 import twitter4j.User;
@@ -16,6 +12,9 @@ import uk.co.eelpieconsulting.feedlistener.model.FeedItem;
 import uk.co.eelpieconsulting.feedlistener.model.TwitterTagSubscription;
 
 import java.util.UUID;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.when;
 
 public class TwitterFeedItemMapperTest {
 
@@ -27,7 +26,7 @@ public class TwitterFeedItemMapperTest {
     private TwitterFeedItemMapper twitterFeedItemMapper = new TwitterFeedItemMapper();
     private TwitterTagSubscription twitterSubscription = new TwitterTagSubscription(UUID.randomUUID().toString(), "", "");
 
-    @Before
+    @BeforeEach
     public void setup() {
         MockitoAnnotations.initMocks(this);
         MediaEntity[] array = new MediaEntity[0];

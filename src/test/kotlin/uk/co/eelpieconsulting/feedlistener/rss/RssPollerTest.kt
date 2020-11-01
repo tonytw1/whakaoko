@@ -1,8 +1,8 @@
 package uk.co.eelpieconsulting.feedlistener.rss
 
-import junit.framework.Assert.assertEquals
 import org.joda.time.DateTime
-import org.junit.Assert.assertNull
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Test
 import uk.co.eelpieconsulting.feedlistener.model.FeedItem
 import java.util.*
