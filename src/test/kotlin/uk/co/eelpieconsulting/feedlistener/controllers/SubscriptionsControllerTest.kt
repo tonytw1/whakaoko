@@ -1,6 +1,6 @@
 package uk.co.eelpieconsulting.feedlistener.controllers
 
-import org.junit.Test
+import org.junit.jupiter.api.Test
 import org.mockito.Mockito.*
 import org.springframework.mock.web.MockHttpServletResponse
 import uk.co.eelpieconsulting.common.views.ViewFactory

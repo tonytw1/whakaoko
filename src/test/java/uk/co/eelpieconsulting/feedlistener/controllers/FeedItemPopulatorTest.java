@@ -1,14 +1,14 @@
 package uk.co.eelpieconsulting.feedlistener.controllers;
 
 import org.joda.time.DateTime;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import uk.co.eelpieconsulting.feedlistener.controllers.ui.SubscriptionLabelService;
 import uk.co.eelpieconsulting.feedlistener.model.FeedItem;
 
 import java.util.UUID;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class FeedItemPopulatorTest {
 

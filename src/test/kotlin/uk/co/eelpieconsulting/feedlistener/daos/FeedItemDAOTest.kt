@@ -1,7 +1,7 @@
 package uk.co.eelpieconsulting.feedlistener.daos
 
-import junit.framework.Assert.assertEquals
 import org.joda.time.DateTime
+import org.junit.jupiter.api.Assertions.assertEquals
 import uk.co.eelpieconsulting.feedlistener.model.Channel
 import uk.co.eelpieconsulting.feedlistener.model.FeedItem
 import uk.co.eelpieconsulting.feedlistener.model.RssSubscription

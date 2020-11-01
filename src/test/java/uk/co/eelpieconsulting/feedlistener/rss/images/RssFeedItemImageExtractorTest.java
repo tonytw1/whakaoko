@@ -2,9 +2,9 @@ package uk.co.eelpieconsulting.feedlistener.rss.images;
 
 import com.sun.syndication.feed.module.mediarss.MediaModule;
 import com.sun.syndication.feed.synd.SyndEntry;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 

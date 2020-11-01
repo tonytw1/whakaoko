@@ -1,12 +1,13 @@
 package uk.co.eelpieconsulting.feedlistener.controllers
 
-import org.junit.Assert.assertEquals
-import org.junit.Test
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Test
 import org.mockito.Mockito.`when`
 import org.mockito.Mockito.mock
 import org.springframework.mock.web.MockHttpServletRequest
 import uk.co.eelpieconsulting.feedlistener.daos.UsersDAO
 import uk.co.eelpieconsulting.feedlistener.model.User
+
 class CurrentUserServiceTest {
 
     private val usersDAO = mock(UsersDAO::class.java)
