@@ -1,7 +1,7 @@
 package uk.co.eelpieconsulting.feedlistener.rss.classification
 
 import junit.framework.Assert.assertEquals
-import org.junit.Test
+import org.junit.jupiter.api.Test
 import uk.co.eelpieconsulting.feedlistener.model.RssSubscription
 import java.util.*
 
