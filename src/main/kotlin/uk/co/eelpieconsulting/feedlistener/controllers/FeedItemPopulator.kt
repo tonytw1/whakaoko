@@ -24,7 +24,7 @@ class FeedItemPopulator @Autowired constructor(val subscriptionLabelService: Sub
         // This is repeated processing but makes for a reversible change and an accurate persisted representation of the source feed.
         val cleanedFeedItems: Stream<FeedItem> = feedItems.stream().map { feedItem: FeedItem -> overlyUnescape(feedItem) }
         val withSubscriptionNames = cleanedFeedItems.map { feedItem: FeedItem ->
-            val label = subscriptionLabelService.labelForSubscription(feedItem.subscriptionId!!)
+            val label = subscriptionLabelService.labelForSubscription(feedItem.subscriptionId)
             feedItem.subscriptionName = label
             feedItem
         }.collect(Collectors.toList())

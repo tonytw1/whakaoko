@@ -22,7 +22,7 @@ class DataStoreFactory @Autowired constructor(@Value("\${mongo.uri}") private va
 
     init {
         datastore = createDataStore(mongoUri, mongoDatabase)
-        datastore!!.ensureIndexes()
+        datastore.ensureIndexes()
     }
 
     fun get(): Datastore {
