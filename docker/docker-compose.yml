@@ -1,10 +1,12 @@
 version: '3'
 services:
-  memcached:
-    image: memcached
-    ports:
-    - "11211:11211"
   mongo:
     image: mongo:3.4
+    container_name: mongo
     ports:
     - "27017:27017"
+
+networks:
+  default:
+    external:
+      name: cloudbuild

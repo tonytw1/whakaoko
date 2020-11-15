@@ -10,9 +10,17 @@ import java.util.*
 
 class FeedItemDAOTest {
 
-    val mongoDatabase = "whakaokotest" + UUID.randomUUID().toString();
+    private val mongoDatabase = "whakaokotest" + UUID.randomUUID().toString();
 
-    val dataStoreFactory = DataStoreFactory("mongodb://localhost:27017", mongoDatabase);
+    private val mongoHost = run {
+        var mongoHost = System.getenv("MONGO_HOST");
+        if (mongoHost == null) {
+            mongoHost = "localhost";
+        }
+        mongoHost
+    }
+
+    val dataStoreFactory = DataStoreFactory("mongodb://" + mongoHost + ":27017", mongoDatabase)
     val subscriptionsDAO = SubscriptionsDAO(dataStoreFactory);
     val feedItemDAO = FeedItemDAO(dataStoreFactory, subscriptionsDAO)
     val channelsDAO = ChannelsDAO(dataStoreFactory)
@@ -63,5 +71,4 @@ class FeedItemDAOTest {
         val feedItem = FeedItem(UUID.randomUUID().toString(), url, null, DateTime.now().toDate(), null, null, null, subscription.id, subscription.channelId);
         return feedItem
     }
-
 }
