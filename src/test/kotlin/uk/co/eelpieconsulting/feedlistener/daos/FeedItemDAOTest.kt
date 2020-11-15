@@ -2,6 +2,7 @@ package uk.co.eelpieconsulting.feedlistener.daos
 
 import org.joda.time.DateTime
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Test
 import uk.co.eelpieconsulting.feedlistener.model.Channel
 import uk.co.eelpieconsulting.feedlistener.model.FeedItem
 import uk.co.eelpieconsulting.feedlistener.model.RssSubscription
@@ -16,7 +17,7 @@ class FeedItemDAOTest {
     val feedItemDAO = FeedItemDAO(dataStoreFactory, subscriptionsDAO)
     val channelsDAO = ChannelsDAO(dataStoreFactory)
 
-    //@Test
+    @Test
     fun canFetchSubscriptionFeedItems() {
         val channel = Channel()
         channel.id = UUID.randomUUID().toString()
@@ -31,7 +32,7 @@ class FeedItemDAOTest {
         assertEquals(feedItem.url, reloaded.feedsItems.first().url);
     }
 
-    //@Test
+    @Test
     fun canFetchChannelFeedItems() {
         val channel = Channel()
         channel.id = UUID.randomUUID().toString()
