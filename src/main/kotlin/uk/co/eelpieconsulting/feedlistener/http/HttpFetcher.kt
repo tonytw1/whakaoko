@@ -12,7 +12,7 @@ class HttpFetcher(val userAgent: String, val timeout: Int) {
     private val log = Logger.getLogger(HttpFetcher::class.java)
 
     fun head(url: String): Result<Pair<Headers, Int>, FuelError>  {
-        val (request, response, result) = url.httpHead().
+        val (_, response, result) = url.httpHead().
         timeout(timeout).header("User-Agent", userAgent).
         response()
 
@@ -30,7 +30,7 @@ class HttpFetcher(val userAgent: String, val timeout: Int) {
     }
 
     fun getBytes(url: String): Result<HttpResult, FuelError> {
-        val (request, response, result) = url.httpGet().
+        val (_, response, result) = url.httpGet().
         timeout(timeout).header("User-Agent", userAgent).response()
 
         result.fold({ bytes ->
