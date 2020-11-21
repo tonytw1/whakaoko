@@ -23,7 +23,6 @@ class FeedItemDAOTest {
     val dataStoreFactory = DataStoreFactory("mongodb://" + mongoHost + ":27017", mongoDatabase)
     val subscriptionsDAO = SubscriptionsDAO(dataStoreFactory);
     val feedItemDAO = FeedItemDAO(dataStoreFactory, subscriptionsDAO)
-    val channelsDAO = ChannelsDAO(dataStoreFactory)
 
     @Test
     fun canFetchSubscriptionFeedItems() {
