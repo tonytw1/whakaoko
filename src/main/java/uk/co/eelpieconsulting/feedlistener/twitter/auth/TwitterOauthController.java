@@ -3,9 +3,8 @@ package uk.co.eelpieconsulting.feedlistener.twitter.auth;
 import java.net.UnknownHostException;
 import java.util.Map;
 
-;
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -29,64 +28,64 @@ import com.google.common.collect.Maps;
 
 @Controller
 public class TwitterOauthController {
-	
-	private static Logger log = LogManager.getLogger(TwitterOauthController.class);
-		
-	private final CredentialService credentialService;
-	private final TwitterApiFactory twitterApiFactory;
-	private final TwitterSubscriptionManager twitterSubscriptionManager;
-	private final UrlBuilder urlBuilder;
-	
-	private final Map<String, RequestToken> requestTokens;
-	
-	@Autowired
-	public TwitterOauthController(CredentialService credentialService, TwitterApiFactory twitterApiFactory, TwitterSubscriptionManager twitterSubscriptionManager,
-			UrlBuilder urlBuilder) {
-		this.credentialService = credentialService;
-		this.twitterApiFactory = twitterApiFactory;
-		this.twitterSubscriptionManager = twitterSubscriptionManager;
-		this.urlBuilder = urlBuilder;
-		requestTokens = Maps.newConcurrentMap();
-	}
-	
-	@RequestMapping(value="/twitter/authorise/{username}", method=RequestMethod.GET)
-	public ModelAndView authorize(@PathVariable String username) throws TwitterException {
-		final Twitter twitterApi = twitterApiFactory.getTwitterApi();
-		
-		RequestToken requestToken = twitterApi.getOAuthRequestToken(urlBuilder.getTwitterCallback(username));
-		log.info("Stashing request token: " + requestToken.getToken());
-		requestTokens.put(requestToken.getToken(), requestToken);
-		
-		final String authorizeRedirectUrl = requestToken.getAuthorizationURL();
 
-		log.info("Redirecting user to twitter: " + authorizeRedirectUrl);
-		return new ModelAndView(new RedirectView(authorizeRedirectUrl));
-	}
-	
-	@RequestMapping(value="/twitter/callback/{username}", method=RequestMethod.GET)
-	public ModelAndView callback(@PathVariable String username, @RequestParam(value="oauth_token", required=true) String token,
-			@RequestParam(value="oauth_verifier", required=true) String verifier) throws TwitterException, UnknownHostException, UnknownUserException {		
-		log.info("Received Twitter oauth callback: oauth_token: " + token + ", oauth_verifier: " + verifier);
+    private static Logger log = LogManager.getLogger(TwitterOauthController.class);
 
-		log.info("Popping stashed request token: " + token);
-		final RequestToken requestToken = requestTokens.get(token);
-		if (requestToken == null) {
-			log.warn("Twitter callback mentions an unknown request token: " + token);
-			throw new RuntimeException();
-		}
-		
-		final Twitter twitterApi = twitterApiFactory.getTwitterApi();
-		final AccessToken accessToken = twitterApi.getOAuthAccessToken(requestToken, verifier);
-		
-		log.info("Got twitter access token: " + accessToken);
-		log.info("Got twitter access token: " + accessToken.getToken());
-		log.info("Got twitter access secret: " + accessToken.getTokenSecret());
+    private final CredentialService credentialService;
+    private final TwitterApiFactory twitterApiFactory;
+    private final TwitterSubscriptionManager twitterSubscriptionManager;
+    private final UrlBuilder urlBuilder;
 
-		credentialService.setTwitterAccessTokenForUser(username, accessToken.getToken());
-		credentialService.setTwitterAccessSecretForUser(username, accessToken.getTokenSecret());
+    private final Map<String, RequestToken> requestTokens;
 
-		twitterSubscriptionManager.reconnect();		
-		return null;
-	}
-	
+    @Autowired
+    public TwitterOauthController(CredentialService credentialService, TwitterApiFactory twitterApiFactory, TwitterSubscriptionManager twitterSubscriptionManager,
+                                  UrlBuilder urlBuilder) {
+        this.credentialService = credentialService;
+        this.twitterApiFactory = twitterApiFactory;
+        this.twitterSubscriptionManager = twitterSubscriptionManager;
+        this.urlBuilder = urlBuilder;
+        requestTokens = Maps.newConcurrentMap();
+    }
+
+    @RequestMapping(value = "/twitter/authorise/{username}", method = RequestMethod.GET)
+    public ModelAndView authorize(@PathVariable String username) throws TwitterException {
+        final Twitter twitterApi = twitterApiFactory.getTwitterApi();
+
+        RequestToken requestToken = twitterApi.getOAuthRequestToken(urlBuilder.getTwitterCallback(username));
+        log.info("Stashing request token: " + requestToken.getToken());
+        requestTokens.put(requestToken.getToken(), requestToken);
+
+        final String authorizeRedirectUrl = requestToken.getAuthorizationURL();
+
+        log.info("Redirecting user to twitter: " + authorizeRedirectUrl);
+        return new ModelAndView(new RedirectView(authorizeRedirectUrl));
+    }
+
+    @RequestMapping(value = "/twitter/callback/{username}", method = RequestMethod.GET)
+    public ModelAndView callback(@PathVariable String username, @RequestParam(value = "oauth_token", required = true) String token,
+                                 @RequestParam(value = "oauth_verifier", required = true) String verifier) throws TwitterException, UnknownHostException, UnknownUserException {
+        log.info("Received Twitter oauth callback: oauth_token: " + token + ", oauth_verifier: " + verifier);
+
+        log.info("Popping stashed request token: " + token);
+        final RequestToken requestToken = requestTokens.get(token);
+        if (requestToken == null) {
+            log.warn("Twitter callback mentions an unknown request token: " + token);
+            throw new RuntimeException();
+        }
+
+        final Twitter twitterApi = twitterApiFactory.getTwitterApi();
+        final AccessToken accessToken = twitterApi.getOAuthAccessToken(requestToken, verifier);
+
+        log.info("Got twitter access token: " + accessToken);
+        log.info("Got twitter access token: " + accessToken.getToken());
+        log.info("Got twitter access secret: " + accessToken.getTokenSecret());
+
+        credentialService.setTwitterAccessTokenForUser(username, accessToken.getToken());
+        credentialService.setTwitterAccessSecretForUser(username, accessToken.getTokenSecret());
+
+        twitterSubscriptionManager.reconnect();
+        return null;
+    }
+
 }

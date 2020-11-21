@@ -1,8 +1,7 @@
 package uk.co.eelpieconsulting.feedlistener.twitter;
 
-;
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import twitter4j.StallWarning;
 import twitter4j.Status;
 import twitter4j.StatusDeletionNotice;
@@ -18,68 +17,68 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class TwitterStatusListener implements StatusListener {
-	
-	private final static Logger log = LogManager.getLogger(TwitterListener.class);
 
-	private final FeedItemDAO feedItemDAO;
-	private final TwitterFeedItemMapper twitterFeedItemMapper;
-	private final SubscriptionsDAO subscriptionsDAO;	// TODO subscriptions dao is an odd pass in; list of subscriptions would be better?
-	private final String username;
-	
-	public TwitterStatusListener(FeedItemDAO feedItemDAO, TwitterFeedItemMapper twitterFeedItemMapper, SubscriptionsDAO subscriptionsDAO, String username) {
-		this.feedItemDAO = feedItemDAO;
-		this.twitterFeedItemMapper = twitterFeedItemMapper;
-		this.subscriptionsDAO = subscriptionsDAO;
-		this.username = username;
-	}
+    private final static Logger log = LogManager.getLogger(TwitterListener.class);
 
-	public void onStatus(Status status) {
-		log.info("Received: " + status.getText());
+    private final FeedItemDAO feedItemDAO;
+    private final TwitterFeedItemMapper twitterFeedItemMapper;
+    private final SubscriptionsDAO subscriptionsDAO;    // TODO subscriptions dao is an odd pass in; list of subscriptions would be better?
+    private final String username;
 
-		List<TwitterTagSubscription> usersTwitterSubscriptions = subscriptionsDAO.getTwitterSubscriptionsFor(username);	// TODO dao hint in each tweet =(
-		final List<Subscription> subscriptionsMatchingThisTweet = filterSubscriptionsMatchingThisTweet(usersTwitterSubscriptions, status);
-		for (Subscription subscription : subscriptionsMatchingThisTweet) {
-			final FeedItem tweetFeedItem = twitterFeedItemMapper.createFeedItemFrom(status, subscription);
-			tweetFeedItem.setSubscriptionId(subscription.getId());	// TODO should we be duplicating tweets like this?
-			tweetFeedItem.setChannelId(subscription.getChannelId());
-			subscription.setLatestItemDate(status.getCreatedAt());
-			subscriptionsDAO.save(subscription);
-			
-			try {
-				feedItemDAO.add(tweetFeedItem);
-			} catch (FeeditemPersistanceException e) {
-				log.error(e);
-			}			
-		}	
-	}
-	
-	public void onDeletionNotice(StatusDeletionNotice statusDeletionNotice) {
-		log.warn("Unimplemented deletion notice action for tweet: " + statusDeletionNotice.getStatusId());			// TODO implement
-	}
-	
-	public void onTrackLimitationNotice(int numberOfLimitedStatuses) {
-		log.warn("Limitation notice; numberOfLimitedStatuses: " + numberOfLimitedStatuses);
-	}
+    public TwitterStatusListener(FeedItemDAO feedItemDAO, TwitterFeedItemMapper twitterFeedItemMapper, SubscriptionsDAO subscriptionsDAO, String username) {
+        this.feedItemDAO = feedItemDAO;
+        this.twitterFeedItemMapper = twitterFeedItemMapper;
+        this.subscriptionsDAO = subscriptionsDAO;
+        this.username = username;
+    }
 
-	public void onException(Exception e) {
-		log.error(e);
-	}
+    public void onStatus(Status status) {
+        log.info("Received: " + status.getText());
 
-	@Override
-	public void onScrubGeo(long arg0, long arg1) {
-		log.warn("Unimplemented scrub geo for: " + arg0 + ", " + arg1);	// TODO implement
-	}
-	
-	@Override
-	public void onStallWarning(StallWarning stallWarning) {
-		log.warn("Unimplemented stall warning: " + stallWarning.getMessage());	// TODO implement
-	}
+        List<TwitterTagSubscription> usersTwitterSubscriptions = subscriptionsDAO.getTwitterSubscriptionsFor(username);    // TODO dao hint in each tweet =(
+        final List<Subscription> subscriptionsMatchingThisTweet = filterSubscriptionsMatchingThisTweet(usersTwitterSubscriptions, status);
+        for (Subscription subscription : subscriptionsMatchingThisTweet) {
+            final FeedItem tweetFeedItem = twitterFeedItemMapper.createFeedItemFrom(status, subscription);
+            tweetFeedItem.setSubscriptionId(subscription.getId());    // TODO should we be duplicating tweets like this?
+            tweetFeedItem.setChannelId(subscription.getChannelId());
+            subscription.setLatestItemDate(status.getCreatedAt());
+            subscriptionsDAO.save(subscription);
 
-	// TODO does twitter really not tell us why a tweet matched?
-	private List<Subscription> filterSubscriptionsMatchingThisTweet(List<TwitterTagSubscription> twitterSubscriptions, Status status) {
-		return twitterSubscriptions.stream().filter(subscription ->
-			status.getText().toLowerCase().contains(subscription.getTag().toLowerCase())
-		).collect(Collectors.toList());
-	}
-	
+            try {
+                feedItemDAO.add(tweetFeedItem);
+            } catch (FeeditemPersistanceException e) {
+                log.error(e);
+            }
+        }
+    }
+
+    public void onDeletionNotice(StatusDeletionNotice statusDeletionNotice) {
+        log.warn("Unimplemented deletion notice action for tweet: " + statusDeletionNotice.getStatusId());            // TODO implement
+    }
+
+    public void onTrackLimitationNotice(int numberOfLimitedStatuses) {
+        log.warn("Limitation notice; numberOfLimitedStatuses: " + numberOfLimitedStatuses);
+    }
+
+    public void onException(Exception e) {
+        log.error(e);
+    }
+
+    @Override
+    public void onScrubGeo(long arg0, long arg1) {
+        log.warn("Unimplemented scrub geo for: " + arg0 + ", " + arg1);    // TODO implement
+    }
+
+    @Override
+    public void onStallWarning(StallWarning stallWarning) {
+        log.warn("Unimplemented stall warning: " + stallWarning.getMessage());    // TODO implement
+    }
+
+    // TODO does twitter really not tell us why a tweet matched?
+    private List<Subscription> filterSubscriptionsMatchingThisTweet(List<TwitterTagSubscription> twitterSubscriptions, Status status) {
+        return twitterSubscriptions.stream().filter(subscription ->
+                status.getText().toLowerCase().contains(subscription.getTag().toLowerCase())
+        ).collect(Collectors.toList());
+    }
+
 }

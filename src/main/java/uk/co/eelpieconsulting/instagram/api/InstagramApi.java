@@ -7,8 +7,8 @@ import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.message.BasicNameValuePair;
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -25,8 +25,6 @@ import uk.co.eelpieconsulting.feedlistener.model.InstagramTagSubscription;
 import java.io.UnsupportedEncodingException;
 import java.util.List;
 import java.util.UUID;
-
-;
 
 @Component
 public class InstagramApi {
