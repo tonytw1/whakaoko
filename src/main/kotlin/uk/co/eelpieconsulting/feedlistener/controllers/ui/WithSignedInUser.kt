@@ -1,6 +1,6 @@
 package uk.co.eelpieconsulting.feedlistener.controllers.ui
 
-import org.apache.log4j.LogManager
+import org.apache.logging.log4j.LogManager
 import org.springframework.http.HttpStatus
 import org.springframework.web.servlet.ModelAndView
 import org.springframework.web.servlet.view.RedirectView

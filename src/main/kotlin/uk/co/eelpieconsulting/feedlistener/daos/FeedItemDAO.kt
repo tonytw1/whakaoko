@@ -8,7 +8,7 @@ import dev.morphia.query.FindOptions
 import dev.morphia.query.Query
 import dev.morphia.query.Sort
 import dev.morphia.query.experimental.filters.Filters
-import org.apache.log4j.LogManager
+import org.apache.logging.log4j.LogManager
 
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component

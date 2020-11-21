@@ -5,8 +5,7 @@ import com.github.kittinunf.fuel.core.Headers
 import com.github.kittinunf.fuel.httpGet
 import com.github.kittinunf.fuel.httpHead
 import com.github.kittinunf.result.Result
-import org.apache.log4j.LogManager
-
+import org.apache.logging.log4j.LogManager
 
 class HttpFetcher(val userAgent: String, val timeout: Int) {
 

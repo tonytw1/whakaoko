@@ -1,7 +1,7 @@
 package uk.co.eelpieconsulting.feedlistener.controllers
 
 import com.google.common.base.Strings
-import org.apache.log4j.LogManager
+import org.apache.logging.log4j.LogManager
 
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Controller

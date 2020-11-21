@@ -4,7 +4,7 @@ import com.github.kittinunf.result.Result
 import com.sun.syndication.feed.synd.SyndEntry
 import com.sun.syndication.feed.synd.SyndFeed
 import io.micrometer.core.instrument.MeterRegistry
-import org.apache.log4j.LogManager
+import org.apache.logging.log4j.LogManager
 
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component

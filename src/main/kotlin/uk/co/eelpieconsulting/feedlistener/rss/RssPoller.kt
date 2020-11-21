@@ -3,7 +3,7 @@ package uk.co.eelpieconsulting.feedlistener.rss
 import com.github.kittinunf.result.Result
 import com.google.common.base.Strings
 import io.micrometer.core.instrument.MeterRegistry
-import org.apache.log4j.LogManager
+import org.apache.logging.log4j.LogManager
 
 import org.joda.time.DateTime
 import org.springframework.beans.factory.annotation.Autowired

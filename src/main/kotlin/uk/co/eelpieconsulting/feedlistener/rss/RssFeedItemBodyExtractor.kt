@@ -3,7 +3,7 @@ package uk.co.eelpieconsulting.feedlistener.rss
 import com.google.common.base.Strings
 import com.sun.syndication.feed.synd.SyndContentImpl
 import com.sun.syndication.feed.synd.SyndEntry
-import org.apache.log4j.LogManager
+import org.apache.logging.log4j.LogManager
 import org.springframework.stereotype.Component
 
 @Component

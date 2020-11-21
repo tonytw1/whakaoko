@@ -4,7 +4,7 @@ import com.google.common.base.Strings
 import com.sun.syndication.feed.module.georss.GeoRSSUtils
 import com.sun.syndication.feed.synd.SyndEntry
 import org.apache.commons.lang.StringEscapeUtils
-import org.apache.log4j.LogManager
+import org.apache.logging.log4j.LogManager
 
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component

@@ -1,7 +1,6 @@
 package uk.co.eelpieconsulting.feedlistener.rss
 
-
-import org.apache.log4j.LogManager
+import org.apache.logging.log4j.LogManager
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
 import uk.co.eelpieconsulting.feedlistener.daos.SubscriptionsDAO
