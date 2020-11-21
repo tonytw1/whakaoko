@@ -51,9 +51,9 @@ class FeedItem : RssFeedable {
                 url: String,
                 body: String?,
                 date: Date,
-                place: Place?,
-                imageUrl: String?,
-                author: String?,
+                place: Place? = null,
+                imageUrl: String? = null,
+                author: String? = null,
                 subscriptionId: String,
                 channelId: String) {
         this.title = title
