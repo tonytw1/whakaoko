@@ -1,8 +1,7 @@
 package uk.co.eelpieconsulting.feedlistener.controllers
 
 import com.google.common.base.Strings
-import org.apache.log4j.Logger
-import org.dom4j.rule.Mode
+import org.apache.log4j.LogManager
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Controller
 import org.springframework.web.bind.annotation.*
@@ -41,7 +40,7 @@ class SubscriptionsController @Autowired constructor(private val usersDAO: Users
                                                      currentUserService: CurrentUserService,
                                                      response: HttpServletResponse) : WithSignedInUser(currentUserService, response) {
 
-    private val log = Logger.getLogger(ChannelsController::class.java)
+    private val log = LogManager.getLogger(ChannelsController::class.java)
 
     private val X_TOTAL_COUNT = "X-Total-Count"
 

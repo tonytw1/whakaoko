@@ -5,11 +5,12 @@ import com.github.kittinunf.fuel.core.Headers
 import com.github.kittinunf.fuel.httpGet
 import com.github.kittinunf.fuel.httpHead
 import com.github.kittinunf.result.Result
-import org.apache.log4j.Logger
+import org.apache.log4j.LogManager
+
 
 class HttpFetcher(val userAgent: String, val timeout: Int) {
 
-    private val log = Logger.getLogger(HttpFetcher::class.java)
+    private val log = LogManager.getLogger(HttpFetcher::class.java)
 
     fun head(url: String): Result<Pair<Headers, Int>, FuelError>  {
         val (_, response, result) = url.httpHead().

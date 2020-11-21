@@ -4,7 +4,9 @@ import com.sun.syndication.feed.module.mediarss.MediaEntryModuleImpl;
 import com.sun.syndication.feed.module.mediarss.MediaModule;
 import com.sun.syndication.feed.module.mediarss.types.MediaContent;
 import com.sun.syndication.feed.synd.SyndEntry;
-import org.apache.log4j.Logger;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Component;
 
 import java.util.Arrays;
@@ -16,7 +18,7 @@ import java.util.stream.Stream;
 @Component
 public class MediaModuleImageExtractor {
 
-    private final static Logger log = Logger.getLogger(MediaModuleImageExtractor.class);
+    private final static Logger log = LogManager.getLogger(MediaModuleImageExtractor.class);
 
     private final Set<String> blockedUrlSnippets = Set.of("http://stats.wordpress.com", "gravatar.com/avatar", "share_save_171_16");    // TODO push up
 

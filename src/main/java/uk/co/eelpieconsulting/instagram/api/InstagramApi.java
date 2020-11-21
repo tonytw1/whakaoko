@@ -7,6 +7,7 @@ import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.message.BasicNameValuePair;
+import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -25,10 +26,12 @@ import java.io.UnsupportedEncodingException;
 import java.util.List;
 import java.util.UUID;
 
+;
+
 @Component
 public class InstagramApi {
 
-    private static Logger log = Logger.getLogger(InstagramApi.class);
+    private static Logger log = LogManager.getLogger(InstagramApi.class);
 
     private static final String INSTAGRAM_API_AUTHORIZE = "https://api.instagram.com/oauth/authorize/";
     private static final String INSTAGRAM_API_ACCESS_TOKEN = "https://api.instagram.com/oauth/access_token";

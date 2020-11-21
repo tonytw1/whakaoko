@@ -1,5 +1,7 @@
 package uk.co.eelpieconsulting.feedlistener.twitter;
 
+;
+import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import twitter4j.StallWarning;
 import twitter4j.Status;
@@ -17,7 +19,7 @@ import java.util.stream.Collectors;
 
 public class TwitterStatusListener implements StatusListener {
 	
-	private final static Logger log = Logger.getLogger(TwitterListener.class);
+	private final static Logger log = LogManager.getLogger(TwitterListener.class);
 
 	private final FeedItemDAO feedItemDAO;
 	private final TwitterFeedItemMapper twitterFeedItemMapper;

@@ -3,6 +3,8 @@ package uk.co.eelpieconsulting.feedlistener.twitter.auth;
 import java.net.UnknownHostException;
 import java.util.Map;
 
+;
+import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -28,7 +30,7 @@ import com.google.common.collect.Maps;
 @Controller
 public class TwitterOauthController {
 	
-	private static Logger log = Logger.getLogger(TwitterOauthController.class);
+	private static Logger log = LogManager.getLogger(TwitterOauthController.class);
 		
 	private final CredentialService credentialService;
 	private final TwitterApiFactory twitterApiFactory;

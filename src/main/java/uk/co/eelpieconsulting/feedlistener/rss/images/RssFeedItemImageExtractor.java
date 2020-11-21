@@ -1,7 +1,9 @@
 package uk.co.eelpieconsulting.feedlistener.rss.images;
 
 import com.sun.syndication.feed.synd.SyndEntry;
-import org.apache.log4j.Logger;
+;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -12,7 +14,7 @@ import java.util.Set;
 @Component
 public class RssFeedItemImageExtractor {
 
-    private final static Logger log = Logger.getLogger(RssFeedItemImageExtractor.class);
+    private final static Logger log = LogManager.getLogger(RssFeedItemImageExtractor.class);
 
     private final Set<String> BLOCKED_URL_SNIPPETS = Set.of("http://stats.wordpress.com", "gravatar.com/avatar", "share_save_171_16");
 

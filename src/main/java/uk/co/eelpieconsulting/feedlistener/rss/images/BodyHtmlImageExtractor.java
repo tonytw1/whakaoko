@@ -2,7 +2,9 @@ package uk.co.eelpieconsulting.feedlistener.rss.images;
 
 import com.google.common.base.Strings;
 import com.sun.syndication.feed.synd.SyndEntry;
-import org.apache.log4j.Logger;
+;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.htmlparser.NodeFilter;
 import org.htmlparser.Parser;
 import org.htmlparser.Tag;
@@ -16,7 +18,7 @@ import uk.co.eelpieconsulting.feedlistener.rss.RssFeedItemBodyExtractor;
 @Component
 public class BodyHtmlImageExtractor {
 
-    private static Logger log = Logger.getLogger(BodyHtmlImageExtractor.class);
+    private static Logger log = LogManager.getLogger(BodyHtmlImageExtractor.class);
 
     private final RssFeedItemBodyExtractor rssFeedItemBodyExtractor;
 

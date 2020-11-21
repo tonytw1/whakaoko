@@ -1,7 +1,8 @@
 package uk.co.eelpieconsulting.feedlistener.controllers
 
 import com.google.common.base.Strings
-import org.apache.log4j.Logger
+import org.apache.log4j.LogManager
+
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Controller
 import org.springframework.web.bind.annotation.GetMapping
@@ -16,7 +17,7 @@ import uk.co.eelpieconsulting.feedlistener.model.User
 @Controller
 class UsersController @Autowired constructor(val usersDAO: UsersDAO, val viewFactory: ViewFactory) {
 
-    private val log = Logger.getLogger(DataStoreFactory::class.java)
+    private val log = LogManager.getLogger(DataStoreFactory::class.java)
 
     @GetMapping("/users")
     fun users(): ModelAndView? {

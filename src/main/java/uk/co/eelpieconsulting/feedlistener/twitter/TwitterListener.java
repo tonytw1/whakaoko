@@ -3,7 +3,9 @@ package uk.co.eelpieconsulting.feedlistener.twitter;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
-import org.apache.log4j.Logger;
+;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import twitter4j.FilterQuery;
@@ -23,7 +25,7 @@ import java.util.Set;
 @Component
 public class TwitterListener {
 
-    private final static Logger log = Logger.getLogger(TwitterListener.class);
+    private final static Logger log = LogManager.getLogger(TwitterListener.class);
 
     private final SubscriptionsDAO subscriptionsDAO;
     private final CredentialService credentialService;

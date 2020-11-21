@@ -1,6 +1,6 @@
 package uk.co.eelpieconsulting.feedlistener.controllers.ui
 
-import org.apache.log4j.Logger
+import org.apache.log4j.LogManager
 import org.springframework.http.HttpStatus
 import org.springframework.web.servlet.ModelAndView
 import org.springframework.web.servlet.view.RedirectView
@@ -8,10 +8,9 @@ import uk.co.eelpieconsulting.feedlistener.controllers.CurrentUserService
 import uk.co.eelpieconsulting.feedlistener.model.User
 import javax.servlet.http.HttpServletResponse
 
-
 abstract class WithSignedInUser(val currentUserService: CurrentUserService, val response: HttpServletResponse) {
 
-    private val log = Logger.getLogger(WithSignedInUser::class.java)
+    private val log = LogManager.getLogger(WithSignedInUser::class.java)
 
     fun forCurrentUser(handler: (User) -> ModelAndView?): ModelAndView? {
         val user = currentUserService.getCurrentUserUser()

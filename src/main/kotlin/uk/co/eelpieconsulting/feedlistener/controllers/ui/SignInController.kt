@@ -1,6 +1,7 @@
 package uk.co.eelpieconsulting.feedlistener.controllers.ui
 
-import org.apache.log4j.Logger
+
+import org.apache.log4j.LogManager
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Controller
 import org.springframework.web.bind.annotation.GetMapping
@@ -15,7 +16,7 @@ import javax.servlet.http.HttpServletRequest
 class SignInController @Autowired constructor(val request: HttpServletRequest, val usersDAO: UsersDAO,
                                               val currentUserService: CurrentUserService) {
 
-    private val log = Logger.getLogger(SignInController::class.java)
+    private val log = LogManager.getLogger(SignInController::class.java)
 
     @GetMapping("/signin")
     fun signinPrompt(): ModelAndView {

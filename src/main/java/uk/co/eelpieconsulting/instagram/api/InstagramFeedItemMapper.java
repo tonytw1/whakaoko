@@ -1,6 +1,7 @@
 package uk.co.eelpieconsulting.instagram.api;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.joda.time.DateTime;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -11,7 +12,7 @@ import java.util.UUID;
 
 public class InstagramFeedItemMapper {
 
-    private final static Logger log = Logger.getLogger(InstagramFeedItemMapper.class);
+    private final static Logger log = LogManager.getLogger(InstagramFeedItemMapper.class);
 
     private static final String USERNAME = "username";
     private static final String USER = "user";

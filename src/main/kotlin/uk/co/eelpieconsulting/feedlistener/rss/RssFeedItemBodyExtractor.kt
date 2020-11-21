@@ -3,13 +3,13 @@ package uk.co.eelpieconsulting.feedlistener.rss
 import com.google.common.base.Strings
 import com.sun.syndication.feed.synd.SyndContentImpl
 import com.sun.syndication.feed.synd.SyndEntry
-import org.apache.log4j.Logger
+import org.apache.log4j.LogManager
 import org.springframework.stereotype.Component
 
 @Component
 class RssFeedItemBodyExtractor {
 
-    private val log = Logger.getLogger(RssFeedItemBodyExtractor::class.java)
+    private val log = LogManager.getLogger(RssFeedItemBodyExtractor::class.java)
 
     fun extractBody(syndEntry: SyndEntry): String? {
         val contents = syndEntry.contents // contents returns an untyped list of SyndContentImpl

@@ -8,7 +8,8 @@ import dev.morphia.query.FindOptions
 import dev.morphia.query.Query
 import dev.morphia.query.Sort
 import dev.morphia.query.experimental.filters.Filters
-import org.apache.log4j.Logger
+import org.apache.log4j.LogManager
+
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
 import uk.co.eelpieconsulting.feedlistener.annotations.Timed
@@ -23,7 +24,7 @@ import java.util.regex.Pattern
 @Component
 class FeedItemDAO @Autowired constructor(private val dataStoreFactory: DataStoreFactory, private val subscriptionsDAO: SubscriptionsDAO) {
 
-    private val log = Logger.getLogger(FeedItemDAO::class.java)
+    private val log = LogManager.getLogger(FeedItemDAO::class.java)
 
     private val CHANNEL_ID = "channelId"
     private val SUBSCRIPTION_ID = "subscriptionId"

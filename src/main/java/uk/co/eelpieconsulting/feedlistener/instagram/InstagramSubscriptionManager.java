@@ -2,7 +2,9 @@ package uk.co.eelpieconsulting.feedlistener.instagram;
 
 import java.io.UnsupportedEncodingException;
 
-import org.apache.log4j.Logger;
+;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.json.JSONException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -23,7 +25,7 @@ import uk.co.eelpieconsulting.instagram.api.InstagramApi;
 @Component
 public class InstagramSubscriptionManager {
 
-    private static Logger log = Logger.getLogger(InstagramSubscriptionManager.class);
+    private static Logger log = LogManager.getLogger(InstagramSubscriptionManager.class);
 
     private final UrlBuilder urlBuilder;
     private final CredentialService credentialService;

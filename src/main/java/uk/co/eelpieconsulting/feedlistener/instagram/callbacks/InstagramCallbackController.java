@@ -1,6 +1,7 @@
 package uk.co.eelpieconsulting.feedlistener.instagram.callbacks;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.json.JSONException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -31,7 +32,7 @@ import java.util.List;
 @Controller
 public class InstagramCallbackController {
 
-    private static Logger log = Logger.getLogger(InstagramCallbackController.class);
+    private static Logger log = LogManager.getLogger(InstagramCallbackController.class);
 
     private final InstagramApi instagramApi;
     private final InstagramSubscriptionCallbackParser instagramSubscriptionCallbackParser;

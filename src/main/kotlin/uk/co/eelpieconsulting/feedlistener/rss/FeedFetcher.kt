@@ -4,7 +4,8 @@ import com.github.kittinunf.result.Result
 import com.sun.syndication.feed.synd.SyndEntry
 import com.sun.syndication.feed.synd.SyndFeed
 import io.micrometer.core.instrument.MeterRegistry
-import org.apache.log4j.Logger
+import org.apache.log4j.LogManager
+
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
 import uk.co.eelpieconsulting.feedlistener.http.HttpFetcher
@@ -19,7 +20,7 @@ class FeedFetcher @Autowired constructor(private val httpFetcher: HttpFetcher,
                                          private val rssFeedItemMapper: RssFeedItemMapper,
                                          meterRegistry: MeterRegistry) {
 
-    private val log = Logger.getLogger(FeedFetcher::class.java)
+    private val log = LogManager.getLogger(FeedFetcher::class.java)
 
     private val rssFetchesCounter = meterRegistry.counter("rss_fetches")
     private val rssFetchedBytesCounter = meterRegistry.counter("rss_fetched_bytes")

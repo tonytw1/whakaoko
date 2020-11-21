@@ -4,7 +4,8 @@ import com.google.common.base.Strings
 import com.sun.syndication.feed.module.georss.GeoRSSUtils
 import com.sun.syndication.feed.synd.SyndEntry
 import org.apache.commons.lang.StringEscapeUtils
-import org.apache.log4j.Logger
+import org.apache.log4j.LogManager
+
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
 import uk.co.eelpieconsulting.common.html.HtmlCleaner
@@ -20,7 +21,7 @@ class RssFeedItemMapper @Autowired constructor(private val rssFeedItemImageExtra
                                                private val cachingUrlResolverService: CachingUrlResolverService,
                                                private val urlCleaner: UrlCleaner) {
 
-    private val log = Logger.getLogger(RssFeedItemMapper::class.java)
+    private val log = LogManager.getLogger(RssFeedItemMapper::class.java)
 
     fun createFeedItemFrom(syndEntry: SyndEntry, subscription: Subscription): FeedItem? {
         val place = extractLocationFrom(syndEntry)

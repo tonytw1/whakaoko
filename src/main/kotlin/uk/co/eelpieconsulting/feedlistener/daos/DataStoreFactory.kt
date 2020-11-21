@@ -6,7 +6,8 @@ import dev.morphia.Datastore
 import dev.morphia.Morphia
 import dev.morphia.mapping.DiscriminatorFunction
 import dev.morphia.mapping.MapperOptions
-import org.apache.log4j.Logger
+import org.apache.log4j.LogManager
+
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
@@ -16,7 +17,7 @@ import uk.co.eelpieconsulting.feedlistener.model.*
 class DataStoreFactory @Autowired constructor(@Value("\${mongo.uri}") private val mongoUri: String,
                                               @Value("\${mongo.database}") private val mongoDatabase: String) {
 
-    private val log = Logger.getLogger(DataStoreFactory::class.java)
+    private val log = LogManager.getLogger(DataStoreFactory::class.java)
 
     private val datastore: Datastore
 

@@ -3,7 +3,8 @@ package uk.co.eelpieconsulting.feedlistener.rss
 import com.github.kittinunf.result.Result
 import com.google.common.base.Strings
 import io.micrometer.core.instrument.MeterRegistry
-import org.apache.log4j.Logger
+import org.apache.log4j.LogManager
+
 import org.joda.time.DateTime
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.core.task.TaskExecutor
@@ -29,7 +30,7 @@ class RssPoller @Autowired constructor(val subscriptionsDAO: SubscriptionsDAO, v
                                        val classifier: Classifier,
                                        meterRegistry: MeterRegistry) {
 
-    private val log = Logger.getLogger(RssPoller::class.java)
+    private val log = LogManager.getLogger(RssPoller::class.java)
 
     val rssAddedItems = meterRegistry.counter("rss_added_items")
     val rssSuccessesEtagged = meterRegistry.counter("rss_successes", "etagged", "false")

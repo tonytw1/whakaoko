@@ -2,7 +2,8 @@ package uk.co.eelpieconsulting.feedlistener.instagram.auth;
 
 import java.io.IOException;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.json.JSONException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -25,7 +26,7 @@ import uk.co.eelpieconsulting.instagram.api.InstagramApi;
 @Controller
 public class InstagramOauthController {
 
-    private final static Logger log = Logger.getLogger(InstagramOauthController.class);
+    private final static Logger log = LogManager.getLogger(InstagramOauthController.class);
 
     private static final String INSTAGRAM_OAUTH_CALLBACK = "/instagram/oauth";
 
