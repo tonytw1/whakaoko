@@ -153,22 +153,7 @@ class SubscriptionsController @Autowired constructor(private val usersDAO: Users
 
         return forCurrentUser(::performDelete)
     }
-
-    @Timed(timingNotes = "")
-    @PostMapping("/{username}/subscriptions/feeds")
-    fun addFeedSubscription(@PathVariable username: String, @RequestParam url: String, @RequestParam channel: String): ModelAndView? {
-        fun executeAddSubscription(user: User): ModelAndView? {
-            usersDAO.getByUsername(username)
-            val subscription = rssSubscriptionManager.requestFeedSubscription(url, channel, username)
-            subscriptionsDAO.add(subscription)
-            log.info("Added subscription: $subscription")
-            rssPoller.run(subscription)
-            return ModelAndView(viewFactory.getJsonView()).addObject("data", subscription)
-        }
-
-        return forCurrentUser(::executeAddSubscription)
-    }
-
+    
     @Timed(timingNotes = "")
     @PostMapping("/{username}/subscriptions/twitter/tags")
     fun addTwitterTagSubscription(@PathVariable username: String, @RequestParam tag: String, @RequestParam channel: String): ModelAndView? {
