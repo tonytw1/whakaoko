@@ -1,5 +1,6 @@
 package uk.co.eelpieconsulting.feedlistener.model
 
+import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.annotation.JsonPropertyOrder
 import dev.morphia.annotations.Entity
 import dev.morphia.annotations.Id
@@ -9,6 +10,7 @@ import java.util.*
 
 @Entity("subscriptions")
 @JsonPropertyOrder("id", "name", "channel", "url")
+@JsonInclude(JsonInclude.Include.NON_NULL)
 abstract class Subscription {
     @Id
     var objectId: ObjectId? = null

@@ -1,6 +1,7 @@
 package uk.co.eelpieconsulting.feedlistener.model
 
 import com.fasterxml.jackson.annotation.JsonIgnore
+import com.fasterxml.jackson.annotation.JsonInclude
 import dev.morphia.annotations.*
 import dev.morphia.utils.IndexType
 import org.bson.types.ObjectId
@@ -10,6 +11,7 @@ import java.util.*
 
 @Entity("feeditems")
 @Indexes(Index(fields = [Field(value = "date", type = IndexType.DESC), Field(value = "_id")]), Index(fields = [Field(value = "subscriptionId"), Field(value = "date", type = IndexType.DESC), Field(value = "_id")]))
+@JsonInclude(JsonInclude.Include.NON_NULL)
 class FeedItem : RssFeedable {
 
     @Id
