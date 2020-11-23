@@ -9,6 +9,9 @@
     "/subscriptions/{id}": {
       "get": {
         "summary": "Show subscription",
+        "tags": [
+          "Subscriptions"
+        ],
         "parameters": [
           {
             "name": "id",
@@ -22,7 +25,14 @@
         ],
         "responses": {
           "200": {
-            "description": "The subscription"
+            "description": "A single subscription",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FeedItem"
+                }
+              }
+            }
           }
         }
       }
