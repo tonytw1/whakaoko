@@ -17,6 +17,7 @@ import uk.co.eelpieconsulting.feedlistener.daos.SubscriptionsDAO
 import uk.co.eelpieconsulting.feedlistener.daos.UsersDAO
 import uk.co.eelpieconsulting.feedlistener.instagram.InstagramSubscriptionManager
 import uk.co.eelpieconsulting.feedlistener.model.InstagramSubscription
+import uk.co.eelpieconsulting.feedlistener.model.RssSubscription
 import uk.co.eelpieconsulting.feedlistener.model.TwitterTagSubscription
 import uk.co.eelpieconsulting.feedlistener.model.User
 import uk.co.eelpieconsulting.feedlistener.rss.RssPoller
@@ -104,6 +105,18 @@ class SubscriptionsController @Autowired constructor(private val usersDAO: Users
         }
 
         return forCurrentUser(::renderSubscription)
+    }
+
+    @PostMapping("/subscriptions")
+    fun createSubscription(@RequestBody update: SubscriptionUpdateRequest): ModelAndView? {
+        fun createSubscription(user: User): ModelAndView? {
+            log.info("Got subscription create request: " + update);
+            val subscription = RssSubscription(url = "TODO", channelId = "", username = user.username)
+            subscription.name = update.name
+            return ModelAndView(viewFactory.getJsonView()).addObject("data", subscription)
+        }
+
+        return forCurrentUser(::createSubscription)
     }
 
     @PutMapping("/subscriptions/{id}")
