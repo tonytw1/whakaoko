@@ -35,6 +35,7 @@ class RssPoller @Autowired constructor(val subscriptionsDAO: SubscriptionsDAO, v
     val rssAddedItems = meterRegistry.counter("rss_added_items")
     val rssSuccessesEtagged = meterRegistry.counter("rss_successes", "etagged", "false")
     val rssSuccessesNotEtagged = meterRegistry.counter("rss_successes", "etagged", "true")
+    val rssErrors = meterRegistry.counter("rss_errors")
 
     @Scheduled(fixedRate = 3600000, initialDelay = 300000)
     fun run() {
@@ -76,6 +77,7 @@ class RssPoller @Autowired constructor(val subscriptionsDAO: SubscriptionsDAO, v
                             return Result.success(subscription)
                         }
                     }, { ex ->
+                        rssErrors.increment()
                         return Result.error(FeedFetchingException(message = ex.message!!, httpStatus = ex.response.statusCode))
                     })
                 }
