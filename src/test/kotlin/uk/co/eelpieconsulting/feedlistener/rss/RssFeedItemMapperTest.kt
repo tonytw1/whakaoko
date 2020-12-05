@@ -16,7 +16,7 @@ import java.io.FileInputStream
 class RssFeedItemMapperTest {
 
     @Test
-    fun insideWellingtonMediaBreak() {
+    fun canMapRssSyndEntriesToFeedItem() {
         val rssFeedItemImageExtractor = RssFeedItemImageExtractor(
                 BodyHtmlImageExtractor(RssFeedItemBodyExtractor()),
                 MediaModuleImageExtractor()
