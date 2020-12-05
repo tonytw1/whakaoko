@@ -15,32 +15,47 @@ import java.io.FileInputStream
 
 class RssFeedItemMapperTest {
 
+    private val rssFeedItemImageExtractor = RssFeedItemImageExtractor(
+            BodyHtmlImageExtractor(RssFeedItemBodyExtractor()),
+            MediaModuleImageExtractor()
+    )
+    private val rssFeedItemBodyExtractor = RssFeedItemBodyExtractor()
+    private val cachingUrlResolverService = mock(CachingUrlResolverService::class.java)
+
+    private val rssFeedItemMapper = RssFeedItemMapper(
+            rssFeedItemImageExtractor,
+            rssFeedItemBodyExtractor,
+            cachingUrlResolverService,
+            UrlCleaner()
+    )
+
+    private val subscription = RssSubscription(url = "a-subscription", channelId = "a-channel", username = "a-user")
+
+
     @Test
     fun canMapRssSyndEntriesToFeedItem() {
-        val rssFeedItemImageExtractor = RssFeedItemImageExtractor(
-                BodyHtmlImageExtractor(RssFeedItemBodyExtractor()),
-                MediaModuleImageExtractor()
-        )
-        val rssFeedItemBodyExtractor = RssFeedItemBodyExtractor()
-        val cachingUrlResolverService = mock(CachingUrlResolverService::class.java)
         `when`(cachingUrlResolverService.resolveUrl(anyObject())).thenReturn("http://localhost/something")
-        val rssFeedItemMapper = RssFeedItemMapper(
-                rssFeedItemImageExtractor,
-                rssFeedItemBodyExtractor,
-                cachingUrlResolverService,
-                UrlCleaner()
-        )
 
-        val input = IOUtils.toString(FileInputStream(this.javaClass.classLoader.getResource("inside-wellington-media-break.xml").file))
-        val result = FeedParser().parseSyndFeed(input.toByteArray())
-        val syndFeed = result.get()
-
-        val subscription = RssSubscription(url = "123", channelId = "123", username = "123")
-        val feedItems = syndFeed.entries.iterator().asSequence().map { entire ->
-            rssFeedItemMapper.createFeedItemFrom((entire as SyndEntry), subscription)
-        }.toList()
+        val feedItems = testSyndEntries().map { rssFeedItemMapper.createFeedItemFrom(it, subscription) }
 
         assertEquals(10, feedItems.size)
+    }
+
+    @Test
+    fun feedItemsShouldInheritSubscriptionAndChannel() {
+        `when`(cachingUrlResolverService.resolveUrl(anyObject())).thenReturn("http://localhost/something")
+
+        val feedItems = testSyndEntries().map { rssFeedItemMapper.createFeedItemFrom(it, subscription) }
+
+        val feedItem = feedItems.first()
+        assertEquals(subscription.channelId, feedItem?.channelId)
+        assertEquals(subscription.id, feedItem?.subscriptionId)
+    }
+
+    private fun testSyndEntries(): List<SyndEntry> {
+        val input = IOUtils.toString(FileInputStream(this.javaClass.classLoader.getResource("inside-wellington-media-break.xml").file))
+        val result = FeedParser().parseSyndFeed(input.toByteArray())
+        return result.get().entries.asSequence().map { entry -> entry as SyndEntry }.toList()
     }
 
 }
