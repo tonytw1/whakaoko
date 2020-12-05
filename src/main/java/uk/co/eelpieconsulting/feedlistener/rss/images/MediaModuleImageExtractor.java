@@ -4,7 +4,6 @@ import com.sun.syndication.feed.module.mediarss.MediaEntryModuleImpl;
 import com.sun.syndication.feed.module.mediarss.MediaModule;
 import com.sun.syndication.feed.module.mediarss.types.MediaContent;
 import com.sun.syndication.feed.synd.SyndEntry;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Component;
@@ -29,7 +28,8 @@ public class MediaModuleImageExtractor {
 
             final Stream<MediaContent> mediaContents = Arrays.stream(mediaModule.getMediaContents());
 
-            Comparator<MediaContent> latestImageFirst = Comparator.comparing(MediaContent::getWidth);
+            Comparator<MediaContent> latestImageFirst = Comparator.comparing(mediaContent-> mediaContent.getWidth() != null ? mediaContent.getWidth() : 0);
+
             Stream<MediaContent> nonBlockListedImages = mediaContents.
                     filter(this::isImage).
                     filter(image -> !isBlockListed(image)).
