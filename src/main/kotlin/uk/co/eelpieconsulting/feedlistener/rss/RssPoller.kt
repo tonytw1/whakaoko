@@ -4,7 +4,6 @@ import com.github.kittinunf.result.Result
 import com.google.common.base.Strings
 import io.micrometer.core.instrument.MeterRegistry
 import org.apache.logging.log4j.LogManager
-
 import org.joda.time.DateTime
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.core.task.TaskExecutor
@@ -77,7 +76,6 @@ class RssPoller @Autowired constructor(val subscriptionsDAO: SubscriptionsDAO, v
                             return Result.success(subscription)
                         }
                     }, { ex ->
-                        rssErrors.increment()
                         return Result.error(FeedFetchingException(message = ex.message!!, httpStatus = ex.response.statusCode))
                     })
                 }
@@ -121,12 +119,23 @@ class RssPoller @Autowired constructor(val subscriptionsDAO: SubscriptionsDAO, v
                     { updatedSubscription ->
                         log.info("Feed polled with no errors: " + subscription.url)
 
-                    }, { ex ->
-                log.warn("Exception while fetching RSS subscription: " + subscription.url + ": " + ex.javaClass.simpleName)
-                val errorMessage = ex.message
-                log.info("Setting feed error to: " + errorMessage + "; http status: " + ex.httpStatus)
+                    }, { feedFetchingException ->
+
+                val exceptionName = feedFetchingException.javaClass.simpleName
+                val httpStatus = feedFetchingException.httpStatus
+
+                val errorMessage = feedFetchingException.message
+                log.warn("Exception while fetching RSS subscription: " + subscription.url + ": " + exceptionName)
+
+                log.info("Setting feed error to: " + errorMessage + "; http status: " + httpStatus)
                 subscription.error = errorMessage
-                subscription.httpStatus = ex.httpStatus
+                subscription.httpStatus = httpStatus
+
+                // TODO io.prometheus.client.Counter would let us do dynamic labelling like this:
+                // val rssErrors = Counter.build().name("rss_errors").labelNames("http_status", "exception_name").help("RSS polling errors").register()
+                //  rssErrors.labels(httpStatus, errorMessage).inc()
+                // We want to be able todo the same with micrometer interface
+                rssErrors.increment()
             }
             )
 
