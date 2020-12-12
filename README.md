@@ -186,3 +186,18 @@ or curl:
 ```
 curl -XPOST http://localhost:8080/users?username=new-user
 ```
+
+## Create a channel
+
+## Create a feed
+
+curl -H "Content-type: application/json" -H "Authorization: Bearer YOUR_TOKEN" --data "@create-feed.json" -XPOST http://localhost:8080/subscriptions
+
+Where create-feed.json looks like this:
+```
+{
+	"channel": "meh",
+	"url": "http://www.victoria.ac.nz/home/about/newspubs/news/newslatest/news-rss-feed"
+}
+
+```

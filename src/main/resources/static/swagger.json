@@ -6,6 +6,28 @@
     "version": "1.0.0"
   },
   "paths": {
+    "/subscriptions": {
+      "post": {
+        "summary": "Create subscription",
+        "tags": [
+          "Subscriptions"
+        ],
+        "parameters": [
+        ],
+        "responses": {
+          "200": {
+            "description": "The created subscription",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Subscription"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/subscriptions/{id}": {
       "get": {
         "summary": "Show subscription",
@@ -29,7 +51,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/FeedItem"
+                  "$ref": "#/components/schemas/Subscription"
                 }
               }
             }
@@ -71,6 +93,23 @@
           },
           "channelId": {
             "type": "string"
+          }
+        }
+      },
+      "SubscriptionCreateRequest": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string",""
+            "required": true
+          },
+          "channel": {
+            "type": "string",
+            "required": true,
+            "description": "The id of the channel to add this feed to."
           }
         }
       },

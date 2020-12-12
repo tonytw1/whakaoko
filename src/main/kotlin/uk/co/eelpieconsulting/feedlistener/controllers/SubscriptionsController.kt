@@ -12,6 +12,7 @@ import uk.co.eelpieconsulting.common.views.ViewFactory
 import uk.co.eelpieconsulting.feedlistener.UrlBuilder
 import uk.co.eelpieconsulting.feedlistener.annotations.Timed
 import uk.co.eelpieconsulting.feedlistener.controllers.ui.WithSignedInUser
+import uk.co.eelpieconsulting.feedlistener.daos.ChannelsDAO
 import uk.co.eelpieconsulting.feedlistener.daos.FeedItemDAO
 import uk.co.eelpieconsulting.feedlistener.daos.SubscriptionsDAO
 import uk.co.eelpieconsulting.feedlistener.daos.UsersDAO
@@ -29,6 +30,7 @@ import javax.servlet.http.HttpServletResponse
 @Controller
 class SubscriptionsController @Autowired constructor(private val usersDAO: UsersDAO,
                                                      private val subscriptionsDAO: SubscriptionsDAO,
+                                                     private val channelsDAO: ChannelsDAO,
                                                      private val feedItemPopulator: FeedItemPopulator,
                                                      private val feedItemDAO: FeedItemDAO,
                                                      private val viewFactory: ViewFactory,
@@ -108,11 +110,27 @@ class SubscriptionsController @Autowired constructor(private val usersDAO: Users
     }
 
     @PostMapping("/subscriptions")
-    fun createSubscription(@RequestBody update: SubscriptionUpdateRequest): ModelAndView? {
+    fun createSubscription(@RequestBody create: SubscriptionCreateRequest): ModelAndView? {
         fun createSubscription(user: User): ModelAndView? {
-            log.info("Got subscription create request: " + update);
-            val subscription = RssSubscription(url = "TODO", channelId = "", username = user.username)
-            subscription.name = update.name
+            log.info("Got subscription create request: " + create)
+
+            if (Strings.isNullOrEmpty(create.url) || Strings.isNullOrEmpty(create.channel)) {
+                return null // TODO bad request response
+            }
+
+            // TODO check for existing idempotent feed
+
+            val channel = channelsDAO.getById(create.channel)
+            if (channel == null) {
+                return null // TODO bad request response
+            }
+            // TODO validate channel user
+
+            val subscription = RssSubscription(url = create.url, channelId = channel.id, username = user.username)
+            subscriptionsDAO.add(subscription)
+            log.info("Added subscription: $subscription")
+            rssPoller.run(subscription)
+
             return ModelAndView(viewFactory.getJsonView()).addObject("data", subscription)
         }
 

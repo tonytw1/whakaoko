@@ -5,6 +5,7 @@ import org.mockito.Mockito.*
 import org.springframework.mock.web.MockHttpServletResponse
 import uk.co.eelpieconsulting.common.views.ViewFactory
 import uk.co.eelpieconsulting.feedlistener.UrlBuilder
+import uk.co.eelpieconsulting.feedlistener.daos.ChannelsDAO
 import uk.co.eelpieconsulting.feedlistener.daos.FeedItemDAO
 import uk.co.eelpieconsulting.feedlistener.daos.SubscriptionsDAO
 import uk.co.eelpieconsulting.feedlistener.daos.UsersDAO
@@ -20,6 +21,7 @@ import uk.co.eelpieconsulting.feedlistener.twitter.TwitterSubscriptionManager
 class SubscriptionsControllerTest {
 
     private val usersDAO = mock(UsersDAO::class.java)
+    private val channelsDAO = mock(ChannelsDAO::class.java)
     private val subscriptionsDAO = mock(SubscriptionsDAO::class.java)
     private val feedItemPopulator = mock(FeedItemPopulator::class.java)
     private val feedItemDAO = mock(FeedItemDAO::class.java)
@@ -34,6 +36,7 @@ class SubscriptionsControllerTest {
 
     val subscriptionsController = SubscriptionsController(usersDAO,
             subscriptionsDAO,
+            channelsDAO,
             feedItemPopulator,
             feedItemDAO,
             viewFactory,
