@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.Ordered;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
+import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.HandlerExceptionResolver;
 import org.springframework.web.servlet.ModelAndView;
 import uk.co.eelpieconsulting.common.views.ViewFactory;
@@ -27,12 +28,12 @@ public class ExceptionHandler implements HandlerExceptionResolver, Ordered {
 
     @Override
     public ModelAndView resolveException(HttpServletRequest request, HttpServletResponse response, Object handler, Exception e) {
-        if (e instanceof UnknownSubscriptionException) {
-            response.setStatus(HttpStatus.NOT_FOUND.value());
-            return new ModelAndView(viewFactory.getJsonView()).addObject("data", "Not found");
+        if (e instanceof ResponseStatusException) {
+            response.setStatus(((ResponseStatusException) e).getStatus().value());
+            return new ModelAndView(viewFactory.getJsonView()).addObject("data", e.getMessage());
         }
 
-        log.error("Returing unexpected 500 error", e);
+        log.error("Returning unexpected 500 error", e);
         return new ModelAndView(viewFactory.getJsonView()).addObject("data", "500");
     }
 
