@@ -135,7 +135,7 @@
       "get": {
         "summary": "List feed items for this subscription.",
         "tags": [
-          "Channels"
+          "Subscriptions"
         ],
         "parameters": [
           {
