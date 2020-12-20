@@ -6,6 +6,35 @@
     "version": "1.0.0"
   },
   "paths": {
+    "/channels": {
+      "post": {
+        "summary": "Create a channel",
+        "tags": [
+          "Channels"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateChannelRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The created channel",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Channel"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/{username}/channels": {
       "get": {
         "summary": "List a user's channels",
@@ -233,6 +262,21 @@
           },
           "channelId": {
             "type": "string"
+          }
+        }
+      },
+      "CreateChannelRequest": {
+        "type": "object",
+        "required": [
+          "name", "user"
+        ],
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "user": {
+            "type": "string",
+            "description": "A user id"
           }
         }
       },
