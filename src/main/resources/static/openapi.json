@@ -212,7 +212,8 @@
             "type": "string"
           },
           "url": {
-            "type": "string"
+            "type": "string",
+            "description": "The URL of an RSS feed."
           },
           "channel": {
             "type": "string",
