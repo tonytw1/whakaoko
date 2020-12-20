@@ -130,6 +130,40 @@
           }
         }
       }
+    },
+    "/subscriptions/{id}/items": {
+      "get": {
+        "summary": "List feed items for this subscription.",
+        "tags": [
+          "Channels"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Subscription id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A list of feed items",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/FeedItem"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
