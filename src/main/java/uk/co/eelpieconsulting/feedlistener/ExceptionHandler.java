@@ -30,7 +30,7 @@ public class ExceptionHandler implements HandlerExceptionResolver, Ordered {
     public ModelAndView resolveException(HttpServletRequest request, HttpServletResponse response, Object handler, Exception e) {
         if (e instanceof ResponseStatusException) {
             response.setStatus(((ResponseStatusException) e).getStatus().value());
-            return new ModelAndView(viewFactory.getJsonView()).addObject("data", e.getMessage());
+            return new ModelAndView(viewFactory.getJsonView()).addObject("data", ((ResponseStatusException) e).getReason());
         }
 
         log.error("Returning unexpected 500 error", e);
