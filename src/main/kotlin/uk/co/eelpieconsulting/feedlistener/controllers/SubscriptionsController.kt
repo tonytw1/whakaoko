@@ -3,8 +3,10 @@ package uk.co.eelpieconsulting.feedlistener.controllers
 import com.google.common.base.Strings
 import org.apache.logging.log4j.LogManager
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Controller
 import org.springframework.web.bind.annotation.*
+import org.springframework.web.server.ResponseStatusException
 import org.springframework.web.servlet.ModelAndView
 import org.springframework.web.servlet.view.RedirectView
 import uk.co.eelpieconsulting.common.geo.model.LatLong
@@ -68,7 +70,7 @@ class SubscriptionsController @Autowired constructor(private val usersDAO: Users
                 return mv
 
             } else {
-                return null  // TODO 404
+                throw ResponseStatusException(HttpStatus.NOT_FOUND, "Subscription not found")
             }
         }
 
@@ -86,7 +88,7 @@ class SubscriptionsController @Autowired constructor(private val usersDAO: Users
                 return ModelAndView(viewFactory.getJsonView()).addObject("data", "ok")
 
             } else {
-                return null // TODO 404
+                throw ResponseStatusException(HttpStatus.NOT_FOUND, "Subscription not found")
             }
         }
 
@@ -102,7 +104,7 @@ class SubscriptionsController @Autowired constructor(private val usersDAO: Users
             if (subscription != null) {
                 return ModelAndView(viewFactory.getJsonView()).addObject("data", subscription)
             } else {
-                return null  // TODO 404
+                throw ResponseStatusException(HttpStatus.NOT_FOUND, "Subscription not found")
             }
         }
 
@@ -164,7 +166,7 @@ class SubscriptionsController @Autowired constructor(private val usersDAO: Users
         fun performDelete(use: User): ModelAndView? {
             val subscription = subscriptionsDAO.getById(id)
             if (subscription == null) {
-                return null // TODO 404
+                throw ResponseStatusException(HttpStatus.NOT_FOUND, "Subscription not found")
             }
 
             when (subscription) {
