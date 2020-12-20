@@ -170,17 +170,18 @@
       },
       "SubscriptionCreateRequest": {
         "type": "object",
+        "required": [
+          "channel", "url"
+        ],
         "properties": {
           "name": {
             "type": "string"
           },
           "url": {
-            "type": "string",
-            "required": true
+            "type": "string"
           },
           "channel": {
             "type": "string",
-            "required": true,
             "description": "The id of the channel to add this feed to."
           }
         }
