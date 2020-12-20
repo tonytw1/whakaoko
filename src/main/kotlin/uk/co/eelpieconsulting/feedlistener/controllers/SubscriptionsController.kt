@@ -17,7 +17,6 @@ import uk.co.eelpieconsulting.feedlistener.controllers.ui.WithSignedInUser
 import uk.co.eelpieconsulting.feedlistener.daos.ChannelsDAO
 import uk.co.eelpieconsulting.feedlistener.daos.FeedItemDAO
 import uk.co.eelpieconsulting.feedlistener.daos.SubscriptionsDAO
-import uk.co.eelpieconsulting.feedlistener.daos.UsersDAO
 import uk.co.eelpieconsulting.feedlistener.instagram.InstagramSubscriptionManager
 import uk.co.eelpieconsulting.feedlistener.model.InstagramSubscription
 import uk.co.eelpieconsulting.feedlistener.model.RssSubscription
@@ -30,8 +29,7 @@ import uk.co.eelpieconsulting.feedlistener.twitter.TwitterSubscriptionManager
 import javax.servlet.http.HttpServletResponse
 
 @Controller
-class SubscriptionsController @Autowired constructor(private val usersDAO: UsersDAO,
-                                                     private val subscriptionsDAO: SubscriptionsDAO,
+class SubscriptionsController @Autowired constructor(private val subscriptionsDAO: SubscriptionsDAO,
                                                      private val channelsDAO: ChannelsDAO,
                                                      private val feedItemPopulator: FeedItemPopulator,
                                                      private val feedItemDAO: FeedItemDAO,

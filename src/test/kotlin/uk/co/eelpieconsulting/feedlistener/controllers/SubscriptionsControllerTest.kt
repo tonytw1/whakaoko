@@ -8,7 +8,6 @@ import uk.co.eelpieconsulting.feedlistener.UrlBuilder
 import uk.co.eelpieconsulting.feedlistener.daos.ChannelsDAO
 import uk.co.eelpieconsulting.feedlistener.daos.FeedItemDAO
 import uk.co.eelpieconsulting.feedlistener.daos.SubscriptionsDAO
-import uk.co.eelpieconsulting.feedlistener.daos.UsersDAO
 import uk.co.eelpieconsulting.feedlistener.instagram.InstagramSubscriptionManager
 import uk.co.eelpieconsulting.feedlistener.model.InstagramTagSubscription
 import uk.co.eelpieconsulting.feedlistener.model.RssSubscription
@@ -20,7 +19,6 @@ import uk.co.eelpieconsulting.feedlistener.twitter.TwitterSubscriptionManager
 
 class SubscriptionsControllerTest {
 
-    private val usersDAO = mock(UsersDAO::class.java)
     private val channelsDAO = mock(ChannelsDAO::class.java)
     private val subscriptionsDAO = mock(SubscriptionsDAO::class.java)
     private val feedItemPopulator = mock(FeedItemPopulator::class.java)
@@ -34,8 +32,7 @@ class SubscriptionsControllerTest {
     private val twitterListener = mock(TwitterListener::class.java)
     private val currentUserService = mock(CurrentUserService::class.java)
 
-    val subscriptionsController = SubscriptionsController(usersDAO,
-            subscriptionsDAO,
+    val subscriptionsController = SubscriptionsController(subscriptionsDAO,
             channelsDAO,
             feedItemPopulator,
             feedItemDAO,
