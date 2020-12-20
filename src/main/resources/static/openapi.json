@@ -6,6 +6,40 @@
     "version": "1.0.0"
   },
   "paths": {
+    "/{username}/channels": {
+      "get": {
+        "summary": "List a user's channels",
+        "tags": [
+          "Channels"
+        ],
+        "parameters": [
+          {
+            "name": "username",
+            "in": "path",
+            "description": "A username",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A list of channels",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Channel"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/channels/{id}": {
       "get": {
         "summary": "Show single channel",
