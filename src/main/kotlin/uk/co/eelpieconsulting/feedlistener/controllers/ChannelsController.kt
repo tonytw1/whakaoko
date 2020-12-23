@@ -2,13 +2,9 @@ package uk.co.eelpieconsulting.feedlistener.controllers
 
 import com.google.common.base.Strings
 import org.apache.logging.log4j.LogManager
-
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Controller
-import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.PathVariable
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RequestParam
+import org.springframework.web.bind.annotation.*
 import org.springframework.web.servlet.ModelAndView
 import org.springframework.web.servlet.view.RedirectView
 import uk.co.eelpieconsulting.common.views.ViewFactory
@@ -21,6 +17,7 @@ import uk.co.eelpieconsulting.feedlistener.daos.SubscriptionsDAO
 import uk.co.eelpieconsulting.feedlistener.daos.UsersDAO
 import uk.co.eelpieconsulting.feedlistener.model.Channel
 import uk.co.eelpieconsulting.feedlistener.model.User
+import java.util.*
 import javax.servlet.http.HttpServletResponse
 
 @Controller
@@ -56,6 +53,26 @@ class ChannelsController @Autowired constructor(val usersDAO: UsersDAO, val chan
         }
 
         return forCurrentUser(::renderChannel)
+    }
+
+    @PostMapping("/channels")
+    fun createSubscription(@RequestBody create: CreateChannelRequest): ModelAndView? {
+        fun createChannel(user: User): ModelAndView? {
+            log.info("Got channel create request: " + create)
+            if (Strings.isNullOrEmpty(create.name)) {
+                return null // TODO bad request response
+            }
+
+            // TODO check for existing channel with same name
+
+            val channel = Channel(id = UUID.randomUUID().toString(), name = create.name, username = user.username)
+            channelsDAO.save(channel)
+            log.info("Added channel: $channel")
+
+            return ModelAndView(viewFactory.getJsonView()).addObject("data", channel)
+        }
+
+        return forCurrentUser(::createChannel)
     }
 
     @GetMapping("/channels/{id}/subscriptions")
@@ -100,6 +117,7 @@ class ChannelsController @Autowired constructor(val usersDAO: UsersDAO, val chan
         return forCurrentUser(::renderChannelItems)
     }
 
+    // TODO deprecated or move to UI
     @RequestMapping("/{username}/channels")
     fun addChannel(@PathVariable username: String, @RequestParam name: String): ModelAndView? {
         fun executeAddChannel(user: User): ModelAndView? {

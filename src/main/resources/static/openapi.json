@@ -268,15 +268,11 @@
       "CreateChannelRequest": {
         "type": "object",
         "required": [
-          "name", "user"
+          "name"
         ],
         "properties": {
           "name": {
             "type": "string"
-          },
-          "user": {
-            "type": "string",
-            "description": "A user id"
           }
         }
       },
