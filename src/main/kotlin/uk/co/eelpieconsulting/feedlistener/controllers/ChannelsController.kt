@@ -6,9 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Controller
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.servlet.ModelAndView
-import org.springframework.web.servlet.view.RedirectView
 import uk.co.eelpieconsulting.common.views.ViewFactory
-import uk.co.eelpieconsulting.feedlistener.IdBuilder
 import uk.co.eelpieconsulting.feedlistener.UrlBuilder
 import uk.co.eelpieconsulting.feedlistener.controllers.ui.WithSignedInUser
 import uk.co.eelpieconsulting.feedlistener.daos.ChannelsDAO
@@ -21,9 +19,11 @@ import java.util.*
 import javax.servlet.http.HttpServletResponse
 
 @Controller
-class ChannelsController @Autowired constructor(val usersDAO: UsersDAO, val channelsDAO: ChannelsDAO,
-                                                val viewFactory: ViewFactory, val subscriptionsDAO: SubscriptionsDAO,
-                                                val urlBuilder: UrlBuilder, val idBuilder: IdBuilder,
+class ChannelsController @Autowired constructor(val usersDAO: UsersDAO,
+                                                val channelsDAO: ChannelsDAO,
+                                                val viewFactory: ViewFactory,
+                                                val subscriptionsDAO: SubscriptionsDAO,
+                                                val urlBuilder: UrlBuilder,
                                                 val feedItemPopulator: FeedItemPopulator,
                                                 val feedItemDAO: FeedItemDAO,
                                                 currentUserService: CurrentUserService,
@@ -115,19 +115,6 @@ class ChannelsController @Autowired constructor(val usersDAO: UsersDAO, val chan
         }
 
         return forCurrentUser(::renderChannelItems)
-    }
-
-    // TODO deprecated or move to UI
-    @RequestMapping("/{username}/channels")
-    fun addChannel(@PathVariable username: String, @RequestParam name: String): ModelAndView? {
-        fun executeAddChannel(user: User): ModelAndView? {
-            usersDAO.getByUsername(username)
-            val newChannel = Channel(idBuilder.makeIdFor(name), name, username)
-            channelsDAO.add(username, newChannel)
-            return ModelAndView(RedirectView(urlBuilder.getChannelUrl(newChannel)))
-        }
-
-        return forCurrentUser(::executeAddChannel)
     }
 
 }

@@ -2,16 +2,18 @@ package uk.co.eelpieconsulting.feedlistener.controllers.ui
 
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Controller
-import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.PathVariable
-import org.springframework.web.bind.annotation.RequestParam
+import org.springframework.web.bind.annotation.*
 import org.springframework.web.servlet.ModelAndView
+import org.springframework.web.servlet.view.RedirectView
+import uk.co.eelpieconsulting.feedlistener.IdBuilder
+import uk.co.eelpieconsulting.feedlistener.UrlBuilder
 import uk.co.eelpieconsulting.feedlistener.controllers.CurrentUserService
 import uk.co.eelpieconsulting.feedlistener.controllers.FeedItemPopulator
 import uk.co.eelpieconsulting.feedlistener.daos.ChannelsDAO
 import uk.co.eelpieconsulting.feedlistener.daos.FeedItemDAO
 import uk.co.eelpieconsulting.feedlistener.daos.SubscriptionsDAO
 import uk.co.eelpieconsulting.feedlistener.daos.UsersDAO
+import uk.co.eelpieconsulting.feedlistener.model.Channel
 import uk.co.eelpieconsulting.feedlistener.model.User
 import javax.servlet.http.HttpServletResponse
 
@@ -21,6 +23,8 @@ class ChannelsUIController @Autowired constructor(val usersDAO: UsersDAO,
                                                   val feedItemPopulator: FeedItemPopulator,
                                                   val channelsDAO: ChannelsDAO,
                                                   val feedItemDAO: FeedItemDAO,
+                                                  val idBuilder: IdBuilder,
+                                                  val urlBuilder: UrlBuilder,
                                                   currentUserService: CurrentUserService,
                                                   response: HttpServletResponse) : WithSignedInUser(currentUserService, response) {
 
@@ -32,6 +36,16 @@ class ChannelsUIController @Autowired constructor(val usersDAO: UsersDAO,
         return forCurrentUser(::newChannelPage)
     }
 
+    @PostMapping("/ui/channels/new")
+    fun addChannel(@PathVariable username: String, @RequestParam name: String): ModelAndView? {
+        fun executeAddChannel(user: User): ModelAndView? {
+            val newChannel = Channel(idBuilder.makeIdFor(name), name, username)
+            channelsDAO.add(username, newChannel)
+            return ModelAndView(RedirectView(urlBuilder.getChannelUrl(newChannel)))
+        }
+
+        return forCurrentUser(::executeAddChannel)
+    }
 
     @GetMapping("/ui/channels/{id}")
     fun channel(@PathVariable id: String,

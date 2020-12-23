@@ -1,4 +1,4 @@
-<form action="/$user.username/channels" method="POST">
+<form action="/ui/channels/new" method="POST">
 	Name: <input name="name" />
 	<input type="submit" />
 </form>
