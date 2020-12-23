@@ -189,6 +189,8 @@ curl -XPOST http://localhost:8080/users?username=new-user
 
 ## Create a channel
 
+TODO
+
 ## Create a feed
 
 curl -H "Content-type: application/json" -H "Authorization: Bearer YOUR_TOKEN" --data "@create-feed.json" -XPOST http://localhost:8080/subscriptions
