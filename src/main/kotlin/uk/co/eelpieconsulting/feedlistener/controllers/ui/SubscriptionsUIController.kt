@@ -39,7 +39,7 @@ class SubscriptionsUIController @Autowired constructor(val usersDAO: UsersDAO, v
         fun newChannelPrompt(user: User): ModelAndView {
             return ModelAndView("newSubscription").
             addObject("username", user.username).
-            addObject("channels", channelsDAO.getChannels(user.username))
+            addObject("channels", channelsDAO.getChannelsFor(user))
         }
 
         return forCurrentUser(::newChannelPrompt)

@@ -9,6 +9,7 @@ import org.apache.logging.log4j.LogManager
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
 import uk.co.eelpieconsulting.feedlistener.model.Channel
+import uk.co.eelpieconsulting.feedlistener.model.User
 
 @Component
 class ChannelsDAO @Autowired constructor(val dataStoreFactory: DataStoreFactory) {
@@ -17,9 +18,9 @@ class ChannelsDAO @Autowired constructor(val dataStoreFactory: DataStoreFactory)
 
     private val NAME_ASCENDING = Sort.ascending("name")
 
-    fun getChannels(username: String?): List<Channel> {
+    fun getChannelsFor(user: User): List<Channel> {
         return try {
-            val channelsByUser = dataStoreFactory.get().find<Channel>(Channel::class.java).filter(Filters.eq("username", username))
+            val channelsByUser = dataStoreFactory.get().find<Channel>(Channel::class.java).filter(Filters.eq("username", user.username))
             channelsByUser.iterator(FindOptions().sort(NAME_ASCENDING)).toList()
         } catch (e: MongoException) {
             throw RuntimeException(e)
@@ -31,8 +32,8 @@ class ChannelsDAO @Autowired constructor(val dataStoreFactory: DataStoreFactory)
     }
 
     @Synchronized
-    fun add(username: String, channel: Channel) {
-        if (!channelExists(username, channel)) {
+    fun add(user: User, channel: Channel) {
+        if (!channelExists(user, channel)) {
             log.info("Adding new channel: $channel")
             save(channel)
         } else {
@@ -48,8 +49,8 @@ class ChannelsDAO @Autowired constructor(val dataStoreFactory: DataStoreFactory)
         }
     }
 
-    private fun channelExists(username: String, channel: Channel): Boolean {
-        for (existingChannel in getChannels(username)) {
+    private fun channelExists(user: User, channel: Channel): Boolean {
+        for (existingChannel in getChannelsFor(user)) {
             if (existingChannel.id == channel.id) {
                 return true
             }

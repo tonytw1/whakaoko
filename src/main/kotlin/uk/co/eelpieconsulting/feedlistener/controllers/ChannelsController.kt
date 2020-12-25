@@ -12,15 +12,13 @@ import uk.co.eelpieconsulting.feedlistener.controllers.ui.WithSignedInUser
 import uk.co.eelpieconsulting.feedlistener.daos.ChannelsDAO
 import uk.co.eelpieconsulting.feedlistener.daos.FeedItemDAO
 import uk.co.eelpieconsulting.feedlistener.daos.SubscriptionsDAO
-import uk.co.eelpieconsulting.feedlistener.daos.UsersDAO
 import uk.co.eelpieconsulting.feedlistener.model.Channel
 import uk.co.eelpieconsulting.feedlistener.model.User
 import java.util.*
 import javax.servlet.http.HttpServletResponse
 
 @Controller
-class ChannelsController @Autowired constructor(val usersDAO: UsersDAO,
-                                                val channelsDAO: ChannelsDAO,
+class ChannelsController @Autowired constructor(val channelsDAO: ChannelsDAO,
                                                 val viewFactory: ViewFactory,
                                                 val subscriptionsDAO: SubscriptionsDAO,
                                                 val urlBuilder: UrlBuilder,
@@ -36,9 +34,7 @@ class ChannelsController @Autowired constructor(val usersDAO: UsersDAO,
     @GetMapping("/{username}/channels")
     fun channelsJson(@PathVariable username: String): ModelAndView? {
         fun renderChannels(user: User): ModelAndView? {
-            usersDAO.getByUsername(username)
-            log.info("Channels for user: $username")
-            return ModelAndView(viewFactory.getJsonView()).addObject("data", channelsDAO.getChannels(username))
+            return ModelAndView(viewFactory.getJsonView()).addObject("data", channelsDAO.getChannelsFor(user))
         }
 
         return forCurrentUser(::renderChannels)
@@ -47,7 +43,6 @@ class ChannelsController @Autowired constructor(val usersDAO: UsersDAO,
     @GetMapping("/channels/{id}")
     fun channel(@PathVariable username: String, @PathVariable id: String): ModelAndView? {
         fun renderChannel(user: User): ModelAndView? {
-            usersDAO.getByUsername(username)
             val channel = channelsDAO.getById(id)
             return ModelAndView(viewFactory.getJsonView()).addObject("data", channel)
         }
