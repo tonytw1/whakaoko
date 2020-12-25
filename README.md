@@ -189,17 +189,12 @@ curl -XPOST http://localhost:8080/users?username=new-user
 
 ## Create a channel
 
-TODO
+```
+curl -X POST "/channels" -H "Authorization: Bearer YOUR_TOKEN" -H "Content-Type: application/json" -d "{\"name\":\"A channel\"}"
+```
 
 ## Create a feed
 
-curl -H "Content-type: application/json" -H "Authorization: Bearer YOUR_TOKEN" --data "@create-feed.json" -XPOST http://localhost:8080/subscriptions
-
-Where create-feed.json looks like this:
 ```
-{
-	"channel": "meh",
-	"url": "http://www.victoria.ac.nz/home/about/newspubs/news/newslatest/news-rss-feed"
-}
-
+curl -X POST "/subscriptions" -H "Authorization: Bearer YOUR_TOKEN" -H  "Content-Type: application/json" -d "{\"channel\":\"a-channel\",\"url\":\"http://www.victoria.ac.nz/home/about/newspubs/news/newslatest/news-rss-feed\"}"
 ```
