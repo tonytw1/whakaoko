@@ -9,7 +9,6 @@ import org.springframework.web.bind.annotation.*
 import org.springframework.web.server.ResponseStatusException
 import org.springframework.web.servlet.ModelAndView
 import org.springframework.web.servlet.view.RedirectView
-import uk.co.eelpieconsulting.common.geo.model.LatLong
 import uk.co.eelpieconsulting.common.views.ViewFactory
 import uk.co.eelpieconsulting.feedlistener.UrlBuilder
 import uk.co.eelpieconsulting.feedlistener.annotations.Timed
@@ -17,13 +16,10 @@ import uk.co.eelpieconsulting.feedlistener.controllers.ui.WithSignedInUser
 import uk.co.eelpieconsulting.feedlistener.daos.ChannelsDAO
 import uk.co.eelpieconsulting.feedlistener.daos.FeedItemDAO
 import uk.co.eelpieconsulting.feedlistener.daos.SubscriptionsDAO
-import uk.co.eelpieconsulting.feedlistener.instagram.InstagramSubscriptionManager
-import uk.co.eelpieconsulting.feedlistener.model.InstagramSubscription
 import uk.co.eelpieconsulting.feedlistener.model.RssSubscription
 import uk.co.eelpieconsulting.feedlistener.model.TwitterTagSubscription
 import uk.co.eelpieconsulting.feedlistener.model.User
 import uk.co.eelpieconsulting.feedlistener.rss.RssPoller
-import uk.co.eelpieconsulting.feedlistener.rss.RssSubscriptionManager
 import uk.co.eelpieconsulting.feedlistener.twitter.TwitterListener
 import uk.co.eelpieconsulting.feedlistener.twitter.TwitterSubscriptionManager
 import javax.servlet.http.HttpServletResponse
@@ -35,10 +31,8 @@ class SubscriptionsController @Autowired constructor(private val subscriptionsDA
                                                      private val feedItemDAO: FeedItemDAO,
                                                      private val viewFactory: ViewFactory,
                                                      private val urlBuilder: UrlBuilder,
-                                                     private val rssSubscriptionManager: RssSubscriptionManager,
                                                      private val rssPoller: RssPoller,
                                                      private val twitterSubscriptionManager: TwitterSubscriptionManager,
-                                                     private val instagramSubscriptionManager: InstagramSubscriptionManager,
                                                      private val twitterListener: TwitterListener,
                                                      currentUserService: CurrentUserService,
                                                      response: HttpServletResponse) : WithSignedInUser(currentUserService, response) {
@@ -168,9 +162,6 @@ class SubscriptionsController @Autowired constructor(private val subscriptionsDA
             }
 
             when (subscription) {
-                is InstagramSubscription -> {
-                    instagramSubscriptionManager.requestUnsubscribeFrom(subscription.subscriptionId)
-                }
                 is TwitterTagSubscription -> {
                     twitterListener.connect()
                 }
@@ -195,38 +186,6 @@ class SubscriptionsController @Autowired constructor(private val subscriptionsDA
         }
 
         return forCurrentUser(::executeAddTwitterTag)
-    }
-
-    @Timed(timingNotes = "")
-    @PostMapping("/{username}/subscriptions/instagram/tags")
-    fun addInstagramTagSubscription(@PathVariable username: String,
-                                    @RequestParam tag: String, @RequestParam channel: String): ModelAndView? {
-        fun executeAddInstagramTag(user: User): ModelAndView? {
-            log.info("Instagram tag")
-            val subscription = instagramSubscriptionManager.requestInstagramTagSubscription(tag, channel, username)
-            subscriptionsDAO.add(subscription)
-            return ModelAndView(RedirectView(urlBuilder.getBaseUrl()))
-        }
-
-        return forCurrentUser(::executeAddInstagramTag)
-    }
-
-    @Timed(timingNotes = "")
-    @PostMapping("/{username}/subscriptions/instagram/geography")
-    fun addInstagramTagSubscription(@PathVariable username: String,
-                                    @RequestParam latitude: Double,
-                                    @RequestParam longitude: Double,
-                                    @RequestParam radius: Int,
-                                    @RequestParam channel: String): ModelAndView? {
-        fun executeAddGeoSubscription(user: User): ModelAndView? {
-            val latLong = LatLong(latitude, longitude)
-            val instagramGeographySubscription = instagramSubscriptionManager.requestInstagramGeographySubscription(latLong, radius, channel, username)
-            log.info("Saving subscription: $instagramGeographySubscription")
-            subscriptionsDAO.add(instagramGeographySubscription)
-            return ModelAndView(RedirectView(urlBuilder.getBaseUrl()))
-        }
-
-        return forCurrentUser(::executeAddGeoSubscription)
     }
 
 }

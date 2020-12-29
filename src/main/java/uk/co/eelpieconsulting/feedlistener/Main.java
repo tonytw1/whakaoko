@@ -49,11 +49,6 @@ public class Main {
     }
 
     @Bean
-    public uk.co.eelpieconsulting.common.http.HttpFetcher commonHttpFetcher() {
-        return new uk.co.eelpieconsulting.common.http.HttpFetcher ("UTF-8", "Whakaoko", 30000);
-    }
-
-    @Bean
     public TaskExecutor taskExecutor() {
         ThreadPoolTaskExecutor taskExecutor = new ThreadPoolTaskExecutor();
         taskExecutor.setCorePoolSize(5);

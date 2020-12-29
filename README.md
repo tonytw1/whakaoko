@@ -27,17 +27,6 @@ The following subscriptions are currently supported:
 	Twitter tag
 	Content tagged with a twitter hashtag. ie. #twickenham
 
-- Instagram
-
-Receives Instagram posts via the Instagram call back API.
-The following subscriptions are currently supported:
-
-	Instagram tag
-	Content tagged with an instragram tag. ie. #twickenham
-
-	Instagram geography
-	Geotagged Instagram content within a given latitude/longitude/radius boundary.
-
 
 ### Channels
 
@@ -116,39 +105,6 @@ Request a new subscription to a RSS or ATOM feed url.
 	
 Request a new subscription to a Twitter tag.
 Requires the API users account to be linked to a Twitter account.
-
-
-#### POST /subscriptions/instagram/tags
-
-
-| Parameter	|	Description |
-|----------|----------------|
-|channel|The channel id to add this subscription to|
-|tag|The twitter tag to subscribed to|
-	
-Request a new subscription to an Instagram tag.
-Requires the API users account to be linked to an Instagram account.
-
-	
-#### POST /subscriptions/instagram/geography
-
-| Parameter	|	Description |
-|----------|---------------- |
-|channel | The channel id to add this subscription to|
-|latitude | The latitude of the center of circle to follow|
-|longitude | The longitude of the center of circle to follow|
-|radius | The radius in metres of the circle to follow (1 - 5000)|
-
-Request a new subscription to an Instagram geography. An Instagram geography is a circle
-centered on a given latitude/longitude with a radius upto 5000 metres.
-
-Requires the API users account to be linked to an Instagram account.
-
-
-#### /instagram/authorise
-	
-Initiate linking of an Instragram account by redirecting to the Instagram authorise url.
-
 
 #### /twitter/authorise
 

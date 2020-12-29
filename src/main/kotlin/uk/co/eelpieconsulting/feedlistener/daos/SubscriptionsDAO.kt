@@ -9,7 +9,6 @@ import dev.morphia.query.experimental.filters.Filters
 import org.apache.logging.log4j.LogManager
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
-import uk.co.eelpieconsulting.feedlistener.model.InstagramSubscription
 import uk.co.eelpieconsulting.feedlistener.model.RssSubscription
 import uk.co.eelpieconsulting.feedlistener.model.Subscription
 import uk.co.eelpieconsulting.feedlistener.model.TwitterTagSubscription
@@ -70,11 +69,6 @@ class SubscriptionsDAO @Autowired constructor(private val dataStoreFactory: Data
     fun delete(subscription: Subscription) {
         log.info("Deleting subscription: $subscription")
         dataStoreFactory.get().find(Subscription::class.java).filter(Filters.eq("id", subscription.id)).delete()
-    }
-
-    @Throws(MongoException::class)
-    fun getByInstagramId(subscriptionId: Long?): InstagramSubscription {
-        return dataStoreFactory.get().find(InstagramSubscription::class.java).filter(Filters.eq("subscriptionId", subscriptionId)).first() // TODO subscriptionId is not a very clear field name
     }
 
     fun twitterSubscriptions(): List<Subscription> {

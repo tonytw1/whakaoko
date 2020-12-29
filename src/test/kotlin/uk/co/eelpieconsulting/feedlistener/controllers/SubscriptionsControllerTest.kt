@@ -8,12 +8,9 @@ import uk.co.eelpieconsulting.feedlistener.UrlBuilder
 import uk.co.eelpieconsulting.feedlistener.daos.ChannelsDAO
 import uk.co.eelpieconsulting.feedlistener.daos.FeedItemDAO
 import uk.co.eelpieconsulting.feedlistener.daos.SubscriptionsDAO
-import uk.co.eelpieconsulting.feedlistener.instagram.InstagramSubscriptionManager
-import uk.co.eelpieconsulting.feedlistener.model.InstagramTagSubscription
 import uk.co.eelpieconsulting.feedlistener.model.RssSubscription
 import uk.co.eelpieconsulting.feedlistener.model.User
 import uk.co.eelpieconsulting.feedlistener.rss.RssPoller
-import uk.co.eelpieconsulting.feedlistener.rss.RssSubscriptionManager
 import uk.co.eelpieconsulting.feedlistener.twitter.TwitterListener
 import uk.co.eelpieconsulting.feedlistener.twitter.TwitterSubscriptionManager
 
@@ -25,10 +22,8 @@ class SubscriptionsControllerTest {
     private val feedItemDAO = mock(FeedItemDAO::class.java)
     private val viewFactory = mock(ViewFactory::class.java)
     private val urlBuilder = mock(UrlBuilder::class.java)
-    private val rssSubscriptionManager = mock(RssSubscriptionManager::class.java)
     private val rssPoller = mock(RssPoller::class.java)
     private val twitterSubscriptionManager = mock(TwitterSubscriptionManager::class.java)
-    private val instagramSubscriptionManager = mock(InstagramSubscriptionManager::class.java)
     private val twitterListener = mock(TwitterListener::class.java)
     private val currentUserService = mock(CurrentUserService::class.java)
 
@@ -38,10 +33,8 @@ class SubscriptionsControllerTest {
             feedItemDAO,
             viewFactory,
             urlBuilder,
-            rssSubscriptionManager,
             rssPoller,
             twitterSubscriptionManager,
-            instagramSubscriptionManager,
             twitterListener,
             currentUserService,
             MockHttpServletResponse()
@@ -67,20 +60,7 @@ class SubscriptionsControllerTest {
         subscriptionsController.deleteSubscription("a-user", subscription.id)
 
         verify(feedItemDAO).deleteSubscriptionFeedItems(subscription)
-        verifyNoInteractions(instagramSubscriptionManager)
         verifyNoInteractions(twitterSubscriptionManager)
-    }
-
-    @Test
-    fun deletingAnInstagramSubscriptionShouldUnsubscribeFromInstagram() {
-        `when`(currentUserService.getCurrentUserUser()).thenReturn(User())
-        val instagramTagSubscription = InstagramTagSubscription("something", 123L, "", "")
-
-        `when`(subscriptionsDAO.getById(instagramTagSubscription.id)).thenReturn(instagramTagSubscription)
-
-        subscriptionsController.deleteSubscription("a-user", instagramTagSubscription.id)
-
-        verify(instagramSubscriptionManager).requestUnsubscribeFrom(instagramTagSubscription.subscriptionId)
     }
 
 }

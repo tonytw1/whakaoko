@@ -14,7 +14,6 @@ public class User {
 
     private String username;
 
-    private String instagramAccessToken;
     private String twitterAccessToken;
     private String twitterAccessSecret;
 
@@ -33,15 +32,6 @@ public class User {
 
     public void setUsername(String username) {
         this.username = username;
-    }
-
-    @JsonIgnore
-    public String getInstagramAccessToken() {
-        return instagramAccessToken;
-    }
-
-    public void setInstagramAccessToken(String instagramAccessToken) {
-        this.instagramAccessToken = instagramAccessToken;
     }
 
     @JsonIgnore
