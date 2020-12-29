@@ -39,7 +39,7 @@ public class CachingUrlResolverService {
                 return cachedResult;
             }
 
-            log.debug("Delegrating to live url resolver");
+            log.debug("Delegating to live url resolver");
             final String result = urlResolverService.resolveUrl(url);
             if (result != null) {
                 putUrlIntoCache(url, result);
