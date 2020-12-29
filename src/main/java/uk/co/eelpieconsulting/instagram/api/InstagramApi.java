@@ -17,7 +17,6 @@ import org.springframework.stereotype.Component;
 import uk.co.eelpieconsulting.common.geo.model.LatLong;
 import uk.co.eelpieconsulting.common.http.HttpBadRequestException;
 import uk.co.eelpieconsulting.common.http.HttpFetchException;
-import uk.co.eelpieconsulting.common.http.HttpFetcher;
 import uk.co.eelpieconsulting.feedlistener.model.FeedItem;
 import uk.co.eelpieconsulting.feedlistener.model.InstagramGeographySubscription;
 import uk.co.eelpieconsulting.feedlistener.model.InstagramTagSubscription;
@@ -38,11 +37,11 @@ public class InstagramApi {
     private static final String DATA = "data";
 
     private final InstagramFeedItemMapper mapper;
-    private final HttpFetcher httpFetcher;
+    private final uk.co.eelpieconsulting.common.http.HttpFetcher commonHttpFetcher;
 
     @Autowired
-    public InstagramApi(HttpFetcher httpFetcher) {
-        this.httpFetcher = httpFetcher;
+    public InstagramApi(uk.co.eelpieconsulting.common.http.HttpFetcher commonHttpFetcher) {
+        this.commonHttpFetcher = commonHttpFetcher;
         this.mapper = new InstagramFeedItemMapper();
     }
 
@@ -56,7 +55,7 @@ public class InstagramApi {
         post.setEntity(entity);
 
         try {
-            final String response = httpFetcher.post(post);
+            final String response = commonHttpFetcher.post(post);
             final JSONObject responseJSON = new JSONObject(response);
             return new InstagramTagSubscription(
                     responseJSON.getJSONObject(DATA).getString("object_id"),
@@ -80,7 +79,7 @@ public class InstagramApi {
         post.setEntity(entity);
 
         try {
-            final String response = httpFetcher.post(post);
+            final String response = commonHttpFetcher.post(post);
             log.info(response);
 
             JSONObject responseJSON = new JSONObject(response);
@@ -94,26 +93,26 @@ public class InstagramApi {
     }
 
     public String getSubscriptions(String clientId, String clientSecret) throws HttpFetchException {
-        return httpFetcher.get(INSTAGRAM_API_V1_SUBSCRIPTIONS + "?client_secret=" + clientSecret + "&client_id=" + clientId);
+        return commonHttpFetcher.get(INSTAGRAM_API_V1_SUBSCRIPTIONS + "?client_secret=" + clientSecret + "&client_id=" + clientId);
     }
 
     public void deleteAllSubscriptions(String clientId, String clientSecret) throws HttpFetchException {
         HttpDelete delete = new HttpDelete(INSTAGRAM_API_V1_SUBSCRIPTIONS + "?client_secret=" + clientSecret + "&object=all&client_id=" + clientId);
-        log.info("Delete all response: " + httpFetcher.delete(delete));
+        log.info("Delete all response: " + commonHttpFetcher.delete(delete));
     }
 
     public void deleteSubscription(long id, String clientId, String clientSecret) throws HttpFetchException {
         HttpDelete delete = new HttpDelete(INSTAGRAM_API_V1_SUBSCRIPTIONS + "?client_secret=" + clientSecret + "&id=" + Long.toString(id) + "&client_id=" + clientId);
-        log.info("Delete subscription response; " + httpFetcher.delete(delete));
+        log.info("Delete subscription response; " + commonHttpFetcher.delete(delete));
     }
 
     public List<FeedItem> getRecentMediaForTag(String tag, String accessToken) throws HttpFetchException, JSONException {
-        final String response = httpFetcher.get("https://api.instagram.com/v1/tags/" + tag + "/media/recent" + "?access_token=" + accessToken);
+        final String response = commonHttpFetcher.get("https://api.instagram.com/v1/tags/" + tag + "/media/recent" + "?access_token=" + accessToken);
         return parseFeedItems(response);
     }
 
     public List<FeedItem> getRecentMediaForGeography(long geoId, String clientId) throws HttpFetchException, JSONException {
-        final String response = httpFetcher.get("https://api.instagram.com/v1/geographies/" + geoId + "/media/recent" + "?client_id=" + clientId);
+        final String response = commonHttpFetcher.get("https://api.instagram.com/v1/geographies/" + geoId + "/media/recent" + "?client_id=" + clientId);
         return parseFeedItems(response);
     }
 
@@ -133,7 +132,7 @@ public class InstagramApi {
         post.setEntity(entity);
 
         try {
-            final String response = httpFetcher.post(post);
+            final String response = commonHttpFetcher.post(post);
 
             log.info("Got access token response: " + response);
 
