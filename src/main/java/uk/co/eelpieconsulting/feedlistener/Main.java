@@ -1,6 +1,8 @@
 package uk.co.eelpieconsulting.feedlistener;
 
 import com.google.common.collect.Maps;
+import net.spy.memcached.AddrUtil;
+import net.spy.memcached.MemcachedClient;
 import org.apache.velocity.app.Velocity;
 import org.apache.velocity.runtime.RuntimeConstants;
 import org.springframework.beans.factory.annotation.Value;
@@ -18,8 +20,8 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import uk.co.eelpieconsulting.backports.VelocityConfigurer;
 import uk.co.eelpieconsulting.backports.VelocityViewResolver;
-import uk.co.eelpieconsulting.common.caching.MemcachedCache;
 import uk.co.eelpieconsulting.common.dates.DateFormatter;
+import uk.co.eelpieconsulting.common.shorturls.*;
 import uk.co.eelpieconsulting.feedlistener.http.HttpFetcher;
 
 import java.io.IOException;
@@ -39,8 +41,17 @@ public class Main {
     }
 
     @Bean
-    public MemcachedCache memcachedCache(@Value("${memcached.urls}") String memcacheUrls) throws IOException {
-        return new MemcachedCache(memcacheUrls);
+    public MemcachedClient memcachedClient(@Value("${memcached.urls}") String memcachedUrls) throws IOException {
+        return new MemcachedClient(AddrUtil.getAddresses(memcachedUrls));
+    }
+
+    @Bean
+    ShortUrlResolverService shortUrlResolverService() {
+        return new ShortUrlResolverService(
+                new BitlyUrlResolver(),
+                new FeedBurnerRedirectResolver(),
+                new TinyUrlResolver(),
+                new TwitterShortenerUrlResolver());
     }
 
     @Bean
