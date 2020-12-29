@@ -38,9 +38,6 @@ class DataStoreFactory @Autowired constructor(@Value("\${mongo.uri}") private va
 
             // These explicit mappings are needed to trigger subclass querying during finds;
             // see subtype in LegacyQuery source code for hints
-            datastore.mapper.map(InstagramSubscription::class.java)
-            datastore.mapper.map(InstagramGeographySubscription::class.java)
-            datastore.mapper.map(InstagramTagSubscription::class.java)
             datastore.mapper.map(TwitterTagSubscription::class.java)
             datastore.mapper.map(RssSubscription::class.java)
             datastore

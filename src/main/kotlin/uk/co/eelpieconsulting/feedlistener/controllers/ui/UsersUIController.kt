@@ -26,7 +26,6 @@ class UsersUIController @Autowired constructor(val channelsDAO: ChannelsDAO,
         fun usersHomepage(user: User): ModelAndView {
             return ModelAndView("userhome").
             addObject("channels", channelsDAO.getChannelsFor(user)).
-            addObject("instagramCredentials", credentialService.hasInstagramAccessToken(user.username)).
             addObject("twitterCredentials", credentialService.hasTwitterAccessToken(user.username))
         }
         return forCurrentUser(::usersHomepage)

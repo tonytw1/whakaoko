@@ -25,34 +25,3 @@
 	<input type="submit" />
 </form>
 <hr/>
-
-<form action="/${username}/subscriptions/instagram/tags" method="POST">
-	Instagram tag: <input name="tag" />
-	
-	Channel: 
-	<select name="channel">
-	#foreach($channel in $channels) 
-		<option value="$channel.id">$channel.name</option>
-	#end
-	</select>
-	
-	<input type="submit" />
-</form>
-<hr/>
-
-<form action="/${username}/subscriptions/instagram/geography" method="POST">
-	Instagram geography<br/>
-	Latitude: <input name="latitude" />
-	Longitude: <input name="longitude" />
-	Radius:	<input name="radius" />
-	
-	Channel: 
-	<select name="channel">
-	#foreach($channel in $channels) 
-		<option value="$channel.id">$channel.name</option>
-	#end
-	</select>
-	
-	<input type="submit" />
-</form>
-<hr/>
