@@ -20,12 +20,12 @@ class RssFeedItemMapperTest {
             MediaModuleImageExtractor()
     )
     private val rssFeedItemBodyExtractor = RssFeedItemBodyExtractor()
-    private val cachingUrlResolverService = mock(CachingUrlResolverService::class.java)
+    private val urlResolverService = mock(UrlResolverService::class.java)
 
     private val rssFeedItemMapper = RssFeedItemMapper(
             rssFeedItemImageExtractor,
             rssFeedItemBodyExtractor,
-            cachingUrlResolverService,
+            urlResolverService,
             UrlCleaner()
     )
 
@@ -34,7 +34,7 @@ class RssFeedItemMapperTest {
 
     @Test
     fun canMapRssSyndEntriesToFeedItem() {
-        `when`(cachingUrlResolverService.resolveUrl(anyObject())).thenReturn("http://localhost/something")
+        `when`(urlResolverService.resolveUrl(anyObject())).thenReturn("http://localhost/something")
 
         val feedItems = testSyndEntries().map { rssFeedItemMapper.createFeedItemFrom(it, subscription) }
 
@@ -43,7 +43,7 @@ class RssFeedItemMapperTest {
 
     @Test
     fun feedItemsShouldInheritSubscriptionAndChannel() {
-        `when`(cachingUrlResolverService.resolveUrl(anyObject())).thenReturn("http://localhost/something")
+        `when`(urlResolverService.resolveUrl(anyObject())).thenReturn("http://localhost/something")
 
         val feedItems = testSyndEntries().map { rssFeedItemMapper.createFeedItemFrom(it, subscription) }
 

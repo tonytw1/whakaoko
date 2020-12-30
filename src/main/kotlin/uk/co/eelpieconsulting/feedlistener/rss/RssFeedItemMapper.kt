@@ -18,7 +18,7 @@ import uk.co.eelpieconsulting.feedlistener.rss.images.RssFeedItemImageExtractor
 @Component
 class RssFeedItemMapper @Autowired constructor(private val rssFeedItemImageExtractor: RssFeedItemImageExtractor,
                                                private val rssFeedItemBodyExtractor: RssFeedItemBodyExtractor,
-                                               private val cachingUrlResolverService: CachingUrlResolverService,
+                                               private val urlResolverService: UrlResolverService,
                                                private val urlCleaner: UrlCleaner) {
 
     private val log = LogManager.getLogger(RssFeedItemMapper::class.java)
@@ -39,7 +39,7 @@ class RssFeedItemMapper @Autowired constructor(private val rssFeedItemImageExtra
     private fun extractUrl(syndEntry: SyndEntry): String? {
         val url = syndEntry.link
         return if (!Strings.isNullOrEmpty(url)) {
-            urlCleaner.cleanSubmittedItemUrl(cachingUrlResolverService.resolveUrl(url))
+            urlCleaner.cleanSubmittedItemUrl(urlResolverService.resolveUrl(url))
         } else {
             null
         }
