@@ -17,7 +17,7 @@ class UrlResolverService @Autowired constructor(private val shortUrlResolverServ
     fun resolveUrl(url: String?): String? {
         return if (url != null && !url.isEmpty()) {
             val key = cacheKeyFor(url)
-            val cachedResult = memcachedClient[key] as String
+            val cachedResult = memcachedClient[key] as String?
             if (cachedResult != null) {
                 log.debug("Found result for url '$url' in cache: $cachedResult")
                 return cachedResult
@@ -29,6 +29,7 @@ class UrlResolverService @Autowired constructor(private val shortUrlResolverServ
                 memcachedClient.add(key, ONE_DAY, result)
             }
             result
+
         } else {
             log.warn("Called with empty url; not attempting to resolve")
             url
