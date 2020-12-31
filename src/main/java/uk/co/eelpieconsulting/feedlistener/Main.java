@@ -21,7 +21,11 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import uk.co.eelpieconsulting.backports.VelocityConfigurer;
 import uk.co.eelpieconsulting.backports.VelocityViewResolver;
 import uk.co.eelpieconsulting.common.dates.DateFormatter;
-import uk.co.eelpieconsulting.common.shorturls.*;
+import uk.co.eelpieconsulting.common.shorturls.ShortUrlResolverService;
+import uk.co.eelpieconsulting.common.shorturls.resolvers.BitlyUrlResolver;
+import uk.co.eelpieconsulting.common.shorturls.resolvers.FeedBurnerRedirectResolver;
+import uk.co.eelpieconsulting.common.shorturls.resolvers.TinyUrlResolver;
+import uk.co.eelpieconsulting.common.shorturls.resolvers.TwitterShortenerUrlResolver;
 import uk.co.eelpieconsulting.feedlistener.http.HttpFetcher;
 
 import java.io.IOException;
