@@ -38,7 +38,7 @@ class HttpFetcher(val userAgent: String, val timeout: Int) {
             return Result.success(httpResult)
 
         }, { fuelError ->
-            log.warn("Failed to fetch from url: " + url + "; status code was: " + fuelError.response.statusCode, fuelError)
+            log.warn("Failed to fetch from url: " + url + "; status code was: " + fuelError.response.statusCode, fuelError.message)
             return Result.error(fuelError)
         })
     }
