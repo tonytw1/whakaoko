@@ -10,7 +10,7 @@ class Classifier {
         if (subscription.httpStatus == 200 && subscription.error == null) {
             return "ok"
         }
-        if (subscription.httpStatus == 404) {
+        if (subscription.httpStatus == 404 || subscription.httpStatus == 410) {
             return "gone"
         }
         return null
