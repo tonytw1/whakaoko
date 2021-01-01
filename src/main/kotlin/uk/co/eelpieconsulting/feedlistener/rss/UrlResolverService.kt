@@ -13,7 +13,7 @@ import java.net.URL
 class UrlResolverService @Autowired constructor(private val shortUrlResolver: ShortUrlResolver, private val memcachedClient: MemcachedClient) {
 
     private val log = LogManager.getLogger(UrlResolverService::class.java)
-    private val ONE_DAY = 3600 * 24
+    private val ONE_WEEK = 3600 * 24 * 7
     private val KEY_PREFIX = "resolved-urls::"
 
     fun resolveUrl(url: String?): String? {
@@ -37,7 +37,7 @@ class UrlResolverService @Autowired constructor(private val shortUrlResolver: Sh
                 log.debug("Delegating to live url resolver")
                 val result = shortUrlResolver.resolveUrl(parsedUrl)
                 log.info("Caching result for url: $url")
-                memcachedClient.add(key, ONE_DAY, result.toExternalForm())
+                memcachedClient.add(key, ONE_WEEK, result.toExternalForm())
                 return result.toExternalForm()
             }
 
