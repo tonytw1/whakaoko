@@ -2,7 +2,9 @@ package uk.co.eelpieconsulting.feedlistener.rss
 
 import com.github.kittinunf.result.Result
 import com.google.common.base.Strings
+import io.micrometer.core.instrument.Counter
 import io.micrometer.core.instrument.MeterRegistry
+import io.micrometer.core.instrument.Metrics
 import org.apache.logging.log4j.LogManager
 import org.joda.time.DateTime
 import org.springframework.beans.factory.annotation.Autowired
@@ -34,7 +36,11 @@ class RssPoller @Autowired constructor(val subscriptionsDAO: SubscriptionsDAO, v
     val rssAddedItems = meterRegistry.counter("rss_added_items")
     val rssSuccessesEtagged = meterRegistry.counter("rss_successes", "etagged", "false")
     val rssSuccessesNotEtagged = meterRegistry.counter("rss_successes", "etagged", "true")
-    val rssErrors = meterRegistry.counter("rss_errors")
+
+    val rssErrors = Counter.builder("rss_errors")
+            .description("Errors while reading rss feeds")
+            .tags("http_status", "", "exception_name", "")
+            .register(meterRegistry)
 
     @Scheduled(fixedRate = 3600000, initialDelay = 300000)
     fun run() {
@@ -131,11 +137,7 @@ class RssPoller @Autowired constructor(val subscriptionsDAO: SubscriptionsDAO, v
                 subscription.error = errorMessage
                 subscription.httpStatus = httpStatus
 
-                // TODO io.prometheus.client.Counter would let us do dynamic labelling like this:
-                // val rssErrors = Counter.build().name("rss_errors").labelNames("http_status", "exception_name").help("RSS polling errors").register()
-                //  rssErrors.labels(httpStatus, errorMessage).inc()
-                // We want to be able todo the same with micrometer interface
-                rssErrors.increment()
+                Metrics.counter("rss_errors", "http_status", httpStatus.toString(), "exception_name", errorMessage).increment()
             }
             )
 
