@@ -21,7 +21,6 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import uk.co.eelpieconsulting.backports.VelocityConfigurer;
 import uk.co.eelpieconsulting.backports.VelocityViewResolver;
 import uk.co.eelpieconsulting.common.dates.DateFormatter;
-import uk.co.eelpieconsulting.common.shorturls.ShortUrlResolverService;
 import uk.co.eelpieconsulting.common.shorturls.resolvers.*;
 import uk.co.eelpieconsulting.feedlistener.http.HttpFetcher;
 
@@ -47,14 +46,12 @@ public class Main {
     }
 
     @Bean
-    ShortUrlResolverService shortUrlResolverService() {
-        return new ShortUrlResolverService(
+    CompositeUrlResolver shortUrlResolverService() {
+        return new CompositeUrlResolver(
                 new BitlyUrlResolver(),
                 new FeedBurnerRedirectResolver(),
                 new TinyUrlResolver(),
-                new TinyUrlHttpsResolver(),
-                new TwitterShortenerUrlResolver(),
-                new TwitterHttpsShortenerUrlResolver()
+                new TwitterShortenerUrlResolver()
         );
     }
 
