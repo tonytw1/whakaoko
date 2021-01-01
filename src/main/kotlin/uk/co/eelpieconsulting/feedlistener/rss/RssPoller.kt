@@ -127,7 +127,7 @@ class RssPoller @Autowired constructor(val subscriptionsDAO: SubscriptionsDAO, v
 
                     }, { feedFetchingException ->
 
-                val exceptionName = feedFetchingException.cause?.javaClass?.simpleName
+                val exceptionName: String = feedFetchingException.cause?.javaClass?.simpleName.orEmpty()
                 val httpStatus = feedFetchingException.httpStatus
 
                 log.warn("Exception while fetching RSS subscription: " + subscription.url + ": " + exceptionName)
