@@ -21,14 +21,14 @@ class UrlResolverService @Autowired constructor(private val shortUrlResolver: Sh
             val parsedUrl = URL(url)    // TODO exceptions
 
             if (!shortUrlResolver.isValid(parsedUrl)) {
-                log.info("Skipping resolve short url which is not supported by resolver: " + parsedUrl.toExternalForm())
+                // If the resolver does not support this url we can return early.
+                // No need to fill the cache with uninteresting resolutions.
                 return url
             }
 
+            // Resolve and cache urls which the resolver has expressed an interest in
             val key = cacheKeyFor(parsedUrl.toExternalForm())
-
             val cachedResult = memcachedClient[key] as String?
-
             cachedResult?.let {
                 log.info("Found result for url '$url' in cache: $cachedResult")
                 return it
