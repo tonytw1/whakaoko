@@ -192,6 +192,44 @@
             }
           }
         }
+      },
+      "put": {
+        "summary": "Update a subscription",
+        "tags": [
+          "Subscriptions"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Subscription id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateSubscriptionRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The updated subscription",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Subscription"
+                }
+              }
+            }
+          }
+        }
       }
     },
     "/subscriptions/{id}/items": {
@@ -276,10 +314,19 @@
           }
         }
       },
+      "UpdateSubscriptionRequest": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          }
+        }
+      },
       "SubscriptionCreateRequest": {
         "type": "object",
         "required": [
-          "channel", "url"
+          "channel",
+          "url"
         ],
         "properties": {
           "name": {
