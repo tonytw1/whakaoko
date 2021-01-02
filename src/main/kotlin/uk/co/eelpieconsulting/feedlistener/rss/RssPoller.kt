@@ -116,6 +116,7 @@ class RssPoller @Autowired constructor(val subscriptionsDAO: SubscriptionsDAO, v
                             return Result.success(subscription)
                         },
                         { ex ->
+                            log.warn("Fetch feed returning error: " + ex)
                             return Result.error(ex)
                         }
                 )
