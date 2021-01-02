@@ -53,7 +53,7 @@ class FeedFetcher @Autowired constructor(private val httpFetcher: HttpFetcher,
                 Result.success(Pair(syndFeed, httpResult))
             }, { ex ->
                 log.warn("Feed parsing error: " + ex.message)
-                Result.error(FeedFetchingException(message = ex.message!!, httpStatus = httpResult.status, cause = ex))
+                Result.error(FeedFetchingException(message = ex.message!!, httpStatus = httpResult.status, rootCause = ex))
             })
 
         }, { fuelError ->
@@ -68,4 +68,4 @@ class FeedFetcher @Autowired constructor(private val httpFetcher: HttpFetcher,
     }
 }
 
-class FeedFetchingException(message: String, val httpStatus: Int? = null, cause: Throwable): Exception(message)
+class FeedFetchingException(message: String, val httpStatus: Int? = null, val rootCause: Throwable): Exception(message)

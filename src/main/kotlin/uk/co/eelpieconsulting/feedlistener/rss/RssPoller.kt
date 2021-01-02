@@ -82,7 +82,7 @@ class RssPoller @Autowired constructor(val subscriptionsDAO: SubscriptionsDAO, v
                             return Result.success(subscription)
                         }
                     }, { ex ->
-                        return Result.error(FeedFetchingException(message = ex.message!!, httpStatus = ex.response.statusCode, cause = ex))
+                        return Result.error(FeedFetchingException(message = ex.message!!, httpStatus = ex.response.statusCode, rootCause = ex))
                     })
                 }
 
@@ -128,21 +128,17 @@ class RssPoller @Autowired constructor(val subscriptionsDAO: SubscriptionsDAO, v
 
                     }, { feedFetchingException ->
 
-                log.info("Exception is: " + feedFetchingException)
-                val exceptionCauseClass = feedFetchingException.cause?.javaClass
-                val exceptionCauseName: String = exceptionCauseClass?.simpleName.orEmpty()
-                log.info("Exception cause is: " + exceptionCauseClass + " and exception name is: " + exceptionCauseName)
-
+                val rootCauseName = feedFetchingException.rootCause.javaClass.simpleName
                 val httpStatus = feedFetchingException.httpStatus
 
-                log.warn("Exception while fetching RSS subscription: " + subscription.url + ": " + exceptionCauseName)
+                log.warn("Exception while fetching RSS subscription: " + subscription.url + ": " + rootCauseName)
 
                 val errorMessage = feedFetchingException.message
                 log.info("Setting feed error to: " + errorMessage + "; http status: " + httpStatus)
                 subscription.error = errorMessage
                 subscription.httpStatus = httpStatus
 
-                Metrics.counter("rss_errors", "http_status", httpStatus.toString(), "exception_name", exceptionCauseName).increment()
+                Metrics.counter("rss_errors", "http_status", httpStatus.toString(), "exception_name", rootCauseName).increment()
             }
             )
 
