@@ -37,7 +37,7 @@ class RssPollerTest {
         val feedFetchingException = FeedFetchingException(message = "Something", rootCause = RuntimeException("Something went wrong"))
 
         assertEquals("Something", feedFetchingException.message)
-        val rootCauseName = feedFetchingException.rootCause?.javaClass.simpleName
+        val rootCauseName = feedFetchingException.rootCause?.javaClass?.simpleName
         assertEquals("RuntimeException", rootCauseName)
     }
 

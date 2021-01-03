@@ -49,12 +49,18 @@ class FeedFetcher @Autowired constructor(private val httpFetcher: HttpFetcher,
             val fetchedBytes = httpResult.bytes
             rssFetchedBytesCounter.increment(fetchedBytes.size.toDouble())
 
-            return feedParser.parseSyndFeed(fetchedBytes).fold({ syndFeed ->
-                Result.success(Pair(syndFeed, httpResult))
-            }, { ex ->
-                log.warn("Feed parsing error: " + ex.message)
-                Result.error(FeedFetchingException(message = ex.message!!, httpStatus = httpResult.status, rootCause = ex))
-            })
+            if (httpResult.status == 200) {
+                return feedParser.parseSyndFeed(fetchedBytes).fold({ syndFeed ->
+                    Result.success(Pair(syndFeed, httpResult))
+                }, { ex ->
+                    log.warn("Feed parsing error: " + ex.message)
+                    Result.error(FeedFetchingException(message = ex.message!!, httpStatus = httpResult.status, rootCause = ex))
+                })
+
+            } else {
+                return Result.Failure(FeedFetchingException(message = "Could not fetch feed", httpResult.status))
+
+            }
 
         }, { fuelError ->
             return Result.Failure(FeedFetchingException(message = fuelError.message!!, fuelError.response.statusCode, fuelError))
@@ -68,4 +74,4 @@ class FeedFetcher @Autowired constructor(private val httpFetcher: HttpFetcher,
     }
 }
 
-class FeedFetchingException(message: String, val httpStatus: Int? = null, val rootCause: Throwable): Exception(message)
+class FeedFetchingException(message: String, val httpStatus: Int? = null, val rootCause: Throwable? = null): Exception(message)
