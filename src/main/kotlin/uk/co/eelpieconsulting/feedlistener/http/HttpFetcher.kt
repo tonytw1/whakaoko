@@ -19,7 +19,7 @@ class HttpFetcher(val userAgent: String, val timeout: Int) {
         when (result) {
             is Result.Failure -> {
                 val ex = result.getException()
-                log.warn("Failed to head url: " + url, ex)
+                log.warn("Failed to head url '" + url + "'. Status code was " + ex.response.statusCode + " and exception was " + ex.message)
                 return Result.error(ex)
             }
             is Result.Success -> {
