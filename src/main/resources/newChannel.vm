@@ -1,5 +1,13 @@
-<form action="/ui/channels/new" method="POST">
-	Name: <input name="name" />
-	<input type="submit" />
-</form>
-<hr/>
+#parse('includes/header.vm')
+<div class="container">
+    #parse('includes/heading.vm')
+    <div class="row">
+        <div class="col">
+            <form action="/ui/channels/new" method="POST">
+                Name: <input name="name" />
+                <input type="submit" />
+            </form>
+        </div>
+    </div>
+</div>
+#parse('includes/footer.vm')
