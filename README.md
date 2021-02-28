@@ -108,7 +108,7 @@ Requires the API users account to be linked to a Twitter account.
 
 #### /twitter/authorise
 
-Initiate linking of an Twitter account by redirecting to the Twitter authorise url.
+Initiate linking of a Twitter account by redirecting to the Twitter authorise url.
 
 
 # Setup
@@ -118,8 +118,7 @@ Initiate linking of an Twitter account by redirecting to the Twitter authorise u
 Start Mongo and Memcached dependencies as Docker images:
 
 ```
-docker run -p 27017:27017 mongo:3.4
-docker run -p 11211:11211 memcached
+docker-compose -f docker/docker-compose.yml up
 ```
 
 Run using the Spring Boot plugin:
