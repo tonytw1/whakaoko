@@ -34,12 +34,13 @@ class SubscriptionsUIController @Autowired constructor(val usersDAO: UsersDAO, v
 
     private val log = LogManager.getLogger(SubscriptionsUIController::class.java)
 
-    @GetMapping("/ui/subscriptions/new")
-    fun newSubscriptionForm(): ModelAndView? {
+    @GetMapping("/ui/subscriptions/{channel}/new")
+    fun newSubscriptionForm(@PathVariable channel: String): ModelAndView? {
         fun newChannelPrompt(user: User): ModelAndView {
             return ModelAndView("newSubscription").
             addObject("username", user.username).
-            addObject("channels", channelsDAO.getChannelsFor(user))
+            addObject("channels", channelsDAO.getChannelsFor(user)).
+            addObject("channel", channel)
         }
 
         return forCurrentUser(::newChannelPrompt)

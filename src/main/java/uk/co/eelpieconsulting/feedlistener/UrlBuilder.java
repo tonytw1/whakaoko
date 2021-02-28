@@ -46,6 +46,10 @@ public class UrlBuilder {
         return getBaseUrl() + "/channels/" + channel.id + "/items";
     }
 
+    public String getChannelNewSubscriptionUrl(Channel channel) {
+        return getBaseUrl() + "/ui/subscriptions/" + channel.id + "/new";
+    }
+
     public String getChannelUrl(Channel channel) {
         return getBaseUrl() + "/ui/channels/" + channel.getId();
     }

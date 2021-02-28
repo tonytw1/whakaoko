@@ -30,7 +30,7 @@
             #else
                 <p>No current subscriptions</p>
             #end
-            <p><a href="/ui/subscriptions/new"><button type="button" class="btn btn-primary">New subscription</button></a></p>
+            <p><a href="$urlBuilder.getChannelNewSubscriptionUrl($channel)"><button type="button" class="btn btn-primary">New subscription</button></a></p>
         </div>
         <div class="col">
             #if(!$geotagged.isEmpty())
