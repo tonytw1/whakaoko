@@ -1,3 +1,10 @@
+#parse('includes/header.vm')
+<div class="container">
+    #parse('includes/heading.vm')
+    <div class="row">
+        <div class="col">
+
+
 <form action="/ui/subscriptions/feeds" method="POST">
 	Feed: <input name="url" />
 	
@@ -24,4 +31,6 @@
 		
 	<input type="submit" />
 </form>
-<hr/>
+
+</div>
+#parse('includes/footer.vm')
