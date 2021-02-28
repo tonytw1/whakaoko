@@ -1,1 +1,3 @@
-($!subscription.classification)
+#if($subscription.classification)
+    ($subscription.classification)
+#end

@@ -14,11 +14,13 @@
     </div>
     <div class="row">
         <div class="container">
-            <code><a href="$subscription.url">$subscription.url</a></code>
+            #if($subscription.url)
+                <code><a href="$subscription.url">$subscription.url</a></code>
+            #end
             <p>#parse('includes/classification.vm')</p>
             #if($subscription.error)
                 <div class="alert alert-danger" role="alert">
-                   Error: $!subscription.error<br/>
+                    Error: $!subscription.error<br/>
                     Http status: $!subscription.httpStatus
                 </div>
             #end
