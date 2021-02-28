@@ -30,7 +30,7 @@ class RssFeedItemMapper @Autowired constructor(private val rssFeedItemImageExtra
         val date = if (syndEntry.publishedDate != null) syndEntry.publishedDate else syndEntry.updatedDate
         val url = extractUrl(syndEntry)
         if (url != null) {
-            return FeedItem(syndEntry.title, url, body, date, place, imageUrl, null, subscription.id, subscription.channelId)
+            return FeedItem(syndEntry.title, url, body, date, place, imageUrl, syndEntry.author, subscription.id, subscription.channelId)
         } else {
             return null
         }
