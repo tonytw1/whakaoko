@@ -41,7 +41,7 @@ class ChannelsController @Autowired constructor(val channelsDAO: ChannelsDAO,
     }
 
     @GetMapping("/channels/{id}")
-    fun channel(@PathVariable username: String, @PathVariable id: String): ModelAndView? {
+    fun channel(@PathVariable id: String): ModelAndView? {
         fun renderChannel(user: User): ModelAndView? {
             val channel = channelsDAO.getById(id)
             return ModelAndView(viewFactory.getJsonView()).addObject("data", channel)

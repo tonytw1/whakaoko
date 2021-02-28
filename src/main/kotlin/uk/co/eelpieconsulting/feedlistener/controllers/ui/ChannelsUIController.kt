@@ -37,9 +37,9 @@ class ChannelsUIController @Autowired constructor(val usersDAO: UsersDAO,
     }
 
     @PostMapping("/ui/channels/new")
-    fun addChannel(@PathVariable username: String, @RequestParam name: String): ModelAndView? {
+    fun addChannel(@RequestParam name: String): ModelAndView? {
         fun executeAddChannel(user: User): ModelAndView? {
-            val newChannel = Channel(idBuilder.makeIdFor(name), name, username)
+            val newChannel = Channel(idBuilder.makeIdFor(name), name, user.username)
             channelsDAO.add(user, newChannel)
             return ModelAndView(RedirectView(urlBuilder.getChannelUrl(newChannel)))
         }
