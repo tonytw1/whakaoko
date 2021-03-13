@@ -142,14 +142,47 @@ or curl:
 curl -XPOST http://localhost:8080/users?username=new-user
 ```
 
+## Generate an access token
+
+Using the user interface sign in as your new user.
+
+```
+http://localhost:8080/ui
+```
+
+Then click Generate to generate an access token.
+
+![Generate a token](generate-token.png)
+
+
 ## Create a channel
 
-```
-curl -X POST "/channels" -H "Authorization: Bearer YOUR_TOKEN" -H "Content-Type: application/json" -d "{\"name\":\"A channel\"}"
-```
-
-## Create a feed
+Either using the UI or with an API call.
 
 ```
-curl -X POST "/subscriptions" -H "Authorization: Bearer YOUR_TOKEN" -H  "Content-Type: application/json" -d "{\"channel\":\"a-channel\",\"url\":\"http://www.victoria.ac.nz/home/about/newspubs/news/newslatest/news-rss-feed\"}"
+curl -X POST http://localhost:8080/channels -H "Authorization: Bearer YOUR_TOKEN" -H "Content-Type: application/json" -d "{\"name\":\"A channel\"}"
 ```
+
+Note the returned channel id. You will use it in the next request.
+
+
+## Create a feed subscription
+
+Either using the UI or with an API call.
+
+```
+curl -X POST http://localhost:8080/subscriptions -H "Authorization: Bearer YOUR_TOKEN" -H  "Content-Type: application/json" -d "{\"channel\":\"YOUR_CHANNEL_ID\",\"url\":\"http://www.victoria.ac.nz/home/about/newspubs/news/newslatest/news-rss-feed\"}"
+\",\"url\":\"http://www.victoria.ac.nz/home/about/newspubs/news/newslatest/news-rss-feed\"}"
+```
+
+Note the returned subscription id. You will use it in the next request
+
+## Read feed items
+
+```
+http://localhost:8080/subscriptions/YOUR_SUBSCRITION_ID/items | json_pp
+```
+
+![Feed items JSON](feeditems.png)
+
+
