@@ -180,7 +180,7 @@ Note the returned subscription id. You will use it in the next request
 ## Read feed items
 
 ```
-http://localhost:8080/subscriptions/YOUR_SUBSCRIPTION_ID/items | json_pp
+curl http://localhost:8080/subscriptions/YOUR_SUBSCRIPTION_ID/items | json_pp
 ```
 
 ![Feed items JSON](feeditems.png)
