@@ -13,7 +13,7 @@ import org.aspectj.lang.reflect.MethodSignature;
 @Aspect
 public class TimingAspect {
 
-    private static Logger log = LogManager.getLogger(TimingAspect.class);
+    private final static Logger log = LogManager.getLogger(TimingAspect.class);
 
     /**
      * This around advice adds timing to any method annotated with the Timed
