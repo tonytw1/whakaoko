@@ -1,8 +1,8 @@
 package uk.co.eelpieconsulting.feedlistener.annotations;
 
 import java.lang.reflect.Method;
+import java.time.Duration;
 
-;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.aspectj.lang.ProceedingJoinPoint;
@@ -29,22 +29,22 @@ public class TimingAspect {
     @Around("@annotation( timedAnnotation ) ")
     public Object processSystemRequest(final ProceedingJoinPoint pjp, Timed timedAnnotation) throws Throwable {
         try {
-            long start = System.currentTimeMillis();
+            long start = System.nanoTime();
             Object retVal = pjp.proceed();
-            long end = System.currentTimeMillis();
-            long differenceMs = end - start;
+            long end = System.nanoTime();
+            Duration differenceNanos = Duration.ofNanos(end - start);
 
             final MethodSignature methodSignature = (MethodSignature) pjp.getSignature();
             final Method targetMethod = methodSignature.getMethod();
 
-            if (differenceMs > 100) {
+            if (differenceNanos.toMillis() > 100) {
                 log.warn(targetMethod.getDeclaringClass().getName() + "."
-                        + targetMethod.getName() + " took " + differenceMs
+                        + targetMethod.getName() + " took " + differenceNanos
                         + " ms : timing notes: " + timedAnnotation.timingNotes()
                         + " request info : ");
             } else {
                 log.debug(targetMethod.getDeclaringClass().getName() + "."
-                        + targetMethod.getName() + " took " + differenceMs
+                        + targetMethod.getName() + " took " + differenceNanos
                         + " ms : timing notes: " + timedAnnotation.timingNotes()
                         + " request info : ");
             }
