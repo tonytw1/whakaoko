@@ -4,8 +4,8 @@
     <div class="row">
         <div class="container">
             <div class="float-right">
-                <a href="$urlBuilder.getSubscriptionItemsUrl($subscription)">JSON</a> |
-                <a href="$urlBuilder.getSubscriptionItemsUrl($subscription)?format=rss">RSS</a>
+                <a href="$urlBuilder.getSubscriptionItemsUrl($subscription)" target="_blank">JSON</a> |
+                <a href="$urlBuilder.getSubscriptionItemsUrl($subscription)?format=rss" target="_blank">RSS</a>
             </div>
             <h5><a href="$urlBuilder.getUserUrl()">$user.username</a> /
             <a href="$urlBuilder.getChannelUrl($channel)">$channel.name</a> /
@@ -15,7 +15,7 @@
     <div class="row">
         <div class="container">
             #if($subscription.url)
-                <code><a href="$subscription.url">$subscription.url</a></code>
+                <code><a href="$subscription.url" target="_blank">$subscription.url</a></code>
             #end
             <p>#parse('includes/classification.vm')</p>
             #if($subscription.error)
