@@ -33,6 +33,14 @@ class UsersDAO @Autowired constructor(val dataStoreFactory: DataStoreFactory){
         }
     }
 
+    fun getByGoogleId(googleId: String): User? {
+        return try {
+            dataStoreFactory.get().find(User::class.java).filter(Filters.eq("googleUserId", googleId)).first()
+        } catch (e: MongoException) {
+            throw RuntimeException(e)
+        }
+    }
+
     fun save(user: User?) {
         dataStoreFactory.get().save(user)
     }

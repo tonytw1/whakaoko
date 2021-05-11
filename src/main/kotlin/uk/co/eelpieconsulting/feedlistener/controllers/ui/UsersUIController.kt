@@ -21,7 +21,7 @@ class UsersUIController @Autowired constructor(val channelsDAO: ChannelsDAO,
         return ModelAndView("newUser")
     }
 
-    @GetMapping("/ui")
+    @GetMapping("/")
     fun userhome(): ModelAndView? {
         fun usersHomepage(user: User): ModelAndView {
             return ModelAndView("userhome").

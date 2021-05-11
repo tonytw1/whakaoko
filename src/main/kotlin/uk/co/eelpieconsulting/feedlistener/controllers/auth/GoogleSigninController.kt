@@ -52,6 +52,7 @@ class GoogleSigninController @Autowired constructor(
             log.warn("Not code parameter seen on callback. error parameter was: $error")
             return redirectToSigninPrompt()
         }
+
         log.info("Received code from oauth callback: $code")
         // Post back to Google to get token
         val tokenUrl = HttpUrl.Builder().scheme("https").host("www.googleapis.com").encodedPath("/oauth2/v4/token").addQueryParameter("code", code).addQueryParameter("client_id", googleClientId).addQueryParameter("client_secret", googleClientSecret).addQueryParameter("redirect_uri", callbackUrl).addQueryParameter("grant_type", "authorization_code").build()
@@ -66,16 +67,31 @@ class GoogleSigninController @Autowired constructor(
         if (!Strings.isNullOrEmpty(googleUserEmail)) {
             log.info("Google token verified to email: $googleUserEmail")
             if (googleUserEmail!!.endsWith(ALLOWED_EMAIL_DOMAINS)) {
-                if (currentUserService.getCurrentUserUser() != null) {
-                    log.info("Attaching google id to current user: " + currentUserService.getCurrentUserUser()!!.username + " / " + googleUserEmail);
-                    val currentUserUser = currentUserService.getCurrentUserUser()!!
-                    currentUserUser.googleUserId = tokenInfo.userId;
-                    usersDAO.save(currentUserUser)
-                }
 
-                return ModelAndView(RedirectView("/ui"))
+                val currentUser = currentUserService.getCurrentUserUser()
+                if (currentUser != null) {
+                    // If a current user is a signed in but has no Google id then attach to this user
+                    if (currentUser.googleUserId == null) {
+                        log.info("Attaching google id to current user: " + currentUser!!.username + " / " + googleUserEmail);
+                        val currentUserUser = currentUser!!
+                        currentUserUser.googleUserId = tokenInfo.userId;
+                        usersDAO.save(currentUserUser)
+                    }
+                    return redirectToSignedInUserUI()
+
+                } else {
+                    // If no user is already signed in we can try to sing in by google id
+                    val byGoogleId = usersDAO.getByGoogleId(tokenInfo.userId!!)
+                    if (byGoogleId != null) {
+                        currentUserService.setSignedInUser(byGoogleId)
+                        return redirectToSignedInUserUI()
+                    } else {
+                        return redirectToSigninPrompt();
+                    }
+                }
             }
         }
+
         return redirectToSigninPrompt()
     }
 
@@ -93,7 +109,11 @@ class GoogleSigninController @Autowired constructor(
     }
 
     private fun redirectToSigninPrompt(): ModelAndView {
-        return ModelAndView(RedirectView(buildRedirectUrl().toString()))
+        return ModelAndView(RedirectView("/signin"))
+    }
+
+    private fun redirectToSignedInUserUI(): ModelAndView {
+        return ModelAndView(RedirectView("/"))
     }
 
     private fun buildRedirectUrl(): HttpUrl {

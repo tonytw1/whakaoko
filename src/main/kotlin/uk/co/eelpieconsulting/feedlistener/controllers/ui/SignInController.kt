@@ -28,7 +28,7 @@ class SignInController @Autowired constructor(val request: HttpServletRequest, v
         val user = usersDAO.getByUsername(username)
         if (user != null) {
             currentUserService.setSignedInUser(user)
-            return ModelAndView(RedirectView("/ui"))
+            return ModelAndView(RedirectView("/"))
 
         } else {
             log.info("Unknown user: " + username);
