@@ -16,5 +16,10 @@
             </form>
          </div>
     </div>
+    <div class="row">
+        <div class="col">
+            <a href="/signin/redirect"><img src="/btn_google_signin_light_normal_web.png"></a>
+        </div>
+    </div>
 </div>
 #parse('includes/footer.vm')
