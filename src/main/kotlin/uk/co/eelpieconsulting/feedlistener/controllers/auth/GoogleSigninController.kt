@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.JsonMappingException
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.google.common.base.Strings
 import com.squareup.okhttp.*
-import org.apache.log4j.LogManager
+import org.apache.logging.log4j.LogManager
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Controller
@@ -13,6 +13,9 @@ import org.springframework.web.bind.annotation.RequestMethod
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.servlet.ModelAndView
 import org.springframework.web.servlet.view.RedirectView
+import uk.co.eelpieconsulting.feedlistener.controllers.ChannelsController
+import uk.co.eelpieconsulting.feedlistener.controllers.CurrentUserService
+import uk.co.eelpieconsulting.feedlistener.daos.UsersDAO
 import java.io.IOException
 import javax.servlet.http.HttpServletRequest
 
@@ -20,11 +23,15 @@ import javax.servlet.http.HttpServletRequest
 class GoogleSigninController @Autowired constructor(
         @Value("\${googleAuthClientId}") private val googleClientId: String,
         @Value("\${googleAuthClientSecret}") private val googleClientSecret: String,
-        @Value("\${googleAuthCallbackUrl}") private val callbackUrl: String) {
+        @Value("\${googleAuthCallbackUrl}") private val callbackUrl: String,
+        private val currentUserService: CurrentUserService,
+        private val usersDAO: UsersDAO
+        ) {
 
     // Does OAuth dance with Google and attaches a Google user to the local session
 
-    private val log = LogManager.getLogger(GoogleSigninController::class.java)
+    private val log = LogManager.getLogger(ChannelsController::class.java)
+
     private val ALLOWED_EMAIL_DOMAINS = "eelpieconsulting.co.uk"
 
     private val client = OkHttpClient()
@@ -39,7 +46,7 @@ class GoogleSigninController @Autowired constructor(
 
     @RequestMapping(value = ["/signin/callback"], method = [RequestMethod.GET])
     @Throws(IOException::class, JsonMappingException::class)
-    fun callback(@RequestParam(required = false) code: String, @RequestParam(required = false) error: String, request: HttpServletRequest): ModelAndView {
+    fun callback(@RequestParam(required = false) code: String?, @RequestParam(required = false) error: String?, request: HttpServletRequest): ModelAndView {
         log.info("Received Google auth callback")
         if (Strings.isNullOrEmpty(code)) {
             log.warn("Not code parameter seen on callback. error parameter was: $error")
@@ -54,27 +61,35 @@ class GoogleSigninController @Autowired constructor(
         val response = call.execute()
         val token = objectMapper.readValue(response.body().string(), TokenResponse::class.java)
         log.info("Got Google token: $token")
-        val googleUserEmail = verifyGoogleAccessToken(token.accessToken)
+        val tokenInfo = verifyGoogleAccessToken(token.accessToken)
+        val googleUserEmail = tokenInfo?.email
         if (!Strings.isNullOrEmpty(googleUserEmail)) {
             log.info("Google token verified to email: $googleUserEmail")
             if (googleUserEmail!!.endsWith(ALLOWED_EMAIL_DOMAINS)) {
-                request.session.setAttribute("user", googleUserEmail)
-                return ModelAndView(RedirectView("/"))
+                if (currentUserService.getCurrentUserUser() != null) {
+                    log.info("Attaching google id to current user: " + currentUserService.getCurrentUserUser()!!.username + " / " + googleUserEmail);
+                    val currentUserUser = currentUserService.getCurrentUserUser()!!
+                    currentUserUser.googleUserId = tokenInfo.userId;
+                    usersDAO.save(currentUserUser)
+                }
+
+                return ModelAndView(RedirectView("/ui"))
             }
         }
         return redirectToSigninPrompt()
     }
 
     @Throws(IOException::class, JsonMappingException::class)
-    private fun verifyGoogleAccessToken(token: String?): String? {
+    private fun verifyGoogleAccessToken(token: String?): TokenInfo? {
         log.info("Verifying up Google access token: $token")
         val tokenInfoUrl = HttpUrl.Builder().scheme("https").host("www.googleapis.com").encodedPath("/oauth2/v2/tokeninfo").addQueryParameter("access_token", token).build()
         val tokenInfoRequest = Request.Builder().url(tokenInfoUrl).get().build()
         val call = client.newCall(tokenInfoRequest)
         val response = call.execute()
         val tokenInfo = objectMapper.readValue(response.body().string(), TokenInfo::class.java)
-        log.info("Got Google token info: $tokenInfo")
-        return tokenInfo.email
+        log.info("Got Google token info email: ${tokenInfo.email}")
+        log.info("Got Google token info id : ${tokenInfo.userId}")
+        return tokenInfo
     }
 
     private fun redirectToSigninPrompt(): ModelAndView {
