@@ -3,7 +3,7 @@
     #parse('includes/heading.vm')
     <div class="row">
         <div class="container">
-            <h5><a href="$urlBuilder.getUserUrl()">$user.username</a></h5>
+            <h5>Channels</h5>
         </div>
     </div>
 

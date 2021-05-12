@@ -7,7 +7,7 @@
                 <a href="$urlBuilder.getSubscriptionItemsUrl($subscription)" target="_blank">JSON</a> |
                 <a href="$urlBuilder.getSubscriptionItemsUrl($subscription)?format=rss" target="_blank">RSS</a>
             </div>
-            <h5><a href="$urlBuilder.getUserUrl()">$user.username</a> /
+            <h5><a href="$urlBuilder.getUserUrl()">Channels</a> /
             <a href="$urlBuilder.getChannelUrl($channel)">$channel.name</a> /
             #if($subscription.name)$subscription.name#else$subscription.url#end #if($totalCount > 0) ($totalCount) #end</h5>
         </div>
