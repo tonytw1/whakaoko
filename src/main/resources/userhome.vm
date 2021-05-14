@@ -24,10 +24,15 @@
     </div>
     <div class="row">
         <div class="container">
-            <h5>Credentials</h5>
-            <p>Access token: $!user.accessToken - <a href="/generate-access-token">Generate</a>
-            <p>Linked Twitter account: $twitterCredentials - <a href="/twitter/authorise/$user.username">Link</a></p>
-            <p>Linked Google account: $!user.googleUserId - <a href="/signin/redirect">Link</a></p>
+            <h5>Credentials and linked accounts</h5>
+            <p>Use an access token to access your feeds with the Whakaoko API.<br/>
+            Access token: $!user.accessToken - <a href="/generate-access-token">Generate</a></p>
+
+            <p>Link a Twitter account if you wish to subscribe to Twitter tags.<br/>
+            Linked Twitter account: $twitterCredentials - <a href="/twitter/authorise/$user.username">Link</a></p>
+
+            <p>Link a Google account to signin with Google.<br/>
+            Linked Google account: $!user.googleUserId - <a href="/signin/redirect">Link</a></p>
             <hr/>
         </div>
     </div>
