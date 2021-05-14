@@ -10,6 +10,7 @@ import org.springframework.web.servlet.view.RedirectView
 import uk.co.eelpieconsulting.feedlistener.controllers.CurrentUserService
 import uk.co.eelpieconsulting.feedlistener.daos.UsersDAO
 import javax.servlet.http.HttpServletRequest
+import javax.servlet.http.HttpSession
 
 @Controller
 class SignInController @Autowired constructor(val request: HttpServletRequest, val usersDAO: UsersDAO,
@@ -18,22 +19,41 @@ class SignInController @Autowired constructor(val request: HttpServletRequest, v
     private val log = LogManager.getLogger(SignInController::class.java)
 
     @GetMapping("/signin")
-    fun signinPrompt(): ModelAndView {
-        return ModelAndView("signin");
+    fun signinPrompt(session: HttpSession): ModelAndView {
+        return withSessionError(session, ModelAndView("signin"));
     }
 
     @PostMapping("/signin")
-    fun signin(username: String): ModelAndView {
+    fun signin(username: String, session: HttpSession): ModelAndView {
         log.info("Signing in as: " + username)
         val user = usersDAO.getByUsername(username)
         if (user != null) {
             currentUserService.setSignedInUser(user)
-            return ModelAndView(RedirectView("/"))
+            return redirectToSignedInUserUI()
 
         } else {
             log.info("Unknown user: " + username);
-            return ModelAndView(RedirectView("/signin"))    // TODO render error
+            return redirectToSigninPromptWithError("We could not find a user with this username", session)
         }
+    }
+
+    private fun withSessionError(session: HttpSession, mv: ModelAndView): ModelAndView {
+        val error = session.getAttribute("error")
+        session.removeAttribute("error");
+        return mv.addObject("error", error);
+    }
+
+    private fun redirectToSigninPromptWithError(error: String, session: HttpSession): ModelAndView {
+        session.setAttribute("error", error);
+        return redirectToSigninPrompt();
+    }
+
+    private fun redirectToSigninPrompt(): ModelAndView {
+        return ModelAndView(RedirectView("/signin"))
+    }
+
+    private fun redirectToSignedInUserUI(): ModelAndView {
+        return ModelAndView(RedirectView("/"))
     }
 
 }

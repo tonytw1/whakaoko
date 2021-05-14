@@ -17,7 +17,7 @@ import uk.co.eelpieconsulting.feedlistener.controllers.ChannelsController
 import uk.co.eelpieconsulting.feedlistener.controllers.CurrentUserService
 import uk.co.eelpieconsulting.feedlistener.daos.UsersDAO
 import java.io.IOException
-import javax.servlet.http.HttpServletRequest
+import javax.servlet.http.HttpSession
 
 @Controller
 class GoogleSigninController @Autowired constructor(
@@ -45,8 +45,7 @@ class GoogleSigninController @Autowired constructor(
     }
 
     @RequestMapping(value = ["/signin/callback"], method = [RequestMethod.GET])
-    @Throws(IOException::class, JsonMappingException::class)
-    fun callback(@RequestParam(required = false) code: String?, @RequestParam(required = false) error: String?, request: HttpServletRequest): ModelAndView {
+    fun callback(@RequestParam(required = false) code: String?, @RequestParam(required = false) error: String?, session: HttpSession): ModelAndView {
         log.info("Received Google auth callback")
         if (Strings.isNullOrEmpty(code)) {
             log.warn("Not code parameter seen on callback. error parameter was: $error")
@@ -86,9 +85,11 @@ class GoogleSigninController @Autowired constructor(
                         currentUserService.setSignedInUser(byGoogleId)
                         return redirectToSignedInUserUI()
                     } else {
-                        return redirectToSigninPrompt();
+                        redirectToSigninPromptWithError("We could not find a user linked to your Google account", session);
                     }
                 }
+            } else {
+                redirectToSigninPromptWithError("Your Google account is not from a domain which is allowed to use this copy of Whakaoko", session);
             }
         }
 
@@ -106,6 +107,11 @@ class GoogleSigninController @Autowired constructor(
         log.info("Got Google token info email: ${tokenInfo.email}")
         log.info("Got Google token info id : ${tokenInfo.userId}")
         return tokenInfo
+    }
+
+    private fun redirectToSigninPromptWithError(error: String, session: HttpSession): ModelAndView {
+        session.setAttribute("error", error);
+        return redirectToSigninPrompt();
     }
 
     private fun redirectToSigninPrompt(): ModelAndView {

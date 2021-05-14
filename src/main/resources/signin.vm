@@ -13,6 +13,11 @@
                         <input type="submit" name="login" value="Sign in" class="btn btn-primary" />
                     </div>
                 </div>
+                #if($error)
+                    <div class="control-group">
+                         <div class="alert alert-warning">$error</div>
+                    </div>
+                #end
             </form>
          </div>
     </div>
