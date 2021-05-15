@@ -32,7 +32,7 @@ class CurrentUserService @Autowired constructor(val request: HttpServletRequest,
     }
 
     fun setSignedInUser(user: User) {
-        request.getSession().setAttribute(signedInUserAttribute, user.getObjectId().toHexString())
+        request.session.setAttribute(signedInUserAttribute, user.getObjectId().toHexString())
     }
 
 }
