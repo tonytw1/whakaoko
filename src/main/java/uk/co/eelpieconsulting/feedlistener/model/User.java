@@ -70,6 +70,10 @@ public class User {
         this.googleUserId = googleUserId;
     }
 
+    public ObjectId getObjectId() {
+        return objectId;
+    }
+
     @Override
     public String toString() {
         return "User{" +

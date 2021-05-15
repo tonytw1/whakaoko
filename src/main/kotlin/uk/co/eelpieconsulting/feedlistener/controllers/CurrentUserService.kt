@@ -15,7 +15,7 @@ class CurrentUserService @Autowired constructor(val request: HttpServletRequest,
         // UI sessions have the signed in user on the session
         val sessionUsername = request.session.getAttribute(signedInUserAttribute)
         if (sessionUsername != null) {
-            return usersDAO.getByUsername(sessionUsername as String)    // TODO migrate to get by id
+            return usersDAO.getByObjectId(sessionUsername as String)
         }
 
         // API clients set a bearer token on each request
@@ -32,7 +32,7 @@ class CurrentUserService @Autowired constructor(val request: HttpServletRequest,
     }
 
     fun setSignedInUser(user: User) {
-        request.getSession().setAttribute(signedInUserAttribute, user.username)
+        request.getSession().setAttribute(signedInUserAttribute, user.getObjectId().toHexString())
     }
 
 }
