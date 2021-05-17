@@ -13,6 +13,7 @@ public class User {
     ObjectId objectId;
 
     private String username;
+    private String googleUserId;
 
     private String twitterAccessToken;
     private String twitterAccessSecret;
@@ -61,11 +62,27 @@ public class User {
         this.accessToken = accessToken;
     }
 
+    public String getGoogleUserId() {
+        return googleUserId;
+    }
+
+    public void setGoogleUserId(String googleUserId) {
+        this.googleUserId = googleUserId;
+    }
+
+    public ObjectId getObjectId() {
+        return objectId;
+    }
+
     @Override
     public String toString() {
         return "User{" +
                 "objectId=" + objectId +
                 ", username='" + username + '\'' +
+                ", googleUserId='" + googleUserId + '\'' +
+                ", twitterAccessToken='" + twitterAccessToken + '\'' +
+                ", twitterAccessSecret='" + twitterAccessSecret + '\'' +
+                ", accessToken='" + accessToken + '\'' +
                 '}';
     }
 

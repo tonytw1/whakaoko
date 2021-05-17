@@ -55,7 +55,7 @@ public class UrlBuilder {
     }
 
     public String getUserUrl() {
-        return getBaseUrl() + "/ui";
+        return getBaseUrl() + "/";
     }
 
     public String getNewChannelUrl() {

@@ -7,7 +7,7 @@
                 <a href="$urlBuilder.getChannelItemsUrl($channel)" target="_blank">JSON</a> |
                 <a href="$urlBuilder.getChannelItemsUrl($channel)?format=rss" target="_blank">RSS</a>
             </div>
-            <h5><a href="$urlBuilder.getUserUrl()">$user.username</a> / $channel.name
+            <h5><a href="$urlBuilder.getUserUrl()">Channels</a> / $channel.name
             #if($totalCount) ($totalCount)#end
             </h5>
         </div>
