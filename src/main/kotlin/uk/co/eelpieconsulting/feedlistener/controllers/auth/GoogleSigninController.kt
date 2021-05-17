@@ -24,6 +24,7 @@ class GoogleSigninController @Autowired constructor(
         @Value("\${googleAuthClientId}") private val googleClientId: String,
         @Value("\${googleAuthClientSecret}") private val googleClientSecret: String,
         @Value("\${googleAuthCallbackUrl}") private val callbackUrl: String,
+        @Value("\${googleAuthAllowedDomain}") private val allowedDomain: String,
         private val currentUserService: CurrentUserService,
         private val usersDAO: UsersDAO
         ) {
@@ -31,8 +32,6 @@ class GoogleSigninController @Autowired constructor(
     // Does OAuth dance with Google and attaches a Google user to the local session
 
     private val log = LogManager.getLogger(ChannelsController::class.java)
-
-    private val ALLOWED_EMAIL_DOMAINS = "eelpieconsulting.co.uk"
 
     private val client = OkHttpClient()
     private val objectMapper = ObjectMapper()
@@ -65,8 +64,7 @@ class GoogleSigninController @Autowired constructor(
         val googleUserEmail = tokenInfo?.email
         if (!Strings.isNullOrEmpty(googleUserEmail)) {
             log.info("Google token verified to email: $googleUserEmail")
-            if (googleUserEmail!!.endsWith(ALLOWED_EMAIL_DOMAINS)) {
-
+            if (!Strings.isNullOrEmpty(allowedDomain) && googleUserEmail!!.endsWith(allowedDomain)) {
                 val currentUser = currentUserService.getCurrentUserUser()
                 if (currentUser != null) {
                     // If a current user is a signed in but has no Google id then attach to this user
