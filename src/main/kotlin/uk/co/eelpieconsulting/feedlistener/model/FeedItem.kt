@@ -24,8 +24,8 @@ class FeedItem : RssFeedable {
 
     var body: String? = null
 
-    private lateinit var date: Date
-    override fun getDate(): Date {
+    private var date: Date? = null
+    override fun getDate(): Date? {
         return date
     }
 
@@ -52,7 +52,7 @@ class FeedItem : RssFeedable {
     constructor(title: String?,
                 url: String,
                 body: String?,
-                date: Date,
+                date: Date?,
                 place: Place? = null,
                 imageUrl: String? = null,
                 author: String? = null,
