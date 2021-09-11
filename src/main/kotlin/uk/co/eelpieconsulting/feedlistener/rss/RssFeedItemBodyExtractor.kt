@@ -12,6 +12,12 @@ class RssFeedItemBodyExtractor {
     private val log = LogManager.getLogger(RssFeedItemBodyExtractor::class.java)
 
     fun extractBody(syndEntry: SyndEntry): String? {
+        val body = syndEntry.description?.value
+        if (!Strings.isNullOrEmpty(body)) {
+            return body
+        }
+
+        log.debug("No description found; looking for content")
         val contents = syndEntry.contents // contents returns an untyped list of SyndContentImpl
         if (contents.isNotEmpty()) {
             val firstItem = contents[0]
@@ -19,16 +25,7 @@ class RssFeedItemBodyExtractor {
                 return firstItem.value
             }
         }
-
-        log.debug("No content body found; looking for description")
-        val body = getItemDescription(syndEntry)
-        return if (!Strings.isNullOrEmpty(body)) {
-            body
-        } else null
-    }
-
-    private fun getItemDescription(syndEntry: SyndEntry): String? {
-        return syndEntry.description?.value
+        return null
     }
 
 }
