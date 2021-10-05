@@ -70,50 +70,45 @@ class RssPoller @Autowired constructor(val subscriptionsDAO: SubscriptionsDAO, v
             subscriptionsDAO.save(subscription)
 
             fun pollFeed(url: String, etag: String?): Result<Subscription, FeedFetchingException> {
-                // If this feed has an etag we may be able to skip a full read this time
-                if (etag != null) {
-                    log.info("Checking feed etag before fetching: " + url)
-                    httpFetcher.head(url).fold({ httpResult ->
-                        val currentEtag = httpResult.first["Etag"].stream().findFirst().orElse(null)
-                        if (currentEtag != null && currentEtag == etag) {
-                            log.info("Feed etag has not changed; skipping fetch")
-                            subscription.httpStatus = httpResult.second
-                            subscription.error = null
-                            return Result.success(subscription)
-                        }
-                    }, { ex ->
-                        return Result.error(FeedFetchingException(message = ex.message!!, httpStatus = ex.response.statusCode, rootCause = ex))
-                    })
-                }
-
                 log.info("Fetching full feed: " + url)
                 feedFetcher.fetchFeed(subscription).fold(
-                        { fetchedFeed ->
-                            log.info("Fetched feed: " + fetchedFeed.feedName)
-                            log.info("Etag: " + fetchedFeed.etag)
-                            if (!Strings.isNullOrEmpty(fetchedFeed.etag)) {
-                                rssSuccessesEtagged.increment()
-                            } else {
-                                rssSuccessesNotEtagged.increment()
-                            }
-                            persistFeedItems(fetchedFeed.feedItems)
+                        { maybeFetchedFeed ->
+                            maybeFetchedFeed?.let { fetchedFeed ->
+                                // Your fetch returned a feed. This indicates the feed has been updated or
+                                // the feed server didn't support our last modified or etag headers
+                                log.info("Fetched feed: " + fetchedFeed.feedName + " with etag " + fetchedFeed.etag)
+                                if (!Strings.isNullOrEmpty(fetchedFeed.etag)) {
+                                    rssSuccessesEtagged.increment()
+                                } else {
+                                    rssSuccessesNotEtagged.increment()
+                                }
+                                persistFeedItems(fetchedFeed.feedItems)
 
-                            // TODO needs to be a common concern with all subscriptions types; ie Twitter etc
-                            val itemCount = feedItemDAO.getSubscriptionFeedItemsCount(subscription.id)
-                            val latestItemDate = feedItemLatestDateFinder.getLatestItemDate(fetchedFeed.feedItems)
+                                // TODO needs to be a common concern with all subscriptions types; ie Twitter etc
+                                val itemCount = feedItemDAO.getSubscriptionFeedItemsCount(subscription.id)
+                                val latestItemDate = feedItemLatestDateFinder.getLatestItemDate(fetchedFeed.feedItems)
 
-                            // Backfill the subscription name with the feed title if not already set
-                            if (Strings.isNullOrEmpty(subscription.name)) {
-                                subscription.name = fetchedFeed.feedName
+                                // Backfill the subscription name with the feed title if not already set
+                                if (Strings.isNullOrEmpty(subscription.name)) {
+                                    subscription.name = fetchedFeed.feedName
+                                }
+                                subscription.itemCount = itemCount
+                                subscription.latestItemDate = latestItemDate
+                                subscription.etag = fetchedFeed.etag
+                                subscription.httpStatus = fetchedFeed.httpStatus
+                                subscription.error = null
+
+                                log.info("Completed feed fetch for: " + fetchedFeed.feedName + "; saw " + fetchedFeed.feedItems.size + " items. Latest feed item date was: " + latestItemDate)
+                                return Result.success(subscription)
                             }
-                            subscription.itemCount = itemCount
-                            subscription.latestItemDate = latestItemDate
-                            subscription.etag = fetchedFeed.etag
-                            subscription.httpStatus = fetchedFeed.httpStatus
+
+                            // Our fetch return successfully but with not feed contents
+                            // This indicates that the feed server responsed with a not modified response
+                            // subscription.httpStatus = fetchedFeed.httpStatus TODO need the not modified response code
+                            log.info("Feed fetch returned unmodified for subscription: ${subscription.name}")
                             subscription.error = null
-
-                            log.info("Completed feed fetch for: " + fetchedFeed.feedName + "; saw " + fetchedFeed.feedItems.size + " items. Latest feed item date was: " + latestItemDate)
                             return Result.success(subscription)
+
                         },
                         { ex ->
                             log.warn("Fetch feed returning error: " + ex)

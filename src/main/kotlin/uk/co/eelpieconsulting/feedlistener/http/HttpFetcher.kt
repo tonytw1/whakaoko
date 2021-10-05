@@ -29,10 +29,13 @@ class HttpFetcher(val userAgent: String, val timeout: Int) {
         }
     }
 
-    fun getBytes(url: String): Result<HttpResult, FuelError> {
-        val (_, response, result) = url.httpGet().
-        timeout(timeout).header("User-Agent", userAgent).response()
+    fun getBytes(url: String, etag: String?): Result<HttpResult, FuelError> {
+        val request = url.httpGet().timeout(timeout).header("User-Agent", userAgent)
+        etag?.let { etag ->
+            request.header("If-None-Match", etag)
+        }
 
+        val (_, response, result) = request.response()
         result.fold({ bytes ->
             val httpResult = HttpResult(bytes = bytes, status = response.statusCode, headers = response.headers)
             return Result.success(httpResult)
