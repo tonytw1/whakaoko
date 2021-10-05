@@ -186,3 +186,11 @@ curl http://localhost:8080/subscriptions/YOUR_SUBSCRIPTION_ID/items | json_pp
 ![Feed items JSON](feeditems.png)
 
 
+# Local development
+
+Maven build.
+
+```
+docker-compose -f docker/docker-compose.yml up
+mvn clean install
+```
