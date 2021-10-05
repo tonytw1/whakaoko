@@ -25,27 +25,28 @@ class FeedFetcher @Autowired constructor(private val httpFetcher: HttpFetcher,
     private val rssFetchesCounter = meterRegistry.counter("rss_fetches")
     private val rssFetchedBytesCounter = meterRegistry.counter("rss_fetched_bytes")
 
-    fun fetchFeed(subscription: RssSubscription): Result<FetchedFeed, FeedFetchingException> {
+    fun fetchFeed(subscription: RssSubscription): Result<FetchedFeed?, FeedFetchingException> {
         loadSyndFeedWithFeedFetcher(subscription.url, subscription.etag).fold({ syndFeedAndHttpResult ->
-            val syndFeed = syndFeedAndHttpResult.first
-            val httpResult = syndFeedAndHttpResult.second
-
-            val headers = httpResult.headers
-            val etag = headers["ETag"].firstOrNull()
-
-            val fetchedFeed = FetchedFeed(feedName = syndFeed.title, feedItems = getFeedItemsFrom(syndFeed, subscription), etag = etag, httpStatus = httpResult.status)
-            return Result.success(fetchedFeed)
-
+            val maybeSyndFeed = syndFeedAndHttpResult.first
+            val maybeFetchedFeed = maybeSyndFeed?.let { syndFeed ->
+                val httpResult = syndFeedAndHttpResult.second
+                val headers = httpResult.headers
+                val etag = headers["ETag"].firstOrNull()
+                FetchedFeed(feedName = maybeSyndFeed.title, feedItems = getFeedItemsFrom(maybeSyndFeed, subscription), etag = etag, httpStatus = httpResult.status)
+            }
+            return Result.Success(maybeFetchedFeed)
         }, { ex ->
             return Result.Failure(ex)
         })
     }
 
-    private fun loadSyndFeedWithFeedFetcher(feedUrl: String, etag: String?): Result<Pair<SyndFeed, HttpResult>, FeedFetchingException> {
+    private fun loadSyndFeedWithFeedFetcher(feedUrl: String, etag: String?): Result<Pair<SyndFeed?, HttpResult>, FeedFetchingException> {
         log.info("Loading SyndFeed from url: " + feedUrl)
         rssFetchesCounter.increment()
 
         httpFetcher.getBytes(feedUrl, etag).fold({ httpResult ->
+            // Always increment the bytes counter even for non 200 requests
+            // The total amount of traffic we are generating is an important metric
             val fetchedBytes = httpResult.bytes
             rssFetchedBytesCounter.increment(fetchedBytes.size.toDouble())
 
@@ -66,7 +67,7 @@ class FeedFetcher @Autowired constructor(private val httpFetcher: HttpFetcher,
             }  else if (httpResult.status == 304) {
                 // Not modified
                 log.info("Feed url responded with 304 not modified: " + feedUrl)
-               return Result.Failure(FeedFetchingException(message = "Feed not modified", httpResult.status))  // TODO what to return in this case
+                return Result.success(Pair(null, httpResult))
 
             } else {
                 return Result.Failure(FeedFetchingException(message = "Could not fetch feed", httpResult.status))
