@@ -1,5 +1,6 @@
 package uk.co.eelpieconsulting.feedlistener.model
 
+import com.fasterxml.jackson.annotation.JsonFormat
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.annotation.JsonPropertyOrder
 import dev.morphia.annotations.Entity
@@ -18,7 +19,9 @@ abstract class Subscription {
     lateinit var id: String
     var name: String? = null
     lateinit var username: String
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSXXX")
     var lastRead: Date? = null
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSXXX")
     var latestItemDate: Date? = null
     var error: String? = null
     var etag: String? = null
