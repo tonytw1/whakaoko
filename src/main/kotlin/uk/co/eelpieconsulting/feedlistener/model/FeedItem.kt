@@ -1,5 +1,6 @@
 package uk.co.eelpieconsulting.feedlistener.model
 
+import com.fasterxml.jackson.annotation.JsonFormat
 import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.annotation.JsonInclude
 import dev.morphia.annotations.*
@@ -25,6 +26,7 @@ class FeedItem : RssFeedable {
     var body: String? = null
 
     private lateinit var date: Date
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSXXX")
     override fun getDate(): Date {
         return date
     }
