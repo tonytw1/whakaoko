@@ -300,6 +300,10 @@
           },
           "channelId": {
             "type": "string"
+          },
+          "date": {
+            "type": "string",
+            "format": "date-time"
           }
         }
       },
@@ -358,10 +362,12 @@
             "type": "string"
           },
           "latestItemDate": {
-            "type": "string"
+            "type": "string",
+            "format": "date-time"
           },
           "lastRead": {
-            "type": "string"
+            "type": "string",
+            "format": "date-time"
           },
           "etag": {
             "type": "string"
