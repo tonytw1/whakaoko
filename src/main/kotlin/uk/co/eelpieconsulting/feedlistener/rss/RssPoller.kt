@@ -72,7 +72,8 @@ class RssPoller @Autowired constructor(val subscriptionsDAO: SubscriptionsDAO, v
             fun pollFeed(url: String, etag: String?): Result<Subscription, FeedFetchingException> {
                 log.info("Fetching full feed: " + url)
                 feedFetcher.fetchFeed(subscription).fold(
-                        { maybeFetchedFeed ->
+                        { successfulFetch ->
+                            val maybeFetchedFeed = successfulFetch.first
                             maybeFetchedFeed?.let { fetchedFeed ->
                                 // Your fetch returned a feed. This indicates the feed has been updated or
                                 // the feed server didn't support our last modified or etag headers
@@ -107,6 +108,7 @@ class RssPoller @Autowired constructor(val subscriptionsDAO: SubscriptionsDAO, v
                             // subscription.httpStatus = fetchedFeed.httpStatus TODO need the not modified response code
                             log.info("Feed fetch returned unmodified for subscription: ${subscription.name}")
                             subscription.error = null
+                            subscription.httpStatus = successfulFetch.second.status
                             return Result.success(subscription)
 
                         },
