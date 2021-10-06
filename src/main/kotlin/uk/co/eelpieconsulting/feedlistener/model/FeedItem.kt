@@ -26,7 +26,7 @@ class FeedItem : RssFeedable {
     var body: String? = null
 
     private lateinit var date: Date
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSXXX")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ssXXX")
     override fun getDate(): Date {
         return date
     }
