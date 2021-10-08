@@ -72,39 +72,45 @@ class RssPoller @Autowired constructor(val subscriptionsDAO: SubscriptionsDAO, v
             subscription.lastRead = DateTime.now().toDate()
             subscriptionsDAO.save(subscription)
 
-            fun pollFeed(url: String, etag: String?): Result<Subscription, FeedFetchingException> {
-                log.info("Fetching full feed: " + url)
+            fun pollFeed(): Result<Subscription, FeedFetchingException> {
+                log.info("Fetching full feed: " + subscription.url)
                 feedFetcher.fetchFeed(subscription).fold(
                         { successfulFetch ->
                             val maybeFetchedFeed = successfulFetch.first
                             val httpResult = successfulFetch.second
 
-                            // Look for Last-Modified so see if it's in wide spread use or not
+                            // Capture useful headers from all successful fetches
+                            subscription.error = null
+                            subscription.httpStatus = httpResult.status
+
+                            // Etag
+                            val etagHeader = httpResult.headers["Etag"].firstOrNull()
+                            if (!Strings.isNullOrEmpty(etagHeader)) {
+                                rssSuccessesEtagged.increment()
+                            } else {
+                                rssSuccessesNotEtagged.increment()
+                            }
+                            subscription.etag = etagHeader
+
+                            // Last-Modified
                             val lastModifiedHeader = httpResult.headers["Last-Modified"].firstOrNull()
-                            val lastModified: Date? = if (lastModifiedHeader != null) {
-                                log.info("Saw last-modified header ${lastModifiedHeader} on url ${url}")
+                            val lastModified = lastModifiedHeader?.let {
+                                log.info("Saw last-modified header ${lastModifiedHeader} on url ${subscription.url}")
                                 try {
-                                    val parsed: ZonedDateTime = ZonedDateTime.parse(lastModifiedHeader, DateTimeFormatter.RFC_1123_DATE_TIME)
-                                    log.info("Last modified time parsed to: ${parsed}")
+                                    val parsed = ZonedDateTime.parse(lastModifiedHeader, DateTimeFormatter.RFC_1123_DATE_TIME)
                                     Date.from(parsed.toInstant())
                                 } catch (dtpe: DateTimeParseException) {
                                     log.warn("Could not parse last modified header '${lastModifiedHeader}'")
                                     null
                                 }
-                            } else {
-                                null
                             }
                             subscription.lastModified = lastModified
 
+                            // If this fetch returned a full feed response then process the feed items
                             maybeFetchedFeed?.let { fetchedFeed ->
                                 // Your fetch returned a feed. This indicates the feed has been updated or
                                 // the feed server didn't support our last modified or etag headers
-                                log.info("Fetched feed: " + fetchedFeed.feedName + " with etag " + fetchedFeed.etag)
-                                if (!Strings.isNullOrEmpty(fetchedFeed.etag)) {
-                                    rssSuccessesEtagged.increment()
-                                } else {
-                                    rssSuccessesNotEtagged.increment()
-                                }
+                                log.info("Fetched feed: " + fetchedFeed.feedName)
                                 persistFeedItems(fetchedFeed.feedItems)
 
                                 // TODO needs to be a common concern with all subscriptions types; ie Twitter etc
@@ -117,11 +123,8 @@ class RssPoller @Autowired constructor(val subscriptionsDAO: SubscriptionsDAO, v
                                 }
                                 subscription.itemCount = itemCount
                                 subscription.latestItemDate = latestItemDate
-                                subscription.etag = fetchedFeed.etag
-                                subscription.httpStatus = fetchedFeed.httpStatus
-                                subscription.error = null
 
-                                log.info("Completed feed fetch for: " + fetchedFeed.feedName + "; saw " + fetchedFeed.feedItems.size + " items. Latest feed item date was: " + latestItemDate)
+                                log.info("Completed fetch of feed named '${fetchedFeed.feedName}' with ${fetchedFeed.feedItems.size} items from '${subscription.url}'. Latest feed item date was ${latestItemDate}")
                                 return Result.success(subscription)
                             }
 
@@ -129,8 +132,6 @@ class RssPoller @Autowired constructor(val subscriptionsDAO: SubscriptionsDAO, v
                             // This indicates that the feed server responsed with a not modified response
                             // subscription.httpStatus = fetchedFeed.httpStatus TODO need the not modified response code
                             log.info("Feed fetch returned unmodified for subscription: ${subscription.name}")
-                            subscription.error = null
-                            subscription.httpStatus = httpResult.status
                             return Result.success(subscription)
 
                         },
@@ -141,7 +142,7 @@ class RssPoller @Autowired constructor(val subscriptionsDAO: SubscriptionsDAO, v
                 )
             }
 
-            pollFeed(subscription.url, subscription.etag).fold(
+            pollFeed().fold(
                     { updatedSubscription ->
                         log.info("Feed polled with no errors: " + subscription.url)
 

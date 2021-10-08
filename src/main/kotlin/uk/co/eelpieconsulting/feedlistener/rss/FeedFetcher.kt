@@ -29,10 +29,7 @@ class FeedFetcher @Autowired constructor(private val httpFetcher: HttpFetcher,
         loadSyndFeedWithFeedFetcher(subscription.url, subscription.etag).fold({ syndFeedAndHttpResult ->
             val maybeSyndFeed = syndFeedAndHttpResult.first
             val maybeFetchedFeed = maybeSyndFeed?.let { syndFeed ->
-                val httpResult = syndFeedAndHttpResult.second
-                val headers = httpResult.headers
-                val etag = headers["ETag"].firstOrNull()    // TODO This is slightly the wrong place; it's applicable to 304 responses as well
-                FetchedFeed(feedName = maybeSyndFeed.title, feedItems = getFeedItemsFrom(maybeSyndFeed, subscription), etag = etag, httpStatus = httpResult.status)
+                FetchedFeed(feedName = maybeSyndFeed.title, feedItems = getFeedItemsFrom(maybeSyndFeed, subscription))
             }
             return Result.Success(Pair(maybeFetchedFeed, syndFeedAndHttpResult.second))
         }, { ex ->
