@@ -186,7 +186,7 @@ class FeedItemLatestDateFinder {
 
     fun getLatestItemDate(feedItems: List<FeedItem>): Date? {
         // Map to dates; filter out nulls; return max
-        return feedItems.map { it.date }.filterNotNull().stream().max(Date::compareTo).orElse(null)
+        return feedItems.map { it.date }.stream().max(Date::compareTo).orElse(null)
     }
 
 }
