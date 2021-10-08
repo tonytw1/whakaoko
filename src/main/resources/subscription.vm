@@ -18,25 +18,29 @@
                 <code><a href="$subscription.url" target="_blank">$subscription.url</a></code>
             #end
             <p>#parse('includes/classification.vm')</p>
-            #if($subscription.error)
-                <div class="alert alert-danger" role="alert">
-                    Error: $!subscription.error<br/>
-                    Http status: $!subscription.httpStatus
-                </div>
-            #end
 
             <p> <a href="$urlBuilder.getReadSubscriptionUrl($subscription)"><button type="button" class="btn btn-primary">Read</button></a>
                 <a href="$urlBuilder.getDeleteSubscriptionUrl($subscription)"><button type="button" class="btn btn-danger">Delete</button></a></p>
 
             #if($subscription.lastRead)
                 <p><span title="$subscription.lastRead">Last read: $dateFormatter.timeSince($subscription.lastRead)</span></p>
+                #if($subscription.error)
+                    <div class="alert alert-danger" role="alert">
+                        Error: $!subscription.error<br/>
+                        Http status: $!subscription.httpStatus
+                    </div>
+                #else
+                    <div>
+                        Http status: $!subscription.httpStatus<br/>
+                        #if($subscription.etag)
+                            <p>ETag: $subscription.etag</p>
+                        #end
+                    </div>
+                #end
             #end
 
             #if($subscription.latestItemDate)
                 <p>Latest item date: $dateFormatter.timeSince($subscription.latestItemDate)</p>
-            #end
-            #if($subscription.etag)
-               <p>ETag: $subscription.etag</p>
             #end
             <hr/>
         </div>
