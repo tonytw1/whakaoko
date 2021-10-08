@@ -15,7 +15,6 @@ import org.springframework.stereotype.Component
 import uk.co.eelpieconsulting.feedlistener.daos.FeedItemDAO
 import uk.co.eelpieconsulting.feedlistener.daos.SubscriptionsDAO
 import uk.co.eelpieconsulting.feedlistener.exceptions.FeeditemPersistanceException
-import uk.co.eelpieconsulting.feedlistener.http.HttpFetcher
 import uk.co.eelpieconsulting.feedlistener.model.FeedItem
 import uk.co.eelpieconsulting.feedlistener.model.RssSubscription
 import uk.co.eelpieconsulting.feedlistener.model.Subscription
@@ -30,7 +29,6 @@ import java.util.function.Consumer
 class RssPoller @Autowired constructor(val subscriptionsDAO: SubscriptionsDAO, val taskExecutor: TaskExecutor,
                                        val feedFetcher: FeedFetcher, val feedItemDestination: FeedItemDAO,
                                        val feedItemLatestDateFinder: FeedItemLatestDateFinder,
-                                       val httpFetcher: HttpFetcher,
                                        val classifier: Classifier,
                                        meterRegistry: MeterRegistry) {
 
@@ -183,10 +181,8 @@ class RssPoller @Autowired constructor(val subscriptionsDAO: SubscriptionsDAO, v
 
 @Component
 class FeedItemLatestDateFinder {
-
     fun getLatestItemDate(feedItems: List<FeedItem>): Date? {
-        // Map to dates; filter out nulls; return max
+        // Map to dates; return max
         return feedItems.map { it.date }.stream().max(Date::compareTo).orElse(null)
     }
-
 }
