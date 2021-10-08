@@ -44,7 +44,7 @@ class FeedFetcher @Autowired constructor(private val httpFetcher: HttpFetcher,
         log.info("Loading SyndFeed from url: " + feedUrl)
         rssFetchesCounter.increment()
 
-        httpFetcher.getBytes(feedUrl, etag).fold({ httpResult ->
+        httpFetcher.get(feedUrl, etag).fold({ httpResult ->
             // Always increment the bytes counter even for non 200 requests
             // The total amount of traffic we are generating is an important metric
             val fetchedBytes = httpResult.bytes

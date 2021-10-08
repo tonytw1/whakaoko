@@ -29,7 +29,7 @@ class HttpFetcher(val userAgent: String, val timeout: Int) {
         }
     }
 
-    fun getBytes(url: String, etag: String?): Result<HttpResult, FuelError> {
+    fun get(url: String, etag: String?): Result<HttpResult, FuelError> {
         val request = url.httpGet().timeout(timeout).header("User-Agent", userAgent)
         etag?.let { etag ->
             request.header("If-None-Match", etag)
