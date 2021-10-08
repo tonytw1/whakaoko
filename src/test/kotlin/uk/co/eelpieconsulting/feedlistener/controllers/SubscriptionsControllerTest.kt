@@ -57,7 +57,7 @@ class SubscriptionsControllerTest {
         val subscription = RssSubscription("http://localhost/feed", "a-channel", "a-user")
         `when`(subscriptionsDAO.getById(subscription.id)).thenReturn(subscription)
 
-        subscriptionsController.deleteSubscription("a-user", subscription.id)
+        subscriptionsController.deleteSubscription(subscription.id)
 
         verify(feedItemDAO).deleteSubscriptionFeedItems(subscription)
         verifyNoInteractions(twitterSubscriptionManager)
