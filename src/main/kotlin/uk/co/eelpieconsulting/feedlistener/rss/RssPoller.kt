@@ -72,8 +72,6 @@ class RssPoller @Autowired constructor(val subscriptionsDAO: SubscriptionsDAO, v
 
         override fun run() {
             log.info("Processing feed: " + subscription + " from thread " + Thread.currentThread().id)
-            subscription.lastRead = DateTime.now().toDate()
-            subscriptionsDAO.save(subscription)
 
             fun pollFeed(): Result<Subscription, FeedFetchingException> {
                 log.info("Fetching full feed: " + subscription.url)
@@ -166,6 +164,7 @@ class RssPoller @Autowired constructor(val subscriptionsDAO: SubscriptionsDAO, v
             )
 
             subscription.classification = classifier.classify(subscription)
+            subscription.lastRead = DateTime.now().toDate()
             subscriptionsDAO.save(subscription)
         }
 
