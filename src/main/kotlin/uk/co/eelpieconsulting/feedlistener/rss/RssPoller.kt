@@ -20,6 +20,9 @@ import uk.co.eelpieconsulting.feedlistener.model.FeedItem
 import uk.co.eelpieconsulting.feedlistener.model.RssSubscription
 import uk.co.eelpieconsulting.feedlistener.model.Subscription
 import uk.co.eelpieconsulting.feedlistener.rss.classification.Classifier
+import java.time.ZonedDateTime
+import java.time.format.DateTimeFormatter
+import java.time.format.DateTimeParseException
 import java.util.*
 import java.util.function.Consumer
 
@@ -74,6 +77,25 @@ class RssPoller @Autowired constructor(val subscriptionsDAO: SubscriptionsDAO, v
                 feedFetcher.fetchFeed(subscription).fold(
                         { successfulFetch ->
                             val maybeFetchedFeed = successfulFetch.first
+                            val httpResult = successfulFetch.second
+
+                            // Look for Last-Modified so see if it's in wide spread use or not
+                            val lastModifiedHeader = httpResult.headers["Last-Modified"].firstOrNull()
+                            val lastModified: Date? = if (lastModifiedHeader != null) {
+                                log.info("Saw last-modified header ${lastModifiedHeader} on url ${url}")
+                                try {
+                                    val parsed: ZonedDateTime = ZonedDateTime.parse(lastModifiedHeader, DateTimeFormatter.RFC_1123_DATE_TIME)
+                                    log.info("Last modified time parsed to: ${parsed}")
+                                    Date.from(parsed.toInstant())
+                                } catch (dtpe: DateTimeParseException) {
+                                    log.warn("Could not parse last modified header '${lastModifiedHeader}'")
+                                    null
+                                }
+                            } else {
+                                null
+                            }
+                            subscription.lastModified = lastModified
+
                             maybeFetchedFeed?.let { fetchedFeed ->
                                 // Your fetch returned a feed. This indicates the feed has been updated or
                                 // the feed server didn't support our last modified or etag headers
@@ -108,7 +130,7 @@ class RssPoller @Autowired constructor(val subscriptionsDAO: SubscriptionsDAO, v
                             // subscription.httpStatus = fetchedFeed.httpStatus TODO need the not modified response code
                             log.info("Feed fetch returned unmodified for subscription: ${subscription.name}")
                             subscription.error = null
-                            subscription.httpStatus = successfulFetch.second.status
+                            subscription.httpStatus = httpResult.status
                             return Result.success(subscription)
 
                         },

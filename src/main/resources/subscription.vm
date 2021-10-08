@@ -35,6 +35,9 @@
                         #if($subscription.etag)
                             <p>ETag: $subscription.etag</p>
                         #end
+                         #if($subscription.lastModified)
+                            <p>Last modified: $subscription.lastModified</p>
+                        #end
                     </div>
                 #end
             #end

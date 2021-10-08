@@ -27,6 +27,7 @@ abstract class Subscription {
     var etag: String? = null
     var httpStatus: Int? = null
     var itemCount= 0L
+    var lastModified: Date? = null
 
     @Indexed
     lateinit var channelId: String
