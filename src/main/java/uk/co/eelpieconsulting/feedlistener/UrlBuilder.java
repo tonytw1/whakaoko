@@ -1,12 +1,9 @@
 package uk.co.eelpieconsulting.feedlistener;
 
-import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-
 import uk.co.eelpieconsulting.feedlistener.model.Channel;
 import uk.co.eelpieconsulting.feedlistener.model.Subscription;
-import uk.co.eelpieconsulting.feedlistener.model.User;
 
 @Component
 public class UrlBuilder {
@@ -35,7 +32,7 @@ public class UrlBuilder {
     }
 
     public String getReadSubscriptionUrl(Subscription subscription) {
-        return subscriptionUrl(subscription) + "/read";
+        return "/ui/subscriptions/" + subscription.id + "/read";
     }
 
     public String getSubscriptionItemsUrl(Subscription subscription) {

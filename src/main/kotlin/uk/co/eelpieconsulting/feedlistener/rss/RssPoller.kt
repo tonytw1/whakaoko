@@ -50,7 +50,12 @@ class RssPoller @Autowired constructor(val subscriptionsDAO: SubscriptionsDAO, v
         log.info("Done")
     }
 
-    fun run(subscription: RssSubscription) {
+    fun requestRead(subscription: RssSubscription) {
+        log.info("Requesting reload of RSS subscription: " + subscription.name + " / " + subscription.url)
+        run(subscription)
+    }
+
+    private fun run(subscription: RssSubscription) {
         log.info("Polling single subscription: " + subscription.id)
         executeRssPoll(subscription)
         log.info("Done")

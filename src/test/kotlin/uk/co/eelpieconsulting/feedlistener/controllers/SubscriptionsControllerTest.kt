@@ -48,7 +48,7 @@ class SubscriptionsControllerTest {
 
         subscriptionsController.reload(subscription.id)
 
-        verify(rssPoller).run(subscription)
+        verify(rssPoller).requestRead(subscription)
     }
 
     @Test

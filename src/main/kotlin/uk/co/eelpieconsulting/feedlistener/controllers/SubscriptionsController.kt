@@ -75,8 +75,7 @@ class SubscriptionsController @Autowired constructor(private val subscriptionsDA
         fun executeReload(user: User): ModelAndView? {
             val subscription = subscriptionsDAO.getByRssSubscriptionById(id)
             if (subscription != null) {
-                log.info("Requesting reload of subscription: " + subscription.name + " / " + subscription.url)
-                rssPoller.run(subscription)
+                rssPoller.requestRead(subscription)
                 return ModelAndView(viewFactory.getJsonView()).addObject("data", "ok")
 
             } else {
@@ -123,7 +122,7 @@ class SubscriptionsController @Autowired constructor(private val subscriptionsDA
             val subscription = RssSubscription(url = create.url, channelId = channel.id, username = user.username)
             subscriptionsDAO.add(subscription)
             log.info("Added subscription: $subscription")
-            rssPoller.run(subscription)
+            rssPoller.requestRead(subscription)
 
             return ModelAndView(viewFactory.getJsonView()).addObject("data", subscription)
         }
@@ -154,8 +153,8 @@ class SubscriptionsController @Autowired constructor(private val subscriptionsDA
 
     @Timed(timingNotes = "")
     @GetMapping("/subscriptions/{id}/delete") // TODO should be a HTTP DELETE
-    fun deleteSubscription(@PathVariable username: String, @PathVariable id: String): ModelAndView? {
-        fun performDelete(use: User): ModelAndView? {
+    fun deleteSubscription(@PathVariable id: String): ModelAndView? {
+        fun performDelete(user: User): ModelAndView? {
             val subscription = subscriptionsDAO.getById(id)
             if (subscription == null) {
                 throw ResponseStatusException(HttpStatus.NOT_FOUND, "Subscription not found")
