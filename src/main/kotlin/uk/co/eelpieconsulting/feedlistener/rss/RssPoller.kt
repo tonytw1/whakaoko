@@ -75,7 +75,7 @@ class RssPoller @Autowired constructor(val subscriptionsDAO: SubscriptionsDAO, v
 
             fun pollFeed(): Result<Subscription, FeedFetchingException> {
                 log.info("Fetching full feed: " + subscription.url)
-                feedFetcher.fetchFeed(subscription).fold(
+                return feedFetcher.fetchFeed(subscription).fold(
                         { successfulFetch ->
                             val maybeFetchedFeed = successfulFetch.first
                             val httpResult = successfulFetch.second
@@ -133,31 +133,31 @@ class RssPoller @Autowired constructor(val subscriptionsDAO: SubscriptionsDAO, v
                             // This indicates that the feed server responsed with a not modified response
                             // subscription.httpStatus = fetchedFeed.httpStatus TODO need the not modified response code
                             log.info("Feed fetch returned unmodified for subscription: ${subscription.name}")
-                            return Result.success(subscription)
+                            Result.success(subscription)
 
                         },
                         { ex ->
                             log.warn("Fetch feed returning error: " + ex)
-                            return Result.error(ex)
+                            Result.error(ex)
                         }
                 )
             }
 
             pollFeed().fold(
-                    { updatedSubscription ->
-                        log.info("Feed polled with no errors: " + subscription.url)
+                { updatedSubscription ->
+                    log.info("Feed polled with no errors: " + subscription.url)
 
                     }, { feedFetchingException ->
 
                 val rootCauseName = feedFetchingException.rootCause?.javaClass?.simpleName.orEmpty()
                 val httpStatus = feedFetchingException.httpStatus
 
-                log.warn("Exception while fetching RSS subscription: " + subscription.url + ": " + rootCauseName)
+                    log.warn("Exception while fetching RSS subscription: " + subscription.url + ": " + rootCauseName)
 
-                val errorMessage = feedFetchingException.message
-                log.info("Setting feed error to: " + errorMessage + "; http status: " + httpStatus)
-                subscription.error = errorMessage
-                subscription.httpStatus = httpStatus
+                    val errorMessage = feedFetchingException.message
+                    log.info("Setting feed error to: " + errorMessage + "; http status: " + httpStatus)
+                    subscription.error = errorMessage
+                    subscription.httpStatus = httpStatus
 
                 Metrics.counter("rss_errors", "http_status", httpStatus.toString(), "exception_name", rootCauseName).increment()
             }
