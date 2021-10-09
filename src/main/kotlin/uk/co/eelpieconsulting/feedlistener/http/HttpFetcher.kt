@@ -6,6 +6,10 @@ import com.github.kittinunf.fuel.httpGet
 import com.github.kittinunf.fuel.httpHead
 import com.github.kittinunf.result.Result
 import org.apache.logging.log4j.LogManager
+import java.time.ZoneOffset
+import java.time.ZonedDateTime
+import java.time.format.DateTimeFormatter
+import java.util.*
 
 class HttpFetcher(val userAgent: String, val timeout: Int) {
 
@@ -29,10 +33,17 @@ class HttpFetcher(val userAgent: String, val timeout: Int) {
         }
     }
 
-    fun get(url: String, etag: String?): Result<HttpResult, FuelError> {
+    fun get(url: String, etag: String?, lastModified: Date?): Result<HttpResult, FuelError> {
         val request = url.httpGet().timeout(timeout).header("User-Agent", userAgent)
-        etag?.let { etag ->
+        etag?.let {
             request.header("If-None-Match", etag)
+        }
+
+        lastModified?.let {
+            val dateTime = ZonedDateTime.ofInstant(lastModified.toInstant(), ZoneOffset.UTC)
+            val ifModifiedSince = dateTime.format(DateTimeFormatter.RFC_1123_DATE_TIME)
+            log.info("Appending If-Modified-Since header to request: $ifModifiedSince")
+            request.header("If-Modified-Since", ifModifiedSince)
         }
 
         val (_, response, result) = request.response()

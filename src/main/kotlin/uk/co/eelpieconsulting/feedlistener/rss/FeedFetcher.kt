@@ -13,6 +13,7 @@ import uk.co.eelpieconsulting.feedlistener.http.HttpResult
 import uk.co.eelpieconsulting.feedlistener.model.FeedItem
 import uk.co.eelpieconsulting.feedlistener.model.RssSubscription
 import uk.co.eelpieconsulting.feedlistener.model.Subscription
+import java.util.*
 
 @Component
 class FeedFetcher @Autowired constructor(private val httpFetcher: HttpFetcher,
@@ -26,7 +27,7 @@ class FeedFetcher @Autowired constructor(private val httpFetcher: HttpFetcher,
     private val rssFetchedBytesCounter = meterRegistry.counter("rss_fetched_bytes")
 
     fun fetchFeed(subscription: RssSubscription): Result<Pair<FetchedFeed?, HttpResult>, FeedFetchingException> {
-        loadSyndFeedWithFeedFetcher(subscription.url, subscription.etag).fold({ syndFeedAndHttpResult ->
+        loadSyndFeedWithFeedFetcher(subscription.url, subscription.etag, subscription.lastModified).fold({ syndFeedAndHttpResult ->
             val maybeSyndFeed = syndFeedAndHttpResult.first
             val maybeFetchedFeed = maybeSyndFeed?.let { syndFeed ->
                 FetchedFeed(feedName = maybeSyndFeed.title, feedItems = getFeedItemsFrom(maybeSyndFeed, subscription))
@@ -37,11 +38,11 @@ class FeedFetcher @Autowired constructor(private val httpFetcher: HttpFetcher,
         })
     }
 
-    private fun loadSyndFeedWithFeedFetcher(feedUrl: String, etag: String?): Result<Pair<SyndFeed?, HttpResult>, FeedFetchingException> {
+    private fun loadSyndFeedWithFeedFetcher(feedUrl: String, etag: String?, lastModified: Date?): Result<Pair<SyndFeed?, HttpResult>, FeedFetchingException> {
         log.info("Loading SyndFeed from url: " + feedUrl)
         rssFetchesCounter.increment()
 
-        httpFetcher.get(feedUrl, etag).fold({ httpResult ->
+        httpFetcher.get(feedUrl, etag, lastModified).fold({ httpResult ->
             // Always increment the bytes counter even for non 200 requests
             // The total amount of traffic we are generating is an important metric
             val fetchedBytes = httpResult.bytes
