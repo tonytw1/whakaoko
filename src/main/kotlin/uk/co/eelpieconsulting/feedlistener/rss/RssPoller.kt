@@ -2,7 +2,6 @@ package uk.co.eelpieconsulting.feedlistener.rss
 
 import com.github.kittinunf.result.Result
 import com.google.common.base.Strings
-import io.micrometer.core.instrument.Counter
 import io.micrometer.core.instrument.MeterRegistry
 import io.micrometer.core.instrument.Metrics
 import org.apache.logging.log4j.LogManager
@@ -37,11 +36,6 @@ class RssPoller @Autowired constructor(val subscriptionsDAO: SubscriptionsDAO, v
     val rssAddedItems = meterRegistry.counter("rss_added_items")
     val rssSuccessesEtagged = meterRegistry.counter("rss_successes", "etagged", "false")
     val rssSuccessesNotEtagged = meterRegistry.counter("rss_successes", "etagged", "true")
-
-    val rssErrors = Counter.builder("rss_errors")
-            .description("Errors while reading rss feeds")
-            .tags("http_status", "", "exception_name", "")
-            .register(meterRegistry)
 
     @Scheduled(fixedRate = 3600000, initialDelay = 300000)
     fun run() {
@@ -147,10 +141,9 @@ class RssPoller @Autowired constructor(val subscriptionsDAO: SubscriptionsDAO, v
                 { updatedSubscription ->
                     log.info("Feed polled with no errors: " + subscription.url)
 
-                    }, { feedFetchingException ->
-
-                val rootCauseName = feedFetchingException.rootCause?.javaClass?.simpleName.orEmpty()
-                val httpStatus = feedFetchingException.httpStatus
+                }, { feedFetchingException ->
+                    val rootCauseName = feedFetchingException.rootCause?.javaClass?.simpleName.orEmpty()
+                    val httpStatus = feedFetchingException.httpStatus
 
                     log.warn("Exception while fetching RSS subscription: " + subscription.url + ": " + rootCauseName)
 
@@ -159,8 +152,9 @@ class RssPoller @Autowired constructor(val subscriptionsDAO: SubscriptionsDAO, v
                     subscription.error = errorMessage
                     subscription.httpStatus = httpStatus
 
-                Metrics.counter("rss_errors", "http_status", httpStatus.toString(), "exception_name", rootCauseName).increment()
-            }
+                    Metrics.counter("rss_errors", "http_status", httpStatus.toString(), "exception_name", rootCauseName)
+                        .increment()
+                }
             )
 
             subscription.classification = classifier.classify(subscription)
