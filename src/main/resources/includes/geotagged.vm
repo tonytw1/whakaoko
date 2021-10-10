@@ -1,0 +1,16 @@
+#if($geotagged && !$geotagged.isEmpty())
+    <div class="row">
+        <div class="container">
+            #parse('includes/map.vm')
+            #foreach($feedItem in $geotagged)
+                <script>
+                    var marker = L.marker([${feedItem.place.latLong.latitude}, ${feedItem.place.latLong.longitude}]).addTo(map).bindPopup("$feedItem.title");
+                    markers.push(marker);
+                </script>
+            #end
+            <script>
+                map.fitBounds(new L.featureGroup(markers).getBounds());
+            </script>
+        </div>
+    </div>
+#end

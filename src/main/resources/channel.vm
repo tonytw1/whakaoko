@@ -33,15 +33,7 @@
             <p><a href="$urlBuilder.getChannelNewSubscriptionUrl($channel)"><button type="button" class="btn btn-primary">New subscription</button></a></p>
         </div>
         <div class="col">
-            #if(!$geotagged.isEmpty())
-                #parse('includes/map.vm')
-                #foreach($feedItem in $geotagged)
-                    <script>
-                        var marker = L.marker([${feedItem.place.latLong.latitude}, ${feedItem.place.latLong.longitude}]).addTo(map).bindPopup("$feedItem.title");
-                        markers.push(marker);
-                    </script>
-                #end
-            #end
+            #parse('includes/geotagged.vm')
             #parse('includes/feeditems.vm')
         </div>
     </div>

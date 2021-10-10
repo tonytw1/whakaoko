@@ -51,25 +51,10 @@
 
     <div class="row">
         <div class="container">
-            #if(!$geotagged.isEmpty())
-                <div class="row">
-                    <div class="container">
-                        #parse('includes/map.vm')
-                        #foreach($feedItem in $geotagged)
-                            <script>
-                                var marker = L.marker([${feedItem.place.latLong.latitude}, ${feedItem.place.latLong.longitude}]).addTo(map).bindPopup("$feedItem.title");
-                                markers.push(marker);
-                            </script>
-                        #end
-                    </div>
-                </div>
-            #end
+            #parse('includes/geotagged.vm')
             #parse('includes/feeditems.vm')
         </div>
     </div>
 </div>
 
-<script>
-    map.fitBounds(new L.featureGroup(markers).getBounds());
-</script>
 #parse('includes/footer.vm')

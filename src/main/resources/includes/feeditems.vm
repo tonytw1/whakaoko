@@ -7,5 +7,9 @@
         </div>
     #end
 #else
-    <p>No feed items.</p>
+    <div class="row">
+        <div class="container">
+            <p>No feed items</p>
+        </div>
+    </div>
 #end
