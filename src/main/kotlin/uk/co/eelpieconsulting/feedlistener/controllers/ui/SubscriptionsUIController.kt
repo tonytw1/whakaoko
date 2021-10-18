@@ -21,6 +21,7 @@ import uk.co.eelpieconsulting.feedlistener.daos.UsersDAO
 import uk.co.eelpieconsulting.feedlistener.model.User
 import uk.co.eelpieconsulting.feedlistener.rss.RssPoller
 import uk.co.eelpieconsulting.feedlistener.rss.RssSubscriptionManager
+import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
 
 @Controller
@@ -32,7 +33,8 @@ class SubscriptionsUIController @Autowired constructor(val usersDAO: UsersDAO, v
                                                        val rssPoller: RssPoller,
                                                        val urlBuilder: UrlBuilder,
                                                        currentUserService: CurrentUserService,
-                                                       response: HttpServletResponse) : WithSignedInUser(currentUserService, response) {
+                                                       response: HttpServletResponse,
+                                                       request: HttpServletRequest) : WithSignedInUser(currentUserService, response, request) {
 
     private val log = LogManager.getLogger(SubscriptionsUIController::class.java)
 

@@ -15,6 +15,7 @@ import uk.co.eelpieconsulting.feedlistener.daos.SubscriptionsDAO
 import uk.co.eelpieconsulting.feedlistener.daos.UsersDAO
 import uk.co.eelpieconsulting.feedlistener.model.Channel
 import uk.co.eelpieconsulting.feedlistener.model.User
+import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
 
 @Controller
@@ -26,7 +27,8 @@ class ChannelsUIController @Autowired constructor(val usersDAO: UsersDAO,
                                                   val idBuilder: IdBuilder,
                                                   val urlBuilder: UrlBuilder,
                                                   currentUserService: CurrentUserService,
-                                                  response: HttpServletResponse) : WithSignedInUser(currentUserService, response) {
+                                                  response: HttpServletResponse,
+                                                  request: HttpServletRequest) : WithSignedInUser(currentUserService, response, request) {
 
     @GetMapping("/ui/channels/new")
     fun newChannelForm(): ModelAndView? {

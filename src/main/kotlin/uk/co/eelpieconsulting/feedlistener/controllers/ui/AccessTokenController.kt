@@ -10,13 +10,15 @@ import uk.co.eelpieconsulting.feedlistener.controllers.CurrentUserService
 import uk.co.eelpieconsulting.feedlistener.daos.UsersDAO
 import uk.co.eelpieconsulting.feedlistener.model.User
 import java.util.*
+import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
 
 @Controller
 class AccessTokenController @Autowired constructor(val urlBuilder: UrlBuilder,
                                                    val usersDAO: UsersDAO,
                                                    currentUserService: CurrentUserService,
-                                                   response: HttpServletResponse) : WithSignedInUser(currentUserService, response) {
+                                                   response: HttpServletResponse,
+                                                   request: HttpServletRequest) : WithSignedInUser(currentUserService, response, request) {
 
     @GetMapping("/generate-access-token")
     fun generate(): ModelAndView? {

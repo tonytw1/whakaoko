@@ -24,12 +24,12 @@ class SignInController @Autowired constructor(val request: HttpServletRequest, v
     }
 
     @PostMapping("/signin")
-    fun signin(username: String, session: HttpSession): ModelAndView {
+    fun signin(username: String, session: HttpSession, request: HttpServletRequest): ModelAndView {
         log.info("Signing in as: " + username)
         val user = usersDAO.getByUsername(username)
         if (user != null) {
             currentUserService.setSignedInUser(user)
-            return redirectToSignedInUserUI()
+            return redirectToSignedInUserUI(request)
 
         } else {
             log.info("Unknown user: " + username);
@@ -52,8 +52,14 @@ class SignInController @Autowired constructor(val request: HttpServletRequest, v
         return ModelAndView(RedirectView("/signin"))
     }
 
-    private fun redirectToSignedInUserUI(): ModelAndView {
-        return ModelAndView(RedirectView("/"))
+    private fun redirectToSignedInUserUI(request: HttpServletRequest): ModelAndView {
+        val redirectUrl = request.session.getAttribute("redirect")
+        request.session.removeAttribute("redirect")
+        if (redirectUrl != null && redirectUrl is String ) {
+            return ModelAndView(RedirectView(redirectUrl))
+        } else {
+            return ModelAndView(RedirectView("/"))
+        }
     }
 
 }

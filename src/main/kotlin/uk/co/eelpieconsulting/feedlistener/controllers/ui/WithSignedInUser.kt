@@ -6,9 +6,10 @@ import org.springframework.web.servlet.ModelAndView
 import org.springframework.web.servlet.view.RedirectView
 import uk.co.eelpieconsulting.feedlistener.controllers.CurrentUserService
 import uk.co.eelpieconsulting.feedlistener.model.User
+import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
 
-abstract class WithSignedInUser(val currentUserService: CurrentUserService, val response: HttpServletResponse) {
+abstract class WithSignedInUser(val currentUserService: CurrentUserService, val response: HttpServletResponse, val request: HttpServletRequest) {
 
     private val log = LogManager.getLogger(WithSignedInUser::class.java)
 
@@ -25,7 +26,10 @@ abstract class WithSignedInUser(val currentUserService: CurrentUserService, val 
             }
 
         } else {
-            log.info("No signed in user; redirecting to sign in.")
+            val path = request.requestURI
+            log.info("No signed in user when requesting path $path; redirecting to sign in")
+            // Push this path so the user can be redirected after successful auth
+            request.session.setAttribute("redirect", path)
             return ModelAndView(RedirectView("/signin"))
         }
     }
