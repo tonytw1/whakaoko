@@ -22,6 +22,7 @@ import uk.co.eelpieconsulting.feedlistener.model.User
 import uk.co.eelpieconsulting.feedlistener.rss.RssPoller
 import uk.co.eelpieconsulting.feedlistener.twitter.TwitterListener
 import uk.co.eelpieconsulting.feedlistener.twitter.TwitterSubscriptionManager
+import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
 
 @Controller
@@ -35,7 +36,8 @@ class SubscriptionsController @Autowired constructor(private val subscriptionsDA
                                                      private val twitterSubscriptionManager: TwitterSubscriptionManager,
                                                      private val twitterListener: TwitterListener,
                                                      currentUserService: CurrentUserService,
-                                                     response: HttpServletResponse) : WithSignedInUser(currentUserService, response) {
+                                                     response: HttpServletResponse,
+                                                     request: HttpServletRequest) : WithSignedInUser(currentUserService, response, request) {
 
     private val log = LogManager.getLogger(ChannelsController::class.java)
 

@@ -15,6 +15,7 @@ import uk.co.eelpieconsulting.feedlistener.daos.SubscriptionsDAO
 import uk.co.eelpieconsulting.feedlistener.model.Channel
 import uk.co.eelpieconsulting.feedlistener.model.User
 import java.util.*
+import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
 
 @Controller
@@ -25,7 +26,8 @@ class ChannelsController @Autowired constructor(val channelsDAO: ChannelsDAO,
                                                 val feedItemPopulator: FeedItemPopulator,
                                                 val feedItemDAO: FeedItemDAO,
                                                 currentUserService: CurrentUserService,
-                                                response: HttpServletResponse) : WithSignedInUser(currentUserService, response) {
+                                                response: HttpServletResponse,
+                                                request: HttpServletRequest) : WithSignedInUser(currentUserService, response, request) {
 
     private val log = LogManager.getLogger(ChannelsController::class.java)
 

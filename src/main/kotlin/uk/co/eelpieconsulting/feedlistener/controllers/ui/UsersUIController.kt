@@ -8,13 +8,15 @@ import uk.co.eelpieconsulting.feedlistener.controllers.CurrentUserService
 import uk.co.eelpieconsulting.feedlistener.credentials.CredentialService
 import uk.co.eelpieconsulting.feedlistener.daos.ChannelsDAO
 import uk.co.eelpieconsulting.feedlistener.model.User
+import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
 
 @Controller
 class UsersUIController @Autowired constructor(val channelsDAO: ChannelsDAO,
                                                val credentialService: CredentialService,
                                                currentUserService: CurrentUserService,
-                                               response: HttpServletResponse) : WithSignedInUser(currentUserService, response) {
+                                               response: HttpServletResponse,
+                                               request: HttpServletRequest) : WithSignedInUser(currentUserService, response, request) {
 
     @GetMapping("/ui/newuser")
     fun newUser(): ModelAndView {
