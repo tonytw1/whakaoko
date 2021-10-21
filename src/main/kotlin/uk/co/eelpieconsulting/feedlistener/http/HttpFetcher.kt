@@ -17,7 +17,9 @@ class HttpFetcher(val userAgent: String, val timeout: Int) {
 
     fun head(url: String): Result<Pair<Headers, Int>, FuelError>  {
         val (_, response, result) = url.httpHead().
-        timeout(timeout).header("User-Agent", userAgent).
+        timeout(timeout).
+        timeoutRead(timeout).
+        header("User-Agent", userAgent).
         response()
 
         when (result) {
