@@ -2,6 +2,7 @@ package uk.co.eelpieconsulting.feedlistener.http
 
 import com.github.kittinunf.fuel.core.FuelError
 import com.github.kittinunf.fuel.core.Headers
+import com.github.kittinunf.fuel.core.Request
 import com.github.kittinunf.fuel.httpGet
 import com.github.kittinunf.fuel.httpHead
 import com.github.kittinunf.result.Result
@@ -16,12 +17,7 @@ class HttpFetcher(val userAgent: String, val timeout: Int) {
     private val log = LogManager.getLogger(HttpFetcher::class.java)
 
     fun head(url: String): Result<Pair<Headers, Int>, FuelError>  {
-        val (_, response, result) = url.httpHead().
-        timeout(timeout).
-        timeoutRead(timeout).
-        header("User-Agent", userAgent).
-        response()
-
+        val (_, response, result) = withCommonRequestProperties(url.httpHead()).response()
         when (result) {
             is Result.Failure -> {
                 val ex = result.getException()
@@ -36,7 +32,7 @@ class HttpFetcher(val userAgent: String, val timeout: Int) {
     }
 
     fun get(url: String, etag: String?, lastModified: Date?): Result<HttpResult, FuelError> {
-        val request = url.httpGet().timeout(timeout).header("User-Agent", userAgent)
+        val request = withCommonRequestProperties(url.httpGet())
         etag?.let {
             request.header("If-None-Match", etag)
         }
@@ -54,9 +50,16 @@ class HttpFetcher(val userAgent: String, val timeout: Int) {
             return Result.success(httpResult)
 
         }, { fuelError ->
-            log.warn("Failed to fetch from url: " + url + "; status code was: " + fuelError.response.statusCode, fuelError.message)
+            log.warn(
+                "Failed to fetch from url: " + url + "; status code was: " + fuelError.response.statusCode,
+                fuelError.message
+            )
             return Result.error(fuelError)
         })
+    }
+
+    fun withCommonRequestProperties(request: Request): Request {
+        return request.timeout(timeout).timeoutRead(timeout).header("User-Agent", userAgent)
     }
 
 }
