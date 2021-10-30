@@ -2,34 +2,27 @@
 <div class="container">
     #parse('includes/heading.vm')
     <div class="row">
+        <div class="container">
+            <h5><a href="$urlBuilder.getUserUrl()">Channels</a> /
+            <a href="$urlBuilder.getChannelUrl($channel)">$channel.name</a> /
+            New subscription
+            </h5>
+        </div>
+    </div>
+    <div class="row">
         <div class="col">
+            <p>Adding a subscription to channel $channel.name</p>
+            <form action="/ui/subscriptions/feeds" method="POST">
+                Rss feed URL <input name="url" />
+                <input name="channel" value="$channel.id" type="hidden"/>
+                <input type="submit" value="Add feed"/>
+            </form>
 
-<form action="/ui/subscriptions/feeds" method="POST">
-	Feed: <input name="url" />
-	
-	Channel: $channel
-	<select name="channel">
-	#foreach($channel in $channels) 
-		<option value="$channel.id">$channel.name</option>
-	#end
-	</select>
-	
-	<input type="submit" />
-</form>
-<hr/>
-
-<form action="/${username}/subscriptions/twitter/tags" method="POST">
-	Twitter tag: <input name="tag" />
-	
-	Channel: 
-	<select name="channel">
-	#foreach($channel in $channels) 
-		<option value="$channel.id">$channel.name</option>
-	#end
-	</select>
-		
-	<input type="submit" />
-</form>
-
+            <form action="/${username}/subscriptions/twitter/tags" method="POST">
+                Twitter tag <input name="tag" />
+                <input name="channel" value="$channel.id" type="hidden"/>
+                <input type="submit" value="Add Twitter tag"/>
+            </form>
+            <hr/>
 </div>
 #parse('includes/footer.vm')
