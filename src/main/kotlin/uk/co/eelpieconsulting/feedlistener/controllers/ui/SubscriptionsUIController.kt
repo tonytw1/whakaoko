@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.server.ResponseStatusException
 import org.springframework.web.servlet.ModelAndView
 import org.springframework.web.servlet.view.RedirectView
-import uk.co.eelpieconsulting.common.views.json.JsonView
 import uk.co.eelpieconsulting.feedlistener.UrlBuilder
 import uk.co.eelpieconsulting.feedlistener.controllers.CurrentUserService
 import uk.co.eelpieconsulting.feedlistener.controllers.FeedItemPopulator
@@ -24,7 +23,6 @@ import uk.co.eelpieconsulting.feedlistener.model.User
 import uk.co.eelpieconsulting.feedlistener.rss.RssPoller
 import uk.co.eelpieconsulting.feedlistener.rss.RssSubscriptionManager
 import javax.servlet.http.HttpServletRequest
-import javax.servlet.http.HttpServletResponse
 
 @Controller
 class SubscriptionsUIController @Autowired constructor(val usersDAO: UsersDAO, val channelsDAO: ChannelsDAO,
@@ -35,8 +33,7 @@ class SubscriptionsUIController @Autowired constructor(val usersDAO: UsersDAO, v
                                                        val rssPoller: RssPoller,
                                                        val urlBuilder: UrlBuilder,
                                                        currentUserService: CurrentUserService,
-                                                       response: HttpServletResponse,
-                                                       request: HttpServletRequest) : WithSignedInUser(currentUserService, response, request) {
+                                                       request: HttpServletRequest) : WithSignedInUser(currentUserService, request) {
 
     private val log = LogManager.getLogger(SubscriptionsUIController::class.java)
 

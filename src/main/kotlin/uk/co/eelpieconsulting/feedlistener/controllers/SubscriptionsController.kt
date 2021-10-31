@@ -36,8 +36,7 @@ class SubscriptionsController @Autowired constructor(private val subscriptionsDA
                                                      private val twitterSubscriptionManager: TwitterSubscriptionManager,
                                                      private val twitterListener: TwitterListener,
                                                      currentUserService: CurrentUserService,
-                                                     response: HttpServletResponse,
-                                                     request: HttpServletRequest) : WithSignedInUser(currentUserService, response, request) {
+                                                     request: HttpServletRequest) : WithSignedInUser(currentUserService, request) {
 
     private val log = LogManager.getLogger(ChannelsController::class.java)
 

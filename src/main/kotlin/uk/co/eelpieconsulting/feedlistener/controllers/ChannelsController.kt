@@ -28,8 +28,7 @@ class ChannelsController @Autowired constructor(val channelsDAO: ChannelsDAO,
                                                 val feedItemPopulator: FeedItemPopulator,
                                                 val feedItemDAO: FeedItemDAO,
                                                 currentUserService: CurrentUserService,
-                                                response: HttpServletResponse,
-                                                request: HttpServletRequest) : WithSignedInUser(currentUserService, response, request) {
+                                                request: HttpServletRequest) : WithSignedInUser(currentUserService, request) {
 
     private val log = LogManager.getLogger(ChannelsController::class.java)
 

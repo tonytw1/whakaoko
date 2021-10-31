@@ -1,15 +1,13 @@
 package uk.co.eelpieconsulting.feedlistener.controllers.ui
 
 import org.apache.logging.log4j.LogManager
-import org.springframework.http.HttpStatus
 import org.springframework.web.servlet.ModelAndView
 import org.springframework.web.servlet.view.RedirectView
 import uk.co.eelpieconsulting.feedlistener.controllers.CurrentUserService
 import uk.co.eelpieconsulting.feedlistener.model.User
 import javax.servlet.http.HttpServletRequest
-import javax.servlet.http.HttpServletResponse
 
-abstract class WithSignedInUser(val currentUserService: CurrentUserService, val response: HttpServletResponse, val request: HttpServletRequest) {
+abstract class WithSignedInUser(val currentUserService: CurrentUserService, val request: HttpServletRequest) {
 
     private val log = LogManager.getLogger(WithSignedInUser::class.java)
 

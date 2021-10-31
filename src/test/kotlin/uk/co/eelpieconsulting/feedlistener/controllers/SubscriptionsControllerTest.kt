@@ -3,7 +3,6 @@ package uk.co.eelpieconsulting.feedlistener.controllers
 import org.junit.jupiter.api.Test
 import org.mockito.Mockito.*
 import org.springframework.mock.web.MockHttpServletRequest
-import org.springframework.mock.web.MockHttpServletResponse
 import uk.co.eelpieconsulting.common.views.ViewFactory
 import uk.co.eelpieconsulting.feedlistener.UrlBuilder
 import uk.co.eelpieconsulting.feedlistener.daos.ChannelsDAO
@@ -38,7 +37,6 @@ class SubscriptionsControllerTest {
             twitterSubscriptionManager,
             twitterListener,
             currentUserService,
-            MockHttpServletResponse(),
             MockHttpServletRequest()
     )
 
