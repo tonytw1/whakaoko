@@ -64,21 +64,19 @@ class SubscriptionsUIController @Autowired constructor(val usersDAO: UsersDAO, v
 
     @GetMapping("/ui/subscriptions/{id}")
     fun subscription(@PathVariable id: String, @RequestParam(required = false) page: Int?): ModelAndView? {
-        fun renderSubscriptionPage(user: User): ModelAndView {
-            val subscription = subscriptionsDAO.getById(id)
-                    ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Subsciption not found")
-
-            val subscriptionChannel = channelsDAO.getById(subscription.channelId)
-            val feedItemsResult = feedItemDAO.getSubscriptionFeedItems(subscription, page)
-
-            val mv = ModelAndView("subscription")
-            feedItemPopulator.populateFeedItems(feedItemsResult, mv, "feedItems")
-            mv.addObject("user", user)
-                    .addObject("channel", subscriptionChannel)
-                    .addObject("subscription", subscription)
-            return mv
+        return forCurrentUser {
+            conditionalLoads.withSubscriptionForUser(id, it) { subscription ->
+                conditionalLoads.withChannelForUser(subscription.channelId, it) { channel ->
+                    val feedItemsResult = feedItemDAO.getSubscriptionFeedItems(subscription, page)
+                    val mv = ModelAndView("subscription")
+                    feedItemPopulator.populateFeedItems(feedItemsResult, mv, "feedItems")
+                    mv.addObject("user", it)
+                        .addObject("channel", channel)
+                        .addObject("subscription", subscription)
+                    mv
+                }
+            }
         }
-        return forCurrentUser(::renderSubscriptionPage)
     }
 
     @GetMapping("/ui/subscriptions/{id}/read")
