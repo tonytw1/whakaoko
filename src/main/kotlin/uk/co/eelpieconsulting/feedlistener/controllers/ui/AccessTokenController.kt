@@ -8,7 +8,6 @@ import org.springframework.web.servlet.view.RedirectView
 import uk.co.eelpieconsulting.feedlistener.UrlBuilder
 import uk.co.eelpieconsulting.feedlistener.controllers.CurrentUserService
 import uk.co.eelpieconsulting.feedlistener.daos.UsersDAO
-import uk.co.eelpieconsulting.feedlistener.model.User
 import java.util.*
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
@@ -21,15 +20,13 @@ class AccessTokenController @Autowired constructor(val urlBuilder: UrlBuilder,
                                                    request: HttpServletRequest) : WithSignedInUser(currentUserService, response, request) {
 
     @GetMapping("/generate-access-token")
-    fun generate(): ModelAndView? {
-        fun generateAccessToken(user: User): ModelAndView? {
+    fun generate(): ModelAndView {
+        return forCurrentUser { user ->
             val token = UUID.randomUUID().toString()
             user.accessToken = token
             usersDAO.save(user)
-            return ModelAndView(RedirectView(urlBuilder.userUrl))
+            ModelAndView(RedirectView(urlBuilder.userUrl))
         }
-
-        return forCurrentUser(::generateAccessToken)
     }
 
 }

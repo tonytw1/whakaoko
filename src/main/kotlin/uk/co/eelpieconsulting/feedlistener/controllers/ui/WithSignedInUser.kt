@@ -13,17 +13,12 @@ abstract class WithSignedInUser(val currentUserService: CurrentUserService, val 
 
     private val log = LogManager.getLogger(WithSignedInUser::class.java)
 
-    fun forCurrentUser(handler: (User) -> ModelAndView?): ModelAndView? {
+    fun forCurrentUser(handler: (User) -> ModelAndView): ModelAndView {
         val user = currentUserService.getCurrentUserUser()
         if (user != null) {
             log.info("Generating page for user: " + user)
             val mv = handler(user)
-            if (mv != null) {
-                return mv.addObject("user", user)
-            } else {
-                response.sendError(HttpStatus.NOT_FOUND.value())
-                return null
-            }
+            return mv.addObject("user", user)
 
         } else {
             val path = request.requestURI

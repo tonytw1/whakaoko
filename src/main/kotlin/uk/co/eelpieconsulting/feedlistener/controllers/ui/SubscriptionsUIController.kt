@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.server.ResponseStatusException
 import org.springframework.web.servlet.ModelAndView
 import org.springframework.web.servlet.view.RedirectView
+import uk.co.eelpieconsulting.common.views.json.JsonView
 import uk.co.eelpieconsulting.feedlistener.UrlBuilder
 import uk.co.eelpieconsulting.feedlistener.controllers.CurrentUserService
 import uk.co.eelpieconsulting.feedlistener.controllers.FeedItemPopulator
@@ -39,47 +40,45 @@ class SubscriptionsUIController @Autowired constructor(val usersDAO: UsersDAO, v
 
     private val log = LogManager.getLogger(SubscriptionsUIController::class.java)
 
-    @GetMapping("/ui/subscriptions/{channel}/new")
+    @GetMapping("/ui/subscriptions/{channelId}/new")
     fun newSubscriptionForm(@PathVariable channelId: String): ModelAndView? {
-        fun withChannelForUser(channelId: String, user: User, handler: (Channel) -> ModelAndView): ModelAndView? {
-            val channel: Channel? = channelsDAO.getById(channelId)
-            if (channel == null) {
-                response.sendError(HttpStatus.NOT_FOUND.value())
-                return null
-            }
-            if (user.username != channel.username) {    // TODO match by ids
-                response.sendError(HttpStatus.FORBIDDEN.value())
-                return null
-            }
-            return handler(channel)
-        }
-
         return forCurrentUser { user ->
             withChannelForUser(channelId, user) { channel ->
-                ModelAndView("newSubscription").
-                addObject("username", user.username).
-                addObject("channel", channel)
+                ModelAndView("newSubscription").addObject("username", user.username).addObject("channel", channel)
             }
         }
     }
 
     @PostMapping("/ui/subscriptions/feeds")
-    fun addFeedSubscription(@RequestParam url: String, @RequestParam channel: String): ModelAndView? {
-        fun executeAddSubscription(user: User): ModelAndView? {
-            // TODO form binding and validation
-            val subscription = rssSubscriptionManager.requestFeedSubscription(url, channel, user.username)
-            subscriptionsDAO.add(subscription)
-            log.info("Added subscription: $subscription")
-            rssPoller.requestRead(subscription)
-            return ModelAndView(RedirectView(urlBuilder.getSubscriptionUrl(subscription.id)))
+    fun addFeedSubscription(@RequestParam url: String, @RequestParam(name = "channel") channelId: String): ModelAndView? {
+        return forCurrentUser { user ->
+            withChannelForUser(channelId, user) { channel ->
+                // TODO form binding and validation
+                val subscription = rssSubscriptionManager.requestFeedSubscription(url, channel.id, user.username)
+                subscriptionsDAO.add(subscription)
+                log.info("Added subscription: $subscription")
+                rssPoller.requestRead(subscription)
+                ModelAndView(RedirectView(urlBuilder.getSubscriptionUrl(subscription)))
+            }
         }
-        return forCurrentUser(::executeAddSubscription)
+    }
+
+    private fun withChannelForUser(channelId: String, user: User, handler: (Channel) -> ModelAndView): ModelAndView {
+        val channel: Channel? = channelsDAO.getById(channelId)
+        if (channel == null) {
+            throw ResponseStatusException(HttpStatus.NOT_FOUND, "Channel not found")
+        }
+        if (user.username != channel.username) {    // TODO match by ids
+            throw ResponseStatusException(HttpStatus.FORBIDDEN, "Channel does not belong to this user")
+        }
+        return handler(channel)
     }
 
     @GetMapping("/ui/subscriptions/{id}")
     fun subscription(@PathVariable id: String, @RequestParam(required = false) page: Int?): ModelAndView? {
-        fun renderSubscriptionPage(user: User): ModelAndView? {
-            val subscription = subscriptionsDAO.getById(id) ?: return null
+        fun renderSubscriptionPage(user: User): ModelAndView {
+            val subscription = subscriptionsDAO.getById(id)
+                    ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Subsciption not found")
 
             val subscriptionChannel = channelsDAO.getById(subscription.channelId)
             val feedItemsResult = feedItemDAO.getSubscriptionFeedItems(subscription, page)
@@ -91,13 +90,12 @@ class SubscriptionsUIController @Autowired constructor(val usersDAO: UsersDAO, v
                     .addObject("subscription", subscription)
             return mv
         }
-
         return forCurrentUser(::renderSubscriptionPage)
     }
 
     @GetMapping("/ui/subscriptions/{id}/read")
     fun subscriptionRead(@PathVariable id: String): ModelAndView? {
-        fun executeReload(user: User): ModelAndView? {
+        fun executeReload(user: User): ModelAndView {
             val subscription = subscriptionsDAO.getByRssSubscriptionById(id)
             if (subscription != null) {
                 rssPoller.requestRead(subscription)

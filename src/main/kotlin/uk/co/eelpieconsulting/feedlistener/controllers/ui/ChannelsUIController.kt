@@ -1,8 +1,10 @@
 package uk.co.eelpieconsulting.feedlistener.controllers.ui
 
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Controller
 import org.springframework.web.bind.annotation.*
+import org.springframework.web.server.ResponseStatusException
 import org.springframework.web.servlet.ModelAndView
 import org.springframework.web.servlet.view.RedirectView
 import uk.co.eelpieconsulting.feedlistener.IdBuilder
@@ -40,7 +42,7 @@ class ChannelsUIController @Autowired constructor(val usersDAO: UsersDAO,
 
     @PostMapping("/ui/channels/new")
     fun addChannel(@RequestParam name: String): ModelAndView? {
-        fun executeAddChannel(user: User): ModelAndView? {
+        fun executeAddChannel(user: User): ModelAndView {
             val newChannel = Channel(idBuilder.makeIdFor(name), name, user.username)
             channelsDAO.add(user, newChannel)
             return ModelAndView(RedirectView(urlBuilder.getChannelUrl(newChannel)))
@@ -53,8 +55,8 @@ class ChannelsUIController @Autowired constructor(val usersDAO: UsersDAO,
     fun channel(@PathVariable id: String,
                 @RequestParam(required = false) page: Int?,
                 @RequestParam(required = false) q: String?
-    ): ModelAndView? {
-        fun userChannelPage(user: User): ModelAndView? {
+    ): ModelAndView {
+        fun userChannelPage(user: User): ModelAndView {
             val channel = channelsDAO.getById(id)
             if (channel != null) {
                 val subscriptionsForChannel = subscriptionsDAO.getSubscriptionsForChannel(channel.id, null)
@@ -68,7 +70,7 @@ class ChannelsUIController @Autowired constructor(val usersDAO: UsersDAO,
                 return mv
 
             } else {
-                return null
+                throw ResponseStatusException(HttpStatus.NOT_FOUND, "Channel not found")
             }
         }
 

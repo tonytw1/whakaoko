@@ -3,8 +3,10 @@ package uk.co.eelpieconsulting.feedlistener.controllers
 import com.google.common.base.Strings
 import org.apache.logging.log4j.LogManager
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Controller
 import org.springframework.web.bind.annotation.*
+import org.springframework.web.server.ResponseStatusException
 import org.springframework.web.servlet.ModelAndView
 import uk.co.eelpieconsulting.common.views.ViewFactory
 import uk.co.eelpieconsulting.feedlistener.UrlBuilder
@@ -34,30 +36,27 @@ class ChannelsController @Autowired constructor(val channelsDAO: ChannelsDAO,
     private val X_TOTAL_COUNT = "X-Total-Count"
 
     @GetMapping("/{username}/channels")
-    fun channelsJson(@PathVariable username: String): ModelAndView? {
-        fun renderChannels(user: User): ModelAndView? {
+    fun channelsJson(@PathVariable username: String): ModelAndView {
+        fun renderChannels(user: User): ModelAndView {
             return ModelAndView(viewFactory.getJsonView()).addObject("data", channelsDAO.getChannelsFor(user))
         }
-
         return forCurrentUser(::renderChannels)
     }
 
     @GetMapping("/channels/{id}")
-    fun channel(@PathVariable id: String): ModelAndView? {
-        fun renderChannel(user: User): ModelAndView? {
+    fun channel(@PathVariable id: String): ModelAndView {
+        return forCurrentUser {
             val channel = channelsDAO.getById(id)
-            return ModelAndView(viewFactory.getJsonView()).addObject("data", channel)
+            ModelAndView(viewFactory.getJsonView()).addObject("data", channel)
         }
-
-        return forCurrentUser(::renderChannel)
     }
 
     @PostMapping("/channels")
-    fun createSubscription(@RequestBody create: CreateChannelRequest): ModelAndView? {
-        fun createChannel(user: User): ModelAndView? {
+    fun createSubscription(@RequestBody create: CreateChannelRequest): ModelAndView {
+        fun createChannel(user: User): ModelAndView {
             log.info("Got channel create request: " + create)
             if (Strings.isNullOrEmpty(create.name)) {
-                return null // TODO bad request response
+                throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Channel name is required")
             }
 
             // TODO check for existing channel with same name
@@ -73,17 +72,16 @@ class ChannelsController @Autowired constructor(val channelsDAO: ChannelsDAO,
     }
 
     @GetMapping("/channels/{id}/subscriptions")
-    fun channelSubscriptions(@PathVariable id: String, @RequestParam(required = false) url: String?): ModelAndView? {
-        fun renderChannels(user: User): ModelAndView? {
+    fun channelSubscriptions(@PathVariable id: String, @RequestParam(required = false) url: String?): ModelAndView {
+        fun renderChannels(user: User): ModelAndView {
             val channel = channelsDAO.getById(id)
             if (channel != null) {
                 val subscriptionsForChannel = subscriptionsDAO.getSubscriptionsForChannel(channel.id, url)
                 return ModelAndView(viewFactory.getJsonView()).addObject("data", subscriptionsForChannel)
             } else {
-                return null // TODO 404
+                throw ResponseStatusException(HttpStatus.NOT_FOUND, "Channel not found")
             }
         }
-
         return forCurrentUser(::renderChannels)
     }
 
@@ -93,8 +91,8 @@ class ChannelsController @Autowired constructor(val channelsDAO: ChannelsDAO,
                     @RequestParam(required = false) pageSize: Int?,
                     @RequestParam(required = false) format: String?,
                     @RequestParam(required = false) q: String?,
-                    response: HttpServletResponse): ModelAndView? {
-        fun renderChannelItems(user: User): ModelAndView? {
+                    response: HttpServletResponse): ModelAndView {
+        fun renderChannelItems(user: User): ModelAndView {
             val channel = channelsDAO.getById(id)
             if (channel != null) {
                 var mv = ModelAndView(viewFactory.getJsonView())
@@ -107,7 +105,7 @@ class ChannelsController @Autowired constructor(val channelsDAO: ChannelsDAO,
                 response.addHeader(X_TOTAL_COUNT, java.lang.Long.toString(totalCount))
                 return mv
             } else {
-                return null // TODO 404
+                throw ResponseStatusException(HttpStatus.NOT_FOUND, "Channel not found")
             }
         }
 

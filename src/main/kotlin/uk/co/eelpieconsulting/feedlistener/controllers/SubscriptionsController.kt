@@ -50,7 +50,7 @@ class SubscriptionsController @Autowired constructor(private val subscriptionsDA
                           @RequestParam(required = false) format: String?,
                           response: HttpServletResponse): ModelAndView? {
 
-        fun renderSubscriptionItems(user: User): ModelAndView? {
+        fun renderSubscriptionItems(user: User): ModelAndView {
             val subscription = subscriptionsDAO.getById(id)
             if (subscription != null) {
                 var mv = ModelAndView(viewFactory.getJsonView())
@@ -73,8 +73,8 @@ class SubscriptionsController @Autowired constructor(private val subscriptionsDA
 
     @Timed(timingNotes = "")
     @GetMapping("/subscriptions/{id}/read")
-    fun reload(@PathVariable id: String): ModelAndView? {
-        fun executeReload(user: User): ModelAndView? {
+    fun reload(@PathVariable id: String): ModelAndView {
+        fun executeReload(user: User): ModelAndView {
             val subscription = subscriptionsDAO.getByRssSubscriptionById(id)
             if (subscription != null) {
                 rssPoller.requestRead(subscription)
@@ -91,8 +91,8 @@ class SubscriptionsController @Autowired constructor(private val subscriptionsDA
     @Timed(timingNotes = "")
     @GetMapping("/subscriptions/{id}")
     fun subscriptionJson(@PathVariable id: String,
-                         @RequestParam(required = false) page: Int?): ModelAndView? {
-        fun renderSubscription(user: User): ModelAndView? {
+                         @RequestParam(required = false) page: Int?): ModelAndView {
+        fun renderSubscription(user: User): ModelAndView {
             val subscription = subscriptionsDAO.getById(id)
             if (subscription != null) {
                 return ModelAndView(viewFactory.getJsonView()).addObject("data", subscription)
@@ -105,19 +105,19 @@ class SubscriptionsController @Autowired constructor(private val subscriptionsDA
     }
 
     @PostMapping("/subscriptions")
-    fun createSubscription(@RequestBody create: SubscriptionCreateRequest): ModelAndView? {
-        fun createSubscription(user: User): ModelAndView? {
+    fun createSubscription(@RequestBody create: SubscriptionCreateRequest): ModelAndView {
+        fun createSubscription(user: User): ModelAndView {
             log.info("Got subscription create request: " + create)
 
             if (Strings.isNullOrEmpty(create.url) || Strings.isNullOrEmpty(create.channel)) {
-                return null // TODO bad request response
+                throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Subscription url or channel missing")
             }
 
             // TODO check for existing idempotent feed
 
             val channel = channelsDAO.getById(create.channel)
             if (channel == null) {
-                return null // TODO bad request response
+                throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Channel not found")
             }
             // TODO validate channel user
 
@@ -134,8 +134,8 @@ class SubscriptionsController @Autowired constructor(private val subscriptionsDA
 
     @PutMapping("/subscriptions/{id}")
     fun subscriptionUpdate(@PathVariable id: String,
-                           @RequestBody update: SubscriptionUpdateRequest): ModelAndView? {
-        fun updateSubscription(user: User): ModelAndView? {
+                           @RequestBody update: SubscriptionUpdateRequest): ModelAndView {
+        fun updateSubscription(user: User): ModelAndView {
             val subscription = subscriptionsDAO.getById(id)
             if (subscription != null) {
                 log.debug("Got subscription update request: " + update);
@@ -146,7 +146,7 @@ class SubscriptionsController @Autowired constructor(private val subscriptionsDA
                 }
                 return ModelAndView(viewFactory.getJsonView()).addObject("data", subscription)
             } else {
-                return null  // TODO 404
+                throw ResponseStatusException(HttpStatus.NOT_FOUND, "Subscription not found")
             }
         }
 
@@ -156,11 +156,9 @@ class SubscriptionsController @Autowired constructor(private val subscriptionsDA
     @Timed(timingNotes = "")
     @GetMapping("/subscriptions/{id}/delete") // TODO should be a HTTP DELETE
     fun deleteSubscription(@PathVariable id: String): ModelAndView? {
-        fun performDelete(user: User): ModelAndView? {
+        fun performDelete(user: User): ModelAndView {
             val subscription = subscriptionsDAO.getById(id)
-            if (subscription == null) {
-                throw ResponseStatusException(HttpStatus.NOT_FOUND, "Subscription not found")
-            }
+                    ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Subscription not found")
 
             when (subscription) {
                 is TwitterTagSubscription -> {
@@ -180,7 +178,7 @@ class SubscriptionsController @Autowired constructor(private val subscriptionsDA
     @Timed(timingNotes = "")
     @PostMapping("/{username}/subscriptions/twitter/tags")
     fun addTwitterTagSubscription(@PathVariable username: String, @RequestParam tag: String, @RequestParam channel: String): ModelAndView? {
-        fun executeAddTwitterTag(user: User): ModelAndView? {
+        fun executeAddTwitterTag(user: User): ModelAndView {
             log.info("Twitter tag: $tag")
             twitterSubscriptionManager.requestTagSubscription(tag, channel, username)
             return ModelAndView(RedirectView(urlBuilder.getBaseUrl()))
