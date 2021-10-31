@@ -30,6 +30,7 @@ class ChannelsUIController @Autowired constructor(val usersDAO: UsersDAO,
                                                   val feedItemDAO: FeedItemDAO,
                                                   val idBuilder: IdBuilder,
                                                   val urlBuilder: UrlBuilder,
+                                                  val conditionalLoads: ConditionalLoads,
                                                   currentUserService: CurrentUserService,
                                                   request: HttpServletRequest) : WithSignedInUser(currentUserService, request) {
 
@@ -58,7 +59,7 @@ class ChannelsUIController @Autowired constructor(val usersDAO: UsersDAO,
                 @RequestParam(required = false) q: String?
     ): ModelAndView {
         fun userChannelPage(user: User): ModelAndView {
-            return withChannelForUser(channelId, user) { channel ->
+            return conditionalLoads.withChannelForUser(channelId, user) { channel ->
                 val subscriptionsForChannel = subscriptionsDAO.getSubscriptionsForChannel(channel.id, null)
                 val mv = ModelAndView("channel").
                 addObject("channel", channel).
@@ -71,18 +72,6 @@ class ChannelsUIController @Autowired constructor(val usersDAO: UsersDAO,
             }
         }
         return forCurrentUser(::userChannelPage)
-    }
-
-    // TODO duplication
-    private fun withChannelForUser(channelId: String, user: User, handler: (Channel) -> ModelAndView): ModelAndView {
-        val channel: Channel? = channelsDAO.getById(channelId)
-        if (channel == null) {
-            throw ResponseStatusException(HttpStatus.NOT_FOUND, "Channel not found")
-        }
-        if (user.username != channel.username) {    // TODO match by ids
-            throw ResponseStatusException(HttpStatus.FORBIDDEN, "Channel does not belong to this user")
-        }
-        return handler(channel)
     }
 
 }

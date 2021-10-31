@@ -18,7 +18,6 @@ import uk.co.eelpieconsulting.feedlistener.daos.ChannelsDAO
 import uk.co.eelpieconsulting.feedlistener.daos.FeedItemDAO
 import uk.co.eelpieconsulting.feedlistener.daos.SubscriptionsDAO
 import uk.co.eelpieconsulting.feedlistener.daos.UsersDAO
-import uk.co.eelpieconsulting.feedlistener.model.Channel
 import uk.co.eelpieconsulting.feedlistener.model.User
 import uk.co.eelpieconsulting.feedlistener.rss.RssPoller
 import uk.co.eelpieconsulting.feedlistener.rss.RssSubscriptionManager
@@ -32,6 +31,7 @@ class SubscriptionsUIController @Autowired constructor(val usersDAO: UsersDAO, v
                                                        val rssSubscriptionManager: RssSubscriptionManager,
                                                        val rssPoller: RssPoller,
                                                        val urlBuilder: UrlBuilder,
+                                                       val conditionalLoads: ConditionalLoads,
                                                        currentUserService: CurrentUserService,
                                                        request: HttpServletRequest) : WithSignedInUser(currentUserService, request) {
 
@@ -40,7 +40,7 @@ class SubscriptionsUIController @Autowired constructor(val usersDAO: UsersDAO, v
     @GetMapping("/ui/subscriptions/{channelId}/new")
     fun newSubscriptionForm(@PathVariable channelId: String): ModelAndView? {
         return forCurrentUser { user ->
-            withChannelForUser(channelId, user) { channel ->
+            conditionalLoads.withChannelForUser(channelId, user) { channel ->
                 ModelAndView("newSubscription").addObject("username", user.username).addObject("channel", channel)
             }
         }
@@ -49,7 +49,7 @@ class SubscriptionsUIController @Autowired constructor(val usersDAO: UsersDAO, v
     @PostMapping("/ui/subscriptions/feeds")
     fun addFeedSubscription(@RequestParam url: String, @RequestParam(name = "channel") channelId: String): ModelAndView? {
         return forCurrentUser { user ->
-            withChannelForUser(channelId, user) { channel ->
+            conditionalLoads.withChannelForUser(channelId, user) { channel ->
                 // TODO form binding and validation
                 val subscription = rssSubscriptionManager.requestFeedSubscription(url, channel.id, user.username)
                 subscriptionsDAO.add(subscription)
@@ -91,17 +91,6 @@ class SubscriptionsUIController @Autowired constructor(val usersDAO: UsersDAO, v
             }
         }
         return forCurrentUser(::executeReload)
-    }
-
-    private fun withChannelForUser(channelId: String, user: User, handler: (Channel) -> ModelAndView): ModelAndView {
-        val channel: Channel? = channelsDAO.getById(channelId)
-        if (channel == null) {
-            throw ResponseStatusException(HttpStatus.NOT_FOUND, "Channel not found")
-        }
-        if (user.username != channel.username) {    // TODO match by ids
-            throw ResponseStatusException(HttpStatus.FORBIDDEN, "Channel does not belong to this user")
-        }
-        return handler(channel)
     }
 
 }
