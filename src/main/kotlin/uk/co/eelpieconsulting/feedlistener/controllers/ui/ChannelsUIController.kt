@@ -51,30 +51,37 @@ class ChannelsUIController @Autowired constructor(val usersDAO: UsersDAO,
         return forCurrentUser(::executeAddChannel)
     }
 
-    @GetMapping("/ui/channels/{id}")
-    fun channel(@PathVariable id: String,
+    @GetMapping("/ui/channels/{channelId}")
+    fun channel(@PathVariable channelId: String,
                 @RequestParam(required = false) page: Int?,
                 @RequestParam(required = false) q: String?
     ): ModelAndView {
         fun userChannelPage(user: User): ModelAndView {
-            val channel = channelsDAO.getById(id)
-            if (channel != null) {
+            return withChannelForUser(channelId, user) { channel ->
                 val subscriptionsForChannel = subscriptionsDAO.getSubscriptionsForChannel(channel.id, null)
-
-                val mv = ModelAndView("channel").addObject("user", user).addObject("channel", channel).addObject("subscriptions", subscriptionsForChannel)
-
+                val mv = ModelAndView("channel").
+                addObject("channel", channel).
+                addObject("subscriptions", subscriptionsForChannel)
                 if (!subscriptionsForChannel.isEmpty()) {
                     val results = feedItemDAO.getChannelFeedItemsResult(channel, page, q, null)
                     feedItemPopulator.populateFeedItems(results, mv, "feedItems")
                 }
-                return mv
-
-            } else {
-                throw ResponseStatusException(HttpStatus.NOT_FOUND, "Channel not found")
+                mv
             }
         }
-
         return forCurrentUser(::userChannelPage)
+    }
+
+    // TODO duplication
+    private fun withChannelForUser(channelId: String, user: User, handler: (Channel) -> ModelAndView): ModelAndView {
+        val channel: Channel? = channelsDAO.getById(channelId)
+        if (channel == null) {
+            throw ResponseStatusException(HttpStatus.NOT_FOUND, "Channel not found")
+        }
+        if (user.username != channel.username) {    // TODO match by ids
+            throw ResponseStatusException(HttpStatus.FORBIDDEN, "Channel does not belong to this user")
+        }
+        return handler(channel)
     }
 
 }

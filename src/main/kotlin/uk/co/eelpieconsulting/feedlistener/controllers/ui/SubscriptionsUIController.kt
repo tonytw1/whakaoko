@@ -63,17 +63,6 @@ class SubscriptionsUIController @Autowired constructor(val usersDAO: UsersDAO, v
         }
     }
 
-    private fun withChannelForUser(channelId: String, user: User, handler: (Channel) -> ModelAndView): ModelAndView {
-        val channel: Channel? = channelsDAO.getById(channelId)
-        if (channel == null) {
-            throw ResponseStatusException(HttpStatus.NOT_FOUND, "Channel not found")
-        }
-        if (user.username != channel.username) {    // TODO match by ids
-            throw ResponseStatusException(HttpStatus.FORBIDDEN, "Channel does not belong to this user")
-        }
-        return handler(channel)
-    }
-
     @GetMapping("/ui/subscriptions/{id}")
     fun subscription(@PathVariable id: String, @RequestParam(required = false) page: Int?): ModelAndView? {
         fun renderSubscriptionPage(user: User): ModelAndView {
@@ -105,6 +94,17 @@ class SubscriptionsUIController @Autowired constructor(val usersDAO: UsersDAO, v
             }
         }
         return forCurrentUser(::executeReload)
+    }
+
+    private fun withChannelForUser(channelId: String, user: User, handler: (Channel) -> ModelAndView): ModelAndView {
+        val channel: Channel? = channelsDAO.getById(channelId)
+        if (channel == null) {
+            throw ResponseStatusException(HttpStatus.NOT_FOUND, "Channel not found")
+        }
+        if (user.username != channel.username) {    // TODO match by ids
+            throw ResponseStatusException(HttpStatus.FORBIDDEN, "Channel does not belong to this user")
+        }
+        return handler(channel)
     }
 
 }
