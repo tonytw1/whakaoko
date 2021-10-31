@@ -16,6 +16,7 @@ import uk.co.eelpieconsulting.feedlistener.daos.FeedItemDAO
 import uk.co.eelpieconsulting.feedlistener.daos.SubscriptionsDAO
 import uk.co.eelpieconsulting.feedlistener.model.Channel
 import uk.co.eelpieconsulting.feedlistener.model.User
+import java.lang.Long
 import java.util.*
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
@@ -27,6 +28,7 @@ class ChannelsController @Autowired constructor(val channelsDAO: ChannelsDAO,
                                                 val urlBuilder: UrlBuilder,
                                                 val feedItemPopulator: FeedItemPopulator,
                                                 val feedItemDAO: FeedItemDAO,
+                                                val conditionalLoads: ConditionalLoads,
                                                 currentUserService: CurrentUserService,
                                                 request: HttpServletRequest) : WithSignedInUser(currentUserService, request) {
 
@@ -44,9 +46,10 @@ class ChannelsController @Autowired constructor(val channelsDAO: ChannelsDAO,
 
     @GetMapping("/channels/{id}")
     fun channel(@PathVariable id: String): ModelAndView {
-        return forCurrentUser {
-            val channel = channelsDAO.getById(id)
-            ModelAndView(viewFactory.getJsonView()).addObject("data", channel)
+        return forCurrentUser { user ->
+            conditionalLoads.withChannelForUser(id, user) { channel ->
+                ModelAndView(viewFactory.getJsonView()).addObject("data", channel)
+            }
         }
     }
 
@@ -72,16 +75,12 @@ class ChannelsController @Autowired constructor(val channelsDAO: ChannelsDAO,
 
     @GetMapping("/channels/{id}/subscriptions")
     fun channelSubscriptions(@PathVariable id: String, @RequestParam(required = false) url: String?): ModelAndView {
-        fun renderChannels(user: User): ModelAndView {
-            val channel = channelsDAO.getById(id)
-            if (channel != null) {
+        return forCurrentUser { user ->
+            conditionalLoads.withChannelForUser(id, user) { channel ->
                 val subscriptionsForChannel = subscriptionsDAO.getSubscriptionsForChannel(channel.id, url)
-                return ModelAndView(viewFactory.getJsonView()).addObject("data", subscriptionsForChannel)
-            } else {
-                throw ResponseStatusException(HttpStatus.NOT_FOUND, "Channel not found")
+                ModelAndView(viewFactory.getJsonView()).addObject("data", subscriptionsForChannel)
             }
         }
-        return forCurrentUser(::renderChannels)
     }
 
     @GetMapping("/channels/{id}/items")
@@ -91,9 +90,8 @@ class ChannelsController @Autowired constructor(val channelsDAO: ChannelsDAO,
                     @RequestParam(required = false) format: String?,
                     @RequestParam(required = false) q: String?,
                     response: HttpServletResponse): ModelAndView {
-        fun renderChannelItems(user: User): ModelAndView {
-            val channel = channelsDAO.getById(id)
-            if (channel != null) {
+        return forCurrentUser { user ->
+            conditionalLoads.withChannelForUser(id, user) { channel ->
                 var mv = ModelAndView(viewFactory.getJsonView())
                 if (!Strings.isNullOrEmpty(format) && format == "rss") {    // TODO view factory could do this?
                     mv = ModelAndView(viewFactory.getRssView(channel.name, urlBuilder.getChannelUrl(channel), ""))
@@ -101,14 +99,10 @@ class ChannelsController @Autowired constructor(val channelsDAO: ChannelsDAO,
                 val results = feedItemDAO.getChannelFeedItemsResult(channel, page, q, pageSize)
                 feedItemPopulator.populateFeedItems(results, mv, "data")
                 val totalCount = results.totalCount
-                response.addHeader(X_TOTAL_COUNT, java.lang.Long.toString(totalCount))
-                return mv
-            } else {
-                throw ResponseStatusException(HttpStatus.NOT_FOUND, "Channel not found")
+                response.addHeader(X_TOTAL_COUNT, Long.toString(totalCount))
+                mv
             }
         }
-
-        return forCurrentUser(::renderChannelItems)
     }
 
 }

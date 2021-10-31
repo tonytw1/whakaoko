@@ -1,4 +1,4 @@
-package uk.co.eelpieconsulting.feedlistener.controllers.ui
+package uk.co.eelpieconsulting.feedlistener.controllers
 
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus

@@ -12,6 +12,7 @@ import org.springframework.web.servlet.ModelAndView
 import org.springframework.web.servlet.view.RedirectView
 import uk.co.eelpieconsulting.feedlistener.IdBuilder
 import uk.co.eelpieconsulting.feedlistener.UrlBuilder
+import uk.co.eelpieconsulting.feedlistener.controllers.ConditionalLoads
 import uk.co.eelpieconsulting.feedlistener.controllers.CurrentUserService
 import uk.co.eelpieconsulting.feedlistener.controllers.FeedItemPopulator
 import uk.co.eelpieconsulting.feedlistener.daos.ChannelsDAO
