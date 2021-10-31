@@ -15,8 +15,7 @@ abstract class WithSignedInUser(val currentUserService: CurrentUserService, val 
         val user = currentUserService.getCurrentUserUser()
         if (user != null) {
             log.info("Generating page for user: " + user.username)
-            val mv = handler(user)
-            return mv.addObject("user", user)
+            return handler(user).addObject("user", user)
 
         } else {
             val path = request.requestURI
