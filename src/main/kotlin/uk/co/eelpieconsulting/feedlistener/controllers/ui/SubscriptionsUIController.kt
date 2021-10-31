@@ -41,16 +41,16 @@ class SubscriptionsUIController @Autowired constructor(val usersDAO: UsersDAO, v
 
     @GetMapping("/ui/subscriptions/{channel}/new")
     fun newSubscriptionForm(@PathVariable channelId: String): ModelAndView? {
-        fun withChannel(channelId: String, handler: (Channel) -> ModelAndView): ModelAndView {
+        fun withChannelForUser(channelId: String, user: User, handler: (Channel) -> ModelAndView): ModelAndView {
             val channel: Channel? = channelsDAO.getById(channelId)
             return handler(channel!!)   // TODO 404 handling and filter by user
         }
 
-        return forCurrentUser {
-            withChannel(channelId) {
+        return forCurrentUser { user ->
+            withChannelForUser(channelId, user) { channel ->
                 ModelAndView("newSubscription").
-                addObject("username", it.username).
-                addObject("channel", it)
+                addObject("username", user.username).
+                addObject("channel", channel)
             }
         }
     }
