@@ -36,15 +36,18 @@ class SubscriptionsControllerTest {
             rssPoller,
             twitterSubscriptionManager,
             twitterListener,
+            ConditionalLoads(channelsDAO, subscriptionsDAO),
             currentUserService,
             MockHttpServletRequest()
     )
 
     @Test
-    fun reloadShouldImmediatelyRepollRSSSubscription() {
-        `when`(currentUserService.getCurrentUserUser()).thenReturn(User())
-        val subscription = RssSubscription("http://localhost/feed", "a-channel", "a-user")
-        `when`(subscriptionsDAO.getByRssSubscriptionById(subscription.id)).thenReturn(subscription)
+    fun readShouldImmediatelyRequestRepollOfRSSSubscription() {
+        val auser = User()
+        auser.username = "a-user"
+        `when`(currentUserService.getCurrentUserUser()).thenReturn(auser)
+        val subscription = RssSubscription("http://localhost/feed", "a-channel", auser.username)
+        `when`(subscriptionsDAO.getById(subscription.id)).thenReturn(subscription)
 
         subscriptionsController.reload(subscription.id)
 

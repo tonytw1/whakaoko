@@ -35,6 +35,7 @@ class SubscriptionsController @Autowired constructor(private val subscriptionsDA
                                                      private val rssPoller: RssPoller,
                                                      private val twitterSubscriptionManager: TwitterSubscriptionManager,
                                                      private val twitterListener: TwitterListener,
+                                                     private val conditionalLoads: ConditionalLoads,
                                                      currentUserService: CurrentUserService,
                                                      request: HttpServletRequest) : WithSignedInUser(currentUserService, request) {
 
@@ -73,18 +74,16 @@ class SubscriptionsController @Autowired constructor(private val subscriptionsDA
     @Timed(timingNotes = "")
     @GetMapping("/subscriptions/{id}/read")
     fun reload(@PathVariable id: String): ModelAndView {
-        fun executeReload(user: User): ModelAndView {
-            val subscription = subscriptionsDAO.getByRssSubscriptionById(id)
-            if (subscription != null) {
-                rssPoller.requestRead(subscription)
-                return ModelAndView(viewFactory.getJsonView()).addObject("data", "ok")
-
-            } else {
-                throw ResponseStatusException(HttpStatus.NOT_FOUND, "Subscription not found")
+        return forCurrentUser { user ->
+            conditionalLoads.withSubscriptionForUser(id, user) { subscription ->
+                if (subscription is RssSubscription) {
+                    rssPoller.requestRead(subscription)
+                    ModelAndView(viewFactory.getJsonView()).addObject("data", "ok")
+                } else {
+                    throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Subscription is not an RSS feed")
+                }
             }
         }
-
-        return forCurrentUser(::executeReload)
     }
 
     @Timed(timingNotes = "")

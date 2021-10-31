@@ -19,6 +19,7 @@ import uk.co.eelpieconsulting.feedlistener.daos.ChannelsDAO
 import uk.co.eelpieconsulting.feedlistener.daos.FeedItemDAO
 import uk.co.eelpieconsulting.feedlistener.daos.SubscriptionsDAO
 import uk.co.eelpieconsulting.feedlistener.daos.UsersDAO
+import uk.co.eelpieconsulting.feedlistener.model.RssSubscription
 import uk.co.eelpieconsulting.feedlistener.model.User
 import uk.co.eelpieconsulting.feedlistener.rss.RssPoller
 import uk.co.eelpieconsulting.feedlistener.rss.RssSubscriptionManager
@@ -83,12 +84,13 @@ class SubscriptionsUIController @Autowired constructor(val usersDAO: UsersDAO, v
     @GetMapping("/ui/subscriptions/{id}/read")
     fun subscriptionRead(@PathVariable id: String): ModelAndView? {
         fun executeReload(user: User): ModelAndView {
-            val subscription = subscriptionsDAO.getByRssSubscriptionById(id)
-            if (subscription != null) {
-                rssPoller.requestRead(subscription)
-                return ModelAndView(RedirectView(urlBuilder.getSubscriptionUrl(subscription.id)))
-            } else {
-                throw ResponseStatusException(HttpStatus.NOT_FOUND, "Subscription not found")
+            return conditionalLoads.withSubscriptionForUser(id, user) { subscription ->
+                if (subscription is RssSubscription) {
+                    rssPoller.requestRead(subscription)
+                    ModelAndView(RedirectView(urlBuilder.getSubscriptionUrl(subscription.id)))
+                } else {
+                    throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Subscription is not an RSS feed")
+                }
             }
         }
         return forCurrentUser(::executeReload)
