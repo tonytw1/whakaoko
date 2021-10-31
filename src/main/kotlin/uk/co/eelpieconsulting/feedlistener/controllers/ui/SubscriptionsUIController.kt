@@ -18,6 +18,7 @@ import uk.co.eelpieconsulting.feedlistener.daos.ChannelsDAO
 import uk.co.eelpieconsulting.feedlistener.daos.FeedItemDAO
 import uk.co.eelpieconsulting.feedlistener.daos.SubscriptionsDAO
 import uk.co.eelpieconsulting.feedlistener.daos.UsersDAO
+import uk.co.eelpieconsulting.feedlistener.model.Channel
 import uk.co.eelpieconsulting.feedlistener.model.User
 import uk.co.eelpieconsulting.feedlistener.rss.RssPoller
 import uk.co.eelpieconsulting.feedlistener.rss.RssSubscriptionManager
@@ -39,13 +40,19 @@ class SubscriptionsUIController @Autowired constructor(val usersDAO: UsersDAO, v
     private val log = LogManager.getLogger(SubscriptionsUIController::class.java)
 
     @GetMapping("/ui/subscriptions/{channel}/new")
-    fun newSubscriptionForm(@PathVariable channel: String): ModelAndView? {
-        fun newChannelPrompt(user: User): ModelAndView {
-            return ModelAndView("newSubscription").
-            addObject("username", user.username).
-            addObject("channel", channelsDAO.getById(channel))  // TODO and filter by user
+    fun newSubscriptionForm(@PathVariable channelId: String): ModelAndView? {
+        fun withChannel(channelId: String, handler: (Channel) -> ModelAndView): ModelAndView {
+            val channel: Channel? = channelsDAO.getById(channelId)
+            return handler(channel!!)   // TODO 404 handling and filter by user
         }
-        return forCurrentUser(::newChannelPrompt)
+
+        return forCurrentUser {
+            withChannel(channelId) {
+                ModelAndView("newSubscription").
+                addObject("username", it.username).
+                addObject("channel", it)
+            }
+        }
     }
 
     @PostMapping("/ui/subscriptions/feeds")
