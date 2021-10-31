@@ -35,21 +35,23 @@ class ChannelsUIController @Autowired constructor(val usersDAO: UsersDAO,
                                                   request: HttpServletRequest) : WithSignedInUser(currentUserService, request) {
 
     @GetMapping("/ui/channels/new")
-    fun newChannelForm(): ModelAndView? {
-        fun newChannelPage(user: User): ModelAndView {
-            return ModelAndView("newChannel")
-        }
-        return forCurrentUser(::newChannelPage)
+    fun newChannelPrompt(): ModelAndView {
+        return forCurrentUser { ModelAndView("newChannel") }
     }
 
     @PostMapping("/ui/channels/new")
-    fun addChannel(@RequestParam name: String): ModelAndView? {
+    fun addChannel(@RequestParam name: String): ModelAndView {
         fun executeAddChannel(user: User): ModelAndView {
-            val newChannel = Channel(idBuilder.makeIdFor(name), name, user.username)
-            channelsDAO.add(user, newChannel)
-            return ModelAndView(RedirectView(urlBuilder.getChannelUrl(newChannel)))
+            val proposedId = idBuilder.makeIdFor(name)
+            val newChannel = Channel(proposedId, name, user.username)
+            val existingChannelById = channelsDAO.getById(proposedId)
+            if (existingChannelById == null) {
+                channelsDAO.add(user, newChannel)
+                return ModelAndView(RedirectView(urlBuilder.getChannelUrl(newChannel)))
+            } else {
+                throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Channel with same id already exists")
+            }
         }
-
         return forCurrentUser(::executeAddChannel)
     }
 
@@ -58,8 +60,8 @@ class ChannelsUIController @Autowired constructor(val usersDAO: UsersDAO,
                 @RequestParam(required = false) page: Int?,
                 @RequestParam(required = false) q: String?
     ): ModelAndView {
-        fun userChannelPage(user: User): ModelAndView {
-            return conditionalLoads.withChannelForUser(channelId, user) { channel ->
+        return forCurrentUser { user ->
+            conditionalLoads.withChannelForUser(channelId, user) { channel ->
                 val subscriptionsForChannel = subscriptionsDAO.getSubscriptionsForChannel(channel.id, null)
                 val mv = ModelAndView("channel").
                 addObject("channel", channel).
@@ -71,7 +73,6 @@ class ChannelsUIController @Autowired constructor(val usersDAO: UsersDAO,
                 mv
             }
         }
-        return forCurrentUser(::userChannelPage)
     }
 
 }
