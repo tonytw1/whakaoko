@@ -43,7 +43,7 @@ class ChannelsUIController @Autowired constructor(val usersDAO: UsersDAO,
     @PostMapping("/ui/channels/new")
     fun addChannel(@RequestParam name: String): ModelAndView {
         fun executeAddChannel(user: User): ModelAndView {
-            val proposedId = idBuilder.makeIdFor(name)
+            val proposedId = idBuilder.makeIdForChannel()
             val newChannel = Channel(proposedId, name, user.username)
             val existingChannelById = channelsDAO.getById(proposedId)
             if (existingChannelById == null) {

@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.*
 import org.springframework.web.server.ResponseStatusException
 import org.springframework.web.servlet.ModelAndView
 import uk.co.eelpieconsulting.common.views.ViewFactory
+import uk.co.eelpieconsulting.feedlistener.IdBuilder
 import uk.co.eelpieconsulting.feedlistener.UrlBuilder
 import uk.co.eelpieconsulting.feedlistener.controllers.ui.WithSignedInUser
 import uk.co.eelpieconsulting.feedlistener.daos.ChannelsDAO
@@ -20,6 +21,7 @@ import java.lang.Long
 import java.util.*
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
+import kotlin.math.ceil
 
 @Controller
 class ChannelsController @Autowired constructor(val channelsDAO: ChannelsDAO,
@@ -29,6 +31,7 @@ class ChannelsController @Autowired constructor(val channelsDAO: ChannelsDAO,
                                                 val feedItemPopulator: FeedItemPopulator,
                                                 val feedItemDAO: FeedItemDAO,
                                                 val conditionalLoads: ConditionalLoads,
+                                                val idBuilder: IdBuilder,
                                                 currentUserService: CurrentUserService,
                                                 request: HttpServletRequest) : WithSignedInUser(currentUserService, request) {
 
@@ -63,7 +66,7 @@ class ChannelsController @Autowired constructor(val channelsDAO: ChannelsDAO,
 
             // TODO check for existing channel with same name
 
-            val channel = Channel(id = UUID.randomUUID().toString(), name = create.name, username = user.username)
+            val channel = Channel(id = idBuilder.makeIdForChannel(), name = create.name, username = user.username)
             channelsDAO.save(channel)
             log.info("Added channel: $channel")
 
