@@ -9,7 +9,8 @@
             </div>
             <h5><a href="$urlBuilder.getUserUrl()">Channels</a> /
             <a href="$urlBuilder.getChannelUrl($channel)">$channel.name</a> /
-            #if($subscription.name)$subscription.name#else$subscription.url#end #if($totalCount > 0) ($totalCount) #end</h5>
+            #if($subscription.name) $subscription.name #else $subscription.id #end
+            #if($totalCount > 0) ($totalCount) #end</h5>
         </div>
     </div>
     <div class="row">

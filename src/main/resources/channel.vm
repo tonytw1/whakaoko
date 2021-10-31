@@ -17,13 +17,16 @@
             #if($subscriptions && !$subscriptions.isEmpty())
                 <ul>
                 #foreach($subscription in $subscriptions)
-                    <li><a href="$urlBuilder.getSubscriptionUrl($subscription)">#if($subscription.name)$subscription.name#else$subscription.url#end</a>
-                    #if($subscription.itemCount > 0) ($subscription.itemCount)#end
-                    #if($subscription.latestItemDate)
-                        <br/>
-                        <span title="$subscription.latestItemDate">$dateFormatter.timeSince($subscription.latestItemDate)
-                    #end
-                    #parse('includes/classification.vm')
+                    <li>
+                        <a href="$urlBuilder.getSubscriptionUrl($subscription)">
+                            #if($subscription.name) $subscription.name #else $subscription.id #end
+                        </a>
+                        #if($subscription.itemCount > 0) ($subscription.itemCount) #end
+                        #if($subscription.latestItemDate)
+                            <br/>
+                            <span title="$subscription.latestItemDate">$dateFormatter.timeSince($subscription.latestItemDate)
+                        #end
+                        #parse('includes/classification.vm')
                     </li>
                 #end
                 </ul>
