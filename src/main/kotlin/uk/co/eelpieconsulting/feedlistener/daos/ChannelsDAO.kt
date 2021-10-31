@@ -31,6 +31,10 @@ class ChannelsDAO @Autowired constructor(val dataStoreFactory: DataStoreFactory)
         return dataStoreFactory.get().find<Channel>(Channel::class.java).filter(Filters.eq("id", id)).first()
     }
 
+    fun usersChannelByName(user: User, name: String): Channel? {
+        return getChannelsFor(user).find { it.name == name }   // TODO proper looking; this will break with pagination
+    }
+
     @Synchronized
     fun add(user: User, channel: Channel) {
         if (!channelExists(user, channel)) {

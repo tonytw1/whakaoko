@@ -45,12 +45,11 @@ class ChannelsUIController @Autowired constructor(val usersDAO: UsersDAO,
         fun executeAddChannel(user: User): ModelAndView {
             val proposedId = idBuilder.makeIdForChannel()
             val newChannel = Channel(proposedId, name, user.username)
-            val existingChannelById = channelsDAO.getById(proposedId)
-            if (existingChannelById == null) {
+            if (channelsDAO.usersChannelByName(user, name) == null) {
                 channelsDAO.add(user, newChannel)
                 return ModelAndView(RedirectView(urlBuilder.getChannelUrl(newChannel)))
             } else {
-                throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Channel with same id already exists")
+                throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Channel with same name already exists")
             }
         }
         return forCurrentUser(::executeAddChannel)

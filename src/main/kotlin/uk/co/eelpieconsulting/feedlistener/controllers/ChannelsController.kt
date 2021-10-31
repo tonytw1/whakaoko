@@ -18,10 +18,8 @@ import uk.co.eelpieconsulting.feedlistener.daos.SubscriptionsDAO
 import uk.co.eelpieconsulting.feedlistener.model.Channel
 import uk.co.eelpieconsulting.feedlistener.model.User
 import java.lang.Long
-import java.util.*
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
-import kotlin.math.ceil
 
 @Controller
 class ChannelsController @Autowired constructor(val channelsDAO: ChannelsDAO,
@@ -64,13 +62,14 @@ class ChannelsController @Autowired constructor(val channelsDAO: ChannelsDAO,
                 throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Channel name is required")
             }
 
-            // TODO check for existing channel with same name
-
-            val channel = Channel(id = idBuilder.makeIdForChannel(), name = create.name, username = user.username)
-            channelsDAO.save(channel)
-            log.info("Added channel: $channel")
-
-            return ModelAndView(viewFactory.getJsonView()).addObject("data", channel)
+            if (channelsDAO.usersChannelByName(user, create.name) == null) {
+                val newChannel = Channel(id = idBuilder.makeIdForChannel(), name = create.name, username = user.username)
+                channelsDAO.save(newChannel)
+                log.info("Added channel: $newChannel")
+                return ModelAndView(viewFactory.getJsonView()).addObject("data", newChannel)
+            } else {
+                throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Channel with same name already exists")
+            }
         }
 
         return forCurrentUser(::createChannel)
