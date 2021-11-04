@@ -1,7 +1,6 @@
 package uk.co.eelpieconsulting.feedlistener.daos
 
 import com.google.common.base.Strings
-import com.google.common.collect.Lists
 import com.mongodb.MongoException
 import dev.morphia.DeleteOptions
 import dev.morphia.query.FindOptions
@@ -9,7 +8,6 @@ import dev.morphia.query.Query
 import dev.morphia.query.Sort
 import dev.morphia.query.experimental.filters.Filters
 import org.apache.logging.log4j.LogManager
-
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
 import uk.co.eelpieconsulting.feedlistener.annotations.Timed
@@ -70,13 +68,18 @@ class FeedItemDAO @Autowired constructor(private val dataStoreFactory: DataStore
         }
     }
 
-    fun getChannelFeedItemsResult(channel: Channel, page: Int?, q: String?, pageSize: Int?): FeedItemsResult {
+    fun getChannelFeedItemsResult(channel: Channel, page: Int?, q: String?, pageSize: Int?, subscriptions: List<String>? = null): FeedItemsResult {
         val pageSizeToUse = pageSize ?: MAX_FEED_ITEMS
         val pageToUse = if (page != null && page > 0) page else 1
         if (pageSizeToUse > MAX_FEED_ITEMS) {
             throw RuntimeException("Too many records requested") // TODO use correct exception.
         }
-        return if (!Strings.isNullOrEmpty(q)) searchChannelFeedItems(channel.id, pageSizeToUse, pageToUse, q) else getChannelFeedItems(channel.id, pageSizeToUse, pageToUse)
+        return if (!Strings.isNullOrEmpty(q)) searchChannelFeedItems(channel.id, pageSizeToUse, pageToUse, q) else getChannelFeedItems(
+            channel.id,
+            pageSizeToUse,
+            pageToUse,
+            subscriptions
+        )
     }
 
     @Throws(MongoException::class)
@@ -103,8 +106,8 @@ class FeedItemDAO @Autowired constructor(private val dataStoreFactory: DataStore
 
     @Timed(timingNotes = "")
     @Throws(MongoException::class)
-    fun getChannelFeedItems(channelId: String, pageSize: Int, page: Int): FeedItemsResult {
-        val query = channelFeedItemsQuery(channelId)
+    fun getChannelFeedItems(channelId: String, pageSize: Int, page: Int, subscriptions: List<String>? = null): FeedItemsResult {
+        val query = channelFeedItemsQuery(channelId, subscriptions)
         val totalCount = query.count()
         return FeedItemsResult(query.iterator(withPaginationFor(pageSize, page).sort(*DATE_DESCENDING_THEN_ID)).toList(), totalCount)
     }
@@ -116,12 +119,12 @@ class FeedItemDAO @Autowired constructor(private val dataStoreFactory: DataStore
     }
 
     @Timed(timingNotes = "")
-    private fun channelFeedItemsQuery(channelId: String): Query<FeedItem> {
-        val channelSubscriptionIds: MutableList<String?> = Lists.newArrayList()
-        for (subscription in subscriptionsDAO.getSubscriptionsForChannel(channelId, null)) {
-            channelSubscriptionIds.add(subscription.id)
+    private fun channelFeedItemsQuery(channelId: String, subscriptions: List<String>? = null): Query<FeedItem> {
+        val channelFeedItems = dataStoreFactory.get().find(FeedItem::class.java).filter(Filters.eq(CHANNEL_ID, channelId))
+        if (subscriptions != null) {
+            return channelFeedItems.filter(Filters.`in`(SUBSCRIPTION_ID, subscriptions))
         }
-        return dataStoreFactory.get().find(FeedItem::class.java).filter(Filters.eq(CHANNEL_ID, channelId))
+        return channelFeedItems
     }
 
     private fun subscriptionFeedItemsQuery(subscriptionId: String): Query<FeedItem> {

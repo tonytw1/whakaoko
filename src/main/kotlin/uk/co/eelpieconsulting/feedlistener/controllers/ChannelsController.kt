@@ -91,6 +91,7 @@ class ChannelsController @Autowired constructor(val channelsDAO: ChannelsDAO,
                     @RequestParam(required = false) pageSize: Int?,
                     @RequestParam(required = false) format: String?,
                     @RequestParam(required = false) q: String?,
+                    @RequestParam(required = false) subscriptions: List<String>?,
                     response: HttpServletResponse): ModelAndView {
         return forCurrentUser { user ->
             conditionalLoads.withChannelForUser(id, user) { channel ->
@@ -98,7 +99,7 @@ class ChannelsController @Autowired constructor(val channelsDAO: ChannelsDAO,
                 if (!Strings.isNullOrEmpty(format) && format == "rss") {    // TODO view factory could do this?
                     mv = ModelAndView(viewFactory.getRssView(channel.name, urlBuilder.getChannelUrl(channel), ""))
                 }
-                val results = feedItemDAO.getChannelFeedItemsResult(channel, page, q, pageSize)
+                val results = feedItemDAO.getChannelFeedItemsResult(channel, page, q, pageSize, subscriptions)
                 feedItemPopulator.populateFeedItems(results, mv, "data")
                 val totalCount = results.totalCount
                 response.addHeader(X_TOTAL_COUNT, Long.toString(totalCount))
