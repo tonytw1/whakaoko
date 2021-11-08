@@ -7,6 +7,29 @@ Provides a local API for applications to consume the aggregated content via a si
 MongoDB 3.4 is used for storage. Memcached is used for caching.
 
 
+## Good at
+
+Very good at the use case of aggregating a list of related RSS feeds into a combined channel.
+
+
+## Features
+
+### Resolving short URLs
+
+Expands feedburner and tinyurl URLs into canonical full URLs.
+
+
+### Minimises HTTP traffic
+
+Uses etag and last modified headers to minimise traffic.
+
+
+### GeoRSS aware
+
+Preserves GeoRSS location data.
+
+
+
 ## Concepts
 
 ### Subscriptions
