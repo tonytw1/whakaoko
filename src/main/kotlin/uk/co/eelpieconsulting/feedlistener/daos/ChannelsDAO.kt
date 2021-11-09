@@ -36,11 +36,7 @@ class ChannelsDAO @Autowired constructor(val dataStoreFactory: DataStoreFactory)
         return byUserAndName.first()
     }
 
-    fun add(channel: Channel) {
-        log.info("Adding new channel: $channel")
-        save(channel)
-    }
-    fun save(channel: Channel) {   // TODO why 2?
+    fun save(channel: Channel) {
         try {
             dataStoreFactory.get().save<Channel>(channel)
         } catch (e: MongoException) {

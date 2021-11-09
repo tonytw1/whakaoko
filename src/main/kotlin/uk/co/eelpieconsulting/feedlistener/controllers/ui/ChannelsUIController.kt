@@ -46,7 +46,7 @@ class ChannelsUIController @Autowired constructor(val usersDAO: UsersDAO,
             val proposedId = idBuilder.makeIdForChannel()
             val newChannel = Channel(proposedId, name, user.username)
             if (channelsDAO.usersChannelByName(user, name) == null) {
-                channelsDAO.add(newChannel)
+                channelsDAO.save(newChannel)
                 return ModelAndView(RedirectView(urlBuilder.getChannelUrl(newChannel)))
             } else {
                 throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Channel with same name already exists")
