@@ -44,11 +44,10 @@ class SubscriptionsDAO @Autowired constructor(private val dataStoreFactory: Data
         return try {
             var query = dataStoreFactory.get().find(Subscription::class.java)
             if (!Strings.isNullOrEmpty(url)) {
-                query = query.disableValidation().filter(Filters.eq("url", url)) // TODO subclasses to helping here Why is validation disabled?
+                query = query.disableValidation()
+                    .filter(Filters.eq("url", url)) // TODO subclasses to helping here Why is validation disabled?
             }
-            val subscriptions = query.iterator(FindOptions().sort(sort)).toList()
-            log.info("Loaded subscriptions: " + subscriptions.size)
-            subscriptions
+            query.iterator(FindOptions().sort(sort)).toList()
         } catch (e: MongoException) {
             throw RuntimeException(e)
         }
@@ -88,7 +87,6 @@ class SubscriptionsDAO @Autowired constructor(private val dataStoreFactory: Data
 
     @Throws(MongoException::class)
     fun getSubscriptionsForChannel(channelID: String, url: String?): List<Subscription> {
-        log.info("Listing subscriptions for channel: $channelID")
         var query = dataStoreFactory.get().find(Subscription::class.java).filter(Filters.eq("channelId", channelID))
         if (!Strings.isNullOrEmpty(url)) {
             query = query.disableValidation().filter(Filters.eq("url", url)) // TODO subclasses to helping here
