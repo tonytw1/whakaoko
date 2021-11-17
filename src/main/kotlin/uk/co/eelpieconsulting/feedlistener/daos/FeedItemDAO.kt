@@ -20,7 +20,7 @@ import java.util.*
 import java.util.regex.Pattern
 
 @Component
-class FeedItemDAO @Autowired constructor(private val dataStoreFactory: DataStoreFactory, private val subscriptionsDAO: SubscriptionsDAO) {
+class FeedItemDAO @Autowired constructor(private val dataStoreFactory: DataStoreFactory) {
 
     private val log = LogManager.getLogger(FeedItemDAO::class.java)
 
@@ -52,12 +52,6 @@ class FeedItemDAO @Autowired constructor(private val dataStoreFactory: DataStore
 
     fun update(feedItem: FeedItem) {
         dataStoreFactory.get().save(feedItem)
-    }
-
-    fun addAll(feedItems: List<FeedItem>) {
-        for (feedItem in feedItems) {
-            add(feedItem)
-        }
     }
 
     fun getSubscriptionFeedItems(subscription: Subscription, page: Int?): FeedItemsResult {

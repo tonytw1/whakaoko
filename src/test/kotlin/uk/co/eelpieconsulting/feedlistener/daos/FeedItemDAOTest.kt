@@ -10,29 +10,29 @@ import java.util.*
 
 class FeedItemDAOTest {
 
-    private val mongoDatabase = "whakaokotest" + UUID.randomUUID().toString();
+    private val mongoDatabase = "whakaokotest${UUID.randomUUID()}"
 
     private val mongoHost = run {
-        var mongoHost = System.getenv("MONGO_HOST");
+        var mongoHost = System.getenv("MONGO_HOST")
         if (mongoHost == null) {
-            mongoHost = "localhost";
+            mongoHost = "localhost"
         }
         mongoHost
     }
 
-    val dataStoreFactory = DataStoreFactory("mongodb://" + mongoHost + ":27017", mongoDatabase)
-    val subscriptionsDAO = SubscriptionsDAO(dataStoreFactory);
-    val feedItemDAO = FeedItemDAO(dataStoreFactory, subscriptionsDAO)
+    private val dataStoreFactory = DataStoreFactory("mongodb://$mongoHost:27017", mongoDatabase)
+    private val subscriptionsDAO = SubscriptionsDAO(dataStoreFactory)
+    private val feedItemDAO = FeedItemDAO(dataStoreFactory)
 
     @Test
     fun canFetchSubscriptionFeedItems() {
         val channel = Channel()
         channel.id = UUID.randomUUID().toString()
         val subscription = testSubscription(channel)
-        subscriptionsDAO.add(subscription);
+        subscriptionsDAO.add(subscription)
 
         val feedItem = testFeedItemFor(subscription)
-        feedItemDAO.add(feedItem);
+        feedItemDAO.add(feedItem)
 
         val feedItems = feedItemDAO.getSubscriptionFeedItems(subscription, 1)
 
@@ -46,18 +46,18 @@ class FeedItemDAOTest {
         channel.id = UUID.randomUUID().toString()
 
         val subscription = testSubscription(channel)
-        subscriptionsDAO.add(subscription);
+        subscriptionsDAO.add(subscription)
         val anotherSubscription = testSubscription(channel)
-        subscriptionsDAO.add(anotherSubscription);
+        subscriptionsDAO.add(anotherSubscription)
 
         val feedItem = testFeedItemFor(subscription)
-        feedItemDAO.add(feedItem);
+        feedItemDAO.add(feedItem)
         val anotherFeedItem = testFeedItemFor(anotherSubscription)
-        feedItemDAO.add(anotherFeedItem);
+        feedItemDAO.add(anotherFeedItem)
 
         val feedItems = feedItemDAO.getChannelFeedItems(channelId = channel.id, 10, 1)
 
-        assertEquals(2, feedItems.totalCount);
+        assertEquals(2, feedItems.totalCount)
     }
 
     @Test
@@ -69,13 +69,18 @@ class FeedItemDAOTest {
         val anotherSubscription = testSubscription(channel)
         val yetAnotherSubscription = testSubscription(channel)
 
-        feedItemDAO.add(testFeedItemFor(subscription));
-        feedItemDAO.add(testFeedItemFor(anotherSubscription));
-        feedItemDAO.add(testFeedItemFor(yetAnotherSubscription));
+        feedItemDAO.add(testFeedItemFor(subscription))
+        feedItemDAO.add(testFeedItemFor(anotherSubscription))
+        feedItemDAO.add(testFeedItemFor(yetAnotherSubscription))
 
-        val feedItems = feedItemDAO.getChannelFeedItems(channelId = channel.id, 10, 1, subscriptions = listOf(yetAnotherSubscription.id))
+        val feedItems = feedItemDAO.getChannelFeedItems(
+            channelId = channel.id,
+            10,
+            1,
+            subscriptions = listOf(yetAnotherSubscription.id)
+        )
 
-        assertEquals(1, feedItems.totalCount);
+        assertEquals(1, feedItems.totalCount)
     }
 
     private fun testSubscription(channel: Channel): RssSubscription {
@@ -86,8 +91,17 @@ class FeedItemDAOTest {
     }
 
     private fun testFeedItemFor(subscription: RssSubscription): FeedItem {
-        val url = "http://localhost/" + UUID.randomUUID().toString();
-        val feedItem = FeedItem(UUID.randomUUID().toString(), url, null, DateTime.now().toDate(), null, null, null, subscription.id, subscription.channelId);
-        return feedItem
+        val url = "http://localhost/" + UUID.randomUUID().toString()
+        return FeedItem(
+            UUID.randomUUID().toString(),
+            url,
+            null,
+            DateTime.now().toDate(),
+            null,
+            null,
+            null,
+            subscription.id,
+            subscription.channelId
+        )
     }
 }
