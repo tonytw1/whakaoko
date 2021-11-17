@@ -14,7 +14,7 @@ abstract class WithSignedInUser(val currentUserService: CurrentUserService, val 
     fun forCurrentUser(handler: (User) -> ModelAndView): ModelAndView {
         val user = currentUserService.getCurrentUserUser()
         if (user != null) {
-            log.info("Generating page for user: " + user.username)
+            log.debug("Generating page for user: " + user.username)
             return handler(user).addObject("user", user)
 
         } else {
