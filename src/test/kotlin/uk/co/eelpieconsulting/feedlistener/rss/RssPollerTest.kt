@@ -25,7 +25,8 @@ class RssPollerTest {
                     url = "url", body = "body",
                     date = date.toDate(),
                     subscriptionId = UUID.randomUUID().toString(),
-                    channelId = UUID.randomUUID().toString())
+                    channelId = UUID.randomUUID().toString(),
+                    categories = null)
         }
 
         val latestItemDate = feedItemLatestDateFinder.getLatestItemDate(feedItems)

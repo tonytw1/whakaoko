@@ -101,7 +101,8 @@ class FeedItemDAOTest {
             null,
             null,
             subscription.id,
-            subscription.channelId
+            subscription.channelId,
+            null,
         )
     }
 }

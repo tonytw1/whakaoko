@@ -2,6 +2,7 @@ package uk.co.eelpieconsulting.feedlistener.rss
 
 import com.google.common.base.Strings
 import com.sun.syndication.feed.module.georss.GeoRSSUtils
+import com.sun.syndication.feed.synd.SyndCategory
 import com.sun.syndication.feed.synd.SyndEntry
 import org.apache.commons.lang.StringEscapeUtils
 import org.apache.logging.log4j.LogManager
@@ -26,11 +27,32 @@ class RssFeedItemMapper @Autowired constructor(private val rssFeedItemImageExtra
     fun createFeedItemFrom(syndEntry: SyndEntry, subscription: Subscription): FeedItem? {
         val place = extractLocationFrom(syndEntry)
         val imageUrl = rssFeedItemImageExtractor.extractImageFrom(syndEntry)
-        val body = HtmlCleaner().stripHtml(StringEscapeUtils.unescapeHtml(rssFeedItemBodyExtractor.extractBody(syndEntry)))
+        val body =
+            HtmlCleaner().stripHtml(StringEscapeUtils.unescapeHtml(rssFeedItemBodyExtractor.extractBody(syndEntry)))
         val date = if (syndEntry.publishedDate != null) syndEntry.publishedDate else syndEntry.updatedDate
         val url = extractUrl(syndEntry)
+
+        val categories: List<String> = syndEntry.categories.mapNotNull {
+            if (it is SyndCategory) {
+                it.name
+            } else {
+                null
+            }
+        }
+
         if (url != null && date != null) {
-            return FeedItem(syndEntry.title, url, body, date, place, imageUrl, syndEntry.author, subscription.id, subscription.channelId)
+            return FeedItem(
+                syndEntry.title,
+                url,
+                body,
+                date,
+                place,
+                imageUrl,
+                syndEntry.author,
+                subscription.id,
+                subscription.channelId,
+                categories
+            )
         } else {
             log.warn("Saw syndEntry with no url or date: $syndEntry")
             return null

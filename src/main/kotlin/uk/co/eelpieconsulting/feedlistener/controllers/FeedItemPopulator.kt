@@ -42,7 +42,8 @@ class FeedItemPopulator @Autowired constructor(val subscriptionLabelService: Sub
                 feedItem.imageUrl,
                 feedItem.author,
                 feedItem.subscriptionId,
-                feedItem.channelId
+                feedItem.channelId,
+                feedItem.categories
         )
         fixed.subscriptionId = feedItem.subscriptionId
         return fixed

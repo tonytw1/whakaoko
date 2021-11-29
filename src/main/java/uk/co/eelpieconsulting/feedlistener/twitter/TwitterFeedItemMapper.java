@@ -14,7 +14,8 @@ public class TwitterFeedItemMapper {
         final uk.co.eelpieconsulting.feedlistener.model.Place place = extractLocationFrom(status);
         final String mediaUrl = extractImageUrl(status);
         final String author = extractAuthorFrom(status);
-        return new FeedItem(extractHeadingFrom(status), extractUrlFrom(status), null, status.getCreatedAt(), place, mediaUrl, author, subscription.getId(), subscription.getChannelId());
+        return new FeedItem(extractHeadingFrom(status), extractUrlFrom(status), null, status.getCreatedAt(), place, mediaUrl,
+                author, subscription.getId(), subscription.getChannelId(), null);
     }
 
     private String extractAuthorFrom(Status status) {
