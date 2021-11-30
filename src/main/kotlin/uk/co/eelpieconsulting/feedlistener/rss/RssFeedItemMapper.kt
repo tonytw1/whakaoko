@@ -34,7 +34,7 @@ class RssFeedItemMapper @Autowired constructor(private val rssFeedItemImageExtra
 
         val categories: List<String> = syndEntry.categories.mapNotNull {
             if (it is SyndCategory) {
-                it.name
+                it.name // TODO capture domain as well
             } else {
                 null
             }

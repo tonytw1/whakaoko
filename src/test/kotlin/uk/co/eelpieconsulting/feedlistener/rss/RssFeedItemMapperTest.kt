@@ -57,11 +57,15 @@ class RssFeedItemMapperTest {
         `when`(urlResolverService.resolveUrl(anyObject())).thenReturn("http://localhost/something")
 
         val feedItems = testSyndEntries("toiponeke.xml").map { rssFeedItemMapper.createFeedItemFrom(it, subscription) }
-
         val first = feedItems.first()
         assertEquals(1, first?.categories?.size)
         assertEquals("Emerging Production Designer Residency 2022 - Call for applications", first?.headline)
         assertEquals("residency", first?.categories?.first())
+
+        val cdataEncodedFeedItems = testSyndEntries("nra-feed.xml").map { rssFeedItemMapper.createFeedItemFrom(it, subscription) }
+        val firstCdataEncoded = cdataEncodedFeedItems.first()
+        assertEquals("Draft District Plan, Bike Network and LGWM – 3 consultations open now!", firstCdataEncoded?.title)
+        assertEquals(listOf("Consultation", "News"), firstCdataEncoded?.categories)
     }
 
     private fun testSyndEntries(filename: String = "inside-wellington-media-break.xml"): List<SyndEntry> {
