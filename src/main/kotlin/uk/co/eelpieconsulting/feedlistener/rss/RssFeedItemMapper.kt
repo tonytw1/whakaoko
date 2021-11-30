@@ -10,10 +10,7 @@ import org.apache.logging.log4j.LogManager
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
 import uk.co.eelpieconsulting.common.html.HtmlCleaner
-import uk.co.eelpieconsulting.feedlistener.model.FeedItem
-import uk.co.eelpieconsulting.feedlistener.model.LatLong
-import uk.co.eelpieconsulting.feedlistener.model.Place
-import uk.co.eelpieconsulting.feedlistener.model.Subscription
+import uk.co.eelpieconsulting.feedlistener.model.*
 import uk.co.eelpieconsulting.feedlistener.rss.images.RssFeedItemImageExtractor
 
 @Component
@@ -32,9 +29,11 @@ class RssFeedItemMapper @Autowired constructor(private val rssFeedItemImageExtra
         val date = if (syndEntry.publishedDate != null) syndEntry.publishedDate else syndEntry.updatedDate
         val url = extractUrl(syndEntry)
 
-        val categories: List<String> = syndEntry.categories.mapNotNull {
+        val categories: List<Category> = syndEntry.categories.mapNotNull {
             if (it is SyndCategory) {
-                it.name // TODO capture domain as well
+                val category = Category()
+                category.value = it.name // TODO capture domain as well
+                category
             } else {
                 null
             }

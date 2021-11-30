@@ -60,12 +60,12 @@ class RssFeedItemMapperTest {
         val first = feedItems.first()
         assertEquals(1, first?.categories?.size)
         assertEquals("Emerging Production Designer Residency 2022 - Call for applications", first?.headline)
-        assertEquals("residency", first?.categories?.first())
+        assertEquals("residency", first?.categories?.first()?.value)
 
         val cdataEncodedFeedItems = testSyndEntries("nra-feed.xml").map { rssFeedItemMapper.createFeedItemFrom(it, subscription) }
         val firstCdataEncoded = cdataEncodedFeedItems.first()
         assertEquals("Draft District Plan, Bike Network and LGWM – 3 consultations open now!", firstCdataEncoded?.title)
-        assertEquals(listOf("Consultation", "News"), firstCdataEncoded?.categories)
+        assertEquals(listOf("Consultation", "News"), firstCdataEncoded?.categories?.map{it -> it.value})
     }
 
     private fun testSyndEntries(filename: String = "inside-wellington-media-break.xml"): List<SyndEntry> {
