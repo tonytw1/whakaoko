@@ -4,7 +4,7 @@ import com.google.common.collect.Maps;
 import net.spy.memcached.AddrUtil;
 import net.spy.memcached.MemcachedClient;
 import org.apache.velocity.app.Velocity;
-import org.apache.velocity.runtime.RuntimeConstants;
+import org.apache.velocity.spring.VelocityEngineFactoryBean;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
@@ -18,14 +18,14 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
-import uk.co.eelpieconsulting.backports.VelocityConfigurer;
-import uk.co.eelpieconsulting.backports.VelocityViewResolver;
 import uk.co.eelpieconsulting.common.dates.DateFormatter;
 import uk.co.eelpieconsulting.common.shorturls.resolvers.*;
 import uk.co.eelpieconsulting.feedlistener.http.HttpFetcher;
+import uk.co.eelpieconsulting.spring.VelocityViewResolver;
 
 import java.io.IOException;
 import java.util.Map;
+import java.util.Properties;
 
 @SpringBootApplication
 @EnableAutoConfiguration(exclude = {DataSourceAutoConfiguration.class, MongoAutoConfiguration.class})
@@ -74,16 +74,18 @@ public class Main {
         return new DateFormatter("UTC");
     }
 
-    @Bean
-    public VelocityConfigurer velocityConfigurer() {
-        final VelocityConfigurer vc = new VelocityConfigurer();
-        final Map<String, Object> velocityPropertiesMap = Maps.newHashMap();
-        velocityPropertiesMap.put(Velocity.OUTPUT_ENCODING, "UTF-8");
-        velocityPropertiesMap.put(Velocity.INPUT_ENCODING, "UTF-8");
-        velocityPropertiesMap.put(RuntimeConstants.RESOURCE_LOADER, "classpath");
-        velocityPropertiesMap.put("eventhandler.referenceinsertion.class", "org.apache.velocity.app.event.implement.EscapeHtmlReference");
-        vc.setVelocityPropertiesMap(velocityPropertiesMap);
-        return vc;
+
+    @Bean("velocityEngine")
+    public VelocityEngineFactoryBean velocityEngineFactoryBean() {
+        VelocityEngineFactoryBean velocityEngineFactory = new VelocityEngineFactoryBean();
+        Properties velocityPropertiesMap = new Properties();
+        velocityPropertiesMap.setProperty(Velocity.INPUT_ENCODING, "UTF-8");
+        velocityPropertiesMap.setProperty(Velocity.EVENTHANDLER_REFERENCEINSERTION, "org.apache.velocity.app.event.implement.EscapeHtmlReference");
+        velocityPropertiesMap.setProperty("resource.loader", "class");
+        velocityPropertiesMap.setProperty("class.resource.loader.class", "org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader");
+        velocityPropertiesMap.setProperty("velocimacro.library", "spring.vm");
+        velocityEngineFactory.setVelocityProperties(velocityPropertiesMap);
+        return velocityEngineFactory;
     }
 
     @Bean
@@ -91,7 +93,6 @@ public class Main {
                                                      UrlBuilder urlBuilder) {
         final VelocityViewResolver viewResolver = new VelocityViewResolver();
         viewResolver.setCache(true);
-        viewResolver.setPrefix("");
         viewResolver.setSuffix(".vm");
         viewResolver.setContentType("text/html;charset=UTF-8");
 
@@ -101,4 +102,5 @@ public class Main {
         viewResolver.setAttributesMap(attributes);
         return viewResolver;
     }
+
 }
