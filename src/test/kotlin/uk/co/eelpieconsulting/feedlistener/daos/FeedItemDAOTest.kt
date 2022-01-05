@@ -3,6 +3,7 @@ package uk.co.eelpieconsulting.feedlistener.daos
 import org.joda.time.DateTime
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
+import uk.co.eelpieconsulting.feedlistener.model.Category
 import uk.co.eelpieconsulting.feedlistener.model.Channel
 import uk.co.eelpieconsulting.feedlistener.model.FeedItem
 import uk.co.eelpieconsulting.feedlistener.model.RssSubscription
@@ -38,6 +39,28 @@ class FeedItemDAOTest {
 
         assertEquals(1, feedItems.totalCount)
         assertEquals(feedItem.url, feedItems.feedsItems.first().url)
+    }
+
+    @Test
+    fun canPersistFeedItemCategories() {
+        val channel = Channel()
+        channel.id = UUID.randomUUID().toString()
+        val subscription = testSubscription(channel)
+        subscriptionsDAO.add(subscription)
+
+        val feedItem = testFeedItemFor(subscription)
+        val category = Category()
+        category.value = "consultations"
+        val anotherCategory = Category()
+        anotherCategory.value = "news"
+        feedItem.categories = listOf(category, anotherCategory)
+        feedItemDAO.add(feedItem)
+
+        val feedItems = feedItemDAO.getSubscriptionFeedItems(subscription, 1)
+
+        assertEquals(1, feedItems.totalCount)
+        val reloadedCategories = feedItems.feedsItems.first().categories
+        assertEquals(listOf("consultations", "news"), reloadedCategories?.map{it -> it.value})
     }
 
     @Test
@@ -101,7 +124,8 @@ class FeedItemDAOTest {
             null,
             null,
             subscription.id,
-            subscription.channelId
+            subscription.channelId,
+            null,
         )
     }
 }

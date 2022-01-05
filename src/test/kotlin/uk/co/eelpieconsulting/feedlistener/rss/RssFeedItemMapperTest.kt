@@ -52,8 +52,24 @@ class RssFeedItemMapperTest {
         assertEquals(subscription.id, feedItem?.subscriptionId)
     }
 
-    private fun testSyndEntries(): List<SyndEntry> {
-        val input = IOUtils.toString(FileInputStream(this.javaClass.classLoader.getResource("inside-wellington-media-break.xml").file))
+    @Test
+    fun canExtractCategoriesFromRssItems() {
+        `when`(urlResolverService.resolveUrl(anyObject())).thenReturn("http://localhost/something")
+
+        val feedItems = testSyndEntries("toiponeke.xml").map { rssFeedItemMapper.createFeedItemFrom(it, subscription) }
+        val first = feedItems.first()
+        assertEquals(1, first?.categories?.size)
+        assertEquals("Emerging Production Designer Residency 2022 - Call for applications", first?.headline)
+        assertEquals("residency", first?.categories?.first()?.value)
+
+        val cdataEncodedFeedItems = testSyndEntries("nra-feed.xml").map { rssFeedItemMapper.createFeedItemFrom(it, subscription) }
+        val firstCdataEncoded = cdataEncodedFeedItems.first()
+        assertEquals("Draft District Plan, Bike Network and LGWM – 3 consultations open now!", firstCdataEncoded?.title)
+        assertEquals(listOf("Consultation", "News"), firstCdataEncoded?.categories?.map{it -> it.value})
+    }
+
+    private fun testSyndEntries(filename: String = "inside-wellington-media-break.xml"): List<SyndEntry> {
+        val input = IOUtils.toString(FileInputStream(this.javaClass.classLoader.getResource(filename).file))
         val result = FeedParser().parseSyndFeed(input.toByteArray())
         return result.get().entries.asSequence().map { entry -> entry as SyndEntry }.toList()
     }

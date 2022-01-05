@@ -50,6 +50,8 @@ class FeedItem : RssFeedable {
     @get:JsonIgnore
     var subscriptionName: String? = null
 
+    var categories: List<Category>? = null
+
     constructor() {}
     constructor(title: String?,
                 url: String,
@@ -59,7 +61,9 @@ class FeedItem : RssFeedable {
                 imageUrl: String? = null,
                 author: String? = null,
                 subscriptionId: String,
-                channelId: String) {
+                channelId: String,
+                categories: List<Category>?
+    ) {
         this.title = title
         this.url = url
         this.body = body
@@ -69,6 +73,7 @@ class FeedItem : RssFeedable {
         this.author = author
         this.subscriptionId = subscriptionId
         this.channelId = channelId
+        this.categories = categories
     }
 
     val id: String?

@@ -10,6 +10,13 @@
         #if($feedItem.place && $feedItem.latLong)
             <p>$feedItem.place.latLong.longitude, $feedItem.place.latLong.latitude</p>
         #end
+        #if($feedItem.categories)
+            <ul>
+            #foreach($category in $feedItem.categories)
+                <li>$category.value</li>
+            #end
+            </ul>
+        #end
         #if($feedItem.imageUrl)
             <p><a href="$feedItem.url"><img class="img-fluid" src="$feedItem.imageUrl"></a></p>
         #end
