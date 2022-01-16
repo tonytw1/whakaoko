@@ -2,7 +2,7 @@
   "openapi": "3.0.0",
   "info": {
     "title": "Whakaoko",
-    "description": "A service for aggregating 3rd party content from a variety of sources (RSS / Twitter / Instagram) into an easy to consume local JSON or RSS feed.",
+    "description": "A service for aggregating 3rd party content from a variety of sources (RSS / Twitter) into an easy to consume local JSON or RSS feed.",
     "version": "1.0.0"
   },
   "paths": {
