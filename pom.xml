@@ -17,6 +17,7 @@
         <jackson.version>2.11.2</jackson.version>
         <spymemcached.version>2.11.2</spymemcached.version>
         <kotlin.version>1.5.31</kotlin.version>
+        <twitter4j.version>4.0.7</twitter4j.version>
     </properties>
 
     <repositories>
@@ -279,12 +280,12 @@
         <dependency>
             <groupId>org.twitter4j</groupId>
             <artifactId>twitter4j-core</artifactId>
-            <version>4.0.2</version>
+            <version>${twitter4j.version}</version>
         </dependency>
         <dependency>
             <groupId>org.twitter4j</groupId>
             <artifactId>twitter4j-stream</artifactId>
-            <version>4.0.7</version>
+            <version>${twitter4j.version}</version>
         </dependency>
 
         <dependency>
