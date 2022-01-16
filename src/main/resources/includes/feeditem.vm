@@ -13,7 +13,7 @@
         #if($feedItem.categories)
             <ul>
             #foreach($category in $feedItem.categories)
-                <li>$category.value</li>
+                <span class="badge badge-pill badge-info">$category.value</span>
             #end
             </ul>
         #end
