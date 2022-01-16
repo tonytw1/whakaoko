@@ -11,11 +11,11 @@
             <p>$feedItem.place.latLong.longitude, $feedItem.place.latLong.latitude</p>
         #end
         #if($feedItem.categories)
-            <ul>
+            <p>
             #foreach($category in $feedItem.categories)
                 <span class="badge badge-pill badge-info">$category.value</span>
             #end
-            </ul>
+            </p>
         #end
         #if($feedItem.imageUrl)
             <p><a href="$feedItem.url"><img class="img-fluid" src="$feedItem.imageUrl"></a></p>
