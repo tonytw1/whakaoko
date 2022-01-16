@@ -24,10 +24,6 @@
             <id>local-dependencies</id>
             <url>file:${basedir}/lib/repository</url>
         </repository>
-        <repository>
-            <id>jcenter</id>
-            <url>https://jcenter.bintray.com</url>
-        </repository>
     </repositories>
 
     <build>
@@ -107,9 +103,6 @@
                         <goals>
                             <goal>testCompile</goal>
                         </goals>
-                        <configuration>
-                            <skip>${maven.test.skip}</skip>
-                        </configuration>
                     </execution>
                     <execution>
                         <id>compile</id>
@@ -291,12 +284,7 @@
         <dependency>
             <groupId>org.twitter4j</groupId>
             <artifactId>twitter4j-stream</artifactId>
-            <version>4.0.2</version>
-        </dependency>
-        <dependency>
-            <groupId>org.json</groupId>
-            <artifactId>json</artifactId>
-            <version>20090211</version>
+            <version>4.0.7</version>
         </dependency>
 
         <dependency>
