@@ -4,7 +4,8 @@ A service for aggregating 3rd party content from a variety of sources (RSS / Twi
 
 Provides a local API for applications to consume the aggregated content via a single HTTP/JSON interface.
 
-MongoDB 3.4 is used for storage. Memcached is used for caching.
+
+![Screenshot of an aggregated channel of RSS feeds](channel.png)
 
 
 ## Good at
@@ -28,6 +29,11 @@ Uses etag and last modified headers to minimise traffic.
 
 Preserves GeoRSS location data.
 
+## Implementation
+
+Kotlin / Java application. 
+MongoDB 3.4 is used for storage. 
+Memcached for caching.
 
 
 ## Concepts
