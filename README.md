@@ -1,8 +1,10 @@
 # Whakaoko (verb. to listen)
 
-A service for aggregating 3rd party content from a variety of sources (RSS / Twitter) into an easy to consume local JSON or RSS feed.
+A service for aggregating 3rd party content from a variety of sources (RSS / Twitter) into an easy 
+to consume local JSON or RSS feed.
 
-Provides a local API for applications to consume the aggregated content via a single HTTP/JSON interface.
+Provides a [local API](src/main/resources/static/openapi.json) for other applications to consume 
+the aggregated content via a single HTTP/JSON interface.
 
 
 ![Screenshot of an aggregated channel of RSS feeds](channel.png)
