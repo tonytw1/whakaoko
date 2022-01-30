@@ -1,5 +1,6 @@
 <form action="/users" method="POST">
-	Username: <input name="username" />	
+	Username: <input name="username" />
+	Password: <input name="password />
 	<input type="submit" />
 </form>
 <hr/>

@@ -24,8 +24,11 @@ class UsersController @Autowired constructor(val usersDAO: UsersDAO, val viewFac
         return ModelAndView(viewFactory.getJsonView()).addObject("data", usersDAO.getUsers())
     }
 
-    @PostMapping("/users")
-    fun newUser(@RequestParam(value = "username", required = true) username: String): ModelAndView? {
+    @PostMapping("/users")  // TODO This is a UI controller
+    fun newUser(
+            @RequestParam(value = "username", required = true) username: String,
+            @RequestParam(value = "password", required = true) password: String
+    ): ModelAndView? {
         if (Strings.isNullOrEmpty(username)) {
             throw RuntimeException("No username given")
         }
@@ -33,7 +36,12 @@ class UsersController @Autowired constructor(val usersDAO: UsersDAO, val viewFac
             throw RuntimeException("Username is not available")
         }
 
-        val newUser = User(username)
+        val isValidPassword = password.trim().length > 6
+        if (!isValidPassword) {
+            throw  RuntimeException("Invalid password")
+        }
+
+        val newUser = User(username, password)
         usersDAO.save(newUser)
         log.info("Created user: " + newUser)
 
