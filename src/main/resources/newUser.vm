@@ -1,6 +1,6 @@
-<form action="/users" method="POST">
+<form action="/ui/newuser" method="POST">
 	Username: <input name="username" />
-	Password: <input name="password />
+	Password: <input name="password" />
 	<input type="submit" />
 </form>
 <hr/>

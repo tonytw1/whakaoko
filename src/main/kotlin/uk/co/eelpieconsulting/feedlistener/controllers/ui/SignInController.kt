@@ -24,17 +24,18 @@ class SignInController @Autowired constructor(val request: HttpServletRequest, v
     }
 
     @PostMapping("/signin")
-    fun signin(username: String, session: HttpSession, request: HttpServletRequest): ModelAndView {
+    fun signin(username: String, password: String, session: HttpSession, request: HttpServletRequest): ModelAndView {
         log.info("Signing in as: " + username)
         val user = usersDAO.getByUsername(username)
         if (user != null) {
-            currentUserService.setSignedInUser(user)
-            return redirectToSignedInUserUI(request)
-
-        } else {
-            log.info("Unknown user: " + username);
-            return redirectToSigninPromptWithError("We could not find a user with this username", session)
+            if (user.password.isNotEmpty() && user.password == password) {
+                currentUserService.setSignedInUser(user)
+                return redirectToSignedInUserUI(request)
+            } else {
+                log.info("Password incorrect")
+            }
         }
+        return redirectToSigninPromptWithError("We could not find a user with this username and password", session)
     }
 
     private fun withSessionError(session: HttpSession, mv: ModelAndView): ModelAndView {
