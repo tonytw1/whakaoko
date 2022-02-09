@@ -13,6 +13,7 @@ public class User {
     ObjectId objectId;
 
     private String username;
+    private String password;
     private String googleUserId;
 
     private String twitterAccessToken;
@@ -23,8 +24,9 @@ public class User {
     public User() {
     }
 
-    public User(String username) {
+    public User(String username, String password) {
         this.username = username;
+        this.password = password;
     }
 
     public String getUsername() {
@@ -33,6 +35,15 @@ public class User {
 
     public void setUsername(String username) {
         this.username = username;
+    }
+
+    @JsonIgnore
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 
     @JsonIgnore

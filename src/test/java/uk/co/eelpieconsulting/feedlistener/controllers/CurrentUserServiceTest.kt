@@ -12,7 +12,7 @@ class CurrentUserServiceTest {
 
     private val usersDAO = mock(UsersDAO::class.java)
 
-    private val user = User("a-user")
+    private val user = User("a-user", "with-a-password")
 
     @Test
     fun currentUserCanBeSetAsSessionAttributeForTheUI() {
