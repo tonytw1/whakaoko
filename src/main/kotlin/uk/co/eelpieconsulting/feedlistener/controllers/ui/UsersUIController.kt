@@ -14,6 +14,7 @@ import uk.co.eelpieconsulting.feedlistener.credentials.CredentialService
 import uk.co.eelpieconsulting.feedlistener.daos.ChannelsDAO
 import uk.co.eelpieconsulting.feedlistener.daos.UsersDAO
 import uk.co.eelpieconsulting.feedlistener.model.User
+import uk.co.eelpieconsulting.feedlistener.passwords.PasswordHashing
 import javax.servlet.http.HttpServletRequest
 
 @Controller
@@ -21,6 +22,7 @@ class UsersUIController @Autowired constructor(val channelsDAO: ChannelsDAO,
                                                val credentialService: CredentialService,
                                                val usersDAO: UsersDAO,
                                                val viewFactory: ViewFactory,
+                                               val passwordHashing: PasswordHashing,
                                                currentUserService: CurrentUserService,
                                                request: HttpServletRequest) : WithSignedInUser(currentUserService, request) {
 
@@ -48,7 +50,7 @@ class UsersUIController @Autowired constructor(val channelsDAO: ChannelsDAO,
             throw  RuntimeException("Invalid password")
         }
 
-        val newUser = User(username, password)
+        val newUser = User(username, passwordHashing.hash(password))
         usersDAO.save(newUser)
         log.info("Created user: " + newUser)
 
