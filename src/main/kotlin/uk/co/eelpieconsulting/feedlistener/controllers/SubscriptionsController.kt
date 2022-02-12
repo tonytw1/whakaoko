@@ -47,6 +47,7 @@ class SubscriptionsController @Autowired constructor(private val subscriptionsDA
     @GetMapping("/subscriptions/{id}/items")
     fun subscriptionItems(@PathVariable id: String,
                           @RequestParam(required = false) page: Int?,
+                          @RequestParam(required = false) pageSize: Int?,
                           @RequestParam(required = false) format: String?,
                           response: HttpServletResponse): ModelAndView? {
 
@@ -58,7 +59,7 @@ class SubscriptionsController @Autowired constructor(private val subscriptionsDA
                     val title = if (!Strings.isNullOrEmpty(subscription.name)) subscription.name else subscription.id
                     mv = ModelAndView(viewFactory.getRssView(title, urlBuilder.getSubscriptionUrl(subscription), ""))
                 }
-                val feedItemsResult = feedItemDAO.getSubscriptionFeedItems(subscription, page)
+                val feedItemsResult = feedItemDAO.getSubscriptionFeedItems(subscription, page, pageSize)
                 feedItemPopulator.populateFeedItems(feedItemsResult, mv, "data")
                 response.addHeader(X_TOTAL_COUNT, java.lang.Long.toString(feedItemsResult.totalCount))
                 return mv

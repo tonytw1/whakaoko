@@ -115,6 +115,15 @@
             "schema": {
               "type": "string"
             }
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "required": false,
+            "description": "Optional page size",
+            "schema": {
+              "type": "integer"
+            }
           }
         ],
         "responses": {
@@ -280,6 +289,15 @@
             "required": true,
             "schema": {
               "type": "string"
+            }
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "required": false,
+            "description": "Optional page size",
+            "schema": {
+              "type": "integer"
             }
           }
         ],

@@ -54,20 +54,26 @@ class FeedItemDAO @Autowired constructor(private val dataStoreFactory: DataStore
         dataStoreFactory.get().save(feedItem)
     }
 
-    fun getSubscriptionFeedItems(subscription: Subscription, page: Int?): FeedItemsResult {
+    fun getSubscriptionFeedItems(subscription: Subscription, page: Int?, pageSize: Int? = null): FeedItemsResult {
+        val pageSizeToUse = pageSize ?: MAX_FEED_ITEMS
+        if (pageSizeToUse > MAX_FEED_ITEMS) {
+            throw RuntimeException("Too many records requested") // TODO use correct exception.
+        }
+
         return if (page != null) {
-            getSubscriptionFeedItems(subscription.id, MAX_FEED_ITEMS, page)
+            getSubscriptionFeedItems(subscription.id, pageSizeToUse, page)
         } else {
-            getSubscriptionFeedItems(subscription.id, MAX_FEED_ITEMS)
+            getSubscriptionFeedItems(subscription.id, pageSizeToUse)
         }
     }
 
     fun getChannelFeedItemsResult(channel: Channel, page: Int?, q: String?, pageSize: Int?, subscriptions: List<String>? = null): FeedItemsResult {
         val pageSizeToUse = pageSize ?: MAX_FEED_ITEMS
-        val pageToUse = if (page != null && page > 0) page else 1
         if (pageSizeToUse > MAX_FEED_ITEMS) {
             throw RuntimeException("Too many records requested") // TODO use correct exception.
         }
+        val pageToUse = if (page != null && page > 0) page else 1
+
         return if (!Strings.isNullOrEmpty(q)) searchChannelFeedItems(channel.id, pageSizeToUse, pageToUse, q) else getChannelFeedItems(
             channel.id,
             pageSizeToUse,
