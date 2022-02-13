@@ -368,7 +368,7 @@
           "categories": {
             "type": "array",
             "items": {
-              "$ref": "#/definitions/Category"
+              "$ref": "#/components/schemas/Category"
             }
           }
         }
