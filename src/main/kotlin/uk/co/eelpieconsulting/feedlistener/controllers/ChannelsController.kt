@@ -37,6 +37,7 @@ class ChannelsController @Autowired constructor(val channelsDAO: ChannelsDAO,
 
     private val X_TOTAL_COUNT = "X-Total-Count"
 
+    @CrossOrigin
     @GetMapping("/{username}/channels")
     fun channelsJson(@PathVariable username: String): ModelAndView {
         fun renderChannels(user: User): ModelAndView {
@@ -45,6 +46,7 @@ class ChannelsController @Autowired constructor(val channelsDAO: ChannelsDAO,
         return forCurrentUser(::renderChannels)
     }
 
+    @CrossOrigin
     @GetMapping("/channels/{id}")
     fun channel(@PathVariable id: String): ModelAndView {
         return forCurrentUser { user ->
@@ -54,6 +56,7 @@ class ChannelsController @Autowired constructor(val channelsDAO: ChannelsDAO,
         }
     }
 
+    @CrossOrigin
     @PostMapping("/channels")
     fun createSubscription(@RequestBody create: CreateChannelRequest): ModelAndView {
         fun createChannel(user: User): ModelAndView {
@@ -75,6 +78,7 @@ class ChannelsController @Autowired constructor(val channelsDAO: ChannelsDAO,
         return forCurrentUser(::createChannel)
     }
 
+    @CrossOrigin
     @GetMapping("/channels/{id}/subscriptions")
     fun channelSubscriptions(@PathVariable id: String, @RequestParam(required = false) url: String?): ModelAndView {
         return forCurrentUser { user ->
@@ -85,6 +89,7 @@ class ChannelsController @Autowired constructor(val channelsDAO: ChannelsDAO,
         }
     }
 
+    @CrossOrigin
     @GetMapping("/channels/{id}/items")
     fun channelJson(@PathVariable id: String,
                     @RequestParam(required = false) page: Int?,

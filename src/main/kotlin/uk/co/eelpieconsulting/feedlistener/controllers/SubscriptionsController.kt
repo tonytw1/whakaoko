@@ -43,6 +43,7 @@ class SubscriptionsController @Autowired constructor(private val subscriptionsDA
 
     private val X_TOTAL_COUNT = "X-Total-Count"
 
+    @CrossOrigin
     @Timed(timingNotes = "")
     @GetMapping("/subscriptions/{id}/items")
     fun subscriptionItems(@PathVariable id: String,
@@ -73,7 +74,7 @@ class SubscriptionsController @Autowired constructor(private val subscriptionsDA
     }
 
     @Timed(timingNotes = "")
-    @GetMapping("/subscriptions/{id}/read")
+    @GetMapping("/subscriptions/{id}/read") // TODO Make a POST
     fun reload(@PathVariable id: String): ModelAndView {
         return forCurrentUser { user ->
             conditionalLoads.withSubscriptionForUser(id, user) { subscription ->
@@ -87,6 +88,7 @@ class SubscriptionsController @Autowired constructor(private val subscriptionsDA
         }
     }
 
+    @CrossOrigin
     @Timed(timingNotes = "")
     @GetMapping("/subscriptions/{id}")
     fun subscriptionJson(@PathVariable id: String,
