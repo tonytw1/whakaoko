@@ -18,6 +18,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import uk.co.eelpieconsulting.common.dates.DateFormatter;
 import uk.co.eelpieconsulting.common.shorturls.resolvers.*;
 import uk.co.eelpieconsulting.feedlistener.http.HttpFetcher;
@@ -32,7 +34,7 @@ import java.util.Properties;
 @EnableScheduling
 @ComponentScan("uk.co.eelpieconsulting")
 @Configuration
-public class Main {
+public class Main implements WebMvcConfigurer {
 
     private static ApplicationContext ctx;
 
@@ -101,6 +103,13 @@ public class Main {
         attributes.put("urlBuilder", urlBuilder);
         viewResolver.setAttributesMap(attributes);
         return viewResolver;
+    }
+
+    @Override
+    public void addCorsMappings(final CorsRegistry registry) {
+        registry.addMapping("/openapi.json")
+                .allowedOrigins("*")
+                .allowedMethods("GET");
     }
 
 }
