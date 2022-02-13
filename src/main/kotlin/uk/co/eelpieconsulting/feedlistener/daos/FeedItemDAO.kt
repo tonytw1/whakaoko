@@ -27,7 +27,8 @@ class FeedItemDAO @Autowired constructor(private val dataStoreFactory: DataStore
     private val CHANNEL_ID = "channelId"
     private val SUBSCRIPTION_ID = "subscriptionId"
     private val DATE_DESCENDING_THEN_ID = arrayOf(Sort.descending("date"), Sort.ascending("_id"))
-    private val MAX_FEED_ITEMS = 25
+    private val DEFAULT_FEED_ITEMS = 25
+    private val MAX_FEED_ITEMS = 100
 
     fun before(date: Date): MutableList<FeedItem>? {
         val query = dataStoreFactory.get().find(FeedItem::class.java).filter(Filters.lt("date", date));
@@ -55,10 +56,7 @@ class FeedItemDAO @Autowired constructor(private val dataStoreFactory: DataStore
     }
 
     fun getSubscriptionFeedItems(subscription: Subscription, page: Int?, pageSize: Int? = null): FeedItemsResult {
-        val pageSizeToUse = pageSize ?: MAX_FEED_ITEMS
-        if (pageSizeToUse > MAX_FEED_ITEMS) {
-            throw RuntimeException("Too many records requested") // TODO use correct exception.
-        }
+        val pageSizeToUse = pageSizeToUse(pageSize)
 
         return if (page != null) {
             getSubscriptionFeedItems(subscription.id, pageSizeToUse, page)
@@ -68,10 +66,7 @@ class FeedItemDAO @Autowired constructor(private val dataStoreFactory: DataStore
     }
 
     fun getChannelFeedItemsResult(channel: Channel, page: Int?, q: String?, pageSize: Int?, subscriptions: List<String>? = null): FeedItemsResult {
-        val pageSizeToUse = pageSize ?: MAX_FEED_ITEMS
-        if (pageSizeToUse > MAX_FEED_ITEMS) {
-            throw RuntimeException("Too many records requested") // TODO use correct exception.
-        }
+        val pageSizeToUse = pageSizeToUse(pageSize)
         val pageToUse = if (page != null && page > 0) page else 1
 
         return if (!Strings.isNullOrEmpty(q)) searchChannelFeedItems(channel.id, pageSizeToUse, pageToUse, q) else getChannelFeedItems(
@@ -139,6 +134,14 @@ class FeedItemDAO @Autowired constructor(private val dataStoreFactory: DataStore
         return if (page > 0) {
             (page - 1) * pageSize
         } else 0
+    }
+
+    private fun pageSizeToUse(pageSize: Int?): Int {
+        val pageSizeToUse = pageSize ?: DEFAULT_FEED_ITEMS
+        if (pageSizeToUse > MAX_FEED_ITEMS) {
+            throw RuntimeException("Too many records requested") // TODO use correct exception.
+        }
+        return pageSizeToUse
     }
 
 }
