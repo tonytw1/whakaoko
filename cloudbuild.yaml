@@ -8,6 +8,7 @@ steps:
     - 'MONGO_HOST=mongo'
   - name: docker
     args:
+    - docker
     - run
     - '--privileged'
     - 'linuxkit/binfmt:v0.7'
@@ -16,24 +17,28 @@ steps:
     args: ['buildx', 'create']
   - name: 'docker'
     args:
+    - docker
     - buildx
     - create
     - '--name'
     - mybuilder
   - name: docker
     args:
+    - docker
     - buildx
     - use
     - mybuilder
     id: select-builder
   - name: docker
     args:
+    - docker
     - buildx
     - inspect
     - '--bootstrap'
     id: show-target-build-platforms
   - name: docker
     args:
+    - docker
     - buildx
     - build
     - '--platform'
