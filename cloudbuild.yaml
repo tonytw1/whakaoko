@@ -5,35 +5,35 @@ steps:
     entrypoint: 'mvn'
     args: ['install']
     env:
-      - 'MONGO_HOST=mongo'
-- name: gcr.io/cloud-builders/docker
-  args:
+    - 'MONGO_HOST=mongo'
+  - name: gcr.io/cloud-builders/docker
+    args:
     - run
     - '--privileged'
     - 'linuxkit/binfmt:v0.7'
-  id: initialize-qemu
-- name: 'gcr.io/cloud-builders/docker'
-  args: ['buildx', 'create']
-- name: 'gcr.io/cloud-builders/docker'
-  args:
-  - buildx
-  - create
-  - '--name'
-  - mybuilder
-- name: gcr.io/cloud-builders/docker
-  args:
+    id: initialize-qemu
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['buildx', 'create']
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+    - buildx
+    - create
+    - '--name'
+    - mybuilder
+  - name: gcr.io/cloud-builders/docker
+    args:
     - buildx
     - use
     - mybuilder
-  id: select-builder
-- name: gcr.io/cloud-builders/docker
-  args:
+    id: select-builder
+  - name: gcr.io/cloud-builders/docker
+    args:
     - buildx
     - inspect
     - '--bootstrap'
-  id: show-target-build-platforms
-- name: gcr.io/cloud-builders/docker
-  args:
+    id: show-target-build-platforms
+  - name: gcr.io/cloud-builders/docker
+    args:
     - buildx
     - build
     - '--platform'
@@ -42,4 +42,4 @@ steps:
     - 'eu.gcr.io/$PROJECT_ID/whakaoko'
     - '--push'
     - .
-  id: build-multi-architecture-container-image
+    id: build-multi-architecture-container-image
