@@ -6,7 +6,6 @@ steps:
     args: ['install']
     env:
       - 'MONGO_HOST=mongo'
-
 - name: gcr.io/cloud-builders/docker
   args:
     - run
@@ -15,20 +14,18 @@ steps:
   id: initialize-qemu
 - name: 'gcr.io/cloud-builders/docker'
   args: ['buildx', 'create']
-
 - name: 'gcr.io/cloud-builders/docker'
   args:
   - buildx
   - create
   - '--name'
   - mybuilder
-
 - name: gcr.io/cloud-builders/docker
-    args:
-      - buildx
-      - use
-      - mybuilder
-    id: select-builder
+  args:
+    - buildx
+    - use
+    - mybuilder
+  id: select-builder
 - name: gcr.io/cloud-builders/docker
   args:
     - buildx
