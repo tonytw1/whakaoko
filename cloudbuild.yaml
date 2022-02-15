@@ -9,6 +9,14 @@ steps:
   - name: 'docker'
     args:
     - docker
+    - exec
+    - COPY
+    - '----from=docker/buildx-bin:latest'
+    - /buildx
+    - /usr/libexec/docker/cli-plugins/docker-buildx
+  - name: 'docker'
+    args:
+    - docker
     - buildx
     - create
     - '--name'
