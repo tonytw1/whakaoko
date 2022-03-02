@@ -40,7 +40,14 @@ class RssPoller @Autowired constructor(val subscriptionsDAO: SubscriptionsDAO, v
     @Scheduled(fixedRate = 3600000, initialDelay = 300000)
     fun run() {
         log.info("Polling subscriptions")
-        subscriptionsDAO.allRssSubscriptions().forEach(Consumer { subscription -> executeRssPoll(subscription) })
+        subscriptionsDAO.allRssSubscriptions().filter { subscription ->
+            val lastRead = subscription.lastRead
+            val fetchNow = subscription.classification == "ok" ||
+                    lastRead == null ||
+                    lastRead.before(DateTime.now().minusDays(1).toDate())
+            fetchNow
+        }.
+        forEach(Consumer { subscription -> executeRssPoll(subscription) })
         log.info("Done")
     }
 
