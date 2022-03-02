@@ -13,6 +13,11 @@ class Classifier {
         if (goodHttpCodes.contains(subscription.httpStatus) && subscription.error == null) {
             return "ok"
         }
+
+        if (goodHttpCodes.contains(subscription.httpStatus) && subscription.error != null) {
+            return "broken"
+        }
+
         if (badHttpCodes.contains(subscription.httpStatus)) {
             return "gone"
         }
