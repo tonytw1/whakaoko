@@ -225,3 +225,11 @@ Maven build.
 docker-compose -f docker/docker-compose.yml up
 mvn clean install
 ```
+
+
+## Cloud build
+
+```
+gcloud components install cloud-build-local
+cloud-build-local --config=cloudbuild.yaml --dryrun=false --push=false .
+```
