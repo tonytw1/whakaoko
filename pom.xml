@@ -16,7 +16,7 @@
     <properties>
         <jackson.version>2.11.2</jackson.version>
         <spymemcached.version>2.11.2</spymemcached.version>
-        <kotlin.version>1.5.31</kotlin.version>
+        <kotlin.version>1.5.32</kotlin.version>
         <twitter4j.version>4.0.7</twitter4j.version>
     </properties>
 
