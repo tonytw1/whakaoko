@@ -1,7 +1,7 @@
 package uk.co.eelpieconsulting.feedlistener.rss.images;
 
-import com.sun.syndication.feed.module.mediarss.MediaModule;
-import com.sun.syndication.feed.synd.SyndEntry;
+import com.rometools.modules.mediarss.MediaModule;
+import com.rometools.rome.feed.synd.SyndEntry;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;

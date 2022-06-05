@@ -1,7 +1,6 @@
 package uk.co.eelpieconsulting.feedlistener.rss.images;
 
-import com.sun.syndication.feed.synd.SyndEntry;
-;
+import com.rometools.rome.feed.synd.SyndEntry;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;

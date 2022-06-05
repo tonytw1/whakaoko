@@ -1,10 +1,10 @@
 package uk.co.eelpieconsulting.feedlistener.rss
 
 import com.github.kittinunf.result.Result
-import com.sun.syndication.feed.synd.SyndFeed
-import com.sun.syndication.io.FeedException
-import com.sun.syndication.io.ParsingFeedException
-import com.sun.syndication.io.SyndFeedInput
+import com.rometools.rome.feed.synd.SyndFeed
+import com.rometools.rome.io.FeedException
+import com.rometools.rome.io.ParsingFeedException
+import com.rometools.rome.io.SyndFeedInput
 import org.apache.commons.io.IOUtils
 import org.springframework.stereotype.Component
 import org.xml.sax.InputSource
@@ -46,7 +46,7 @@ class FeedParser {
         val byteArrayInputStream = ByteArrayInputStream(bytes)
         val inputStream = InputSource(byteArrayInputStream)
         return try {
-            val syndFeedInput = SyndFeedInput(false)
+            val syndFeedInput = SyndFeedInput()
             val syndFeed = syndFeedInput.build(inputStream)
             IOUtils.closeQuietly(byteArrayInputStream)
             Result.success(syndFeed)

@@ -1,12 +1,12 @@
 package uk.co.eelpieconsulting.feedlistener.rss
 
-import com.sun.syndication.feed.synd.SyndEntry
+import com.rometools.rome.feed.synd.SyndEntry
 import org.apache.commons.io.IOUtils
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.mockito.ArgumentMatchers.anyObject
-import org.mockito.Mockito.`when`
 import org.mockito.Mockito.mock
+import org.mockito.Mockito.`when`
 import uk.co.eelpieconsulting.feedlistener.model.RssSubscription
 import uk.co.eelpieconsulting.feedlistener.rss.images.BodyHtmlImageExtractor
 import uk.co.eelpieconsulting.feedlistener.rss.images.MediaModuleImageExtractor
@@ -58,14 +58,14 @@ class RssFeedItemMapperTest {
 
         val feedItems = testSyndEntries("toiponeke.xml").map { rssFeedItemMapper.createFeedItemFrom(it, subscription) }
         val first = feedItems.first()
-        assertEquals(1, first?.categories?.size)
+        assertEquals(1, first?._categories?.size)
         assertEquals("Emerging Production Designer Residency 2022 - Call for applications", first?.headline)
-        assertEquals("residency", first?.categories?.first()?.value)
+        assertEquals("residency", first?._categories?.first()?.value)
 
         val cdataEncodedFeedItems = testSyndEntries("nra-feed.xml").map { rssFeedItemMapper.createFeedItemFrom(it, subscription) }
         val firstCdataEncoded = cdataEncodedFeedItems.first()
         assertEquals("Draft District Plan, Bike Network and LGWM – 3 consultations open now!", firstCdataEncoded?.title)
-        assertEquals(listOf("Consultation", "News"), firstCdataEncoded?.categories?.map{it -> it.value})
+        assertEquals(listOf("Consultation", "News"), firstCdataEncoded?._categories?.map{it -> it.value})
     }
 
     private fun testSyndEntries(filename: String = "inside-wellington-media-break.xml"): List<SyndEntry> {

@@ -1,9 +1,9 @@
 package uk.co.eelpieconsulting.feedlistener.rss
 
 import com.google.common.base.Strings
-import com.sun.syndication.feed.module.georss.GeoRSSUtils
-import com.sun.syndication.feed.synd.SyndCategory
-import com.sun.syndication.feed.synd.SyndEntry
+import com.rometools.modules.georss.GeoRSSUtils
+import com.rometools.rome.feed.synd.SyndCategory
+import com.rometools.rome.feed.synd.SyndEntry
 import org.apache.commons.lang.StringEscapeUtils
 import org.apache.logging.log4j.LogManager
 

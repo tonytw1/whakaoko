@@ -46,11 +46,17 @@ class FeedItem : RssFeedable {
         return author.orEmpty()
     }
 
+    override fun getCategories(): MutableList<String> {
+        val categories: List<Category> = _categories ?: emptyList<Category>()
+        return categories.mapNotNull { it.value }.toMutableList()
+    }
+
     // Display only field
     @get:JsonIgnore
     var subscriptionName: String? = null
 
-    var categories: List<Category>? = null
+    @Property("categories") // TODO clear this clash by renaming rss categories interface method
+    var _categories: List<Category>? = null
 
     constructor() {}
     constructor(title: String?,
@@ -73,7 +79,7 @@ class FeedItem : RssFeedable {
         this.author = author
         this.subscriptionId = subscriptionId
         this.channelId = channelId
-        this.categories = categories
+        this._categories = categories
     }
 
     val id: String?
@@ -84,6 +90,10 @@ class FeedItem : RssFeedable {
         return if (place != null && place!!.latLong != null) {
             LatLong(place!!.latLong.latitude, place!!.latLong.longitude)
         } else null
+    }
+
+    override fun getFeatureName(): String? {
+       return place?.address
     }
 
     fun isGeoTagged(): Boolean {

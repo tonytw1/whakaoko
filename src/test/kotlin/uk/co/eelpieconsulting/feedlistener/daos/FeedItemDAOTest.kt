@@ -53,13 +53,13 @@ class FeedItemDAOTest {
         category.value = "consultations"
         val anotherCategory = Category()
         anotherCategory.value = "news"
-        feedItem.categories = listOf(category, anotherCategory)
+        feedItem._categories = listOf(category, anotherCategory)
         feedItemDAO.add(feedItem)
 
         val feedItems = feedItemDAO.getSubscriptionFeedItems(subscription, 1)
 
         assertEquals(1, feedItems.totalCount)
-        val reloadedCategories = feedItems.feedsItems.first().categories
+        val reloadedCategories = feedItems.feedsItems.first()._categories
         assertEquals(listOf("consultations", "news"), reloadedCategories?.map{it -> it.value})
     }
 

@@ -10,9 +10,9 @@
         #if($feedItem.place && $feedItem.latLong)
             <p>$feedItem.place.latLong.longitude, $feedItem.place.latLong.latitude</p>
         #end
-        #if($feedItem.categories)
+        #if($feedItem._categories)
             <p>
-            #foreach($category in $feedItem.categories)
+            #foreach($category in $feedItem._categories)
                 <span class="badge badge-pill badge-info">$category.value</span>
             #end
             </p>

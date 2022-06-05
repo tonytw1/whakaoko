@@ -1,8 +1,8 @@
 package uk.co.eelpieconsulting.feedlistener.rss;
 
 import com.github.kittinunf.result.Result;
-import com.sun.syndication.feed.synd.SyndEntry;
-import com.sun.syndication.feed.synd.SyndFeed;
+import com.rometools.rome.feed.synd.SyndEntry;
+import com.rometools.rome.feed.synd.SyndFeed;
 import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.Test;
 
@@ -18,6 +18,7 @@ public class FeedParserTest {
     @Test
     public void canParseFeedBytesIntoSyndFeed() throws Exception {
         String input = IOUtils.toString(new FileInputStream(this.getClass().getClassLoader().getResource("wcc-news.xml").getFile()));
+        System.out.println(input);
 
         Result<SyndFeed, Exception> result = feedParser.parseSyndFeed(input.getBytes());
 

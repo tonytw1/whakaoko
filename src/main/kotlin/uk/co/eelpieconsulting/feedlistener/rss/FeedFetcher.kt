@@ -1,8 +1,8 @@
 package uk.co.eelpieconsulting.feedlistener.rss
 
 import com.github.kittinunf.result.Result
-import com.sun.syndication.feed.synd.SyndEntry
-import com.sun.syndication.feed.synd.SyndFeed
+import com.rometools.rome.feed.synd.SyndEntry
+import com.rometools.rome.feed.synd.SyndFeed
 import io.micrometer.core.instrument.MeterRegistry
 import org.apache.logging.log4j.LogManager
 
