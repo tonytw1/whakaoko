@@ -3,6 +3,7 @@ package uk.co.eelpieconsulting.feedlistener.model
 import com.fasterxml.jackson.annotation.JsonFormat
 import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.annotation.JsonInclude
+import com.fasterxml.jackson.annotation.JsonProperty
 import dev.morphia.annotations.*
 import dev.morphia.utils.IndexType
 import org.bson.types.ObjectId
@@ -46,6 +47,7 @@ class FeedItem : RssFeedable {
         return author.orEmpty()
     }
 
+    @JsonIgnore
     override fun getCategories(): MutableList<String> {
         val categories: List<Category> = _categories ?: emptyList<Category>()
         return categories.mapNotNull { it.value }.toMutableList()
@@ -55,6 +57,7 @@ class FeedItem : RssFeedable {
     @get:JsonIgnore
     var subscriptionName: String? = null
 
+    @JsonProperty("categories")
     @Property("categories") // TODO clear this clash by renaming rss categories interface method
     var _categories: List<Category>? = null
 
