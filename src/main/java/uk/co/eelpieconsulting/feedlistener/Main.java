@@ -80,13 +80,18 @@ public class Main implements WebMvcConfigurer {
     @Bean("velocityEngine")
     public VelocityEngineFactoryBean velocityEngineFactoryBean() {
         VelocityEngineFactoryBean velocityEngineFactory = new VelocityEngineFactoryBean();
-        Properties velocityPropertiesMap = new Properties();
-        velocityPropertiesMap.setProperty(Velocity.INPUT_ENCODING, "UTF-8");
-        velocityPropertiesMap.setProperty(Velocity.EVENTHANDLER_REFERENCEINSERTION, "org.apache.velocity.app.event.implement.EscapeHtmlReference");
-        velocityPropertiesMap.setProperty("resource.loader", "class");
-        velocityPropertiesMap.setProperty("class.resource.loader.class", "org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader");
-        velocityPropertiesMap.setProperty("velocimacro.library", "spring.vm");
-        velocityEngineFactory.setVelocityProperties(velocityPropertiesMap);
+        Properties velocityProperties = new Properties();
+        velocityProperties.setProperty(Velocity.INPUT_ENCODING, "UTF-8");
+        velocityProperties.setProperty(Velocity.EVENTHANDLER_REFERENCEINSERTION, "org.apache.velocity.app.event.implement.EscapeHtmlReference");
+        velocityProperties.setProperty("resource.loader", "class");
+        velocityProperties.setProperty("class.resource.loader.class", "org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader");
+        velocityProperties.setProperty("velocimacro.library", "spring.vm");
+
+        velocityProperties.setProperty("resource.loader.class.cache", "true");
+        // When resource.manager.cache.default_size is set to 0, then the default implementation uses the standard Java ConcurrentHashMap.
+        velocityProperties.setProperty("resource.manager.cache.default_size", "0");
+
+        velocityEngineFactory.setVelocityProperties(velocityProperties);
         return velocityEngineFactory;
     }
 
