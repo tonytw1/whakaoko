@@ -17,19 +17,18 @@ import uk.co.eelpieconsulting.feedlistener.daos.FeedItemDAO
 import uk.co.eelpieconsulting.feedlistener.daos.SubscriptionsDAO
 import uk.co.eelpieconsulting.feedlistener.model.Channel
 import uk.co.eelpieconsulting.feedlistener.model.User
-import java.lang.Long
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
 
 @Controller
-class ChannelsController @Autowired constructor(val channelsDAO: ChannelsDAO,
-                                                val viewFactory: ViewFactory,
+class ChannelsController @Autowired constructor(private val channelsDAO: ChannelsDAO,
+                                                private val viewFactory: ViewFactory,
                                                 val subscriptionsDAO: SubscriptionsDAO,
                                                 val urlBuilder: UrlBuilder,
-                                                val feedItemPopulator: FeedItemPopulator,
-                                                val feedItemDAO: FeedItemDAO,
-                                                val conditionalLoads: ConditionalLoads,
-                                                val idBuilder: IdBuilder,
+                                                private val feedItemPopulator: FeedItemPopulator,
+                                                private val feedItemDAO: FeedItemDAO,
+                                                private val conditionalLoads: ConditionalLoads,
+                                                private val idBuilder: IdBuilder,
                                                 currentUserService: CurrentUserService,
                                                 request: HttpServletRequest) : WithSignedInUser(currentUserService, request) {
 
@@ -41,6 +40,9 @@ class ChannelsController @Autowired constructor(val channelsDAO: ChannelsDAO,
     @GetMapping("/{username}/channels")
     fun channelsJson(@PathVariable username: String): ModelAndView {
         fun renderChannels(user: User): ModelAndView {
+            if (user.username != username) {
+                throw ResponseStatusException(HttpStatus.FORBIDDEN, "Cannot list another users channels")
+            }
             return ModelAndView(viewFactory.getJsonView()).addObject("data", channelsDAO.getChannelsFor(user))
         }
         return forCurrentUser(::renderChannels)
@@ -107,7 +109,7 @@ class ChannelsController @Autowired constructor(val channelsDAO: ChannelsDAO,
                 val results = feedItemDAO.getChannelFeedItemsResult(channel, page, q, pageSize, subscriptions)
                 feedItemPopulator.populateFeedItems(results, mv, "data")
                 val totalCount = results.totalCount
-                response.addHeader(X_TOTAL_COUNT, Long.toString(totalCount))
+                response.addHeader(X_TOTAL_COUNT, totalCount.toString())
                 mv
             }
         }
