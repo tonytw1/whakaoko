@@ -18,7 +18,6 @@ public class FeedParserTest {
     @Test
     public void canParseFeedBytesIntoSyndFeed() throws Exception {
         String input = IOUtils.toString(new FileInputStream(this.getClass().getClassLoader().getResource("wcc-news.xml").getFile()));
-        System.out.println(input);
 
         Result<SyndFeed, Exception> result = feedParser.parseSyndFeed(input.getBytes());
 
