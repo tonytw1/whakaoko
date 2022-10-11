@@ -313,6 +313,11 @@
         </dependency>
 
         <dependency>
+            <groupId>uk.co.eelpieconsulting</groupId>
+            <artifactId>spring-velocity-views</artifactId>
+            <version>0.0.1</version>
+        </dependency>
+        <dependency>
             <groupId>org.apache.velocity</groupId>
             <artifactId>velocity-engine-core</artifactId>
             <version>2.3</version>

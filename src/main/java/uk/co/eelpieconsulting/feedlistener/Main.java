@@ -23,7 +23,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import uk.co.eelpieconsulting.common.dates.DateFormatter;
 import uk.co.eelpieconsulting.common.shorturls.resolvers.*;
 import uk.co.eelpieconsulting.feedlistener.http.HttpFetcher;
-import uk.co.eelpieconsulting.spring.VelocityViewResolver;
+import uk.co.eelpieconsulting.spring.views.velocity.VelocityViewResolver;
 
 import java.io.IOException;
 import java.util.Map;
