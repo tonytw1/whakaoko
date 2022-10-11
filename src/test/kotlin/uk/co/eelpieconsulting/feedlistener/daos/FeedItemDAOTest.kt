@@ -119,6 +119,7 @@ class FeedItemDAOTest {
             UUID.randomUUID().toString(),
             url,
             null,
+            null,
             DateTime.now().toDate(),
             null,
             null,

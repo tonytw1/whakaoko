@@ -112,7 +112,7 @@ class RssPoller @Autowired constructor(val subscriptionsDAO: SubscriptionsDAO, v
                             maybeFetchedFeed?.let { fetchedFeed ->
                                 // Your fetch returned a feed. This indicates the feed has been updated or
                                 // the feed server didn't support our last modified or etag headers
-                                log.info("Fetched feed: " + fetchedFeed.feedName)
+                                log.info("Fetched feed: " + fetchedFeed.feedName + " with " + fetchedFeed.feedItems.size  + " feed items")
                                 persistFeedItems(fetchedFeed.feedItems)
 
                                 // TODO needs to be a common concern with all subscriptions types; ie Twitter etc
@@ -172,6 +172,7 @@ class RssPoller @Autowired constructor(val subscriptionsDAO: SubscriptionsDAO, v
         private fun persistFeedItems(feedItems: List<FeedItem>) {
             feedItems.forEach { feedItem ->
                 try {
+                    feedItem.accepted = DateTime.now().toDate()
                     if (feedItemDAO.add(feedItem)) {
                         rssAddedItems.increment()
                     }
@@ -188,6 +189,6 @@ class RssPoller @Autowired constructor(val subscriptionsDAO: SubscriptionsDAO, v
 class FeedItemLatestDateFinder {
     fun getLatestItemDate(feedItems: List<FeedItem>): Date? {
         // Map to dates; return max
-        return feedItems.map { it.date }.stream().max(Date::compareTo).orElse(null)
+        return feedItems.map { it.date }.filterNotNull().stream().max(Date::compareTo).orElse(null)
     }
 }

@@ -26,11 +26,14 @@ class FeedItem : RssFeedable {
 
     var body: String? = null
 
-    private lateinit var date: Date
+    private var date: Date? = null
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ssXXX")
-    override fun getDate(): Date {
+    override fun getDate(): Date? {
         return date
     }
+
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ssXXX")
+    var accepted: Date? = null
 
     var place: Place? = null
 
@@ -65,7 +68,8 @@ class FeedItem : RssFeedable {
     constructor(title: String?,
                 url: String,
                 body: String?,
-                date: Date,
+                date: Date?,
+                accepted: Date? = null,
                 place: Place? = null,
                 imageUrl: String? = null,
                 author: String? = null,
@@ -77,6 +81,7 @@ class FeedItem : RssFeedable {
         this.url = url
         this.body = body
         this.date = date
+        this.accepted = accepted
         this.place = place
         this.imageUrl = imageUrl
         this.author = author

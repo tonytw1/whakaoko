@@ -38,6 +38,7 @@ class FeedItemPopulator @Autowired constructor(val subscriptionLabelService: Sub
                 feedItem.url,
                 StringEscapeUtils.unescapeHtml(feedItem.body),
                 feedItem.date,
+                feedItem.accepted,
                 feedItem.place,
                 feedItem.imageUrl,
                 feedItem.author,
