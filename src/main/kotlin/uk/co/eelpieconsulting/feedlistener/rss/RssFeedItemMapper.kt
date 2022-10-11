@@ -39,7 +39,7 @@ class RssFeedItemMapper @Autowired constructor(private val rssFeedItemImageExtra
             }
         }
 
-        if (url != null && date != null) {
+        if (url != null) {
             return FeedItem(
                 syndEntry.title,
                 url,
@@ -52,8 +52,9 @@ class RssFeedItemMapper @Autowired constructor(private val rssFeedItemImageExtra
                 subscription.channelId,
                 categories
             )
+
         } else {
-            log.warn("Saw syndEntry with no url or date: $syndEntry")
+            log.warn("Saw and ignored a syndEntry with no url: $syndEntry")
             return null
         }
     }
