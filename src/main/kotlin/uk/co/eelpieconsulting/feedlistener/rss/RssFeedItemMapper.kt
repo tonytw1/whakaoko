@@ -45,6 +45,7 @@ class RssFeedItemMapper @Autowired constructor(private val rssFeedItemImageExtra
                 url,
                 body,
                 date,
+                null,
                 place,
                 imageUrl,
                 syndEntry.author,

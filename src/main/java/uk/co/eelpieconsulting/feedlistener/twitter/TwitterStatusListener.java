@@ -2,6 +2,7 @@ package uk.co.eelpieconsulting.feedlistener.twitter;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.joda.time.DateTime;
 import twitter4j.StallWarning;
 import twitter4j.Status;
 import twitter4j.StatusDeletionNotice;
@@ -41,6 +42,7 @@ public class TwitterStatusListener implements StatusListener {
             final FeedItem tweetFeedItem = twitterFeedItemMapper.createFeedItemFrom(status, subscription);
             tweetFeedItem.setSubscriptionId(subscription.getId());    // TODO should we be duplicating tweets like this?
             tweetFeedItem.setChannelId(subscription.getChannelId());
+            tweetFeedItem.setAccepted(DateTime.now().toDate());
             subscription.setLatestItemDate(status.getCreatedAt());
             subscriptionsDAO.save(subscription);
 

@@ -32,6 +32,9 @@ class FeedItem : RssFeedable {
         return date
     }
 
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ssXXX")
+    var accepted: Date? = null
+
     var place: Place? = null
 
     private var imageUrl: String? = null
@@ -66,6 +69,7 @@ class FeedItem : RssFeedable {
                 url: String,
                 body: String?,
                 date: Date?,
+                accepted: Date? = null,
                 place: Place? = null,
                 imageUrl: String? = null,
                 author: String? = null,
@@ -77,6 +81,7 @@ class FeedItem : RssFeedable {
         this.url = url
         this.body = body
         this.date = date
+        this.accepted = accepted
         this.place = place
         this.imageUrl = imageUrl
         this.author = author
