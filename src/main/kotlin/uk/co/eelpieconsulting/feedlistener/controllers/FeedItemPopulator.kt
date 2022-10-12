@@ -34,19 +34,9 @@ class FeedItemPopulator @Autowired constructor(val subscriptionLabelService: Sub
     }
 
     protected fun overlyUnescape(feedItem: FeedItem): FeedItem? {
-        val fixed = FeedItem(StringEscapeUtils.unescapeHtml(feedItem.title),    // TODO Does kotlin have a copy function?
-                feedItem.url,
-                StringEscapeUtils.unescapeHtml(feedItem.body),
-                feedItem.date,
-                feedItem.accepted,
-                feedItem.place,
-                feedItem.imageUrl,
-                feedItem.author,
-                feedItem.subscriptionId,
-                feedItem.channelId,
-                feedItem._categories
-        )
-        fixed.subscriptionId = feedItem.subscriptionId
+        val fixed = feedItem.copy()
+        fixed.title = StringEscapeUtils.unescapeHtml(fixed.title)
+        fixed.body = StringEscapeUtils.unescapeHtml(fixed.body)
         return fixed
     }
 

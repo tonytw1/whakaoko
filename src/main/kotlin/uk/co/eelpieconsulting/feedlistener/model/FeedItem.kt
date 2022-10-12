@@ -128,4 +128,20 @@ class FeedItem : RssFeedable {
         return url
     }
 
+    fun copy(): FeedItem {
+        return FeedItem(
+            this.title,
+            this.url,
+            this.body,
+            this.date,
+            this.accepted,
+            this.place,
+            this.imageUrl,
+            this.author,
+            this.subscriptionId,
+            this.channelId,
+            this._categories
+        )
+    }
+
 }
