@@ -76,7 +76,9 @@ class RssPoller @Autowired constructor(val subscriptionsDAO: SubscriptionsDAO, v
 
             fun pollFeed(): Result<Subscription, FeedFetchingException> {
                 log.info("Fetching full feed: " + subscription.url)
-                return feedFetcher.fetchFeed(subscription).fold(
+
+                try {
+                    return feedFetcher.fetchFeed(subscription).fold(
                         { successfulFetch ->
                             val maybeFetchedFeed = successfulFetch.first
                             val httpResult = successfulFetch.second
@@ -112,7 +114,7 @@ class RssPoller @Autowired constructor(val subscriptionsDAO: SubscriptionsDAO, v
                             maybeFetchedFeed?.let { fetchedFeed ->
                                 // Your fetch returned a feed. This indicates the feed has been updated or
                                 // the feed server didn't support our last modified or etag headers
-                                log.info("Fetched feed: " + fetchedFeed.feedName + " with " + fetchedFeed.feedItems.size  + " feed items")
+                                log.info("Fetched feed: " + fetchedFeed.feedName + " with " + fetchedFeed.feedItems.size + " feed items")
                                 persistFeedItems(fetchedFeed.feedItems)
 
                                 // TODO needs to be a common concern with all subscriptions types; ie Twitter etc
@@ -141,7 +143,11 @@ class RssPoller @Autowired constructor(val subscriptionsDAO: SubscriptionsDAO, v
                             log.warn("Fetch feed returning error: " + ex)
                             Result.error(ex)
                         }
-                )
+                    )
+
+                } catch (e: Exception) {
+                    return Result.error(FeedFetchingException(e.message.toString(), null, e))
+                }
             }
 
             pollFeed().fold(
