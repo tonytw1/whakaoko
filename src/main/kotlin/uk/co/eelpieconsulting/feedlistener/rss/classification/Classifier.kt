@@ -1,5 +1,6 @@
 package uk.co.eelpieconsulting.feedlistener.rss.classification
 
+import org.joda.time.DateTime
 import org.springframework.stereotype.Component
 import uk.co.eelpieconsulting.feedlistener.model.RssSubscription
 
@@ -19,8 +20,16 @@ class Classifier {
         }
 
         if (badHttpCodes.contains(subscription.httpStatus)) {
-            return "gone"
+            if (subscription.latestItemDate == null) {
+                return "gone"
+
+            } else {
+                val lm = DateTime(subscription.latestItemDate)
+                val afterNow: Boolean = lm.plusDays(3).isAfterNow()
+                return if (afterNow)  "wobbling" else "gone"
+            }
         }
+
         return null
     }
 

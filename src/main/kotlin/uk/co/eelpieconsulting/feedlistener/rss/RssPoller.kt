@@ -42,7 +42,8 @@ class RssPoller @Autowired constructor(val subscriptionsDAO: SubscriptionsDAO, v
         log.info("Polling subscriptions")
         subscriptionsDAO.allRssSubscriptions().filter { subscription ->
             val lastRead = subscription.lastRead
-            val fetchNow = subscription.classification == "ok" ||
+            val fetchNow = subscription.classification == "ok" ||   // Invert this boolean
+                    subscription.classification == "wobbling" ||
                     lastRead == null ||
                     lastRead.before(DateTime.now().minusDays(1).toDate())
             fetchNow
