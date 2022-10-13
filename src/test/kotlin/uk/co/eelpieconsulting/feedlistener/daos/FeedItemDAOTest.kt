@@ -49,10 +49,8 @@ class FeedItemDAOTest {
         subscriptionsDAO.add(subscription)
 
         val feedItem = testFeedItemFor(subscription)
-        val category = Category()
-        category.value = "consultations"
-        val anotherCategory = Category()
-        anotherCategory.value = "news"
+        val category = Category("consultations")
+        val anotherCategory = Category("news")
         feedItem._categories = listOf(category, anotherCategory)
         feedItemDAO.add(feedItem)
 
