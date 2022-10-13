@@ -10,23 +10,23 @@ class Classifier {
     private val goodHttpCodes = setOf(200, 304)
     private val badHttpCodes = setOf(404, 401, -1)
 
-    fun classify(subscription: RssSubscription): String? {
+    fun classify(subscription: RssSubscription): FeedStatus? {
         if (goodHttpCodes.contains(subscription.httpStatus) && subscription.error == null) {
-            return "ok"
+            return FeedStatus.ok
         }
 
         if (goodHttpCodes.contains(subscription.httpStatus) && subscription.error != null) {
-            return "broken"
+            return FeedStatus.broken
         }
 
         if (badHttpCodes.contains(subscription.httpStatus)) {
             if (subscription.latestItemDate == null) {
-                return "gone"
+                return FeedStatus.gone
 
             } else {
                 val lm = DateTime(subscription.latestItemDate)
                 val afterNow: Boolean = lm.plusDays(3).isAfterNow()
-                return if (afterNow)  "wobbling" else "gone"
+                return if (afterNow) FeedStatus.wobbling else FeedStatus.gone
             }
         }
 

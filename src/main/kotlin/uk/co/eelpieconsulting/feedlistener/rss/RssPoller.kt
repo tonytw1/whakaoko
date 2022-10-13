@@ -18,6 +18,7 @@ import uk.co.eelpieconsulting.feedlistener.model.FeedItem
 import uk.co.eelpieconsulting.feedlistener.model.RssSubscription
 import uk.co.eelpieconsulting.feedlistener.model.Subscription
 import uk.co.eelpieconsulting.feedlistener.rss.classification.Classifier
+import uk.co.eelpieconsulting.feedlistener.rss.classification.FeedStatus
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 import java.time.format.DateTimeParseException
@@ -42,8 +43,8 @@ class RssPoller @Autowired constructor(val subscriptionsDAO: SubscriptionsDAO, v
         log.info("Polling subscriptions")
         subscriptionsDAO.allRssSubscriptions().filter { subscription ->
             val lastRead = subscription.lastRead
-            val fetchNow = subscription.classification == "ok" ||   // Invert this boolean
-                    subscription.classification == "wobbling" ||
+            val fetchNow = subscription.classification == FeedStatus.ok ||   // Invert this boolean
+                    subscription.classification == FeedStatus.wobbling ||
                     lastRead == null ||
                     lastRead.before(DateTime.now().minusDays(1).toDate())
             fetchNow

@@ -18,7 +18,7 @@ class ClassifierTest {
 
         val result = classifier.classify(subscription)
 
-        assertEquals("ok", result)
+        assertEquals(FeedStatus.ok, result)
     }
 
     @Test
@@ -28,7 +28,7 @@ class ClassifierTest {
 
         val result = classifier.classify(subscription)
 
-        assertEquals("gone", result)
+        assertEquals(FeedStatus.gone, result)
     }
 
     @Test
@@ -40,7 +40,7 @@ class ClassifierTest {
 
         val result = classifier.classify(subscription)
 
-        assertEquals("wobbling", result)
+        assertEquals(FeedStatus.wobbling, result)
     }
 
 }
