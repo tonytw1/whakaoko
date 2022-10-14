@@ -56,10 +56,14 @@ class RssPoller @Autowired constructor(val subscriptionsDAO: SubscriptionsDAO, v
 
     private fun shouldFetchNow(subscription: RssSubscription): Boolean {
         val lastRead = subscription.lastRead
-        return subscription.classification == FeedStatus.ok ||   // Invert this boolean
-                subscription.classification == FeedStatus.wobbling ||
-                lastRead == null ||
-                lastRead.before(DateTime.now().minusDays(1).toDate())
+        if (lastRead == null) {
+            return true
+        }
+        if (setOf(FeedStatus.ok, FeedStatus.wobbling).contains(subscription.classification)) {
+            return true
+        }
+        // broken and gone feeds are only reasd once a day to look for a resurrection.
+        return lastRead.before(DateTime.now().minusDays(1).toDate())
     }
 
     private fun run(subscription: RssSubscription) {
