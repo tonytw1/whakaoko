@@ -42,11 +42,7 @@ class RssPoller @Autowired constructor(val subscriptionsDAO: SubscriptionsDAO, v
     fun run() {
         log.info("Polling subscriptions")
         subscriptionsDAO.allRssSubscriptions().filter { subscription ->
-            val lastRead = subscription.lastRead
-            val fetchNow = subscription.classification == FeedStatus.ok ||   // Invert this boolean
-                    subscription.classification == FeedStatus.wobbling ||
-                    lastRead == null ||
-                    lastRead.before(DateTime.now().minusDays(1).toDate())
+            val fetchNow = shouldFetchNow(subscription)
             fetchNow
         }.
         forEach(Consumer { subscription -> executeRssPoll(subscription) })
@@ -56,6 +52,14 @@ class RssPoller @Autowired constructor(val subscriptionsDAO: SubscriptionsDAO, v
     fun requestRead(subscription: RssSubscription) {
         log.info("Requesting reload of RSS subscription: " + subscription.name + " / " + subscription.url)
         run(subscription)
+    }
+
+    private fun shouldFetchNow(subscription: RssSubscription): Boolean {
+        val lastRead = subscription.lastRead
+        return subscription.classification == FeedStatus.ok ||   // Invert this boolean
+                subscription.classification == FeedStatus.wobbling ||
+                lastRead == null ||
+                lastRead.before(DateTime.now().minusDays(1).toDate())
     }
 
     private fun run(subscription: RssSubscription) {
