@@ -24,9 +24,7 @@ class Classifier {
                 return FeedStatus.gone
 
             } else {
-                val lm = DateTime(subscription.latestItemDate)
-                val afterNow: Boolean = lm.plusDays(3).isAfterNow()
-                return if (afterNow) FeedStatus.wobbling else FeedStatus.gone
+                return if (DateTime(subscription.latestItemDate).plusDays(3).isAfterNow) FeedStatus.wobbling else FeedStatus.gone
             }
         }
 
