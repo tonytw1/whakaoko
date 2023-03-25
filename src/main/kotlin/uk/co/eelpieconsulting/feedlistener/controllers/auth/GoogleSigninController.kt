@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonMappingException
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.google.common.base.Strings
 import com.squareup.okhttp.*
+import jakarta.servlet.http.HttpSession
 import org.apache.logging.log4j.LogManager
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
@@ -17,7 +18,6 @@ import uk.co.eelpieconsulting.feedlistener.controllers.ChannelsController
 import uk.co.eelpieconsulting.feedlistener.controllers.CurrentUserService
 import uk.co.eelpieconsulting.feedlistener.daos.UsersDAO
 import java.io.IOException
-import javax.servlet.http.HttpSession
 
 @Controller
 class GoogleSigninController @Autowired constructor(

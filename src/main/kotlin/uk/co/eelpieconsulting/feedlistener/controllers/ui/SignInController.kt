@@ -1,5 +1,7 @@
 package uk.co.eelpieconsulting.feedlistener.controllers.ui
 
+import jakarta.servlet.http.HttpServletRequest
+import jakarta.servlet.http.HttpSession
 import org.apache.logging.log4j.LogManager
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Controller
@@ -10,8 +12,6 @@ import org.springframework.web.servlet.view.RedirectView
 import uk.co.eelpieconsulting.feedlistener.controllers.CurrentUserService
 import uk.co.eelpieconsulting.feedlistener.daos.UsersDAO
 import uk.co.eelpieconsulting.feedlistener.passwords.PasswordHashing
-import javax.servlet.http.HttpServletRequest
-import javax.servlet.http.HttpSession
 
 @Controller
 class SignInController @Autowired constructor(val request: HttpServletRequest,

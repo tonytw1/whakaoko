@@ -1,11 +1,11 @@
 package uk.co.eelpieconsulting.feedlistener.controllers.ui
 
+import jakarta.servlet.http.HttpServletRequest
 import org.apache.logging.log4j.LogManager
 import org.springframework.web.servlet.ModelAndView
 import org.springframework.web.servlet.view.RedirectView
 import uk.co.eelpieconsulting.feedlistener.controllers.CurrentUserService
 import uk.co.eelpieconsulting.feedlistener.model.User
-import javax.servlet.http.HttpServletRequest
 
 abstract class WithSignedInUser(val currentUserService: CurrentUserService, val request: HttpServletRequest) {
 

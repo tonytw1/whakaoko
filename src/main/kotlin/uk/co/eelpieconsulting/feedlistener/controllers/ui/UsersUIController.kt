@@ -1,6 +1,7 @@
 package uk.co.eelpieconsulting.feedlistener.controllers.ui
 
 import com.google.common.base.Strings
+import jakarta.servlet.http.HttpServletRequest
 import org.apache.logging.log4j.LogManager
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Controller
@@ -15,7 +16,6 @@ import uk.co.eelpieconsulting.feedlistener.daos.ChannelsDAO
 import uk.co.eelpieconsulting.feedlistener.daos.UsersDAO
 import uk.co.eelpieconsulting.feedlistener.model.User
 import uk.co.eelpieconsulting.feedlistener.passwords.PasswordHashing
-import javax.servlet.http.HttpServletRequest
 
 @Controller
 class UsersUIController @Autowired constructor(val channelsDAO: ChannelsDAO,
