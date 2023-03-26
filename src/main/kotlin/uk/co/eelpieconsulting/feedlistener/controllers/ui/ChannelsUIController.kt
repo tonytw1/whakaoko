@@ -1,5 +1,6 @@
 package uk.co.eelpieconsulting.feedlistener.controllers.ui
 
+import jakarta.servlet.http.HttpServletRequest
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Controller
@@ -21,7 +22,6 @@ import uk.co.eelpieconsulting.feedlistener.daos.SubscriptionsDAO
 import uk.co.eelpieconsulting.feedlistener.daos.UsersDAO
 import uk.co.eelpieconsulting.feedlistener.model.Channel
 import uk.co.eelpieconsulting.feedlistener.model.User
-import javax.servlet.http.HttpServletRequest
 
 @Controller
 class ChannelsUIController @Autowired constructor(val usersDAO: UsersDAO,

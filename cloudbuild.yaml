@@ -1,7 +1,7 @@
 steps:
 - name: 'docker/compose:1.19.0'
   args: [ '-f', 'docker/docker-compose.yml', 'up', '-d' ]
-- name: 'maven:3-openjdk-11'
+- name: 'maven:3-openjdk-17'
   entrypoint: 'mvn'
   args: ['install']
   env:

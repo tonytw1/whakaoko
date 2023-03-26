@@ -1,5 +1,6 @@
 package uk.co.eelpieconsulting.feedlistener.controllers.ui
 
+import jakarta.servlet.http.HttpServletRequest
 import org.apache.logging.log4j.LogManager
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
@@ -23,7 +24,6 @@ import uk.co.eelpieconsulting.feedlistener.model.RssSubscription
 import uk.co.eelpieconsulting.feedlistener.model.User
 import uk.co.eelpieconsulting.feedlistener.rss.RssPoller
 import uk.co.eelpieconsulting.feedlistener.rss.RssSubscriptionManager
-import javax.servlet.http.HttpServletRequest
 
 @Controller
 class SubscriptionsUIController @Autowired constructor(val usersDAO: UsersDAO, val channelsDAO: ChannelsDAO,

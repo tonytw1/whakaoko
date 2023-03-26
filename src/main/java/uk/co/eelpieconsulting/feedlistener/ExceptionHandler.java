@@ -1,18 +1,16 @@
 package uk.co.eelpieconsulting.feedlistener;
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.Ordered;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.HandlerExceptionResolver;
 import org.springframework.web.servlet.ModelAndView;
 import uk.co.eelpieconsulting.common.views.ViewFactory;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 @Component
 public class ExceptionHandler implements HandlerExceptionResolver, Ordered {
@@ -29,7 +27,7 @@ public class ExceptionHandler implements HandlerExceptionResolver, Ordered {
     @Override
     public ModelAndView resolveException(HttpServletRequest request, HttpServletResponse response, Object handler, Exception e) {
         if (e instanceof ResponseStatusException) {
-            response.setStatus(((ResponseStatusException) e).getStatus().value());
+            response.setStatus(((ResponseStatusException) e).getStatusCode().value());
             return new ModelAndView(viewFactory.getJsonView()).addObject("data", ((ResponseStatusException) e).getReason());
         }
 

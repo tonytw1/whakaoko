@@ -1,5 +1,6 @@
 package uk.co.eelpieconsulting.feedlistener.controllers.ui
 
+import jakarta.servlet.http.HttpServletRequest
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Controller
 import org.springframework.web.bind.annotation.GetMapping
@@ -9,7 +10,6 @@ import uk.co.eelpieconsulting.feedlistener.UrlBuilder
 import uk.co.eelpieconsulting.feedlistener.controllers.CurrentUserService
 import uk.co.eelpieconsulting.feedlistener.daos.UsersDAO
 import java.util.*
-import javax.servlet.http.HttpServletRequest
 
 @Controller
 class AccessTokenController @Autowired constructor(val urlBuilder: UrlBuilder,
