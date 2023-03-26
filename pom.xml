@@ -18,7 +18,7 @@
         <spymemcached.version>2.11.2</spymemcached.version>
         <kotlin.version>1.6.21</kotlin.version>
         <twitter4j.version>4.0.7</twitter4j.version>
-        <morphia.version>2.0.0</morphia.version>
+        <morphia.version>2.0.2</morphia.version>
         <maven.compiler.target>17</maven.compiler.target>
         <maven.compiler.source>17</maven.compiler.source>
     </properties>
