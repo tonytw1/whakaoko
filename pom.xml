@@ -19,6 +19,8 @@
         <kotlin.version>1.6.21</kotlin.version>
         <twitter4j.version>4.0.7</twitter4j.version>
         <morphia.version>2.0.0</morphia.version>
+        <maven.compiler.target>17</maven.compiler.target>
+        <maven.compiler.source>17</maven.compiler.source>
     </properties>
 
     <repositories>
@@ -77,9 +79,6 @@
                         </configuration>
                     </execution>
                 </executions>
-                <configuration>
-                    <jvmTarget>1.8</jvmTarget>
-                </configuration>
             </plugin>
 
             <plugin>
