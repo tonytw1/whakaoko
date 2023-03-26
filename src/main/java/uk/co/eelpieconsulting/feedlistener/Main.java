@@ -7,11 +7,9 @@ import org.apache.velocity.app.Velocity;
 import org.apache.velocity.spring.VelocityEngineFactoryBean;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.boot.autoconfigure.mongo.MongoAutoConfiguration;
-import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -29,17 +27,14 @@ import java.io.IOException;
 import java.util.Map;
 import java.util.Properties;
 
-@SpringBootApplication
-@EnableAutoConfiguration(exclude = {DataSourceAutoConfiguration.class, MongoAutoConfiguration.class})
+@SpringBootApplication(exclude = {DataSourceAutoConfiguration.class, MongoAutoConfiguration.class})
 @EnableScheduling
 @ComponentScan("uk.co.eelpieconsulting")
 @Configuration
 public class Main implements WebMvcConfigurer {
 
-    private static ApplicationContext ctx;
-
     public static void main(String[] args) {
-        ctx = SpringApplication.run(Main.class, args);
+        SpringApplication.run(Main.class, args);
     }
 
     @Bean
