@@ -1,6 +1,7 @@
 package uk.co.eelpieconsulting.feedlistener.rss
 
 import com.rometools.rome.feed.synd.SyndEntry
+import io.micrometer.core.instrument.simple.SimpleMeterRegistry
 import org.apache.commons.io.IOUtils
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
@@ -15,9 +16,12 @@ import java.io.FileInputStream
 
 class RssFeedItemMapperTest {
 
+    private val meterRegistry = SimpleMeterRegistry()
+
     private val rssFeedItemImageExtractor = RssFeedItemImageExtractor(
             BodyHtmlImageExtractor(RssFeedItemBodyExtractor()),
-            MediaModuleImageExtractor()
+            MediaModuleImageExtractor(),
+        meterRegistry
     )
     private val rssFeedItemBodyExtractor = RssFeedItemBodyExtractor()
     private val urlResolverService = mock(UrlResolverService::class.java)

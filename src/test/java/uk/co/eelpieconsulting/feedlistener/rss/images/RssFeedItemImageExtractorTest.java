@@ -2,6 +2,8 @@ package uk.co.eelpieconsulting.feedlistener.rss.images;
 
 import com.rometools.modules.mediarss.MediaModule;
 import com.rometools.rome.feed.synd.SyndEntry;
+import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -19,7 +21,11 @@ public class RssFeedItemImageExtractorTest {
 
     private SyndEntry itemWithImageInHtmlBody = mock(SyndEntry.class);
 
-    private RssFeedItemImageExtractor extractor = new RssFeedItemImageExtractor(bodyHtmlImageExtractor, new MediaModuleImageExtractor());
+    private MeterRegistry meterRegistry = new SimpleMeterRegistry();
+
+    private RssFeedItemImageExtractor extractor = new RssFeedItemImageExtractor(bodyHtmlImageExtractor,
+            new MediaModuleImageExtractor(),
+            meterRegistry);
 
     @Test
     public void shouldExtractFirstImageFromHtmlItemBodyIfAvailable() throws Exception {
