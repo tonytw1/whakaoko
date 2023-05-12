@@ -144,4 +144,8 @@ class FeedItem : RssFeedable {
         )
     }
 
+    override fun toString(): String {
+        return "FeedItem(objectId=$objectId, title=$title, url='$url', body=$body, date=$date, accepted=$accepted, place=$place, imageUrl=$imageUrl, subscriptionId='$subscriptionId', channelId='$channelId', author=$author, _categories=$_categories)"
+    }
+
 }

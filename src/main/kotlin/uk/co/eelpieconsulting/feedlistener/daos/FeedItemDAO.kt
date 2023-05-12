@@ -37,11 +37,22 @@ class FeedItemDAO @Autowired constructor(private val dataStoreFactory: DataStore
 
     fun add(feedItem: FeedItem): Boolean {
         return try {
-            val existingFeeditemFromSameSubscription = dataStoreFactory.get().find(FeedItem::class.java).filter(Filters.eq("url", feedItem.url), Filters.eq(SUBSCRIPTION_ID, feedItem.subscriptionId))
-            if (existingFeeditemFromSameSubscription.iterator().toList().isEmpty()) {    // TODO shouldn't need to read before every write - use an upsert?
+            val existingSubscriptionFeeditemsWithSameUrl = dataStoreFactory.get().find(FeedItem::class.java).filter(Filters.eq("url", feedItem.url), Filters.eq(SUBSCRIPTION_ID, feedItem.subscriptionId))
+            val existing = existingSubscriptionFeeditemsWithSameUrl.first()
+            val isNewItem = existing == null
+            val replacesItemWithNoDate = feedItem.date != null && existing != null && existing.date == null
+            val shouldSave = isNewItem || replacesItemWithNoDate
+            // We allow overwriting of the existing feed item with the same url only if
+            // the replacement is considered better because it has a date
+            log.info("Deciding if to save: " + feedItem + " / " + existing + " / " + shouldSave)
+            if (shouldSave) {
+                if (existing != null) {
+                    feedItem.objectId = existing.objectId
+                }
                 log.info("Added: " + feedItem.subscriptionId + ", " + feedItem.title)
                 dataStoreFactory.get().save(feedItem)
                 true
+
             } else {
                 log.debug("Skipping previously added: " + feedItem.title)
                 false
