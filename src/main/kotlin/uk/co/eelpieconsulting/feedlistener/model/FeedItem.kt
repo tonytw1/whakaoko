@@ -12,7 +12,13 @@ import uk.co.eelpieconsulting.common.views.rss.RssFeedable
 import java.util.*
 
 @Entity("feeditems")
-@Indexes(Index(fields = [Field(value = "date", type = IndexType.DESC), Field(value = "_id")]), Index(fields = [Field(value = "subscriptionId"), Field(value = "date", type = IndexType.DESC), Field(value = "_id")]))
+@Indexes(
+    Index(fields = [Field(value = "date", type = IndexType.DESC), Field(value = "_id")]),
+    Index(fields = [Field(value = "ordering", type = IndexType.DESC), Field(value = "_id")]),
+    Index(fields = [Field(value = "subscriptionId"), Field(value = "date", type = IndexType.DESC), Field(value = "_id")]),
+    Index(fields = [Field(value = "subscriptionId"), Field(value = "ordering", type = IndexType.DESC), Field(value = "_id")])
+)
+
 @JsonInclude(JsonInclude.Include.NON_NULL)
 class FeedItem : RssFeedable {
 

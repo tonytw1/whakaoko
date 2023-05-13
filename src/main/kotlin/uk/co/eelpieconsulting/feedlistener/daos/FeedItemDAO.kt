@@ -27,13 +27,13 @@ class FeedItemDAO @Autowired constructor(private val dataStoreFactory: DataStore
     private val CHANNEL_ID = "channelId"
     private val SUBSCRIPTION_ID = "subscriptionId"
     private val ORDERING = "ordering"
-    private val DATE_DESCENDING_THEN_ID = arrayOf(Sort.descending("date"), Sort.ascending("_id"))
+    private val ORDER_DESCENDING_THEN_ID = arrayOf(Sort.descending(ORDERING), Sort.ascending("_id"))
     private val DEFAULT_FEED_ITEMS = 25
     private val MAX_FEED_ITEMS = 100
 
     fun before(date: Date): MutableList<FeedItem>? {
         val query = dataStoreFactory.get().find(FeedItem::class.java).filter(Filters.lt("date", date))
-        return query.iterator(FindOptions().limit(1000).sort(*DATE_DESCENDING_THEN_ID)).toList()
+        return query.iterator(FindOptions().limit(1000).sort(*ORDER_DESCENDING_THEN_ID)).toList()
     }
 
     fun add(feedItem: FeedItem): Boolean {
@@ -101,7 +101,7 @@ class FeedItemDAO @Autowired constructor(private val dataStoreFactory: DataStore
     private fun getSubscriptionFeedItems(subscriptionId: String, pageSize: Int, page: Int): FeedItemsResult {
         val query = subscriptionFeedItemsQuery(subscriptionId)
         val totalItems = query.count()
-        return FeedItemsResult(query.iterator(withPaginationFor(pageSize, page).sort(*DATE_DESCENDING_THEN_ID)).toList(), totalItems)
+        return FeedItemsResult(query.iterator(withPaginationFor(pageSize, page).sort(*ORDER_DESCENDING_THEN_ID)).toList(), totalItems)
     }
 
     fun getFeedItemsWithNoOrdering(): MutableList<FeedItem>? {
@@ -126,7 +126,7 @@ class FeedItemDAO @Autowired constructor(private val dataStoreFactory: DataStore
     fun getChannelFeedItems(channelId: String, pageSize: Int, page: Int, subscriptions: List<String>? = null): FeedItemsResult {
         val query = channelFeedItemsQuery(channelId, subscriptions)
         val totalCount = query.count()
-        return FeedItemsResult(query.iterator(withPaginationFor(pageSize, page).sort(*DATE_DESCENDING_THEN_ID)).toList(), totalCount)
+        return FeedItemsResult(query.iterator(withPaginationFor(pageSize, page).sort(*ORDER_DESCENDING_THEN_ID)).toList(), totalCount)
     }
 
     @Timed(timingNotes = "")
