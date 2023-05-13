@@ -1,6 +1,7 @@
 package uk.co.eelpieconsulting.feedlistener.twitter;
 
 import com.google.common.base.Strings;
+import org.joda.time.DateTime;
 import org.springframework.stereotype.Component;
 import twitter4j.GeoLocation;
 import twitter4j.MediaEntity;
@@ -8,14 +9,21 @@ import twitter4j.Status;
 import uk.co.eelpieconsulting.feedlistener.model.FeedItem;
 import uk.co.eelpieconsulting.feedlistener.model.Subscription;
 
+import java.util.Date;
+
 @Component
 public class TwitterFeedItemMapper {
     public FeedItem createFeedItemFrom(Status status, Subscription subscription) {
         final uk.co.eelpieconsulting.feedlistener.model.Place place = extractLocationFrom(status);
         final String mediaUrl = extractImageUrl(status);
         final String author = extractAuthorFrom(status);
-        return new FeedItem(extractHeadingFrom(status), extractUrlFrom(status), null, status.getCreatedAt(), null, place, mediaUrl,
-                author, subscription.getId(), subscription.getChannelId(), null);
+
+        Date date = status.getCreatedAt();
+        Date accepted = DateTime.now().toDate();
+        Date ordering = date != null ? date : accepted;
+
+        return new FeedItem(extractHeadingFrom(status), extractUrlFrom(status), null, date, accepted, place, mediaUrl,
+                author, subscription.getId(), subscription.getChannelId(), null,ordering);
     }
 
     private String extractAuthorFrom(Status status) {

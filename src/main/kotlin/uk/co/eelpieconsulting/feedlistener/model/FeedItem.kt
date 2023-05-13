@@ -35,6 +35,9 @@ class FeedItem : RssFeedable {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ssXXX")
     var accepted: Date? = null
 
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ssXXX")
+    var ordering: Date? = null
+
     var place: Place? = null
 
     private var imageUrl: String? = null
@@ -75,7 +78,8 @@ class FeedItem : RssFeedable {
                 author: String? = null,
                 subscriptionId: String,
                 channelId: String,
-                categories: List<Category>?
+                categories: List<Category>?,
+                ordering: Date?
     ) {
         this.title = title
         this.url = url
@@ -88,6 +92,7 @@ class FeedItem : RssFeedable {
         this.subscriptionId = subscriptionId
         this.channelId = channelId
         this._categories = categories
+        this.ordering = ordering
     }
 
     val id: String?
@@ -140,7 +145,8 @@ class FeedItem : RssFeedable {
             this.author,
             this.subscriptionId,
             this.channelId,
-            this._categories
+            this._categories,
+            this.ordering
         )
     }
 

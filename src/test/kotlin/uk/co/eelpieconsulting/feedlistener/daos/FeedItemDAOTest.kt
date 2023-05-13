@@ -74,13 +74,14 @@ class FeedItemDAOTest {
             url,
             null,
             null,
-            null,
+            DateTime.now().toDate(),
             null,
             null,
             null,
             subscription.id,
             subscription.channelId,
             null,
+            DateTime.now().toDate()
         )
         feedItemDAO.add(feedItem)
 
@@ -89,13 +90,14 @@ class FeedItemDAOTest {
             url,
             null,
             DateTime.now().toDate(),
-            null,
+            DateTime.now().toDate(),
             null,
             null,
             null,
             subscription.id,
             subscription.channelId,
             null,
+            DateTime.now().toDate()
         )
         feedItemDAO.add(betterFeedItem)
 
@@ -161,7 +163,7 @@ class FeedItemDAOTest {
             UUID.randomUUID().toString(),
             url,
             null,
-            null,
+            DateTime.now().toDate(),
             DateTime.now().toDate(),
             null,
             null,
@@ -169,6 +171,7 @@ class FeedItemDAOTest {
             subscription.id,
             subscription.channelId,
             null,
+            DateTime.now().toDate()
         )
     }
 }

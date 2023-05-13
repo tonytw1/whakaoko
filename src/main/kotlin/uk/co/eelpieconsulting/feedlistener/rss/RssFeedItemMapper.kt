@@ -6,6 +6,7 @@ import com.rometools.rome.feed.synd.SyndCategory
 import com.rometools.rome.feed.synd.SyndEntry
 import org.apache.commons.lang.StringEscapeUtils
 import org.apache.logging.log4j.LogManager
+import org.joda.time.DateTime
 
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
@@ -37,19 +38,23 @@ class RssFeedItemMapper @Autowired constructor(private val rssFeedItemImageExtra
             }
         }
 
+        val accepted = DateTime.now().toDate()
+        val ordering = date ?: accepted
+
         if (url != null) {
             return FeedItem(
                 syndEntry.title,
                 url,
                 body,
                 date,
-                null,
+                accepted,
                 place,
                 imageUrl,
                 syndEntry.author,
                 subscription.id,
                 subscription.channelId,
-                categories
+                categories,
+                ordering
             )
 
         } else {
