@@ -27,7 +27,7 @@ import java.util.function.Consumer
 
 @Component
 class RssPoller @Autowired constructor(val subscriptionsDAO: SubscriptionsDAO, val taskExecutor: TaskExecutor,
-                                       val feedFetcher: FeedFetcher, val feedItemDestination: FeedItemDAO,
+                                       val feedFetcher: FeedFetcher, val feedfItemDAO : FeedItemDAO,
                                        val feedItemLatestDateFinder: FeedItemLatestDateFinder,
                                        val classifier: Classifier,
                                        meterRegistry: MeterRegistry) {
@@ -37,6 +37,19 @@ class RssPoller @Autowired constructor(val subscriptionsDAO: SubscriptionsDAO, v
     val rssAddedItems = meterRegistry.counter("rss_added_items")
     val rssSuccessesEtagged = meterRegistry.counter("rss_successes", "etagged", "false")
     val rssSuccessesNotEtagged = meterRegistry.counter("rss_successes", "etagged", "true")
+
+    @Scheduled(fixedRate = 30000, initialDelay = 60000)
+    fun backfillOrdering() {
+        // Query feeditems for items with no ordering.
+        val toUpdate = feedfItemDAO.getFeedItemsWithNoOrdering()
+        log.info("Found " + toUpdate?.size + " feeditems with no ordering to update")
+        toUpdate?.forEach { feedItem ->
+            val ordering = feedItem.date ?: feedItem.accepted
+            log.info("Updating ${feedItem.headline} ordering to $ordering")
+            feedItem.ordering = ordering
+            feedfItemDAO.save(feedItem)
+        }
+    }
 
     @Scheduled(fixedRate = 3600000, initialDelay = 300000)
     fun run() {
@@ -76,7 +89,7 @@ class RssPoller @Autowired constructor(val subscriptionsDAO: SubscriptionsDAO, v
         log.info("Executing RSS poll for: " + subscription.id)
         val threadPoolTaskExecutor = taskExecutor as ThreadPoolTaskExecutor
         log.info("Task executor: active:" + threadPoolTaskExecutor.activeCount + ", pool size: " + threadPoolTaskExecutor.poolSize)
-        taskExecutor.execute(ProcessFeedTask(feedFetcher, feedItemDestination, subscriptionsDAO, subscription))
+        taskExecutor.execute(ProcessFeedTask(feedFetcher, feedfItemDAO, subscriptionsDAO, subscription))
     }
 
     private inner class ProcessFeedTask(private val feedFetcher: FeedFetcher, private val feedItemDAO: FeedItemDAO, private val subscriptionsDAO: SubscriptionsDAO, private val subscription: RssSubscription) : Runnable {

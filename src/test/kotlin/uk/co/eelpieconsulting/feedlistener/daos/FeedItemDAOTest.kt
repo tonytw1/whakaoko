@@ -2,6 +2,7 @@ package uk.co.eelpieconsulting.feedlistener.daos
 
 import org.joda.time.DateTime
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Test
 import uk.co.eelpieconsulting.feedlistener.model.Category
 import uk.co.eelpieconsulting.feedlistener.model.Channel
@@ -57,8 +58,14 @@ class FeedItemDAOTest {
         val feedItems = feedItemDAO.getSubscriptionFeedItems(subscription, 1)
 
         assertEquals(1, feedItems.totalCount)
-        val reloadedCategories = feedItems.feedsItems.first()._categories
+        val first = feedItems.feedsItems.first()
+        val reloadedCategories = first._categories
         assertEquals(listOf("consultations", "news"), reloadedCategories?.map{it -> it.value})
+
+        assertNotNull(first.accepted)
+        assertEquals(feedItem.accepted, first.accepted)
+        assertNotNull(first.ordering)
+        assertEquals(feedItem.ordering, first.ordering)
     }
 
     @Test
