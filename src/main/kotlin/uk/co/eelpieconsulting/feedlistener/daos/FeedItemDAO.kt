@@ -26,13 +26,14 @@ class FeedItemDAO @Autowired constructor(private val dataStoreFactory: DataStore
 
     private val CHANNEL_ID = "channelId"
     private val SUBSCRIPTION_ID = "subscriptionId"
-    private val DATE_DESCENDING_THEN_ID = arrayOf(Sort.descending("date"), Sort.ascending("_id"))
+    private val ORDERING = "ordering"
+    private val ORDER_DESCENDING_THEN_ID = arrayOf(Sort.descending(ORDERING), Sort.ascending("_id"))
     private val DEFAULT_FEED_ITEMS = 25
     private val MAX_FEED_ITEMS = 100
 
     fun before(date: Date): MutableList<FeedItem>? {
-        val query = dataStoreFactory.get().find(FeedItem::class.java).filter(Filters.lt("date", date));
-        return query.iterator(FindOptions().limit(1000).sort(*DATE_DESCENDING_THEN_ID)).toList()
+        val query = dataStoreFactory.get().find(FeedItem::class.java).filter(Filters.lt("date", date))
+        return query.iterator(FindOptions().limit(1000).sort(*ORDER_DESCENDING_THEN_ID)).toList()
     }
 
     fun add(feedItem: FeedItem): Boolean {
@@ -44,13 +45,12 @@ class FeedItemDAO @Autowired constructor(private val dataStoreFactory: DataStore
             val shouldSave = isNewItem || replacesItemWithNoDate
             // We allow overwriting of the existing feed item with the same url only if
             // the replacement is considered better because it has a date
-            log.info("Deciding if to save: " + feedItem + " / " + existing + " / " + shouldSave)
             if (shouldSave) {
                 if (existing != null) {
                     feedItem.objectId = existing.objectId
                 }
                 log.info("Added: " + feedItem.subscriptionId + ", " + feedItem.title)
-                dataStoreFactory.get().save(feedItem)
+                save(feedItem)
                 true
 
             } else {
@@ -60,6 +60,10 @@ class FeedItemDAO @Autowired constructor(private val dataStoreFactory: DataStore
         } catch (e: Exception) {
             throw FeeditemPersistanceException(e)
         }
+    }
+
+    fun save(feedItem: FeedItem) {
+        dataStoreFactory.get().save(feedItem)
     }
 
     fun update(feedItem: FeedItem) {
@@ -97,7 +101,14 @@ class FeedItemDAO @Autowired constructor(private val dataStoreFactory: DataStore
     private fun getSubscriptionFeedItems(subscriptionId: String, pageSize: Int, page: Int): FeedItemsResult {
         val query = subscriptionFeedItemsQuery(subscriptionId)
         val totalItems = query.count()
-        return FeedItemsResult(query.iterator(withPaginationFor(pageSize, page).sort(*DATE_DESCENDING_THEN_ID)).toList(), totalItems)
+        return FeedItemsResult(query.iterator(withPaginationFor(pageSize, page).sort(*ORDER_DESCENDING_THEN_ID)).toList(), totalItems)
+    }
+
+    fun getFeedItemsWithNoOrdering(): MutableList<FeedItem>? {
+        val query = dataStoreFactory.get().find(FeedItem::class.java).filter(Filters.eq(ORDERING, null))
+        val totalItems = query.count()
+        log.info("Found $totalItems feed items with no ordering")
+        return query.iterator(FindOptions().limit(1000)).toList()
     }
 
     @Throws(MongoException::class)
@@ -115,7 +126,7 @@ class FeedItemDAO @Autowired constructor(private val dataStoreFactory: DataStore
     fun getChannelFeedItems(channelId: String, pageSize: Int, page: Int, subscriptions: List<String>? = null): FeedItemsResult {
         val query = channelFeedItemsQuery(channelId, subscriptions)
         val totalCount = query.count()
-        return FeedItemsResult(query.iterator(withPaginationFor(pageSize, page).sort(*DATE_DESCENDING_THEN_ID)).toList(), totalCount)
+        return FeedItemsResult(query.iterator(withPaginationFor(pageSize, page).sort(*ORDER_DESCENDING_THEN_ID)).toList(), totalCount)
     }
 
     @Timed(timingNotes = "")

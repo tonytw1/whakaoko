@@ -2,6 +2,7 @@ package uk.co.eelpieconsulting.feedlistener.daos
 
 import org.joda.time.DateTime
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Test
 import uk.co.eelpieconsulting.feedlistener.model.Category
 import uk.co.eelpieconsulting.feedlistener.model.Channel
@@ -57,8 +58,14 @@ class FeedItemDAOTest {
         val feedItems = feedItemDAO.getSubscriptionFeedItems(subscription, 1)
 
         assertEquals(1, feedItems.totalCount)
-        val reloadedCategories = feedItems.feedsItems.first()._categories
+        val first = feedItems.feedsItems.first()
+        val reloadedCategories = first._categories
         assertEquals(listOf("consultations", "news"), reloadedCategories?.map{it -> it.value})
+
+        assertNotNull(first.accepted)
+        assertEquals(feedItem.accepted, first.accepted)
+        assertNotNull(first.ordering)
+        assertEquals(feedItem.ordering, first.ordering)
     }
 
     @Test
@@ -74,13 +81,14 @@ class FeedItemDAOTest {
             url,
             null,
             null,
-            null,
+            DateTime.now().toDate(),
             null,
             null,
             null,
             subscription.id,
             subscription.channelId,
             null,
+            DateTime.now().toDate()
         )
         feedItemDAO.add(feedItem)
 
@@ -89,13 +97,14 @@ class FeedItemDAOTest {
             url,
             null,
             DateTime.now().toDate(),
-            null,
+            DateTime.now().toDate(),
             null,
             null,
             null,
             subscription.id,
             subscription.channelId,
             null,
+            DateTime.now().toDate()
         )
         feedItemDAO.add(betterFeedItem)
 
@@ -161,7 +170,7 @@ class FeedItemDAOTest {
             UUID.randomUUID().toString(),
             url,
             null,
-            null,
+            DateTime.now().toDate(),
             DateTime.now().toDate(),
             null,
             null,
@@ -169,6 +178,7 @@ class FeedItemDAOTest {
             subscription.id,
             subscription.channelId,
             null,
+            DateTime.now().toDate()
         )
     }
 }

@@ -12,7 +12,13 @@ import uk.co.eelpieconsulting.common.views.rss.RssFeedable
 import java.util.*
 
 @Entity("feeditems")
-@Indexes(Index(fields = [Field(value = "date", type = IndexType.DESC), Field(value = "_id")]), Index(fields = [Field(value = "subscriptionId"), Field(value = "date", type = IndexType.DESC), Field(value = "_id")]))
+@Indexes(
+    Index(fields = [Field(value = "date", type = IndexType.DESC), Field(value = "_id")]),
+    Index(fields = [Field(value = "ordering", type = IndexType.DESC), Field(value = "_id")]),
+    Index(fields = [Field(value = "subscriptionId"), Field(value = "date", type = IndexType.DESC), Field(value = "_id")]),
+    Index(fields = [Field(value = "subscriptionId"), Field(value = "ordering", type = IndexType.DESC), Field(value = "_id")])
+)
+
 @JsonInclude(JsonInclude.Include.NON_NULL)
 class FeedItem : RssFeedable {
 
@@ -34,6 +40,9 @@ class FeedItem : RssFeedable {
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ssXXX")
     var accepted: Date? = null
+
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ssXXX")
+    var ordering: Date? = null
 
     var place: Place? = null
 
@@ -75,7 +84,8 @@ class FeedItem : RssFeedable {
                 author: String? = null,
                 subscriptionId: String,
                 channelId: String,
-                categories: List<Category>?
+                categories: List<Category>?,
+                ordering: Date?
     ) {
         this.title = title
         this.url = url
@@ -88,6 +98,7 @@ class FeedItem : RssFeedable {
         this.subscriptionId = subscriptionId
         this.channelId = channelId
         this._categories = categories
+        this.ordering = ordering
     }
 
     val id: String?
@@ -140,7 +151,8 @@ class FeedItem : RssFeedable {
             this.author,
             this.subscriptionId,
             this.channelId,
-            this._categories
+            this._categories,
+            this.ordering
         )
     }
 
