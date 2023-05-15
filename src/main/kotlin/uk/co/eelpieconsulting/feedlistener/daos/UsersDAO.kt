@@ -35,7 +35,7 @@ class UsersDAO @Autowired constructor(val dataStoreFactory: DataStoreFactory){
          return dataStoreFactory.get().find(User::class.java).filter(Filters.eq("googleUserId", googleId)).first()
     }
 
-    fun save(user: User?) {
+    fun save(user: User) {
         dataStoreFactory.get().save(user)
     }
 
