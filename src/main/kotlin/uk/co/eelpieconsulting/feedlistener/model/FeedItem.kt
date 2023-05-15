@@ -22,17 +22,17 @@ import java.util.*
 class FeedItem(
     var title: String?,
     @Indexed
-    var url: String,
+    val url: String,
     var body: String?,
     private var date: Date?,
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ssXXX") var accepted: Date? = null,
-    var place: Place? = null,
+    val place: Place? = null,
     private var imageUrl: String? = null,
     private var author: String? = null,
     @Indexed
-    var subscriptionId: String,
+    val subscriptionId: String,
     @Indexed
-    var channelId: String,
+    val channelId: String,
     categories: List<Category>?,
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ssXXX") var ordering: Date?
 ) : RssFeedable {
