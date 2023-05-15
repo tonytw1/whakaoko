@@ -39,40 +39,52 @@ class FeedFetcher @Autowired constructor(private val httpFetcher: HttpFetcher,
     }
 
     private fun loadSyndFeedWithFeedFetcher(feedUrl: String, etag: String?, lastModified: Date?): Result<Pair<SyndFeed?, HttpResult>, FeedFetchingException> {
-        log.info("Loading SyndFeed from url: " + feedUrl)
+        log.info("Loading SyndFeed from url: $feedUrl")
         rssFetchesCounter.increment()
 
-        httpFetcher.get(feedUrl, etag, lastModified).fold({ httpResult ->
+        return httpFetcher.get(feedUrl, etag, lastModified).fold({ httpResult ->
             // Always increment the bytes counter even for non 200 requests
             // The total amount of traffic we are generating is an important metric
             val fetchedBytes = httpResult.bytes
             rssFetchedBytesCounter.increment(fetchedBytes.size.toDouble())
 
-            if (httpResult.status == 200) {
-                return feedParser.parseSyndFeed(fetchedBytes).fold({ syndFeed ->
-                    Result.success(Pair(syndFeed, httpResult))
-                }, { ex ->
-                    log.warn("Feed parsing error: " + ex.message)
-                    Result.error(
-                        FeedFetchingException(
-                            message = ex.message!!,
-                            httpStatus = httpResult.status,
-                            rootCause = ex
+            when (httpResult.status) {
+                200 -> {
+                    feedParser.parseSyndFeed(fetchedBytes).fold({ syndFeed ->
+                        Result.success(Pair(syndFeed, httpResult))
+                    }, { ex ->
+                        log.warn("Feed parsing error: " + ex.message)
+                        Result.error(
+                            FeedFetchingException(
+                                message = ex.message!!,
+                                httpStatus = httpResult.status,
+                                rootCause = ex
+                            )
                         )
-                    )
-                })
+                    })
 
-            }  else if (httpResult.status == 304) {
-                // Not modified
-                log.info("Feed url responded with 304 not modified: " + feedUrl)
-                return Result.success(Pair(null, httpResult))
+                }
 
-            } else {
-                return Result.Failure(FeedFetchingException(message = "Could not fetch feed", httpResult.status))
+                304 -> {
+                    // Not modified
+                    log.info("Feed url responded with 304 not modified: $feedUrl")
+                    Result.success(Pair(null, httpResult))
+
+                }
+
+                else -> {
+                    Result.Failure(FeedFetchingException(message = "Could not fetch feed", httpResult.status))
+                }
             }
 
         }, { fuelError ->
-            return Result.Failure(FeedFetchingException(message = fuelError.message!!, fuelError.response.statusCode, fuelError))
+            Result.Failure(
+                FeedFetchingException(
+                    message = fuelError.message!!,
+                    fuelError.response.statusCode,
+                    fuelError
+                )
+            )
         })
     }
 
