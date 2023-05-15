@@ -11,8 +11,6 @@ import uk.co.eelpieconsulting.feedlistener.daos.SubscriptionsDAO
 import uk.co.eelpieconsulting.feedlistener.model.RssSubscription
 import uk.co.eelpieconsulting.feedlistener.model.User
 import uk.co.eelpieconsulting.feedlistener.rss.RssPoller
-import uk.co.eelpieconsulting.feedlistener.twitter.TwitterListener
-import uk.co.eelpieconsulting.feedlistener.twitter.TwitterSubscriptionManager
 
 class SubscriptionsControllerTest {
 
@@ -23,8 +21,6 @@ class SubscriptionsControllerTest {
     private val viewFactory = mock(ViewFactory::class.java)
     private val urlBuilder = mock(UrlBuilder::class.java)
     private val rssPoller = mock(RssPoller::class.java)
-    private val twitterSubscriptionManager = mock(TwitterSubscriptionManager::class.java)
-    private val twitterListener = mock(TwitterListener::class.java)
     private val currentUserService = mock(CurrentUserService::class.java)
 
     val subscriptionsController = SubscriptionsController(subscriptionsDAO,
@@ -34,8 +30,6 @@ class SubscriptionsControllerTest {
             viewFactory,
             urlBuilder,
             rssPoller,
-            twitterSubscriptionManager,
-            twitterListener,
             ConditionalLoads(channelsDAO, subscriptionsDAO),
             currentUserService,
             MockHttpServletRequest()
@@ -63,7 +57,6 @@ class SubscriptionsControllerTest {
         subscriptionsController.deleteSubscription(subscription.id)
 
         verify(feedItemDAO).deleteSubscriptionFeedItems(subscription)
-        verifyNoInteractions(twitterSubscriptionManager)
     }
 
 }

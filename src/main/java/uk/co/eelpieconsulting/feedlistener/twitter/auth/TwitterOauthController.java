@@ -22,7 +22,6 @@ import uk.co.eelpieconsulting.feedlistener.UrlBuilder;
 import uk.co.eelpieconsulting.feedlistener.credentials.CredentialService;
 import uk.co.eelpieconsulting.feedlistener.exceptions.UnknownUserException;
 import uk.co.eelpieconsulting.feedlistener.twitter.TwitterApiFactory;
-import uk.co.eelpieconsulting.feedlistener.twitter.TwitterSubscriptionManager;
 
 import com.google.common.collect.Maps;
 
@@ -33,17 +32,14 @@ public class TwitterOauthController {
 
     private final CredentialService credentialService;
     private final TwitterApiFactory twitterApiFactory;
-    private final TwitterSubscriptionManager twitterSubscriptionManager;
     private final UrlBuilder urlBuilder;
 
     private final Map<String, RequestToken> requestTokens;
 
     @Autowired
-    public TwitterOauthController(CredentialService credentialService, TwitterApiFactory twitterApiFactory, TwitterSubscriptionManager twitterSubscriptionManager,
-                                  UrlBuilder urlBuilder) {
+    public TwitterOauthController(CredentialService credentialService, TwitterApiFactory twitterApiFactory, UrlBuilder urlBuilder) {
         this.credentialService = credentialService;
         this.twitterApiFactory = twitterApiFactory;
-        this.twitterSubscriptionManager = twitterSubscriptionManager;
         this.urlBuilder = urlBuilder;
         requestTokens = Maps.newConcurrentMap();
     }
@@ -84,7 +80,6 @@ public class TwitterOauthController {
         credentialService.setTwitterAccessTokenForUser(username, accessToken.getToken());
         credentialService.setTwitterAccessSecretForUser(username, accessToken.getTokenSecret());
 
-        twitterSubscriptionManager.reconnect();
         return null;
     }
 
