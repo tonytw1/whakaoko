@@ -14,8 +14,10 @@ import org.springframework.stereotype.Component
 import uk.co.eelpieconsulting.feedlistener.model.*
 
 @Component
-class DataStoreFactory @Autowired constructor(@Value("\${mongo.uri}") private val mongoUri: String,
-                                              @Value("\${mongo.database}") private val mongoDatabase: String) {
+class DataStoreFactory @Autowired constructor(
+    @Value("\${mongo.uri}") private val mongoUri: String,
+    @Value("\${mongo.database}") private val mongoDatabase: String
+) {
 
     private val log = LogManager.getLogger(DataStoreFactory::class.java)
 
@@ -32,7 +34,9 @@ class DataStoreFactory @Autowired constructor(@Value("\${mongo.uri}") private va
 
     private fun createDataStore(mongoUri: String, database: String): Datastore {
         return try {
-            val mapperOptions = MapperOptions.builder().discriminatorKey("className").discriminator(DiscriminatorFunction.className()).build()
+            val mapperOptions =
+                MapperOptions.builder().discriminatorKey("className").discriminator(DiscriminatorFunction.className())
+                    .enablePolymorphicQueries(true).build()
             val mongoClient = MongoClients.create(mongoUri)
             val datastore = Morphia.createDatastore(mongoClient, database, mapperOptions)
 

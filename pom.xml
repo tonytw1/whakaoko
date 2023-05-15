@@ -17,7 +17,7 @@
         <jackson.version>2.13.4</jackson.version>
         <spymemcached.version>2.11.2</spymemcached.version>
         <kotlin.version>1.6.21</kotlin.version>
-        <morphia.version>2.0.2</morphia.version>
+        <morphia.version>2.2.10</morphia.version>
         <maven.compiler.target>17</maven.compiler.target>
         <maven.compiler.source>17</maven.compiler.source>
     </properties>
@@ -292,7 +292,12 @@
             <artifactId>morphia-core</artifactId>
             <version>${morphia.version}</version>
         </dependency>
-        
+        <dependency>
+            <groupId>dev.morphia.morphia</groupId>
+            <artifactId>morphia-kotlin</artifactId>
+            <version>${morphia.version}</version>
+        </dependency>
+
         <dependency>
             <groupId>net.spy</groupId>
             <artifactId>spymemcached</artifactId>
