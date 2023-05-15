@@ -18,43 +18,33 @@ import java.util.*
     Index(fields = [Field(value = "subscriptionId"), Field(value = "date", type = IndexType.DESC), Field(value = "_id")]),
     Index(fields = [Field(value = "subscriptionId"), Field(value = "ordering", type = IndexType.DESC), Field(value = "_id")])
 )
-
 @JsonInclude(JsonInclude.Include.NON_NULL)
-class FeedItem : RssFeedable {
+class FeedItem(
+    var title: String?,
+    @Indexed
+    var url: String,
+    var body: String?,
+    private var date: Date?,
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ssXXX") var accepted: Date? = null,
+    var place: Place? = null,
+    private var imageUrl: String? = null,
+    private var author: String? = null,
+    @Indexed
+    var subscriptionId: String,
+    @Indexed
+    var channelId: String,
+    categories: List<Category>?,
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ssXXX") var ordering: Date?
+) : RssFeedable {
 
     @Id
     var objectId: ObjectId? = null
 
-    var title: String? = null
-
-    @Indexed
-    lateinit var url: String
-
-    var body: String? = null
-
-    private var date: Date? = null
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ssXXX")
     override fun getDate(): Date? {
         return date
     }
 
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ssXXX")
-    var accepted: Date? = null
-
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ssXXX")
-    var ordering: Date? = null
-
-    var place: Place? = null
-
-    private var imageUrl: String? = null
-
-    @Indexed
-    lateinit var subscriptionId: String
-
-    @Indexed
-    lateinit var channelId: String
-
-    private var author: String? = null
     override fun getAuthor(): String {
         return author.orEmpty()
     }
@@ -71,35 +61,7 @@ class FeedItem : RssFeedable {
 
     @JsonProperty("categories")
     @Property("categories") // TODO clear this clash by renaming rss categories interface method
-    var _categories: List<Category>? = null
-
-    constructor() {}
-    constructor(title: String?,
-                url: String,
-                body: String?,
-                date: Date?,
-                accepted: Date? = null,
-                place: Place? = null,
-                imageUrl: String? = null,
-                author: String? = null,
-                subscriptionId: String,
-                channelId: String,
-                categories: List<Category>?,
-                ordering: Date?
-    ) {
-        this.title = title
-        this.url = url
-        this.body = body
-        this.date = date
-        this.accepted = accepted
-        this.place = place
-        this.imageUrl = imageUrl
-        this.author = author
-        this.subscriptionId = subscriptionId
-        this.channelId = channelId
-        this._categories = categories
-        this.ordering = ordering
-    }
+    var _categories: List<Category>? = categories
 
     val id: String?
         get() = url
