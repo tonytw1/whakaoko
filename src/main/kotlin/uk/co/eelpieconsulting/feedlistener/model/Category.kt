@@ -1,6 +1,6 @@
 package uk.co.eelpieconsulting.feedlistener.model
 
-import dev.morphia.annotations.Embedded
+import dev.morphia.annotations.Entity
 
-@Embedded
-data class Category (var value: String? = null)
+@Entity
+data class Category (val value: String)
