@@ -1,8 +1,8 @@
 package uk.co.eelpieconsulting.feedlistener.model
 
-import dev.morphia.annotations.Embedded
+import dev.morphia.annotations.Entity
 
-@Embedded
+@Entity
 class LatLong(val latitude: Double, val longitude: Double) {
 
     init {
