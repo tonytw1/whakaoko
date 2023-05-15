@@ -1,9 +1,11 @@
-package uk.co.eelpieconsulting.feedlistener.rss.classification
+package uk.co.eelpieconsulting.feedlistener.classification
 
 import org.joda.time.DateTime
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import uk.co.eelpieconsulting.feedlistener.model.RssSubscription
+import uk.co.eelpieconsulting.feedlistener.rss.classification.Classifier
+import uk.co.eelpieconsulting.feedlistener.rss.classification.FeedStatus
 import java.util.*
 
 class ClassifierTest {
