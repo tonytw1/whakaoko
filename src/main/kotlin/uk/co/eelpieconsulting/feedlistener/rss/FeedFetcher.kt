@@ -40,28 +40,15 @@ class FeedFetcher @Autowired constructor(private val httpFetcher: HttpFetcher,
     private fun loadSyndFeedWithFeedFetcher(feedUrl: String, etag: String?, lastModified: Date?): Result<Pair<SyndFeed?, HttpResult>, FeedFetchingException> {
         log.info("Loading SyndFeed from url: $feedUrl")
 
-        // Begin to preflight head requests; we can use the result to decide whether to fetch the feed
-        val headResult = httpFetcher.head(feedUrl, etag, lastModified)
-        var headStatus = -1
-        headResult.fold({ response ->
-            log.info("HEAD response for $feedUrl was ${response.statusCode}")
-            headStatus = response.statusCode
-
-        }, { fuelError ->
-            log.warn("HEAD request for $feedUrl failed: ${fuelError.message}")
-        })
-
         rssFetchesCounter.increment()
+
+        // There is no reduction in traffic from using HEAD requests to preflight these GETs.
+        // If the feed has not changed, a host that supports etag and modified headers will respond with 304 not modified which has an empty body.
         return httpFetcher.get(feedUrl, etag, lastModified).fold({ httpResult ->
             // Always increment the bytes counter even for non 200 requests
             // The total amount of traffic we are generating is an important metric
             val fetchedBytes = httpResult.bytes
             rssFetchedBytesCounter.increment(fetchedBytes.size.toDouble())
-
-            log.info("GET response for $feedUrl was ${httpResult.status} after a HEAD response of $headStatus")
-            if (httpResult.status == 304) {
-                log.info("GET 304 response for $feedUrl had body size ${httpResult.bytes.size} after a HEAD response of $headStatus")
-            }
 
             when (httpResult.status) {
                 200 -> {
