@@ -33,11 +33,11 @@ class FeedItemPopulator @Autowired constructor(val subscriptionLabelService: Sub
         mv.addObject("geotagged", geoTagged(withSubscriptionNames))
     }
 
-    protected fun overlyUnescape(feedItem: FeedItem): FeedItem? {
-        val fixed = feedItem.copy()
-        fixed.title = StringEscapeUtils.unescapeHtml(fixed.title)
-        fixed.body = StringEscapeUtils.unescapeHtml(fixed.body)
-        return fixed
+    protected fun overlyUnescape(feedItem: FeedItem): FeedItem {
+        return feedItem.copy(
+            title = StringEscapeUtils.unescapeHtml(feedItem.title),
+            body = StringEscapeUtils.unescapeHtml(feedItem.body)
+        )
     }
 
     private fun geoTagged(feedItems: List<FeedItem>): List<FeedItem> {

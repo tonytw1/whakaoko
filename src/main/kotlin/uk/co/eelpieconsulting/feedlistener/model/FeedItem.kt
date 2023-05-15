@@ -19,7 +19,7 @@ import java.util.*
     Index(fields = [Field(value = "subscriptionId"), Field(value = "ordering", type = IndexType.DESC), Field(value = "_id")])
 )
 @JsonInclude(JsonInclude.Include.NON_NULL)
-class FeedItem(
+data class FeedItem(
     var title: String?,
     @Indexed
     val url: String,
@@ -33,7 +33,7 @@ class FeedItem(
     val subscriptionId: String,
     @Indexed
     val channelId: String,
-    categories: List<Category>?,
+    @JsonProperty("categories") @Property("categories") val _categories: List<Category>?,
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ssXXX") var ordering: Date?
 ) : RssFeedable {
 
@@ -59,9 +59,6 @@ class FeedItem(
     @get:JsonIgnore
     var subscriptionName: String? = null
 
-    @JsonProperty("categories")
-    @Property("categories") // TODO clear this clash by renaming rss categories interface method
-    var _categories: List<Category>? = categories
 
     val id: String?
         get() = url
@@ -100,27 +97,6 @@ class FeedItem(
     @JsonIgnore
     override fun getWebUrl(): String {
         return url
-    }
-
-    fun copy(): FeedItem {
-        return FeedItem(
-            this.title,
-            this.url,
-            this.body,
-            this.date,
-            this.accepted,
-            this.place,
-            this.imageUrl,
-            this.author,
-            this.subscriptionId,
-            this.channelId,
-            this._categories,
-            this.ordering
-        )
-    }
-
-    override fun toString(): String {
-        return "FeedItem(objectId=$objectId, title=$title, url='$url', body=$body, date=$date, accepted=$accepted, place=$place, imageUrl=$imageUrl, subscriptionId='$subscriptionId', channelId='$channelId', author=$author, _categories=$_categories)"
     }
 
 }

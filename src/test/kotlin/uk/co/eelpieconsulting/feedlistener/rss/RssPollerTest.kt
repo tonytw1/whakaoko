@@ -26,7 +26,7 @@ class RssPollerTest {
                     date = date.toDate(),
                     subscriptionId = UUID.randomUUID().toString(),
                     channelId = UUID.randomUUID().toString(),
-                    categories = null,
+                    _categories = null,
                     ordering = date.toDate())
         }
 

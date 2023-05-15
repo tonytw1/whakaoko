@@ -48,10 +48,10 @@ class FeedItemDAOTest {
         val subscription = testSubscription(channel)
         subscriptionsDAO.add(subscription)
 
-        val feedItem = testFeedItemFor(subscription)
         val category = Category("consultations")
         val anotherCategory = Category("news")
-        feedItem._categories = listOf(category, anotherCategory)
+        val feedItem = testFeedItemFor(subscription, listOf(category, anotherCategory))
+
         feedItemDAO.add(feedItem)
 
         val feedItems = feedItemDAO.getSubscriptionFeedItems(subscription, 1)
@@ -59,7 +59,7 @@ class FeedItemDAOTest {
         assertEquals(1, feedItems.totalCount)
         val first = feedItems.feedsItems.first()
         val reloadedCategories = first._categories
-        assertEquals(listOf("consultations", "news"), reloadedCategories?.map{it -> it.value})
+        assertEquals(listOf("consultations", "news"), reloadedCategories?.map{it.value})
 
         assertNotNull(first.accepted)
         assertEquals(feedItem.accepted, first.accepted)
@@ -158,7 +158,7 @@ class FeedItemDAOTest {
         return subscription
     }
 
-    private fun testFeedItemFor(subscription: RssSubscription): FeedItem {
+    private fun testFeedItemFor(subscription: RssSubscription, categories: List<Category>? = null): FeedItem {
         val url = "http://localhost/" + UUID.randomUUID().toString()
         return FeedItem(
             UUID.randomUUID().toString(),
@@ -171,7 +171,7 @@ class FeedItemDAOTest {
             null,
             subscription.id,
             subscription.channelId,
-            null,
+            categories,
             DateTime.now().toDate()
         )
     }

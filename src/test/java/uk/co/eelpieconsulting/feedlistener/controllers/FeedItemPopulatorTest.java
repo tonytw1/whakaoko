@@ -12,7 +12,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class FeedItemPopulatorTest {
 
-    private SubscriptionLabelService subscriptionLabelService = Mockito.mock(SubscriptionLabelService.class);
+    private final SubscriptionLabelService subscriptionLabelService = Mockito.mock(SubscriptionLabelService.class);
 
     @Test
     public void canCorrectForExcessivelyEscapedInputFeeds() {
