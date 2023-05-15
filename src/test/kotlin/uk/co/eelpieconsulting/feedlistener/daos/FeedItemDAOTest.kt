@@ -107,7 +107,7 @@ class FeedItemDAOTest {
     }
 
     private fun testSubscription(channel: Channel): RssSubscription {
-        val subscription = RssSubscription()
+        val subscription = RssSubscription(url = "http://localhost/rss", channelId = channel.id, username = "a-user")
         subscription.id = UUID.randomUUID().toString()
         subscription.channelId = channel.id
         return subscription

@@ -4,21 +4,13 @@ import dev.morphia.annotations.Entity
 import org.apache.commons.codec.digest.DigestUtils
 
 @Entity("subscriptions")
-class TwitterTagSubscription : Subscription {
-    var tag: String? = null
-        private set
+class TwitterTagSubscription(val tag: String, channelId: String, username: String) : Subscription() {
 
-    constructor()
-    constructor(tag: String, channel: String?, username: String?) {
+    init {
         id = "twitter-" + DigestUtils.md5Hex("tag$tag")
-        setTag(tag)
-        channelId = channel!!
-        this.username = username!!
-    }
-
-    fun setTag(tag: String) {
-        this.tag = tag
         name = generateName(tag)
+        this.channelId = channelId
+        this.username = username
     }
 
     override fun toString(): String {
@@ -28,4 +20,5 @@ class TwitterTagSubscription : Subscription {
     private fun generateName(tag: String): String {
         return "Twitter - $tag"
     }
+
 }
