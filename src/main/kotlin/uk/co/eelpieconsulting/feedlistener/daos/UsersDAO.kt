@@ -1,13 +1,12 @@
 package uk.co.eelpieconsulting.feedlistener.daos
 
-import com.mongodb.MongoException
 import dev.morphia.query.FindOptions
 import dev.morphia.query.Sort
 import dev.morphia.query.experimental.filters.Filters
+import org.bson.types.ObjectId
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
 import uk.co.eelpieconsulting.feedlistener.model.User
-import org.bson.types.ObjectId
 
 @Component
 class UsersDAO @Autowired constructor(val dataStoreFactory: DataStoreFactory){
@@ -20,7 +19,7 @@ class UsersDAO @Autowired constructor(val dataStoreFactory: DataStoreFactory){
 
     fun getByObjectId(objectId: String): User? {
         val oid = ObjectId(objectId)
-        return dataStoreFactory.get().find(User::class.java).filter(Filters.eq("_id", oid)).first();
+        return dataStoreFactory.get().find(User::class.java).filter(Filters.eq("_id", oid)).first()
     }
 
     fun getByUsername(username: String): User? {
