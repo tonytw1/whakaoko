@@ -18,15 +18,15 @@ class HttpFetcher(val userAgent: String, val timeout: Int) {
 
     fun head(url: String): Result<Pair<Headers, Int>, FuelError>  {
         val (_, response, result) = withCommonRequestProperties(url.httpHead()).response()
-        when (result) {
+        return when (result) {
             is Result.Failure -> {
                 val ex = result.getException()
                 log.warn("Failed to head url '" + url + "'. Status code was " + ex.response.statusCode + " and exception was " + ex.message)
-                return Result.error(ex)
+                Result.error(ex)
             }
             is Result.Success -> {
                 log.info("Head response code is: " + response.statusCode)
-                return Result.success(Pair(response.headers, response.statusCode))
+                Result.success(Pair(response.headers, response.statusCode))
             }
         }
     }
