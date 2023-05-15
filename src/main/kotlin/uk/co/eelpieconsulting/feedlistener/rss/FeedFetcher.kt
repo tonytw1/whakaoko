@@ -42,8 +42,11 @@ class FeedFetcher @Autowired constructor(private val httpFetcher: HttpFetcher,
 
         // Begin to preflight head requests; we can use the result to decide whether to fetch the feed
         val headResult = httpFetcher.head(feedUrl, etag, lastModified)
+        var headStatus = -1
         headResult.fold({ response ->
             log.info("HEAD response for $feedUrl was ${response.statusCode}")
+            headStatus = response.statusCode
+
         }, { fuelError ->
             log.warn("HEAD request for $feedUrl failed: ${fuelError.message}")
         })
@@ -54,6 +57,11 @@ class FeedFetcher @Autowired constructor(private val httpFetcher: HttpFetcher,
             // The total amount of traffic we are generating is an important metric
             val fetchedBytes = httpResult.bytes
             rssFetchedBytesCounter.increment(fetchedBytes.size.toDouble())
+
+            log.info("GET response for $feedUrl was ${httpResult.status} after a HEAD response of $headStatus")
+            if (httpResult.status == 304) {
+                log.info("GET 304 response for $feedUrl had body size ${httpResult.bytes.size} after a HEAD response of $headStatus")
+            }
 
             when (httpResult.status) {
                 200 -> {
