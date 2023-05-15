@@ -5,7 +5,6 @@ import com.rometools.rome.feed.synd.SyndEntry
 import com.rometools.rome.feed.synd.SyndFeed
 import io.micrometer.core.instrument.MeterRegistry
 import org.apache.logging.log4j.LogManager
-
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
 import uk.co.eelpieconsulting.feedlistener.http.HttpFetcher
@@ -40,8 +39,11 @@ class FeedFetcher @Autowired constructor(private val httpFetcher: HttpFetcher,
 
     private fun loadSyndFeedWithFeedFetcher(feedUrl: String, etag: String?, lastModified: Date?): Result<Pair<SyndFeed?, HttpResult>, FeedFetchingException> {
         log.info("Loading SyndFeed from url: $feedUrl")
+
         rssFetchesCounter.increment()
 
+        // There is no reduction in traffic from using HEAD requests to preflight these GETs.
+        // If the feed has not changed, a host that supports etag and modified headers will respond with 304 not modified which has an empty body.
         return httpFetcher.get(feedUrl, etag, lastModified).fold({ httpResult ->
             // Always increment the bytes counter even for non 200 requests
             // The total amount of traffic we are generating is an important metric

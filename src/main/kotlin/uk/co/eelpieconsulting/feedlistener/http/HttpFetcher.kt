@@ -4,7 +4,6 @@ import com.github.kittinunf.fuel.core.FuelError
 import com.github.kittinunf.fuel.core.Headers
 import com.github.kittinunf.fuel.core.Request
 import com.github.kittinunf.fuel.httpGet
-import com.github.kittinunf.fuel.httpHead
 import com.github.kittinunf.result.Result
 import org.apache.logging.log4j.LogManager
 import java.time.ZoneOffset
@@ -15,21 +14,6 @@ import java.util.*
 class HttpFetcher(val userAgent: String, val timeout: Int) {
 
     private val log = LogManager.getLogger(HttpFetcher::class.java)
-
-    fun head(url: String): Result<Pair<Headers, Int>, FuelError>  {
-        val (_, response, result) = withCommonRequestProperties(url.httpHead()).response()
-        return when (result) {
-            is Result.Failure -> {
-                val ex = result.getException()
-                log.warn("Failed to head url '" + url + "'. Status code was " + ex.response.statusCode + " and exception was " + ex.message)
-                Result.error(ex)
-            }
-            is Result.Success -> {
-                log.info("Head response code is: " + response.statusCode)
-                Result.success(Pair(response.headers, response.statusCode))
-            }
-        }
-    }
 
     fun get(url: String, etag: String?, lastModified: Date?): Result<HttpResult, FuelError> {
         val request = withCommonRequestProperties(url.httpGet())
