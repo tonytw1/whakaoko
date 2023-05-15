@@ -33,7 +33,7 @@ data class FeedItem(
     val subscriptionId: String,
     @Indexed
     val channelId: String,
-    @JsonProperty("categories") @Property("categories") val _categories: List<Category>?,
+    @JsonProperty("categories") @Property("categories") val _categories: List<Category>?,   // TODO clear this clash by renaming rss categories interface method
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ssXXX") val ordering: Date?,
     @get:JsonIgnore val subscriptionName: String? = null // Display only field
 ) : RssFeedable {
