@@ -20,21 +20,22 @@ import java.util.*
 )
 @JsonInclude(JsonInclude.Include.NON_NULL)
 data class FeedItem(
-    var title: String?,
+    val title: String?,
     @Indexed
     val url: String,
-    var body: String?,
+    val body: String?,
     private var date: Date?,
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ssXXX") var accepted: Date? = null,
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ssXXX") val accepted: Date? = null,
     val place: Place? = null,
-    private var imageUrl: String? = null,
-    private var author: String? = null,
+    private val imageUrl: String? = null,
+    private val author: String? = null,
     @Indexed
     val subscriptionId: String,
     @Indexed
     val channelId: String,
     @JsonProperty("categories") @Property("categories") val _categories: List<Category>?,
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ssXXX") var ordering: Date?
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ssXXX") val ordering: Date?,
+    @get:JsonIgnore val subscriptionName: String? = null // Display only field
 ) : RssFeedable {
 
     @Id
@@ -54,11 +55,6 @@ data class FeedItem(
         val categories: List<Category> = _categories ?: emptyList<Category>()
         return categories.mapNotNull { it.value }.toMutableList()
     }
-
-    // Display only field
-    @get:JsonIgnore
-    var subscriptionName: String? = null
-
 
     val id: String?
         get() = url

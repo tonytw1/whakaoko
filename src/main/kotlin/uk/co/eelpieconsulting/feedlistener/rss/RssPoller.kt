@@ -38,19 +38,6 @@ class RssPoller @Autowired constructor(val subscriptionsDAO: SubscriptionsDAO, v
     val rssSuccessesEtagged = meterRegistry.counter("rss_successes", "etagged", "false")
     val rssSuccessesNotEtagged = meterRegistry.counter("rss_successes", "etagged", "true")
 
-    @Scheduled(fixedRate = 30000, initialDelay = 60000)
-    fun backfillOrdering() {
-        // Query feeditems for items with no ordering.
-        val toUpdate = feedfItemDAO.getFeedItemsWithNoOrdering()
-        log.info("Found " + toUpdate?.size + " feeditems with no ordering to update")
-        toUpdate?.forEach { feedItem ->
-            val ordering = feedItem.date ?: feedItem.accepted
-            log.info("Updating ${feedItem.headline} ordering to $ordering")
-            feedItem.ordering = ordering
-            feedfItemDAO.save(feedItem)
-        }
-    }
-
     @Scheduled(fixedRate = 3600000, initialDelay = 300000)
     fun run() {
         log.info("Polling subscriptions")
@@ -200,8 +187,8 @@ class RssPoller @Autowired constructor(val subscriptionsDAO: SubscriptionsDAO, v
         private fun persistFeedItems(feedItems: List<FeedItem>) {
             feedItems.forEach { feedItem ->
                 try {
-                    feedItem.accepted = DateTime.now().toDate()
-                    if (feedItemDAO.add(feedItem)) {
+                    val withAccepted = feedItem.copy(accepted = DateTime.now().toDate())
+                    if (feedItemDAO.add(withAccepted)) {
                         rssAddedItems.increment()
                     }
                 } catch (e: FeeditemPersistanceException) {

@@ -68,51 +68,6 @@ class FeedItemDAOTest {
     }
 
     @Test
-    fun canOverwriteUndatedFeedItems() {
-        val channel = Channel(ObjectId.get(), UUID.randomUUID().toString(), "A channel", "a-user")
-        val subscription = testSubscription(channel)
-        subscriptionsDAO.add(subscription)
-
-        val url = "http://localhost/" + UUID.randomUUID().toString()
-        val feedItem = FeedItem(
-            "Without date",
-            url,
-            null,
-            null,
-            DateTime.now().toDate(),
-            null,
-            null,
-            null,
-            subscription.id,
-            subscription.channelId,
-            null,
-            DateTime.now().toDate()
-        )
-        feedItemDAO.add(feedItem)
-
-        val betterFeedItem  = FeedItem(
-            "With date",
-            url,
-            null,
-            DateTime.now().toDate(),
-            DateTime.now().toDate(),
-            null,
-            null,
-            null,
-            subscription.id,
-            subscription.channelId,
-            null,
-            DateTime.now().toDate()
-        )
-        feedItemDAO.add(betterFeedItem)
-
-        val feedItems = feedItemDAO.getSubscriptionFeedItems(subscription, 1)
-
-        assertEquals(1, feedItems.totalCount)
-        assertEquals("With date", feedItems.feedsItems.get(0).title)
-    }
-
-    @Test
     fun canFetchChannelFeedItems() {
         val channel = Channel(ObjectId.get(), UUID.randomUUID().toString(), "A channel", "a-user")
         val subscription = testSubscription(channel)

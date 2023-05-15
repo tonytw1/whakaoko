@@ -23,10 +23,8 @@ class FeedItemPopulator @Autowired constructor(val subscriptionLabelService: Sub
         // In these cases we will import and persist the feed items as provided and HTML unescape when outputting
         // This is repeated processing but makes for a reversible change and an accurate persisted representation of the source feed.
         val cleanedFeedItems: Stream<FeedItem> = feedItems.stream().map { feedItem: FeedItem -> overlyUnescape(feedItem) }
-        val withSubscriptionNames = cleanedFeedItems.map { feedItem: FeedItem ->
-            val label = subscriptionLabelService.labelForSubscription(feedItem.subscriptionId)
-            feedItem.subscriptionName = label
-            feedItem
+        val withSubscriptionNames = cleanedFeedItems.map { feedItem ->
+            feedItem.copy(subscriptionName = subscriptionLabelService.labelForSubscription(feedItem.subscriptionId))
         }.collect(Collectors.toList())
 
         mv.addObject(field, withSubscriptionNames)
