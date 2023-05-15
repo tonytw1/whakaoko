@@ -25,7 +25,7 @@ class FeedItem(
     val url: String,
     var body: String?,
     private var date: Date?,
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ssXXX") var accepted: Date? = null,
+    var accepted: Date? = null,
     val place: Place? = null,
     private var imageUrl: String? = null,
     private var author: String? = null,
@@ -34,7 +34,7 @@ class FeedItem(
     @Indexed
     val channelId: String,
     categories: List<Category>?,
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ssXXX") var ordering: Date?
+    @JsonIgnore var ordering: Date?
 ) : RssFeedable {
 
     @Id
@@ -43,6 +43,12 @@ class FeedItem(
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ssXXX")
     override fun getDate(): Date? {
         return date
+    }
+
+
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ssXXX")
+    fun getAccepted(): Date? {
+        return accepted
     }
 
     override fun getAuthor(): String {
