@@ -69,8 +69,8 @@ class GoogleSigninController @Autowired constructor(
                 if (currentUser != null) {
                     // If a current user is a signed in but has no Google id then attach to this user
                     if (currentUser.googleUserId == null) {
-                        log.info("Attaching google id to current user: " + currentUser.username + " / " + googleUserEmail);
-                        currentUser.googleUserId = tokenInfo.userId;
+                        log.info("Attaching google id to current user: " + currentUser.username + " / " + googleUserEmail)
+                        currentUser.googleUserId = tokenInfo.userId
                         usersDAO.save(currentUser)
                     }
                     return redirectToSignedInUserUI()
@@ -82,11 +82,11 @@ class GoogleSigninController @Autowired constructor(
                         currentUserService.setSignedInUser(byGoogleId)
                         return redirectToSignedInUserUI()
                     } else {
-                        redirectToSigninPromptWithError("We could not find a user linked to your Google account", session);
+                        redirectToSigninPromptWithError("We could not find a user linked to your Google account", session)
                     }
                 }
             } else {
-                redirectToSigninPromptWithError("Your Google account is not from a domain which is allowed to use this copy of Whakaoko", session);
+                redirectToSigninPromptWithError("Your Google account is not from a domain which is allowed to use this copy of Whakaoko", session)
             }
         }
 
@@ -107,8 +107,8 @@ class GoogleSigninController @Autowired constructor(
     }
 
     private fun redirectToSigninPromptWithError(error: String, session: HttpSession): ModelAndView {
-        session.setAttribute("error", error);
-        return redirectToSigninPrompt();
+        session.setAttribute("error", error)
+        return redirectToSigninPrompt()
     }
 
     private fun redirectToSigninPrompt(): ModelAndView {
