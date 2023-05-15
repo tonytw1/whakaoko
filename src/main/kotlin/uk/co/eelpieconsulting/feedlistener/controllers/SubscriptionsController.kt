@@ -57,7 +57,7 @@ class SubscriptionsController @Autowired constructor(private val subscriptionsDA
                 }
                 val feedItemsResult = feedItemDAO.getSubscriptionFeedItems(subscription, page, pageSize)
                 feedItemPopulator.populateFeedItems(feedItemsResult, mv, "data")
-                response.addHeader(X_TOTAL_COUNT, java.lang.Long.toString(feedItemsResult.totalCount))
+                response.addHeader(X_TOTAL_COUNT, feedItemsResult.totalCount.toString())
                 return mv
 
             } else {

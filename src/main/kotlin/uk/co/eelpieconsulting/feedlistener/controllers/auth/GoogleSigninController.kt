@@ -69,10 +69,9 @@ class GoogleSigninController @Autowired constructor(
                 if (currentUser != null) {
                     // If a current user is a signed in but has no Google id then attach to this user
                     if (currentUser.googleUserId == null) {
-                        log.info("Attaching google id to current user: " + currentUser!!.username + " / " + googleUserEmail);
-                        val currentUserUser = currentUser!!
-                        currentUserUser.googleUserId = tokenInfo.userId;
-                        usersDAO.save(currentUserUser)
+                        log.info("Attaching google id to current user: " + currentUser.username + " / " + googleUserEmail);
+                        currentUser.googleUserId = tokenInfo.userId;
+                        usersDAO.save(currentUser)
                     }
                     return redirectToSignedInUserUI()
 
