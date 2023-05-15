@@ -4,6 +4,7 @@ import com.google.common.base.Strings
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
 import org.apache.logging.log4j.LogManager
+import org.bson.types.ObjectId
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Controller
@@ -68,7 +69,7 @@ class ChannelsController @Autowired constructor(private val channelsDAO: Channel
             }
 
             if (channelsDAO.usersChannelByName(user, create.name) == null) {
-                val newChannel = Channel(id = idBuilder.makeIdForChannel(), name = create.name, username = user.username)
+                val newChannel = Channel(ObjectId.get(), id = idBuilder.makeIdForChannel(), name = create.name, username = user.username)
                 channelsDAO.save(newChannel)
                 log.info("Added channel: $newChannel")
                 return ModelAndView(viewFactory.getJsonView()).addObject("data", newChannel)

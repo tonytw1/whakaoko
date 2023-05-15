@@ -1,5 +1,6 @@
 package uk.co.eelpieconsulting.feedlistener.daos
 
+import org.bson.types.ObjectId
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import uk.co.eelpieconsulting.feedlistener.model.Channel
@@ -23,8 +24,7 @@ class SubscriptionsDAOTest {
 
     @Test
     fun canFetchSubscriptionByChannel() {
-        val channel = Channel()
-        channel.id = UUID.randomUUID().toString()
+        val channel = Channel(ObjectId.get(), UUID.randomUUID().toString(), "A channel", "a-user")
         val subscription = testSubscription(channel)
         subscriptionsDAO.add(subscription)
 

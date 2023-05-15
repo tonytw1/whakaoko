@@ -1,5 +1,6 @@
 package uk.co.eelpieconsulting.feedlistener.daos
 
+import org.bson.types.ObjectId
 import org.joda.time.DateTime
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotNull
@@ -28,8 +29,7 @@ class FeedItemDAOTest {
 
     @Test
     fun canFetchSubscriptionFeedItems() {
-        val channel = Channel()
-        channel.id = UUID.randomUUID().toString()
+        val channel = Channel(ObjectId.get(), UUID.randomUUID().toString(), "A channel", "a-user")
         val subscription = testSubscription(channel)
         subscriptionsDAO.add(subscription)
 
@@ -44,8 +44,7 @@ class FeedItemDAOTest {
 
     @Test
     fun canPersistFeedItemCategories() {
-        val channel = Channel()
-        channel.id = UUID.randomUUID().toString()
+        val channel = Channel(ObjectId.get(), UUID.randomUUID().toString(), "A channel", "a-user")
         val subscription = testSubscription(channel)
         subscriptionsDAO.add(subscription)
 
@@ -70,8 +69,7 @@ class FeedItemDAOTest {
 
     @Test
     fun canOverwriteUndatedFeedItems() {
-        val channel = Channel()
-        channel.id = UUID.randomUUID().toString()
+        val channel = Channel(ObjectId.get(), UUID.randomUUID().toString(), "A channel", "a-user")
         val subscription = testSubscription(channel)
         subscriptionsDAO.add(subscription)
 
@@ -116,9 +114,7 @@ class FeedItemDAOTest {
 
     @Test
     fun canFetchChannelFeedItems() {
-        val channel = Channel()
-        channel.id = UUID.randomUUID().toString()
-
+        val channel = Channel(ObjectId.get(), UUID.randomUUID().toString(), "A channel", "a-user")
         val subscription = testSubscription(channel)
         subscriptionsDAO.add(subscription)
         val anotherSubscription = testSubscription(channel)
@@ -136,9 +132,7 @@ class FeedItemDAOTest {
 
     @Test
     fun canFilterChannelFeedItemsBySubscriptions() {
-        val channel = Channel()
-        channel.id = UUID.randomUUID().toString()
-
+        val channel = Channel(ObjectId.get(), UUID.randomUUID().toString(), "A channel", "a-user")
         val subscription = testSubscription(channel)
         val anotherSubscription = testSubscription(channel)
         val yetAnotherSubscription = testSubscription(channel)

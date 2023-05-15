@@ -1,6 +1,7 @@
 package uk.co.eelpieconsulting.feedlistener.controllers.ui
 
 import jakarta.servlet.http.HttpServletRequest
+import org.bson.types.ObjectId
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Controller
@@ -42,7 +43,7 @@ class ChannelsUIController @Autowired constructor(val subscriptionsDAO: Subscrip
     fun addChannel(@RequestParam name: String): ModelAndView {
         fun executeAddChannel(user: User): ModelAndView {
             val proposedId = idBuilder.makeIdForChannel()
-            val newChannel = Channel(proposedId, name, user.username)
+            val newChannel = Channel(ObjectId.get(), proposedId, name, user.username)
             if (channelsDAO.usersChannelByName(user, name) == null) {
                 channelsDAO.save(newChannel)
                 return ModelAndView(RedirectView(urlBuilder.getChannelUrl(newChannel)))
