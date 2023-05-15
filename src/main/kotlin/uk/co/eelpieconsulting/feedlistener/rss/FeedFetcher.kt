@@ -27,14 +27,14 @@ class FeedFetcher @Autowired constructor(private val httpFetcher: HttpFetcher,
     private val rssFetchedBytesCounter = meterRegistry.counter("rss_fetched_bytes")
 
     fun fetchFeed(subscription: RssSubscription): Result<Pair<FetchedFeed?, HttpResult>, FeedFetchingException> {
-        loadSyndFeedWithFeedFetcher(subscription.url, subscription.etag, subscription.lastModified).fold({ syndFeedAndHttpResult ->
+        return loadSyndFeedWithFeedFetcher(subscription.url, subscription.etag, subscription.lastModified).fold({ syndFeedAndHttpResult ->
             val maybeSyndFeed = syndFeedAndHttpResult.first
             val maybeFetchedFeed = maybeSyndFeed?.let { syndFeed ->
                 FetchedFeed(feedName = maybeSyndFeed.title, feedItems = getFeedItemsFrom(maybeSyndFeed, subscription))
             }
-            return Result.Success(Pair(maybeFetchedFeed, syndFeedAndHttpResult.second))
+            Result.Success(Pair(maybeFetchedFeed, syndFeedAndHttpResult.second))
         }, { ex ->
-            return Result.Failure(ex)
+            Result.Failure(ex)
         })
     }
 
