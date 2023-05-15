@@ -31,11 +31,14 @@ class SignInController @Autowired constructor(val request: HttpServletRequest,
         log.info("Signing in as: " + username)
         val user = usersDAO.getByUsername(username)
         if (user != null) {
-            if (user.password.isNotEmpty() && passwordHashing.matches(password, user.password)) {
-                currentUserService.setSignedInUser(user)
-                return redirectToSignedInUserUI(request)
-            } else {
-                log.info("Password incorrect")
+            val userPassword = user.password
+            if (userPassword != null) {
+                if (userPassword.isNotEmpty() && passwordHashing.matches(userPassword, password)) {
+                    currentUserService.setSignedInUser(user)
+                    return redirectToSignedInUserUI(request)
+                } else {
+                    log.info("Password incorrect")
+                }
             }
         }
         return redirectToSigninPromptWithError("We could not find a user with this username and password", session)

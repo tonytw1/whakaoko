@@ -40,7 +40,7 @@ class SubscriptionsControllerTest {
         val auser = User()
         auser.username = "a-user"
         `when`(currentUserService.getCurrentUserUser()).thenReturn(auser)
-        val subscription = RssSubscription("http://localhost/feed", "a-channel", auser.username)
+        val subscription = RssSubscription("http://localhost/feed", "a-channel", "a-user")
         `when`(subscriptionsDAO.getById(subscription.id)).thenReturn(subscription)
 
         subscriptionsController.reload(subscription.id)

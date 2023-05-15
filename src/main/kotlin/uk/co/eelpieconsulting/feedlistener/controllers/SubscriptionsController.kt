@@ -102,7 +102,7 @@ class SubscriptionsController @Autowired constructor(private val subscriptionsDA
     @PostMapping("/subscriptions")
     fun createSubscription(@RequestBody create: SubscriptionCreateRequest): ModelAndView {
         fun createSubscription(user: User): ModelAndView {
-            log.info("Got subscription create request: " + create)
+            log.info("Got subscription create request: $create")
 
             if (Strings.isNullOrEmpty(create.url) || Strings.isNullOrEmpty(create.channel)) {
                 throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Subscription url or channel missing")
@@ -116,12 +116,18 @@ class SubscriptionsController @Autowired constructor(private val subscriptionsDA
             }
             // TODO validate channel user
 
-            val subscription = RssSubscription(url = create.url, channelId = channel.id, username = user.username)
-            subscriptionsDAO.add(subscription)
-            log.info("Added subscription: $subscription")
-            rssPoller.requestRead(subscription)
+            val username = user.username
+            if (username != null) {
+                val subscription = RssSubscription(url = create.url, channelId = channel.id, username = username)
+                subscriptionsDAO.add(subscription)
+                log.info("Added subscription: $subscription")
+                rssPoller.requestRead(subscription)
 
-            return ModelAndView(viewFactory.getJsonView()).addObject("data", subscription)
+                return ModelAndView(viewFactory.getJsonView()).addObject("data", subscription)
+
+            } else {
+                throw ResponseStatusException(HttpStatus.BAD_REQUEST, "User has no username")
+            }
         }
 
         return forCurrentUser(::createSubscription)

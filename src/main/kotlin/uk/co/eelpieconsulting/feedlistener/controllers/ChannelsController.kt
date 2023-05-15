@@ -68,10 +68,15 @@ class ChannelsController @Autowired constructor(private val channelsDAO: Channel
             }
 
             if (channelsDAO.usersChannelByName(user, create.name) == null) {
-                val newChannel = Channel(id = idBuilder.makeIdForChannel(), name = create.name, username = user.username)
-                channelsDAO.save(newChannel)
-                log.info("Added channel: $newChannel")
-                return ModelAndView(viewFactory.getJsonView()).addObject("data", newChannel)
+                val username = user.username
+                if (username != null) { // TODO friction with Morphia but probably points to bad use of username for join
+                    val newChannel = Channel(id = idBuilder.makeIdForChannel(), name = create.name, username = username)
+                    channelsDAO.save(newChannel)
+                    log.info("Added channel: $newChannel")
+                    return ModelAndView(viewFactory.getJsonView()).addObject("data", newChannel)
+                } else {
+                    throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Cannot create channel for anonymous user")
+                }
             } else {
                 throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Channel with same name already exists")
             }

@@ -53,11 +53,16 @@ class SubscriptionsUIController @Autowired constructor(val usersDAO: UsersDAO, v
         return forCurrentUser { user ->
             conditionalLoads.withChannelForUser(channelId, user) { channel ->
                 // TODO form binding and validation
-                val subscription = rssSubscriptionManager.requestFeedSubscription(url, channel.id, user.username)
-                subscriptionsDAO.add(subscription)
-                log.info("Added subscription: $subscription")
-                rssPoller.requestRead(subscription)
-                ModelAndView(RedirectView(urlBuilder.getSubscriptionUrl(subscription)))
+                val username = user.username
+                if (username != null) {
+                    val subscription = rssSubscriptionManager.requestFeedSubscription(url, channel.id, username)
+                    subscriptionsDAO.add(subscription)
+                    log.info("Added subscription: $subscription")
+                    rssPoller.requestRead(subscription)
+                    ModelAndView(RedirectView(urlBuilder.getSubscriptionUrl(subscription)))
+                } else {
+                    throw ResponseStatusException(HttpStatus.BAD_REQUEST, "No username")
+                }
             }
         }
     }

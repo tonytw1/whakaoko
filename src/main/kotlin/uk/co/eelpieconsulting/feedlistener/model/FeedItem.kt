@@ -107,7 +107,7 @@ class FeedItem : RssFeedable {
     @JsonIgnore
     override fun getLatLong(): LatLong? {
         return if (place != null && place!!.latLong != null) {
-            LatLong(place!!.latLong.latitude, place!!.latLong.longitude)
+            LatLong(place!!.latLong!!.latitude, place!!.latLong!!.longitude)    // TODO Latlong fields should be non null
         } else null
     }
 
