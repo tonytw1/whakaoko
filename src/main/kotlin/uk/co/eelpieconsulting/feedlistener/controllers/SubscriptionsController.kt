@@ -19,11 +19,8 @@ import uk.co.eelpieconsulting.feedlistener.daos.ChannelsDAO
 import uk.co.eelpieconsulting.feedlistener.daos.FeedItemDAO
 import uk.co.eelpieconsulting.feedlistener.daos.SubscriptionsDAO
 import uk.co.eelpieconsulting.feedlistener.model.RssSubscription
-import uk.co.eelpieconsulting.feedlistener.model.TwitterTagSubscription
 import uk.co.eelpieconsulting.feedlistener.model.User
 import uk.co.eelpieconsulting.feedlistener.rss.RssPoller
-import uk.co.eelpieconsulting.feedlistener.twitter.TwitterListener
-import uk.co.eelpieconsulting.feedlistener.twitter.TwitterSubscriptionManager
 
 @Controller
 class SubscriptionsController @Autowired constructor(private val subscriptionsDAO: SubscriptionsDAO,
@@ -33,8 +30,6 @@ class SubscriptionsController @Autowired constructor(private val subscriptionsDA
                                                      private val viewFactory: ViewFactory,
                                                      private val urlBuilder: UrlBuilder,
                                                      private val rssPoller: RssPoller,
-                                                     private val twitterSubscriptionManager: TwitterSubscriptionManager,
-                                                     private val twitterListener: TwitterListener,
                                                      private val conditionalLoads: ConditionalLoads,
                                                      currentUserService: CurrentUserService,
                                                      request: HttpServletRequest) : WithSignedInUser(currentUserService, request) {
@@ -160,13 +155,6 @@ class SubscriptionsController @Autowired constructor(private val subscriptionsDA
         fun performDelete(user: User): ModelAndView {
             val subscription = subscriptionsDAO.getById(id)
                     ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Subscription not found")
-
-            when (subscription) {
-                is TwitterTagSubscription -> {
-                    twitterListener.connect()
-                }
-            }
-
             feedItemDAO.deleteSubscriptionFeedItems(subscription)
             subscriptionsDAO.delete(subscription)
 
@@ -174,18 +162,6 @@ class SubscriptionsController @Autowired constructor(private val subscriptionsDA
         }
 
         return forCurrentUser(::performDelete)
-    }
-    
-    @Timed(timingNotes = "")
-    @PostMapping("/{username}/subscriptions/twitter/tags")
-    fun addTwitterTagSubscription(@PathVariable username: String, @RequestParam tag: String, @RequestParam channel: String): ModelAndView? {
-        fun executeAddTwitterTag(user: User): ModelAndView {
-            log.info("Twitter tag: $tag")
-            twitterSubscriptionManager.requestTagSubscription(tag, channel, username)
-            return ModelAndView(RedirectView(urlBuilder.getBaseUrl()))
-        }
-
-        return forCurrentUser(::executeAddTwitterTag)
     }
 
 }

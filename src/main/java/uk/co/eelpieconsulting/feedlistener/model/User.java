@@ -16,9 +16,6 @@ public class User {
     private String password;
     private String googleUserId;
 
-    private String twitterAccessToken;
-    private String twitterAccessSecret;
-
     private String accessToken;
 
     public User() {
@@ -44,24 +41,6 @@ public class User {
 
     public void setPassword(String password) {
         this.password = password;
-    }
-
-    @JsonIgnore
-    public String getTwitterAccessToken() {
-        return twitterAccessToken;
-    }
-
-    public void setTwitterAccessToken(String twitterAccessToken) {
-        this.twitterAccessToken = twitterAccessToken;
-    }
-
-    @JsonIgnore
-    public String getTwitterAccessSecret() {
-        return twitterAccessSecret;
-    }
-
-    public void setTwitterAccessSecret(String twitterAccessSecret) {
-        this.twitterAccessSecret = twitterAccessSecret;
     }
 
     @JsonIgnore
@@ -91,8 +70,6 @@ public class User {
                 "objectId=" + objectId +
                 ", username='" + username + '\'' +
                 ", googleUserId='" + googleUserId + '\'' +
-                ", twitterAccessToken='" + twitterAccessToken + '\'' +
-                ", twitterAccessSecret='" + twitterAccessSecret + '\'' +
                 ", accessToken='" + accessToken + '\'' +
                 '}';
     }

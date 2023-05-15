@@ -15,10 +15,6 @@ public class UrlBuilder {
         return baseUrl;
     }
 
-    public String getTwitterCallback(String username) {
-        return getBaseUrl() + "/twitter/callback/" + username;
-    }
-
     public String getSubscriptionUrl(Subscription subscription) {
         return getBaseUrl() + "/ui/subscriptions/" + subscription.getId();
     }
