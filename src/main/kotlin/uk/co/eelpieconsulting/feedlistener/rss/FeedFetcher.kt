@@ -30,7 +30,7 @@ class FeedFetcher @Autowired constructor(private val httpFetcher: HttpFetcher,
         return loadSyndFeedWithFeedFetcher(subscription.url, subscription.etag, subscription.lastModified).fold({ syndFeedAndHttpResult ->
             val maybeSyndFeed = syndFeedAndHttpResult.first
             val maybeFetchedFeed = maybeSyndFeed?.let { syndFeed ->
-                FetchedFeed(feedName = maybeSyndFeed.title, feedItems = getFeedItemsFrom(maybeSyndFeed, subscription))
+                FetchedFeed(feedName = syndFeed.title, feedItems = getFeedItemsFrom(maybeSyndFeed, subscription))
             }
             Result.Success(Pair(maybeFetchedFeed, syndFeedAndHttpResult.second))
         }, { ex ->
