@@ -10,7 +10,6 @@ import dev.morphia.query.experimental.filters.Filters
 import org.apache.logging.log4j.LogManager
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
-import uk.co.eelpieconsulting.feedlistener.annotations.Timed
 import uk.co.eelpieconsulting.feedlistener.exceptions.FeeditemPersistanceException
 import uk.co.eelpieconsulting.feedlistener.model.Channel
 import uk.co.eelpieconsulting.feedlistener.model.FeedItem
@@ -111,12 +110,10 @@ class FeedItemDAO @Autowired constructor(private val dataStoreFactory: DataStore
         dataStoreFactory.get().find(FeedItem::class.java).filter(Filters.eq(SUBSCRIPTION_ID, subscription.id)).delete(DeleteOptions().multi(true))
     }
 
-    @Timed(timingNotes = "")
     fun getSubscriptionFeedItemsCount(subscriptionId: String): Long {
         return subscriptionFeedItemsQuery(subscriptionId).count()
     }
 
-    @Timed(timingNotes = "")
     @Throws(MongoException::class)
     fun getChannelFeedItems(channelId: String, pageSize: Int, page: Int, subscriptions: List<String>? = null): FeedItemsResult {
         val query = channelFeedItemsQuery(channelId, subscriptions)
@@ -124,13 +121,11 @@ class FeedItemDAO @Autowired constructor(private val dataStoreFactory: DataStore
         return FeedItemsResult(query.iterator(withPaginationFor(pageSize, page).sort(*ORDER_DESCENDING_THEN_ID)).toList(), totalCount)
     }
 
-    @Timed(timingNotes = "")
     fun searchChannelFeedItems(channelId: String, pageSize: Int, page: Int, q: String?): FeedItemsResult {
         val query = channelFeedItemsQuery(channelId).filter(Filters.eq("title", Pattern.compile(q))) // TODO can eq be used with a patten?
         return FeedItemsResult(query.iterator(withPaginationFor(pageSize, page)).toList(), query.count())
     }
 
-    @Timed(timingNotes = "")
     private fun channelFeedItemsQuery(channelId: String, subscriptions: List<String>? = null): Query<FeedItem> {
         val channelFeedItems = dataStoreFactory.get().find(FeedItem::class.java).filter(Filters.eq(CHANNEL_ID, channelId))
         if (subscriptions != null) {

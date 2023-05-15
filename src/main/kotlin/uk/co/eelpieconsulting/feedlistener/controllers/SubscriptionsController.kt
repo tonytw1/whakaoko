@@ -12,7 +12,6 @@ import org.springframework.web.server.ResponseStatusException
 import org.springframework.web.servlet.ModelAndView
 import uk.co.eelpieconsulting.common.views.ViewFactory
 import uk.co.eelpieconsulting.feedlistener.UrlBuilder
-import uk.co.eelpieconsulting.feedlistener.annotations.Timed
 import uk.co.eelpieconsulting.feedlistener.controllers.ui.WithSignedInUser
 import uk.co.eelpieconsulting.feedlistener.daos.ChannelsDAO
 import uk.co.eelpieconsulting.feedlistener.daos.FeedItemDAO
@@ -38,7 +37,6 @@ class SubscriptionsController @Autowired constructor(private val subscriptionsDA
     private val X_TOTAL_COUNT = "X-Total-Count"
 
     @CrossOrigin
-    @Timed(timingNotes = "")
     @GetMapping("/subscriptions/{id}/items")
     fun subscriptionItems(@PathVariable id: String,
                           @RequestParam(required = false) page: Int?,
@@ -67,7 +65,6 @@ class SubscriptionsController @Autowired constructor(private val subscriptionsDA
         return forCurrentUser(::renderSubscriptionItems)
     }
 
-    @Timed(timingNotes = "")
     @GetMapping("/subscriptions/{id}/read") // TODO Make a POST
     fun reload(@PathVariable id: String): ModelAndView {
         return forCurrentUser { user ->
@@ -83,7 +80,6 @@ class SubscriptionsController @Autowired constructor(private val subscriptionsDA
     }
 
     @CrossOrigin
-    @Timed(timingNotes = "")
     @GetMapping("/subscriptions/{id}")
     fun subscriptionJson(@PathVariable id: String,
                          @RequestParam(required = false) page: Int?): ModelAndView {
@@ -148,7 +144,6 @@ class SubscriptionsController @Autowired constructor(private val subscriptionsDA
         return forCurrentUser(::updateSubscription)
     }
 
-    @Timed(timingNotes = "")
     @GetMapping("/subscriptions/{id}/delete") // TODO should be a HTTP DELETE
     fun deleteSubscription(@PathVariable id: String): ModelAndView {
         fun performDelete(user: User): ModelAndView {
