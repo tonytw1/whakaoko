@@ -1,5 +1,6 @@
 package uk.co.eelpieconsulting.feedlistener.controllers
 
+import org.bson.types.ObjectId
 import org.junit.jupiter.api.Test
 import org.mockito.Mockito.*
 import org.springframework.mock.web.MockHttpServletRequest
@@ -37,8 +38,7 @@ class SubscriptionsControllerTest {
 
     @Test
     fun readShouldImmediatelyRequestRepollOfRSSSubscription() {
-        val auser = User()
-        auser.username = "a-user"
+        val auser = User(ObjectId.get(), "a-user")
         `when`(currentUserService.getCurrentUserUser()).thenReturn(auser)
         val subscription = RssSubscription("http://localhost/feed", "a-channel", "a-user")
         `when`(subscriptionsDAO.getById(subscription.id)).thenReturn(subscription)
@@ -50,8 +50,9 @@ class SubscriptionsControllerTest {
 
     @Test
     fun deletingASubscriptionShouldRemoveThatSubscriptionsFeedItems() {
-        `when`(currentUserService.getCurrentUserUser()).thenReturn(User())
-        val subscription = RssSubscription("http://localhost/feed", "a-channel", "a-user")
+        val aUser = User(ObjectId.get(), "a-user")
+        `when`(currentUserService.getCurrentUserUser()).thenReturn(aUser)
+        val subscription = RssSubscription("http://localhost/feed", "a-channel", aUser.username)
         `when`(subscriptionsDAO.getById(subscription.id)).thenReturn(subscription)
 
         subscriptionsController.deleteSubscription(subscription.id)

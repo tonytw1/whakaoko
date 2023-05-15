@@ -116,18 +116,12 @@ class SubscriptionsController @Autowired constructor(private val subscriptionsDA
             }
             // TODO validate channel user
 
-            val username = user.username
-            if (username != null) {
-                val subscription = RssSubscription(url = create.url, channelId = channel.id, username = username)
-                subscriptionsDAO.add(subscription)
-                log.info("Added subscription: $subscription")
-                rssPoller.requestRead(subscription)
+            val subscription = RssSubscription(url = create.url, channelId = channel.id, username = user.username)
+            subscriptionsDAO.add(subscription)
+            log.info("Added subscription: $subscription")
+            rssPoller.requestRead(subscription)
 
-                return ModelAndView(viewFactory.getJsonView()).addObject("data", subscription)
-
-            } else {
-                throw ResponseStatusException(HttpStatus.BAD_REQUEST, "User has no username")
-            }
+            return ModelAndView(viewFactory.getJsonView()).addObject("data", subscription)
         }
 
         return forCurrentUser(::createSubscription)

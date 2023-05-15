@@ -6,23 +6,13 @@ import dev.morphia.annotations.Id
 import org.bson.types.ObjectId
 
 @Entity("users")
-class User {
-    @Id
-    var objectId: ObjectId? = null
-    var username: String? = null
+class User constructor(@Id val objectId: ObjectId, val username: String, @get:JsonIgnore val password: String? = null) {
 
     @get:JsonIgnore
-    var password: String? = null
     var googleUserId: String? = null
 
     @get:JsonIgnore
     var accessToken: String? = null
-
-    constructor()
-    constructor(username: String?, password: String?) {
-        this.username = username
-        this.password = password
-    }
 
     override fun toString(): String {
         return "User{" +

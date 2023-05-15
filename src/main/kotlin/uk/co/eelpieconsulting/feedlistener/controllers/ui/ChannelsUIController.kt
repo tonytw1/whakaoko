@@ -44,17 +44,12 @@ class ChannelsUIController @Autowired constructor(val usersDAO: UsersDAO,
     fun addChannel(@RequestParam name: String): ModelAndView {
         fun executeAddChannel(user: User): ModelAndView {
             val proposedId = idBuilder.makeIdForChannel()
-            val username = user.username
-            if (username != null) {
-                val newChannel = Channel(proposedId, name, username)
-                if (channelsDAO.usersChannelByName(user, name) == null) {
-                    channelsDAO.save(newChannel)
-                    return ModelAndView(RedirectView(urlBuilder.getChannelUrl(newChannel)))
-                } else {
-                    throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Channel with same name already exists")
-                }
+            val newChannel = Channel(proposedId, name, user.username)
+            if (channelsDAO.usersChannelByName(user, name) == null) {
+                channelsDAO.save(newChannel)
+                return ModelAndView(RedirectView(urlBuilder.getChannelUrl(newChannel)))
             } else {
-                throw ResponseStatusException(HttpStatus.BAD_REQUEST, "User has no username")
+                throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Channel with same name already exists")
             }
         }
         return forCurrentUser(::executeAddChannel)

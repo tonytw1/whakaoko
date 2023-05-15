@@ -3,6 +3,7 @@ package uk.co.eelpieconsulting.feedlistener.controllers.ui
 import com.google.common.base.Strings
 import jakarta.servlet.http.HttpServletRequest
 import org.apache.logging.log4j.LogManager
+import org.bson.types.ObjectId
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Controller
 import org.springframework.web.bind.annotation.GetMapping
@@ -48,7 +49,7 @@ class UsersUIController @Autowired constructor(val channelsDAO: ChannelsDAO,
             throw  RuntimeException("Invalid password")
         }
 
-        val newUser = User(username, passwordHashing.hash(password))
+        val newUser = User(ObjectId.get(), username, passwordHashing.hash(password))
         usersDAO.save(newUser)
         log.info("Created user: " + newUser)
 

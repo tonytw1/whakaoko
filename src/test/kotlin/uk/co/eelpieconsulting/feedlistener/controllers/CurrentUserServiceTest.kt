@@ -1,5 +1,6 @@
 package uk.co.eelpieconsulting.feedlistener.controllers
 
+import org.bson.types.ObjectId
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.mockito.Mockito.`when`
@@ -12,7 +13,7 @@ class CurrentUserServiceTest {
 
     private val usersDAO = mock(UsersDAO::class.java)
 
-    private val user = User("a-user", "with-a-password")
+    private val user = User(ObjectId.get(), "a-user", "with-a-password")
 
     @Test
     fun currentUserCanBeSetAsSessionAttributeForTheUI() {
