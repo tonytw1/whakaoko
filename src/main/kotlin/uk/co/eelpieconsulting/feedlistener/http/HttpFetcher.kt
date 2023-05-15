@@ -3,6 +3,7 @@ package uk.co.eelpieconsulting.feedlistener.http
 import com.github.kittinunf.fuel.core.FuelError
 import com.github.kittinunf.fuel.core.Headers
 import com.github.kittinunf.fuel.core.Request
+import com.github.kittinunf.fuel.core.Response
 import com.github.kittinunf.fuel.httpGet
 import com.github.kittinunf.fuel.httpHead
 import com.github.kittinunf.result.Result
@@ -16,8 +17,20 @@ class HttpFetcher(val userAgent: String, val timeout: Int) {
 
     private val log = LogManager.getLogger(HttpFetcher::class.java)
 
-    fun head(url: String): Result<Pair<Headers, Int>, FuelError>  {
-        val (_, response, result) = withCommonRequestProperties(url.httpHead()).response()
+    fun head(url: String, etag: String?, lastModified: Date?): Result<Response, FuelError> {
+        val request = withCommonRequestProperties(url.httpHead())
+        etag?.let {
+            request.header("If-None-Match", etag)
+        }
+
+        lastModified?.let {
+            val dateTime = ZonedDateTime.ofInstant(lastModified.toInstant(), ZoneOffset.UTC)
+            val ifModifiedSince = dateTime.format(DateTimeFormatter.RFC_1123_DATE_TIME)
+            log.info("Appending If-Modified-Since header to request: $ifModifiedSince")
+            request.header("If-Modified-Since", ifModifiedSince)
+        }
+
+        val (_, response, result) = request.response()
         return when (result) {
             is Result.Failure -> {
                 val ex = result.getException()
@@ -26,7 +39,7 @@ class HttpFetcher(val userAgent: String, val timeout: Int) {
             }
             is Result.Success -> {
                 log.info("Head response code is: " + response.statusCode)
-                Result.success(Pair(response.headers, response.statusCode))
+                Result.success(response)
             }
         }
     }
