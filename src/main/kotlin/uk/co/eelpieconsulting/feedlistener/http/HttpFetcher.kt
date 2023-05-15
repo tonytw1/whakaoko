@@ -45,16 +45,16 @@ class HttpFetcher(val userAgent: String, val timeout: Int) {
         }
 
         val (_, response, result) = request.response()
-        result.fold({ bytes ->
+        return result.fold({ bytes ->
             val httpResult = HttpResult(bytes = bytes, status = response.statusCode, headers = response.headers)
-            return Result.success(httpResult)
+            Result.success(httpResult)
 
         }, { fuelError ->
             log.warn(
                 "Failed to fetch from url: " + url + "; status code was: " + fuelError.response.statusCode,
                 fuelError.message
             )
-            return Result.error(fuelError)
+            Result.error(fuelError)
         })
     }
 
