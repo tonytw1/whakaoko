@@ -16,31 +16,30 @@ import uk.co.eelpieconsulting.feedlistener.UrlBuilder
 import uk.co.eelpieconsulting.feedlistener.controllers.ConditionalLoads
 import uk.co.eelpieconsulting.feedlistener.controllers.CurrentUserService
 import uk.co.eelpieconsulting.feedlistener.controllers.FeedItemPopulator
-import uk.co.eelpieconsulting.feedlistener.daos.ChannelsDAO
 import uk.co.eelpieconsulting.feedlistener.daos.FeedItemDAO
 import uk.co.eelpieconsulting.feedlistener.daos.SubscriptionsDAO
-import uk.co.eelpieconsulting.feedlistener.daos.UsersDAO
 import uk.co.eelpieconsulting.feedlistener.model.RssSubscription
 import uk.co.eelpieconsulting.feedlistener.model.User
 import uk.co.eelpieconsulting.feedlistener.rss.RssPoller
 import uk.co.eelpieconsulting.feedlistener.rss.RssSubscriptionManager
 
 @Controller
-class SubscriptionsUIController @Autowired constructor(val usersDAO: UsersDAO, val channelsDAO: ChannelsDAO,
-                                                       val subscriptionsDAO: SubscriptionsDAO,
-                                                       val feedItemDAO: FeedItemDAO,
-                                                       val feedItemPopulator: FeedItemPopulator,
-                                                       val rssSubscriptionManager: RssSubscriptionManager,
-                                                       val rssPoller: RssPoller,
-                                                       val urlBuilder: UrlBuilder,
-                                                       val conditionalLoads: ConditionalLoads,
-                                                       currentUserService: CurrentUserService,
-                                                       request: HttpServletRequest) : WithSignedInUser(currentUserService, request) {
+class SubscriptionsUIController @Autowired constructor(
+    private val subscriptionsDAO: SubscriptionsDAO,
+    private val feedItemDAO: FeedItemDAO,
+    private val feedItemPopulator: FeedItemPopulator,
+    private val rssSubscriptionManager: RssSubscriptionManager,
+    private val rssPoller: RssPoller,
+    private val urlBuilder: UrlBuilder,
+    private val conditionalLoads: ConditionalLoads,
+    currentUserService: CurrentUserService,
+    request: HttpServletRequest
+) : WithSignedInUser(currentUserService, request) {
 
     private val log = LogManager.getLogger(SubscriptionsUIController::class.java)
 
     @GetMapping("/ui/subscriptions/{channelId}/new")
-    fun newSubscriptionForm(@PathVariable channelId: String): ModelAndView? {
+    fun newSubscriptionForm(@PathVariable channelId: String): ModelAndView {
         return forCurrentUser { user ->
             conditionalLoads.withChannelForUser(channelId, user) { channel ->
                 ModelAndView("newSubscription").addObject("username", user.username).addObject("channel", channel)
@@ -49,7 +48,10 @@ class SubscriptionsUIController @Autowired constructor(val usersDAO: UsersDAO, v
     }
 
     @PostMapping("/ui/subscriptions/feeds")
-    fun addFeedSubscription(@RequestParam url: String, @RequestParam(name = "channel") channelId: String): ModelAndView? {
+    fun addFeedSubscription(
+        @RequestParam url: String,
+        @RequestParam(name = "channel") channelId: String
+    ): ModelAndView {
         return forCurrentUser { user ->
             conditionalLoads.withChannelForUser(channelId, user) { channel ->
                 // TODO form binding and validation
@@ -63,7 +65,7 @@ class SubscriptionsUIController @Autowired constructor(val usersDAO: UsersDAO, v
     }
 
     @GetMapping("/ui/subscriptions/{id}")
-    fun subscription(@PathVariable id: String, @RequestParam(required = false) page: Int?): ModelAndView? {
+    fun subscription(@PathVariable id: String, @RequestParam(required = false) page: Int?): ModelAndView {
         return forCurrentUser {
             conditionalLoads.withSubscriptionForUser(id, it) { subscription ->
                 conditionalLoads.withChannelForUser(subscription.channelId, it) { channel ->
@@ -80,7 +82,7 @@ class SubscriptionsUIController @Autowired constructor(val usersDAO: UsersDAO, v
     }
 
     @GetMapping("/ui/subscriptions/{id}/read")
-    fun subscriptionRead(@PathVariable id: String): ModelAndView? {
+    fun subscriptionRead(@PathVariable id: String): ModelAndView {
         fun executeReload(user: User): ModelAndView {
             return conditionalLoads.withSubscriptionForUser(id, user) { subscription ->
                 if (subscription is RssSubscription) {

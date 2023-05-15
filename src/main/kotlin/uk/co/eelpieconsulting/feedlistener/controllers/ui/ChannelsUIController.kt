@@ -19,13 +19,11 @@ import uk.co.eelpieconsulting.feedlistener.controllers.FeedItemPopulator
 import uk.co.eelpieconsulting.feedlistener.daos.ChannelsDAO
 import uk.co.eelpieconsulting.feedlistener.daos.FeedItemDAO
 import uk.co.eelpieconsulting.feedlistener.daos.SubscriptionsDAO
-import uk.co.eelpieconsulting.feedlistener.daos.UsersDAO
 import uk.co.eelpieconsulting.feedlistener.model.Channel
 import uk.co.eelpieconsulting.feedlistener.model.User
 
 @Controller
-class ChannelsUIController @Autowired constructor(val usersDAO: UsersDAO,
-                                                  val subscriptionsDAO: SubscriptionsDAO,
+class ChannelsUIController @Autowired constructor(val subscriptionsDAO: SubscriptionsDAO,
                                                   val feedItemPopulator: FeedItemPopulator,
                                                   val channelsDAO: ChannelsDAO,
                                                   val feedItemDAO: FeedItemDAO,

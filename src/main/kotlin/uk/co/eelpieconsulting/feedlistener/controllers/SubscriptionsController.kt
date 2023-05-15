@@ -150,7 +150,7 @@ class SubscriptionsController @Autowired constructor(private val subscriptionsDA
 
     @Timed(timingNotes = "")
     @GetMapping("/subscriptions/{id}/delete") // TODO should be a HTTP DELETE
-    fun deleteSubscription(@PathVariable id: String): ModelAndView? {
+    fun deleteSubscription(@PathVariable id: String): ModelAndView {
         fun performDelete(user: User): ModelAndView {
             val subscription = subscriptionsDAO.getById(id)
                     ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Subscription not found")
