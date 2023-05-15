@@ -1,7 +1,6 @@
 package uk.co.eelpieconsulting.feedlistener.daos
 
 import com.google.common.base.Strings
-import com.google.common.collect.Lists
 import com.mongodb.MongoException
 import dev.morphia.query.FindOptions
 import dev.morphia.query.Sort
@@ -11,8 +10,6 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
 import uk.co.eelpieconsulting.feedlistener.model.RssSubscription
 import uk.co.eelpieconsulting.feedlistener.model.Subscription
-import uk.co.eelpieconsulting.feedlistener.model.TwitterTagSubscription
-import java.util.stream.Collectors
 
 @Component
 class SubscriptionsDAO @Autowired constructor(private val dataStoreFactory: DataStoreFactory) {
@@ -68,21 +65,6 @@ class SubscriptionsDAO @Autowired constructor(private val dataStoreFactory: Data
     fun delete(subscription: Subscription) {
         log.info("Deleting subscription: $subscription")
         dataStoreFactory.get().find(Subscription::class.java).filter(Filters.eq("id", subscription.id)).delete()
-    }
-
-    fun twitterSubscriptions(): List<Subscription> {
-        val subscriptions: MutableList<Subscription> = Lists.newArrayList()
-        for (subscription in getSubscriptions(LATEST_ITEM_DATE_DESCENDING, null)) {
-            if (subscription.id.startsWith("twitter")) {
-                subscriptions.add(subscription)
-            }
-        }
-        return subscriptions
-    }
-
-    fun getTwitterSubscriptionsFor(username: String): List<TwitterTagSubscription> {
-        val allTwitterSubscriptions = dataStoreFactory.get().find(TwitterTagSubscription::class.java).iterator().toList()
-        return allTwitterSubscriptions.stream().filter { subscription: TwitterTagSubscription -> username == subscription.username }.collect(Collectors.toList())
     }
 
     @Throws(MongoException::class)

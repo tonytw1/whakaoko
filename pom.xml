@@ -17,7 +17,6 @@
         <jackson.version>2.13.4</jackson.version>
         <spymemcached.version>2.11.2</spymemcached.version>
         <kotlin.version>1.6.21</kotlin.version>
-        <twitter4j.version>4.0.7</twitter4j.version>
         <morphia.version>2.0.2</morphia.version>
         <maven.compiler.target>17</maven.compiler.target>
         <maven.compiler.source>17</maven.compiler.source>
@@ -286,17 +285,6 @@
             <version>2.1</version>
             <type>jar</type>
             <scope>compile</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>org.twitter4j</groupId>
-            <artifactId>twitter4j-core</artifactId>
-            <version>${twitter4j.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.twitter4j</groupId>
-            <artifactId>twitter4j-stream</artifactId>
-            <version>${twitter4j.version}</version>
         </dependency>
 
         <dependency>

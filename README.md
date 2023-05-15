@@ -1,7 +1,6 @@
 # Whakaoko (verb. to listen)
 
-A service for aggregating 3rd party content from a variety of sources (RSS / Twitter) into an easy 
-to consume local JSON or RSS feed.
+A service for aggregating 3rd party content from RSS feeds into an easy to consume local JSON or RSS feed.
 
 Provides a [local API](src/main/resources/static/openapi.json) for other applications to consume 
 the aggregated content via a single HTTP/JSON interface.
@@ -48,15 +47,6 @@ The following sources are currently supported.
 - RSS / ATOM feeds
 
 Content, media RSS and geoRSS tags.
-
-- Twitter
-
-Receives Twitter posts via the Twitter real time API.
-The real time API allowed considerably more content to be retrieved than polling the REST API.
-The following subscriptions are currently supported:
-
-	Twitter tag
-	Content tagged with a twitter hashtag. ie. #twickenham
 
 
 ### Channels
@@ -126,20 +116,6 @@ Show content from this subscription.
 |url | The url of an RSS or ATOM feed|
 	
 Request a new subscription to a RSS or ATOM feed url.
-
-#### POST /subscriptions/twitter/tags
-
-|Parameter |	Description |
-|----------|---------------- |
-|channel | The channel id to add this subscription to|
-|tag | The twitter tag to subscribed to|
-	
-Request a new subscription to a Twitter tag.
-Requires the API users account to be linked to a Twitter account.
-
-#### /twitter/authorise
-
-Initiate linking of a Twitter account by redirecting to the Twitter authorise url.
 
 
 # Setup
