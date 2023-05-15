@@ -10,7 +10,6 @@ import org.springframework.stereotype.Controller
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.server.ResponseStatusException
 import org.springframework.web.servlet.ModelAndView
-import org.springframework.web.servlet.view.RedirectView
 import uk.co.eelpieconsulting.common.views.ViewFactory
 import uk.co.eelpieconsulting.feedlistener.UrlBuilder
 import uk.co.eelpieconsulting.feedlistener.annotations.Timed
@@ -45,7 +44,7 @@ class SubscriptionsController @Autowired constructor(private val subscriptionsDA
                           @RequestParam(required = false) page: Int?,
                           @RequestParam(required = false) pageSize: Int?,
                           @RequestParam(required = false) format: String?,
-                          response: HttpServletResponse): ModelAndView? {
+                          response: HttpServletResponse): ModelAndView {
 
         fun renderSubscriptionItems(user: User): ModelAndView {
             val subscription = subscriptionsDAO.getById(id)
@@ -134,11 +133,11 @@ class SubscriptionsController @Autowired constructor(private val subscriptionsDA
         fun updateSubscription(user: User): ModelAndView {
             val subscription = subscriptionsDAO.getById(id)
             if (subscription != null) {
-                log.debug("Got subscription update request: " + update);
+                log.debug("Got subscription update request: {}", update)
                 if (update.name != null) {
                     subscription.name = update.name
                     subscriptionsDAO.save(subscription)
-                    log.info("Updated subscription: " + subscription)
+                    log.info("Updated subscription: $subscription")
                 }
                 return ModelAndView(viewFactory.getJsonView()).addObject("data", subscription)
             } else {

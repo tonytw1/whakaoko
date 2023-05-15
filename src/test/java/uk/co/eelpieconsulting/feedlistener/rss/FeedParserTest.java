@@ -7,6 +7,8 @@ import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.Test;
 
 import java.io.FileInputStream;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.Iterator;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -17,7 +19,7 @@ public class FeedParserTest {
 
     @Test
     public void canParseFeedBytesIntoSyndFeed() throws Exception {
-        String input = IOUtils.toString(new FileInputStream(this.getClass().getClassLoader().getResource("wcc-news.xml").getFile()));
+        String input = IOUtils.toString(new FileInputStream(this.getClass().getClassLoader().getResource("wcc-news.xml").getFile()), StandardCharsets.UTF_8);
 
         Result<SyndFeed, Exception> result = feedParser.parseSyndFeed(input.getBytes());
 
@@ -26,7 +28,7 @@ public class FeedParserTest {
 
     @Test
     public void needToStripNBSPFromMalformedFeeds() throws Exception {
-        String input = IOUtils.toString(new FileInputStream(this.getClass().getClassLoader().getResource("vinnies-news.xml").getFile()));
+        String input = IOUtils.toString(new FileInputStream(this.getClass().getClassLoader().getResource("vinnies-news.xml").getFile()), StandardCharsets.UTF_8);
 
         Result<SyndFeed, Exception> result = feedParser.parseSyndFeed(input.getBytes());
 
@@ -35,7 +37,7 @@ public class FeedParserTest {
 
     @Test
     public void whatsUpWithCricketWellingtonsFeed() throws Exception {
-        String input = IOUtils.toString(new FileInputStream(this.getClass().getClassLoader().getResource("cricketwellington.xml").getFile()));
+        String input = IOUtils.toString(new FileInputStream(this.getClass().getClassLoader().getResource("cricketwellington.xml").getFile()), StandardCharsets.UTF_8);
 
         Result<SyndFeed, Exception> result = feedParser.parseSyndFeed(input.getBytes());
 

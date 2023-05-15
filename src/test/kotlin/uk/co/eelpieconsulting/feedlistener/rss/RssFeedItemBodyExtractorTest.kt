@@ -7,6 +7,7 @@ import org.apache.commons.io.IOUtils
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import java.io.FileInputStream
+import java.nio.charset.StandardCharsets
 
 class RssFeedItemBodyExtractorTest {
 
@@ -33,7 +34,7 @@ class RssFeedItemBodyExtractorTest {
     }
 
     private fun asSyndFeed(filename: String): Result<SyndFeed, Exception> {
-        val input = IOUtils.toString(FileInputStream(this.javaClass.classLoader.getResource(filename).file))
+        val input = IOUtils.toString(FileInputStream(this.javaClass.classLoader.getResource(filename)!!.file), StandardCharsets.UTF_8)
         val feedParser = FeedParser()
         return feedParser.parseSyndFeed(input.toByteArray())
     }

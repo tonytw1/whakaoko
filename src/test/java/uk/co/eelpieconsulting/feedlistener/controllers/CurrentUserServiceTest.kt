@@ -17,7 +17,7 @@ class CurrentUserServiceTest {
     @Test
     fun currentUserCanBeSetAsSessionAttributeForTheUI() {
         val request = MockHttpServletRequest()
-        request.session.setAttribute("signedInUser", "an-oid");
+        request.session!!.setAttribute("signedInUser", "an-oid");
         `when`(usersDAO.getByObjectId("an-oid")).thenReturn(user)
 
         val currentUser = CurrentUserService(request, usersDAO).getCurrentUserUser()

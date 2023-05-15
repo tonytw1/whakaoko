@@ -5,7 +5,7 @@ import io.micrometer.core.instrument.simple.SimpleMeterRegistry
 import org.apache.commons.io.IOUtils
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
-import org.mockito.ArgumentMatchers.anyObject
+import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.mock
 import org.mockito.Mockito.`when`
 import uk.co.eelpieconsulting.feedlistener.model.RssSubscription
@@ -13,6 +13,7 @@ import uk.co.eelpieconsulting.feedlistener.rss.images.BodyHtmlImageExtractor
 import uk.co.eelpieconsulting.feedlistener.rss.images.MediaModuleImageExtractor
 import uk.co.eelpieconsulting.feedlistener.rss.images.RssFeedItemImageExtractor
 import java.io.FileInputStream
+import java.nio.charset.StandardCharsets
 
 class RssFeedItemMapperTest {
 
@@ -38,7 +39,7 @@ class RssFeedItemMapperTest {
 
     @Test
     fun canMapRssSyndEntriesToFeedItem() {
-        `when`(urlResolverService.resolveUrl(anyObject())).thenReturn("http://localhost/something")
+        `when`(urlResolverService.resolveUrl(any())).thenReturn("http://localhost/something")
 
         val feedItems = testSyndEntries().map { rssFeedItemMapper.createFeedItemFrom(it, subscription) }
 
@@ -47,7 +48,7 @@ class RssFeedItemMapperTest {
 
     @Test
     fun feedItemsShouldInheritSubscriptionAndChannel() {
-        `when`(urlResolverService.resolveUrl(anyObject())).thenReturn("http://localhost/something")
+        `when`(urlResolverService.resolveUrl(any())).thenReturn("http://localhost/something")
 
         val feedItems = testSyndEntries().map { rssFeedItemMapper.createFeedItemFrom(it, subscription) }
 
@@ -58,7 +59,7 @@ class RssFeedItemMapperTest {
 
     @Test
     fun canExtractCategoriesFromRssItems() {
-        `when`(urlResolverService.resolveUrl(anyObject())).thenReturn("http://localhost/something")
+        `when`(urlResolverService.resolveUrl(any())).thenReturn("http://localhost/something")
 
         val feedItems = testSyndEntries("toiponeke.xml").map { rssFeedItemMapper.createFeedItemFrom(it, subscription) }
         val first = feedItems.first()
@@ -69,11 +70,11 @@ class RssFeedItemMapperTest {
         val cdataEncodedFeedItems = testSyndEntries("nra-feed.xml").map { rssFeedItemMapper.createFeedItemFrom(it, subscription) }
         val firstCdataEncoded = cdataEncodedFeedItems.first()
         assertEquals("Draft District Plan, Bike Network and LGWM – 3 consultations open now!", firstCdataEncoded?.title)
-        assertEquals(listOf("Consultation", "News"), firstCdataEncoded?._categories?.map{it -> it.value})
+        assertEquals(listOf("Consultation", "News"), firstCdataEncoded?._categories?.map{it.value})
     }
 
     private fun testSyndEntries(filename: String = "inside-wellington-media-break.xml"): List<SyndEntry> {
-        val input = IOUtils.toString(FileInputStream(this.javaClass.classLoader.getResource(filename).file))
+        val input = IOUtils.toString(FileInputStream(this.javaClass.classLoader.getResource(filename)!!.file), StandardCharsets.UTF_8)
         val result = FeedParser().parseSyndFeed(input.toByteArray())
         return result.get().entries.asSequence().map { entry -> entry as SyndEntry }.toList()
     }
