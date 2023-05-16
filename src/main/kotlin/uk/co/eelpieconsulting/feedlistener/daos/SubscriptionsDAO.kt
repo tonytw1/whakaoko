@@ -92,6 +92,4 @@ class SubscriptionsDAO @Autowired constructor(private val dataStoreFactory: Data
         return false
     }
 
-    fun allSubscriptions(): List<Subscription> = dataStoreFactory.get().find(Subscription::class.java).iterator().toList()
-
 }
