@@ -21,7 +21,7 @@ class MediaModuleImageExtractorTest {
         val image = MediaContent(UrlReference(FULLY_QUALIFIED_IMAGE_URL))
         val mediaContents = arrayOf<MediaContent?>(image)
         `when`(itemWithImage.getModule(MediaModule.URI)).thenReturn(mediaModuleWithImage)
-        `when`(mediaModuleWithImage.getMediaContents()).thenReturn(mediaContents)
+        `when`(mediaModuleWithImage.mediaContents).thenReturn(mediaContents)
 
         val imageUrl = extractor.extractImageFromMediaModule(itemWithImage)
 

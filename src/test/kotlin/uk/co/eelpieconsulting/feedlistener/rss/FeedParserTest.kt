@@ -16,7 +16,7 @@ class FeedParserTest {
 
         val result= feedParser.parseSyndFeed(input.toByteArray())
 
-        assertEquals("Wellington City Council - News", result.get().getTitle())
+        assertEquals("Wellington City Council - News", result.get().title)
     }
 
     @Test
@@ -25,7 +25,7 @@ class FeedParserTest {
 
         val result= feedParser.parseSyndFeed(input.toByteArray())
 
-        assertEquals("Latest News - St Vincent de Paul Society Wellington", result.get().getTitle())
+        assertEquals("Latest News - St Vincent de Paul Society Wellington", result.get().title)
     }
 
     @Test
@@ -34,12 +34,12 @@ class FeedParserTest {
 
         val result= feedParser.parseSyndFeed(input.toByteArray())
 
-        assertEquals("Cricket Wellington", result.get().getTitle())
-        assertEquals(50, result.get().getEntries().size)
-        val feedItemsIterator: Iterator<SyndEntry> = result.get().getEntries().iterator()
+        assertEquals("Cricket Wellington", result.get().title)
+        assertEquals(50, result.get().entries.size)
+        val feedItemsIterator: Iterator<SyndEntry> = result.get().entries.iterator()
         val next: SyndEntry = feedItemsIterator.next()
-        assertEquals("Big names return for Firebirds", next.getTitle())
-        assertEquals("21 Feb 2020 11:46:19 GMT", next.getPublishedDate().toGMTString())
+        assertEquals("Big names return for Firebirds", next.title)
+        assertEquals("21 Feb 2020 11:46:19 GMT", next.publishedDate.toGMTString())
     }
 
     private fun readTestFile(filename: String): String {

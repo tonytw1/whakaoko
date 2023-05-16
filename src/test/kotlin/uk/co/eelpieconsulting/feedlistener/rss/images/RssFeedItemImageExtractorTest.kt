@@ -34,7 +34,7 @@ class RssFeedItemImageExtractorTest {
 
     @Test
     fun shouldExtendReferencedFromTheRootImagesFoundInHtmlIntoFullyQualifiedUrlsBasedOnTheItemUrl() {
-        `when`(itemWithImageInHtmlBody.getLink()).thenReturn("http://www.localhost/posts/123")
+        `when`(itemWithImageInHtmlBody.link).thenReturn("http://www.localhost/posts/123")
         `when`(itemWithImageInHtmlBody.getModule(MediaModule.URI)).thenReturn(null)
         `when`(bodyHtmlImageExtractor.extractImageFrom(itemWithImageInHtmlBody)).thenReturn(IMAGE_PATH)
 

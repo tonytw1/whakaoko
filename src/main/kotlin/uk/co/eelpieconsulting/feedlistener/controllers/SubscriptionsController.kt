@@ -47,7 +47,7 @@ class SubscriptionsController @Autowired constructor(private val subscriptionsDA
         fun renderSubscriptionItems(user: User): ModelAndView {
             val subscription = subscriptionsDAO.getById(id)
             if (subscription != null) {
-                var mv = ModelAndView(viewFactory.getJsonView())
+                var mv = ModelAndView(viewFactory.jsonView)
                 if (!Strings.isNullOrEmpty(format) && format == "rss") {
                     val title = if (!Strings.isNullOrEmpty(subscription.name)) subscription.name else subscription.id
                     mv = ModelAndView(viewFactory.getRssView(title, urlBuilder.getSubscriptionUrl(subscription), ""))
@@ -71,7 +71,7 @@ class SubscriptionsController @Autowired constructor(private val subscriptionsDA
             conditionalLoads.withSubscriptionForUser(id, user) { subscription ->
                 if (subscription is RssSubscription) {
                     rssPoller.requestRead(subscription)
-                    ModelAndView(viewFactory.getJsonView()).addObject("data", "ok")
+                    ModelAndView(viewFactory.jsonView).addObject("data", "ok")
                 } else {
                     throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Subscription is not an RSS feed")
                 }
@@ -86,7 +86,7 @@ class SubscriptionsController @Autowired constructor(private val subscriptionsDA
         fun renderSubscription(user: User): ModelAndView {
             val subscription = subscriptionsDAO.getById(id)
             if (subscription != null) {
-                return ModelAndView(viewFactory.getJsonView()).addObject("data", subscription)
+                return ModelAndView(viewFactory.jsonView).addObject("data", subscription)
             } else {
                 throw ResponseStatusException(HttpStatus.NOT_FOUND, "Subscription not found")
             }
@@ -117,7 +117,7 @@ class SubscriptionsController @Autowired constructor(private val subscriptionsDA
             log.info("Added subscription: $subscription")
             rssPoller.requestRead(subscription)
 
-            return ModelAndView(viewFactory.getJsonView()).addObject("data", subscription)
+            return ModelAndView(viewFactory.jsonView).addObject("data", subscription)
         }
 
         return forCurrentUser(::createSubscription)
@@ -135,7 +135,7 @@ class SubscriptionsController @Autowired constructor(private val subscriptionsDA
                     subscriptionsDAO.save(subscription)
                     log.info("Updated subscription: $subscription")
                 }
-                return ModelAndView(viewFactory.getJsonView()).addObject("data", subscription)
+                return ModelAndView(viewFactory.jsonView).addObject("data", subscription)
             } else {
                 throw ResponseStatusException(HttpStatus.NOT_FOUND, "Subscription not found")
             }
@@ -152,7 +152,7 @@ class SubscriptionsController @Autowired constructor(private val subscriptionsDA
             feedItemDAO.deleteSubscriptionFeedItems(subscription)
             subscriptionsDAO.delete(subscription)
 
-            return ModelAndView(viewFactory.getJsonView()).addObject("data", "ok")
+            return ModelAndView(viewFactory.jsonView).addObject("data", "ok")
         }
 
         return forCurrentUser(::performDelete)

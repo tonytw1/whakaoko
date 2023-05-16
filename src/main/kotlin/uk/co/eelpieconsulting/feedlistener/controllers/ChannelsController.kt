@@ -44,7 +44,7 @@ class ChannelsController @Autowired constructor(private val channelsDAO: Channel
             if (user.username != username) {
                 throw ResponseStatusException(HttpStatus.FORBIDDEN, "Cannot list another users channels")
             }
-            return ModelAndView(viewFactory.getJsonView()).addObject("data", channelsDAO.getChannelsFor(user))
+            return ModelAndView(viewFactory.jsonView).addObject("data", channelsDAO.getChannelsFor(user))
         }
         return forCurrentUser(::renderChannels)
     }
@@ -54,7 +54,7 @@ class ChannelsController @Autowired constructor(private val channelsDAO: Channel
     fun channel(@PathVariable id: String): ModelAndView {
         return forCurrentUser { user ->
             conditionalLoads.withChannelForUser(id, user) { channel ->
-                ModelAndView(viewFactory.getJsonView()).addObject("data", channel)
+                ModelAndView(viewFactory.jsonView).addObject("data", channel)
             }
         }
     }
@@ -72,7 +72,7 @@ class ChannelsController @Autowired constructor(private val channelsDAO: Channel
                 val newChannel = Channel(ObjectId.get(), id = idBuilder.makeIdForChannel(), name = create.name, username = user.username)
                 channelsDAO.save(newChannel)
                 log.info("Added channel: $newChannel")
-                return ModelAndView(viewFactory.getJsonView()).addObject("data", newChannel)
+                return ModelAndView(viewFactory.jsonView).addObject("data", newChannel)
             } else {
                 throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Cannot create channel for anonymous user")
             }
@@ -87,7 +87,7 @@ class ChannelsController @Autowired constructor(private val channelsDAO: Channel
         return forCurrentUser { user ->
             conditionalLoads.withChannelForUser(id, user) { channel ->
                 val subscriptionsForChannel = subscriptionsDAO.getSubscriptionsForChannel(channel.id, url)
-                ModelAndView(viewFactory.getJsonView()).addObject("data", subscriptionsForChannel)
+                ModelAndView(viewFactory.jsonView).addObject("data", subscriptionsForChannel)
             }
         }
     }
@@ -103,7 +103,7 @@ class ChannelsController @Autowired constructor(private val channelsDAO: Channel
                     response: HttpServletResponse): ModelAndView {
         return forCurrentUser { user ->
             conditionalLoads.withChannelForUser(id, user) { channel ->
-                var mv = ModelAndView(viewFactory.getJsonView())
+                var mv = ModelAndView(viewFactory.jsonView)
                 if (!Strings.isNullOrEmpty(format) && format == "rss") {    // TODO view factory could do this?
                     mv = ModelAndView(viewFactory.getRssView(channel.name, urlBuilder.getChannelUrl(channel), ""))
                 }

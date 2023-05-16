@@ -12,7 +12,7 @@ class UsersController @Autowired constructor(val usersDAO: UsersDAO, val viewFac
 
     @GetMapping("/users")
     fun users(): ModelAndView? {
-        return ModelAndView(viewFactory.getJsonView()).addObject("data", usersDAO.getUsers())
+        return ModelAndView(viewFactory.jsonView).addObject("data", usersDAO.getUsers())
     }
 
 }

@@ -16,17 +16,17 @@ class MediaModuleImageExtractor {
 
     private val blockedUrlSnippets = setOf("http://stats.wordpress.com", "gravatar.com/avatar", "share_save_171_16") // TODO push up
 
-    private val latestImageFirstCompator: Comparator<MediaContent> = Comparator.comparing { mediaContent -> if (mediaContent.getWidth() != null) mediaContent.getWidth() else 0 }
+    private val latestImageFirstCompator: Comparator<MediaContent> = Comparator.comparing { mediaContent -> if (mediaContent.width != null) mediaContent.width else 0 }
 
     fun extractImageFromMediaModule(item: SyndEntry): String? {
         if (item.getModule(MediaModule.URI) == null) {
-            log.debug("No media module found for item: " + item.getTitle())
+            log.debug("No media module found for item: " + item.title)
             return null
         }
         val mediaModule: MediaEntryModuleImpl = item.getModule(MediaModule.URI) as MediaEntryModuleImpl
         return if (mediaModule != null) {
-            log.debug("Media module found for item: " + item.getTitle())
-            val mediaContents = Arrays.stream(mediaModule.getMediaContents())
+            log.debug("Media module found for item: " + item.title)
+            val mediaContents = Arrays.stream(mediaModule.mediaContents)
 
             val nonBlockListedImages: Stream<MediaContent?> =
                 mediaContents.filter { mediaContent: MediaContent -> isImage(mediaContent) }
@@ -34,8 +34,8 @@ class MediaModuleImageExtractor {
                     .sorted(latestImageFirstCompator) // prefer the latest available image TODO test coverage required
 
             val maybeFirst = nonBlockListedImages.findFirst()
-            if (maybeFirst.isPresent()) {
-                val choosenImage = maybeFirst.get().getReference().toString()
+            if (maybeFirst.isPresent) {
+                val choosenImage = maybeFirst.get().reference.toString()
                 log.debug("Took image reference from MediaContent: $choosenImage")
                 choosenImage
 
@@ -48,14 +48,14 @@ class MediaModuleImageExtractor {
     }
 
     private fun isImage(mediaContent: MediaContent): Boolean {
-        val hasTypeJpegAttribute = mediaContent.getType() != null && mediaContent.getType().equals("image/jpeg")
-        val isJpegUrl = mediaContent.getReference() != null && mediaContent.getReference().toString().contains(".jpg")
+        val hasTypeJpegAttribute = mediaContent.type != null && mediaContent.type.equals("image/jpeg")
+        val isJpegUrl = mediaContent.reference != null && mediaContent.reference.toString().contains(".jpg")
         // TODO Wordpress looks to use medium="image"
-        return mediaContent.getReference() != null && (hasTypeJpegAttribute || isJpegUrl)
+        return mediaContent.reference != null && (hasTypeJpegAttribute || isJpegUrl)
     }
 
     private fun isBlockListed(mediaContent: MediaContent): Boolean {
-        return blockedUrlSnippets.stream().anyMatch(mediaContent.getReference().toString()::contains)
+        return blockedUrlSnippets.stream().anyMatch(mediaContent.reference.toString()::contains)
     }
 
 }

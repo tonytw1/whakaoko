@@ -53,7 +53,7 @@ class UsersUIController @Autowired constructor(val channelsDAO: ChannelsDAO,
         usersDAO.save(newUser)
         log.info("Created user: " + newUser)
 
-        return ModelAndView(viewFactory.getJsonView()).addObject("data", "ok")
+        return ModelAndView(viewFactory.jsonView).addObject("data", "ok")
     }
 
     @GetMapping("/")

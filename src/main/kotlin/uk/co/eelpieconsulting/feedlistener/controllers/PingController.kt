@@ -11,7 +11,7 @@ class PingController @Autowired constructor(val viewFactory: ViewFactory){
 
     @GetMapping("/healthz")
     fun ping(): ModelAndView? {
-        return ModelAndView(viewFactory.getJsonView()).
+        return ModelAndView(viewFactory.jsonView).
         addObject("data", "ok")
     }
 

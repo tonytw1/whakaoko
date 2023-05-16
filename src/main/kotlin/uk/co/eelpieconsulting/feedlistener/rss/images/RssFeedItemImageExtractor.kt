@@ -45,7 +45,7 @@ class RssFeedItemImageExtractor @Autowired constructor(
         val bodyHtmlImage = bodyHtmlImageExtractor.extractImageFrom(item)
         if (bodyHtmlImage != null) {
             // Attempt to expand relative image paths to fully qualified urls.
-            val fullyQualifiedImagePath = ensureFullyQualifiedUrl(bodyHtmlImage, item.getLink())
+            val fullyQualifiedImagePath = ensureFullyQualifiedUrl(bodyHtmlImage, item.link)
             if (fullyQualifiedImagePath != null && !isBlockListedImageUrl(fullyQualifiedImagePath)) { // TODO specific to HTML only?
                 rssImageBodyHtml.increment()
                 return fullyQualifiedImagePath
@@ -60,7 +60,7 @@ class RssFeedItemImageExtractor @Autowired constructor(
             log.debug("Image src looks like a relative url; attempting to fully qualify")
             try {
                 val itemUrlUrl = URL(itemUrl)
-                val fullyQualifiedImageSrc: String = itemUrlUrl.getProtocol() + "://" + itemUrlUrl.getHost() + imageSrc
+                val fullyQualifiedImageSrc: String = itemUrlUrl.protocol + "://" + itemUrlUrl.host + imageSrc
                 val fullyQualifiedImageSrcUrl = URL(fullyQualifiedImageSrc)
                 log.debug("Referenced from root image src resolved to fully qualified url: " + fullyQualifiedImageSrcUrl.toExternalForm())
                 fullyQualifiedImageSrcUrl.toExternalForm()
