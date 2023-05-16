@@ -16,7 +16,6 @@ import uk.co.eelpieconsulting.feedlistener.daos.SubscriptionsDAO
 import uk.co.eelpieconsulting.feedlistener.exceptions.FeeditemPersistanceException
 import uk.co.eelpieconsulting.feedlistener.model.FeedItem
 import uk.co.eelpieconsulting.feedlistener.model.RssSubscription
-import uk.co.eelpieconsulting.feedlistener.model.Subscription
 import uk.co.eelpieconsulting.feedlistener.rss.classification.Classifier
 import uk.co.eelpieconsulting.feedlistener.rss.classification.FeedStatus
 import java.time.ZonedDateTime
@@ -84,7 +83,7 @@ class RssPoller @Autowired constructor(val subscriptionsDAO: SubscriptionsDAO, v
         override fun run() {
             log.info("Processing feed: " + subscription + " from thread " + Thread.currentThread().id)
 
-            fun pollFeed(): Result<Subscription, FeedFetchingException> {
+            fun pollFeed(): Result<RssSubscription, FeedFetchingException> {
                 log.info("Fetching full feed: " + subscription.url)
 
                 try {
@@ -161,7 +160,7 @@ class RssPoller @Autowired constructor(val subscriptionsDAO: SubscriptionsDAO, v
 
             pollFeed().fold(
                 { updatedSubscription ->
-                    log.info("Feed polled with no errors: " + subscription.url)
+                    log.info("Feed polled with no errors: " + updatedSubscription.url)
 
                 }, { feedFetchingException ->
                     val rootCauseName = feedFetchingException.rootCause?.javaClass?.simpleName.orEmpty()
