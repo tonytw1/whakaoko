@@ -109,7 +109,7 @@ class RssPoller @Autowired constructor(val subscriptionsDAO: SubscriptionsDAO, v
                             // Last-Modified
                             val lastModifiedHeader = httpResult.headers["Last-Modified"].firstOrNull()
                             val lastModified = lastModifiedHeader?.let {
-                                log.info("Saw last-modified header ${lastModifiedHeader} on url ${subscription.url}")
+                                log.info("Saw last-modified header $lastModifiedHeader on url $subscription.url")
                                 try {
                                     val parsed = ZonedDateTime.parse(lastModifiedHeader, DateTimeFormatter.RFC_1123_DATE_TIME)
                                     Date.from(parsed.toInstant())

@@ -28,7 +28,7 @@ class CurrentUserService @Autowired constructor(val request: HttpServletRequest,
             val presentedToken = authorizationHeader.substring(bearerPrefix.length, authorizationHeader.length)
             return usersDAO.getByAccessToken(presentedToken)
         }
-        return null;
+        return null
     }
 
     fun setSignedInUser(user: User) {

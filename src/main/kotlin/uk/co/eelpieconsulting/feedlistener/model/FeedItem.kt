@@ -56,7 +56,7 @@ data class FeedItem(
         return categories.mapNotNull { it.value }.toMutableList()
     }
 
-    val id: String?
+    val id: String
         get() = url
 
     @JsonIgnore

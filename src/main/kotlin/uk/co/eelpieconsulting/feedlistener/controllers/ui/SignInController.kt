@@ -23,7 +23,7 @@ class SignInController @Autowired constructor(val request: HttpServletRequest,
 
     @GetMapping("/signin")
     fun signinPrompt(session: HttpSession): ModelAndView {
-        return withSessionError(session, ModelAndView("signin"));
+        return withSessionError(session, ModelAndView("signin"))
     }
 
     @PostMapping("/signin")
@@ -46,13 +46,13 @@ class SignInController @Autowired constructor(val request: HttpServletRequest,
 
     private fun withSessionError(session: HttpSession, mv: ModelAndView): ModelAndView {
         val error = session.getAttribute("error")
-        session.removeAttribute("error");
-        return mv.addObject("error", error);
+        session.removeAttribute("error")
+        return mv.addObject("error", error)
     }
 
     private fun redirectToSigninPromptWithError(error: String, session: HttpSession): ModelAndView {
-        session.setAttribute("error", error);
-        return redirectToSigninPrompt();
+        session.setAttribute("error", error)
+        return redirectToSigninPrompt()
     }
 
     private fun redirectToSigninPrompt(): ModelAndView {
