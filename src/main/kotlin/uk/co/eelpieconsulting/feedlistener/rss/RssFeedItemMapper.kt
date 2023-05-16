@@ -64,10 +64,12 @@ class RssFeedItemMapper @Autowired constructor(private val rssFeedItemImageExtra
     }
 
     private fun extractUrl(syndEntry: SyndEntry): String? {
-        val url = syndEntry.link
-        return if (!Strings.isNullOrEmpty(url)) {
-            urlCleaner.cleanSubmittedItemUrl(urlResolverService.resolveUrl(url))
+        val url: String? = syndEntry.link
+        val resolved = urlResolverService.resolveUrl(url)
+        return if (resolved != null) {
+            urlCleaner.cleanSubmittedItemUrl(resolved)
         } else {
+            log.warn("Could not resolve url: $url")
             null
         }
     }
