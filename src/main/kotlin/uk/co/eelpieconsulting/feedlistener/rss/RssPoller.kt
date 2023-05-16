@@ -138,7 +138,7 @@ class RssPoller @Autowired constructor(val subscriptionsDAO: SubscriptionsDAO,
                                 subscription.itemCount = itemCount
                                 subscription.latestItemDate = latestItemDate
 
-                                log.info("Completed fetch of feed named '${fetchedFeed.feedName}' with ${fetchedFeed.feedItems.size} items from '${subscription.url}'. Latest feed item date was ${latestItemDate}")
+                                log.info("Completed fetch of feed named '${fetchedFeed.feedName}' with ${fetchedFeed.feedItems.size} items from '${subscription.url}'. Latest feed item date was $latestItemDate")
                                 return Result.success(subscription)
                             }
 
