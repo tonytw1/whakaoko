@@ -2,6 +2,7 @@ package uk.co.eelpieconsulting.feedlistener.rss
 
 import com.github.kittinunf.result.Result
 import com.google.common.base.Strings
+import io.micrometer.core.instrument.Counter
 import io.micrometer.core.instrument.MeterRegistry
 import io.micrometer.core.instrument.Metrics
 import org.apache.logging.log4j.LogManager
@@ -35,9 +36,9 @@ class RssPoller @Autowired constructor(val subscriptionsDAO: SubscriptionsDAO,
 
     private val log = LogManager.getLogger(RssPoller::class.java)
 
-    val rssAddedItems = meterRegistry.counter("rss_added_items")
-    val rssSuccessesEtagged = meterRegistry.counter("rss_successes", "etagged", "false")
-    val rssSuccessesNotEtagged = meterRegistry.counter("rss_successes", "etagged", "true")
+    val rssAddedItems: Counter = meterRegistry.counter("rss_added_items")
+    val rssSuccessesEtagged: Counter = meterRegistry.counter("rss_successes", "etagged", "false")
+    val rssSuccessesNotEtagged: Counter = meterRegistry.counter("rss_successes", "etagged", "true")
 
     @Scheduled(fixedRate = 3600000, initialDelay = 300000)
     fun run() {
