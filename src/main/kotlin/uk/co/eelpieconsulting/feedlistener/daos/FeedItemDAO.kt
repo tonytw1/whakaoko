@@ -98,13 +98,6 @@ class FeedItemDAO @Autowired constructor(private val dataStoreFactory: DataStore
         return FeedItemsResult(query.iterator(withPaginationFor(pageSize, page).sort(*ORDER_DESCENDING_THEN_ID)).toList(), totalItems)
     }
 
-    fun getFeedItemsWithNoOrdering(): MutableList<FeedItem>? {
-        val query = dataStoreFactory.get().find(FeedItem::class.java).filter(Filters.eq(ORDERING, null))
-        val totalItems = query.count()
-        log.info("Found $totalItems feed items with no ordering")
-        return query.iterator(FindOptions().limit(1000)).toList()
-    }
-
     @Throws(MongoException::class)
     fun deleteSubscriptionFeedItems(subscription: Subscription) {
         dataStoreFactory.get().find(FeedItem::class.java).filter(Filters.eq(SUBSCRIPTION_ID, subscription.id)).delete(DeleteOptions().multi(true))
