@@ -57,7 +57,7 @@ public class Main implements WebMvcConfigurer {
         return new HttpFetcher("Whakaoko", 90000);
     }
 
-    @Bean
+    @Bean("rssPollerTaskExecutor")
     public TaskExecutor taskExecutor() {
         ThreadPoolTaskExecutor taskExecutor = new ThreadPoolTaskExecutor();
         taskExecutor.setCorePoolSize(5);

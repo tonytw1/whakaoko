@@ -7,6 +7,7 @@ import io.micrometer.core.instrument.Metrics
 import org.apache.logging.log4j.LogManager
 import org.joda.time.DateTime
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.core.task.TaskExecutor
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor
@@ -25,7 +26,8 @@ import java.util.*
 import java.util.function.Consumer
 
 @Component
-class RssPoller @Autowired constructor(val subscriptionsDAO: SubscriptionsDAO, val taskExecutor: TaskExecutor,
+class RssPoller @Autowired constructor(val subscriptionsDAO: SubscriptionsDAO,
+                                       @Qualifier("rssPollerTaskExecutor") val taskExecutor: TaskExecutor,
                                        val feedFetcher: FeedFetcher, val feedfItemDAO : FeedItemDAO,
                                        val feedItemLatestDateFinder: FeedItemLatestDateFinder,
                                        val classifier: Classifier,
@@ -72,9 +74,8 @@ class RssPoller @Autowired constructor(val subscriptionsDAO: SubscriptionsDAO, v
     }
 
     private fun executeRssPoll(subscription: RssSubscription) {
-        log.info("Executing RSS poll for: " + subscription.id)
         val threadPoolTaskExecutor = taskExecutor as ThreadPoolTaskExecutor
-        log.info("Task executor: active:" + threadPoolTaskExecutor.activeCount + ", pool size: " + threadPoolTaskExecutor.poolSize)
+        log.info("Executing RSS poll for: " + subscription.id + " using task executor with active count: " + threadPoolTaskExecutor.activeCount + ", pool size: " + threadPoolTaskExecutor.poolSize)
         taskExecutor.execute(ProcessFeedTask(feedFetcher, feedfItemDAO, subscriptionsDAO, subscription))
     }
 
