@@ -68,7 +68,8 @@ class RssPoller @Autowired constructor(val subscriptionsDAO: SubscriptionsDAO,
     }
 
     private fun run(subscription: RssSubscription) {
-        log.info("Polling single subscription: " + subscription.id)
+        val currentThreadId = Thread.currentThread().id
+        log.info("Polling single subscription $subscription.id using thread $currentThreadId")
         executeRssPoll(subscription)
         log.info("Done")
     }
