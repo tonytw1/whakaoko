@@ -1,13 +1,11 @@
 package uk.co.eelpieconsulting.feedlistener.rss
 
-import com.google.common.base.Strings
 import com.rometools.modules.georss.GeoRSSUtils
 import com.rometools.rome.feed.synd.SyndCategory
 import com.rometools.rome.feed.synd.SyndEntry
 import org.apache.commons.lang.StringEscapeUtils
 import org.apache.logging.log4j.LogManager
 import org.joda.time.DateTime
-
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
 import uk.co.eelpieconsulting.common.html.HtmlCleaner

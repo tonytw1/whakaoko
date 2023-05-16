@@ -28,7 +28,7 @@ class ChannelsDAO @Autowired constructor(val dataStoreFactory: DataStoreFactory)
     }
 
     fun getById(id: String): Channel? {
-        return dataStoreFactory.get().find<Channel>(Channel::class.java).filter(Filters.eq("id", id)).first()
+        return dataStoreFactory.get().find(Channel::class.java).filter(Filters.eq("id", id)).first()
     }
 
     fun usersChannelByName(user: User, name: String): Channel? {
@@ -38,13 +38,13 @@ class ChannelsDAO @Autowired constructor(val dataStoreFactory: DataStoreFactory)
 
     fun save(channel: Channel) {
         try {
-            dataStoreFactory.get().save<Channel>(channel)
+            dataStoreFactory.get().save(channel)
         } catch (e: MongoException) {
             throw RuntimeException(e)
         }
     }
 
     private fun queryForUsersChannels(user: User) =
-        dataStoreFactory.get().find<Channel>(Channel::class.java).filter(Filters.eq("username", user.username))
+        dataStoreFactory.get().find(Channel::class.java).filter(Filters.eq("username", user.username))
     
 }
