@@ -52,8 +52,8 @@ data class FeedItem(
 
     @JsonIgnore
     override fun getCategories(): MutableList<String> {
-        val categories: List<Category> = _categories ?: emptyList<Category>()
-        return categories.mapNotNull { it.value }.toMutableList()
+        val categories = _categories ?: emptyList<Category>()
+        return categories.map { it.value }.toMutableList()
     }
 
     val id: String
