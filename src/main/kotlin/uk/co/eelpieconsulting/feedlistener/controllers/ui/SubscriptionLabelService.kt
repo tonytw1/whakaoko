@@ -2,7 +2,6 @@ package uk.co.eelpieconsulting.feedlistener.controllers.ui
 
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
-import uk.co.eelpieconsulting.feedlistener.UnknownSubscriptionException
 import uk.co.eelpieconsulting.feedlistener.daos.SubscriptionsDAO
 
 @Component
