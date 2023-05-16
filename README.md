@@ -83,10 +83,10 @@ Lists the subscriptions into this channel.
 
 #### GET /{userid}/channels/{channelid}/items
 
-|Parameter	|	Description |
-|----------|----------------|
-| format | json / rss |
-| page | pagination number |
+| Parameter	 | 	Description      |
+|------------|-------------------|
+| format     | json / rss        |
+| page       | pagination number |
 	
 Show content for this channel.
 
@@ -100,20 +100,20 @@ Details for a specific subscription.
 
 #### GET /{userid}/subscriptions/{subscriptionid}/items
 
-|Parameter	|	Description |
-|----------|----------------|
-|format | json / rss |
-|page  | pagination number |
+| Parameter	 | 	Description      |
+|------------|-------------------|
+| format     | json / rss        |
+| page       | pagination number |
 
 Show content from this subscription.
 
 
 #### POST /{username}/subscriptions/feeds
 
-| Parameter	|	Description |
-|----------|----------------|
-|channel | The channel id to add this subscription to|
-|url | The url of an RSS or ATOM feed|
+| Parameter	 | 	Description                               |
+|------------|--------------------------------------------|
+| channel    | The channel id to add this subscription to |
+| url        | The url of an RSS or ATOM feed             |
 	
 Request a new subscription to a RSS or ATOM feed url.
 
