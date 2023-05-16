@@ -1,7 +1,6 @@
 package uk.co.eelpieconsulting.feedlistener.model
 
 import dev.morphia.annotations.Entity
-import dev.morphia.annotations.Indexed
 import org.apache.commons.codec.digest.DigestUtils
 import uk.co.eelpieconsulting.feedlistener.rss.classification.FeedStatus
 
