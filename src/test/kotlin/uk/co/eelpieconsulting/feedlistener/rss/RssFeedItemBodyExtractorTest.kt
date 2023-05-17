@@ -15,7 +15,7 @@ class RssFeedItemBodyExtractorTest {
 
     @Test
     fun canExtractBodyFromItemDescriptionTag() {
-        val firstEntry = asSyndFeed("wcc-news.xml").get().entries.get(0) as SyndEntry
+        val firstEntry = asSyndFeed("wcc-news.xml").get().entries[0] as SyndEntry
 
         val extractedBody = rssFeedItemBodyExtractor.extractBody(firstEntry)
 
@@ -26,7 +26,7 @@ class RssFeedItemBodyExtractorTest {
     fun shouldPreferDescriptionOverContent() {
         // Feed items have a brief description field and an optional content:encoded which may contain the full
         // content of the item
-        val firstEntry = asSyndFeed("adam-art-gallery.xml").get().entries.get(0) as SyndEntry
+        val firstEntry = asSyndFeed("adam-art-gallery.xml").get().entries[0] as SyndEntry
 
         val extractedBody = rssFeedItemBodyExtractor.extractBody(firstEntry)
 

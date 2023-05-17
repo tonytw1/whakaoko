@@ -206,6 +206,6 @@ class RssPoller @Autowired constructor(val subscriptionsDAO: SubscriptionsDAO,
 class FeedItemLatestDateFinder {
     fun getLatestItemDate(feedItems: List<FeedItem>): Date? {
         // Map to dates; return max
-        return feedItems.map { it.date }.filterNotNull().stream().max(Date::compareTo).orElse(null)
+        return feedItems.mapNotNull { it.date }.stream().max(Date::compareTo).orElse(null)
     }
 }

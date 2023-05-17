@@ -51,7 +51,7 @@ class UsersUIController @Autowired constructor(val channelsDAO: ChannelsDAO,
 
         val newUser = User(ObjectId.get(), username, passwordHashing.hash(password))
         usersDAO.save(newUser)
-        log.info("Created user: " + newUser)
+        log.info("Created user: $newUser")
 
         return ModelAndView(viewFactory.jsonView).addObject("data", "ok")
     }

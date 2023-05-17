@@ -44,7 +44,7 @@ class FeedParserTest {
 
     private fun readTestFile(filename: String): String {
         return IOUtils.toString(
-            FileInputStream(javaClass.getClassLoader().getResource(filename).getFile()),
+            FileInputStream(javaClass.classLoader.getResource(filename)!!.file),
             StandardCharsets.UTF_8
         )
     }
