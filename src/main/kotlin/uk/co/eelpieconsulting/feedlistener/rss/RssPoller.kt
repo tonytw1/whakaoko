@@ -63,7 +63,7 @@ class RssPoller @Autowired constructor(val subscriptionsDAO: SubscriptionsDAO,
         if (setOf(FeedStatus.ok, FeedStatus.wobbling).contains(subscription.classification)) {
             return true
         }
-        // broken and gone feeds are only reasd once a day to look for a resurrection.
+        // broken and gone feeds are only read once a day to look for a potential resurrection.
         return lastRead.before(DateTime.now().minusDays(1).toDate())
     }
 
