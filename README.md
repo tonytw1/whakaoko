@@ -23,8 +23,9 @@ Expands feedburner and tinyurl URLs into canonical full URLs.
 
 ### Minimises HTTP traffic
 
-Uses etag and last modified headers to minimise traffic.
+Uses etag and last modified header conditional GETs to minimise traffic.
 
+The feedcache documentation on [implementing conditional HTTP GET](https://feedcache.readthedocs.io/en/latest/howto/index.html#implementing-conditional-http-get) describes the technique well.
 
 ### GeoRSS aware
 
