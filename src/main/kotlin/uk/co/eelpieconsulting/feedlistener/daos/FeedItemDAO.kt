@@ -10,7 +10,6 @@ import dev.morphia.query.experimental.filters.Filters
 import org.apache.logging.log4j.LogManager
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
-import uk.co.eelpieconsulting.feedlistener.exceptions.FeeditemPersistanceException
 import uk.co.eelpieconsulting.feedlistener.model.Channel
 import uk.co.eelpieconsulting.feedlistener.model.FeedItem
 import uk.co.eelpieconsulting.feedlistener.model.FeedItemsResult
@@ -37,32 +36,17 @@ class FeedItemDAO @Autowired constructor(private val dataStoreFactory: DataStore
 
     fun add(feedItem: FeedItem): Boolean {
         return try {
-            val existingSubscriptionFeeditemsWithSameUrl = dataStoreFactory.get().find(FeedItem::class.java)
-                .filter(Filters.eq("url", feedItem.url), Filters.eq(SUBSCRIPTION_ID, feedItem.subscriptionId))
-            val shouldSave = existingSubscriptionFeeditemsWithSameUrl.first() == null
-            // We allow overwriting of the existing feed item with the same url only if
-            // the replacement is considered better because it has a date
-            if (shouldSave) {
-                log.info("Added: " + feedItem.subscriptionId + ", " + feedItem.title)
-                save(feedItem)
-                true
-
-            } else {
-                log.debug("Skipping previously added: " + feedItem.title)
-                false
-            }
+            log.info("Added: " + feedItem.subscriptionId + ", " + feedItem.title)
+            dataStoreFactory.get().save(feedItem)
+            true
         } catch (e: Exception) {
-            throw FeeditemPersistanceException(e)
+            log.error("Could not add feed item", e)
+            false
         }
     }
-
-    fun save(feedItem: FeedItem) {
-        dataStoreFactory.get().save(feedItem)
-    }
-
-    fun update(feedItem: FeedItem) {
-        dataStoreFactory.get().save(feedItem)
-    }
+    fun getExistingFeedItemByUrlAndSubscription(feedItem: FeedItem): Query<FeedItem> =
+        dataStoreFactory.get().find(FeedItem::class.java)
+            .filter(Filters.eq("url", feedItem.url), Filters.eq(SUBSCRIPTION_ID, feedItem.subscriptionId))
 
     fun getSubscriptionFeedItems(subscription: Subscription, page: Int?, pageSize: Int? = null): FeedItemsResult {
         val pageSizeToUse = pageSizeToUse(pageSize)
@@ -78,7 +62,7 @@ class FeedItemDAO @Autowired constructor(private val dataStoreFactory: DataStore
         val pageSizeToUse = pageSizeToUse(pageSize)
         val pageToUse = if (page != null && page > 0) page else 1
 
-        return if (!Strings.isNullOrEmpty(q)) searchChannelFeedItems(channel.id, pageSizeToUse, pageToUse, q) else getChannelFeedItems(
+        return if (q != null && !Strings.isNullOrEmpty(q)) searchChannelFeedItems(channel.id, pageSizeToUse, pageToUse, q) else getChannelFeedItems(
             channel.id,
             pageSizeToUse,
             pageToUse,
@@ -114,7 +98,7 @@ class FeedItemDAO @Autowired constructor(private val dataStoreFactory: DataStore
         return FeedItemsResult(query.iterator(withPaginationFor(pageSize, page).sort(*ORDER_DESCENDING_THEN_ID)).toList(), totalCount)
     }
 
-    fun searchChannelFeedItems(channelId: String, pageSize: Int, page: Int, q: String?): FeedItemsResult {
+    fun searchChannelFeedItems(channelId: String, pageSize: Int, page: Int, q: String): FeedItemsResult {
         val query = channelFeedItemsQuery(channelId).filter(Filters.eq("title", Pattern.compile(q))) // TODO can eq be used with a patten?
         return FeedItemsResult(query.iterator(withPaginationFor(pageSize, page)).toList(), query.count())
     }

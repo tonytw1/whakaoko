@@ -15,7 +15,6 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor
 import org.springframework.stereotype.Component
 import uk.co.eelpieconsulting.feedlistener.daos.FeedItemDAO
 import uk.co.eelpieconsulting.feedlistener.daos.SubscriptionsDAO
-import uk.co.eelpieconsulting.feedlistener.exceptions.FeeditemPersistanceException
 import uk.co.eelpieconsulting.feedlistener.model.FeedItem
 import uk.co.eelpieconsulting.feedlistener.model.RssSubscription
 import uk.co.eelpieconsulting.feedlistener.rss.classification.Classifier
@@ -188,17 +187,22 @@ class RssPoller @Autowired constructor(val subscriptionsDAO: SubscriptionsDAO,
 
         private fun persistFeedItems(feedItems: List<FeedItem>) {
             feedItems.forEach { feedItem ->
-                try {
-                    val withAccepted = feedItem.copy(accepted = DateTime.now().toDate())
+                val withAccepted = feedItem.copy(accepted = DateTime.now().toDate())
+
+                val existingSubscriptionFeeditemsWithSameUrl = feedfItemDAO.getExistingFeedItemByUrlAndSubscription(feedItem)
+                val shouldAdd = existingSubscriptionFeeditemsWithSameUrl.first() == null
+                if (shouldAdd) {
                     if (feedItemDAO.add(withAccepted)) {
                         rssAddedItems.increment()
+                    } else {
+                        log.warn("Failed to add feed item: " + feedItem.title)
                     }
-                } catch (e: FeeditemPersistanceException) {
-                    log.error(e)
+
+                } else {
+                    log.debug("Skipping previously added: " + feedItem.title)
                 }
             }
         }
-
     }
 }
 
