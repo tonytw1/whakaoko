@@ -142,15 +142,14 @@ class RssPoller @Autowired constructor(val subscriptionsDAO: SubscriptionsDAO,
                                 return Result.success(subscription)
                             }
 
-                            // Our fetch return successfully but with not feed contents
-                            // This indicates that the feed server responsed with a not modified response
-                            // subscription.httpStatus = fetchedFeed.httpStatus TODO need the not modified response code
-                            log.info("Feed fetch returned unmodified for subscription: ${subscription.name}")
+                            // Our fetch return successfully but with no feed contents
+                            // This normal indicates that the feed server responded with a not modified response
+                            log.info("Feed fetch returned no feed items / HTTP ${subscription.httpStatus} for subscription: ${subscription.name}")
                             Result.success(subscription)
 
                         },
                         { ex ->
-                            log.warn("Fetch feed returning error: " + ex)
+                            log.warn("Fetch feed returning error", ex)
                             Result.error(ex)
                         }
                     )
