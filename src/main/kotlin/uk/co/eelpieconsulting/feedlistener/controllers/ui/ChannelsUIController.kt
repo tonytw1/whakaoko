@@ -65,7 +65,7 @@ class ChannelsUIController @Autowired constructor(val subscriptionsDAO: Subscrip
                 val mv = ModelAndView("channel").
                 addObject("channel", channel).
                 addObject("subscriptions", subscriptionsForChannel)
-                if (!subscriptionsForChannel.isEmpty()) {
+                if (subscriptionsForChannel.isNotEmpty()) {
                     val results = feedItemDAO.getChannelFeedItemsResult(channel, page, q, null)
                     feedItemPopulator.populateFeedItems(results, mv, "feedItems")
                 }
