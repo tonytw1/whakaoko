@@ -56,10 +56,8 @@ class RssPoller @Autowired constructor(val subscriptionsDAO: SubscriptionsDAO,
     }
 
     private fun shouldFetchNow(subscription: RssSubscription): Boolean {
-        val lastRead = subscription.lastRead
-        if (lastRead == null) {
-            return true
-        }
+        val lastRead: Date = subscription.lastRead ?: return true
+
         if (setOf(FeedStatus.ok, FeedStatus.wobbling).contains(subscription.classification)) {
             return true
         }

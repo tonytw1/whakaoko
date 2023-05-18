@@ -107,9 +107,7 @@ class SubscriptionsController @Autowired constructor(private val subscriptionsDA
             // TODO check for existing idempotent feed
 
             val channel = channelsDAO.getById(create.channel)
-            if (channel == null) {
-                throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Channel not found")
-            }
+                ?: throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Channel not found")
             // TODO validate channel user
 
             val subscription = RssSubscription(url = create.url, channelId = channel.id, username = user.username)

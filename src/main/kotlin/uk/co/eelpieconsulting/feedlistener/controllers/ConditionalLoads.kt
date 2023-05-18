@@ -16,9 +16,8 @@ class ConditionalLoads @Autowired constructor(private val channelsDAO: ChannelsD
 
     fun withChannelForUser(channelId: String, user: User, handler: (Channel) -> ModelAndView): ModelAndView {
         val channel = channelsDAO.getById(channelId)
-        if (channel == null) {
-            throw ResponseStatusException(HttpStatus.NOT_FOUND, "Channel not found")
-        }
+            ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Channel not found")
+
         if (user.username != channel.username) {    // TODO match by ids
             throw ResponseStatusException(HttpStatus.FORBIDDEN, "Channel does not belong to this user")
         }
@@ -27,9 +26,8 @@ class ConditionalLoads @Autowired constructor(private val channelsDAO: ChannelsD
 
     fun withSubscriptionForUser(subscriptionId: String, user: User, handler: (Subscription) -> ModelAndView): ModelAndView {
         val subscription = subscriptionsDAO.getById(subscriptionId)
-        if (subscription == null) {
-            throw ResponseStatusException(HttpStatus.NOT_FOUND, "Subscription not found")
-        }
+            ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Subscription not found")
+
         if (user.username != subscription.username) {    // TODO match by ids
             throw ResponseStatusException(HttpStatus.FORBIDDEN, "Subscription does not belong to this user")
         }
