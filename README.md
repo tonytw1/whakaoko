@@ -33,8 +33,8 @@ Preserves GeoRSS location data.
 
 ## Implementation
 
-Kotlin / Java application. 
-MongoDB 3.4 is used for storage. 
+Kotlin application. 
+MongoDB 3.6 is used for storage. 
 Memcached for caching of resolved short URLs.
 
 
