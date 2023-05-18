@@ -11,7 +11,7 @@ import java.util.stream.Collectors
 import java.util.stream.Stream
 
 @Component
-class FeedItemPopulator @Autowired constructor(val subscriptionLabelService: SubscriptionLabelService) {
+class FeedItemPopulator @Autowired constructor(private val subscriptionLabelService: SubscriptionLabelService) {
 
     fun populateFeedItems(feedItemsResult: FeedItemsResult, mv: ModelAndView, field: String) {
         populate(mv, field, feedItemsResult.feedsItems)

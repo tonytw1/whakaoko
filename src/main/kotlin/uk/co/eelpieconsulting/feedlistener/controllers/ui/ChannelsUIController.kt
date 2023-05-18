@@ -25,12 +25,12 @@ import uk.co.eelpieconsulting.feedlistener.model.User
 
 @Controller
 class ChannelsUIController @Autowired constructor(val subscriptionsDAO: SubscriptionsDAO,
-                                                  val feedItemPopulator: FeedItemPopulator,
-                                                  val channelsDAO: ChannelsDAO,
-                                                  val feedItemDAO: FeedItemDAO,
-                                                  val idBuilder: IdBuilder,
+                                                  private val feedItemPopulator: FeedItemPopulator,
+                                                  private val channelsDAO: ChannelsDAO,
+                                                  private val feedItemDAO: FeedItemDAO,
+                                                  private val idBuilder: IdBuilder,
                                                   val urlBuilder: UrlBuilder,
-                                                  val conditionalLoads: ConditionalLoads,
+                                                  private val conditionalLoads: ConditionalLoads,
                                                   currentUserService: CurrentUserService,
                                                   request: HttpServletRequest) : WithSignedInUser(currentUserService, request) {
 

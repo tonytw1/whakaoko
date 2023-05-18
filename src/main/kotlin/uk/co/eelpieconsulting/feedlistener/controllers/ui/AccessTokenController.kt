@@ -13,7 +13,7 @@ import java.util.*
 
 @Controller
 class AccessTokenController @Autowired constructor(val urlBuilder: UrlBuilder,
-                                                   val usersDAO: UsersDAO,
+                                                   private val usersDAO: UsersDAO,
                                                    currentUserService: CurrentUserService,
                                                    request: HttpServletRequest) : WithSignedInUser(currentUserService, request) {
 

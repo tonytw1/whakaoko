@@ -24,7 +24,7 @@ class SubscriptionsControllerTest {
     private val rssPoller = mock(RssPoller::class.java)
     private val currentUserService = mock(CurrentUserService::class.java)
 
-    val subscriptionsController = SubscriptionsController(subscriptionsDAO,
+    private val subscriptionsController = SubscriptionsController(subscriptionsDAO,
             channelsDAO,
             feedItemPopulator,
             feedItemDAO,

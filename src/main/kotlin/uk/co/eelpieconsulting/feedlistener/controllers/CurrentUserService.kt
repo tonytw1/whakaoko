@@ -7,7 +7,7 @@ import uk.co.eelpieconsulting.feedlistener.daos.UsersDAO
 import uk.co.eelpieconsulting.feedlistener.model.User
 
 @Component
-class CurrentUserService @Autowired constructor(val request: HttpServletRequest, val usersDAO: UsersDAO) {
+class CurrentUserService @Autowired constructor(private val request: HttpServletRequest, private val usersDAO: UsersDAO) {
 
     private val signedInUserAttribute = "signedInUser"
 

@@ -12,7 +12,7 @@ import uk.co.eelpieconsulting.feedlistener.model.Subscription
 import uk.co.eelpieconsulting.feedlistener.model.User
 
 @Component
-class ConditionalLoads @Autowired constructor(val channelsDAO: ChannelsDAO, val subscriptionsDAO: SubscriptionsDAO) {
+class ConditionalLoads @Autowired constructor(private val channelsDAO: ChannelsDAO, val subscriptionsDAO: SubscriptionsDAO) {
 
     fun withChannelForUser(channelId: String, user: User, handler: (Channel) -> ModelAndView): ModelAndView {
         val channel = channelsDAO.getById(channelId)

@@ -18,12 +18,13 @@ import uk.co.eelpieconsulting.feedlistener.model.User
 import uk.co.eelpieconsulting.feedlistener.passwords.PasswordHashing
 
 @Controller
-class UsersUIController @Autowired constructor(val channelsDAO: ChannelsDAO,
-                                               val usersDAO: UsersDAO,
-                                               val viewFactory: ViewFactory,
-                                               val passwordHashing: PasswordHashing,
-                                               currentUserService: CurrentUserService,
-                                               request: HttpServletRequest) : WithSignedInUser(currentUserService, request) {
+class UsersUIController @Autowired constructor(
+    private val channelsDAO: ChannelsDAO,
+    private val usersDAO: UsersDAO,
+    private val viewFactory: ViewFactory,
+    private val passwordHashing: PasswordHashing,
+    currentUserService: CurrentUserService,
+    request: HttpServletRequest) : WithSignedInUser(currentUserService, request) {
 
     private val log = LogManager.getLogger(UsersUIController::class.java)
 

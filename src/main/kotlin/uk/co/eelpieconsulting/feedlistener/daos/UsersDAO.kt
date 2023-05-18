@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component
 import uk.co.eelpieconsulting.feedlistener.model.User
 
 @Component
-class UsersDAO @Autowired constructor(val dataStoreFactory: DataStoreFactory){
+class UsersDAO @Autowired constructor(private val dataStoreFactory: DataStoreFactory){
 
     private val USERNAME_ASCENDING = Sort.ascending("username")
 

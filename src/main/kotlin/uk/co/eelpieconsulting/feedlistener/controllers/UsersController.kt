@@ -8,7 +8,7 @@ import uk.co.eelpieconsulting.common.views.ViewFactory
 import uk.co.eelpieconsulting.feedlistener.daos.UsersDAO
 
 @Controller
-class UsersController @Autowired constructor(val usersDAO: UsersDAO, val viewFactory: ViewFactory) {
+class UsersController @Autowired constructor(private val usersDAO: UsersDAO, private val viewFactory: ViewFactory) {
 
     @GetMapping("/users")
     fun users(): ModelAndView? {

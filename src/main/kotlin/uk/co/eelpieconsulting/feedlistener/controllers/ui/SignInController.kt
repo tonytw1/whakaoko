@@ -15,9 +15,9 @@ import uk.co.eelpieconsulting.feedlistener.passwords.PasswordHashing
 
 @Controller
 class SignInController @Autowired constructor(val request: HttpServletRequest,
-                                              val usersDAO: UsersDAO,
+                                              private val usersDAO: UsersDAO,
                                               val currentUserService: CurrentUserService,
-                                              val passwordHashing: PasswordHashing) {
+                                              private val passwordHashing: PasswordHashing) {
 
     private val log = LogManager.getLogger(SignInController::class.java)
 

@@ -98,7 +98,7 @@ class FeedItemDAO @Autowired constructor(private val dataStoreFactory: DataStore
         return FeedItemsResult(query.iterator(withPaginationFor(pageSize, page).sort(*ORDER_DESCENDING_THEN_ID)).toList(), totalCount)
     }
 
-    fun searchChannelFeedItems(channelId: String, pageSize: Int, page: Int, q: String): FeedItemsResult {
+    private fun searchChannelFeedItems(channelId: String, pageSize: Int, page: Int, q: String): FeedItemsResult {
         val query = channelFeedItemsQuery(channelId).filter(Filters.eq("title", Pattern.compile(q))) // TODO can eq be used with a patten?
         return FeedItemsResult(query.iterator(withPaginationFor(pageSize, page)).toList(), query.count())
     }

@@ -28,7 +28,7 @@ import java.util.function.Consumer
 @Component
 class RssPoller @Autowired constructor(val subscriptionsDAO: SubscriptionsDAO,
                                        @Qualifier("rssPollerTaskExecutor") val taskExecutor: TaskExecutor,
-                                       val feedFetcher: FeedFetcher, val feedfItemDAO : FeedItemDAO,
+                                       private val feedFetcher: FeedFetcher, val feedfItemDAO : FeedItemDAO,
                                        val feedItemLatestDateFinder: FeedItemLatestDateFinder,
                                        val classifier: Classifier,
                                        meterRegistry: MeterRegistry) {

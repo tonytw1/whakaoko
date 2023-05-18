@@ -4,7 +4,7 @@ import dev.morphia.annotations.Entity
 import org.apache.commons.codec.digest.DigestUtils
 
 @Entity("subscriptions")
-class TwitterTagSubscription(val tag: String, channelId: String, username: String) : Subscription() {
+class TwitterTagSubscription(private val tag: String, channelId: String, username: String) : Subscription() {
 
     init {
         id = "twitter-" + DigestUtils.md5Hex("tag$tag")

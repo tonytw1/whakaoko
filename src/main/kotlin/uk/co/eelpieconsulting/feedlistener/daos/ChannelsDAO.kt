@@ -10,7 +10,7 @@ import uk.co.eelpieconsulting.feedlistener.model.Channel
 import uk.co.eelpieconsulting.feedlistener.model.User
 
 @Component
-class ChannelsDAO @Autowired constructor(val dataStoreFactory: DataStoreFactory) {
+class ChannelsDAO @Autowired constructor(private val dataStoreFactory: DataStoreFactory) {
 
     private val NAME_ASCENDING = Sort.ascending("name")
 

@@ -36,7 +36,7 @@ class SubscriptionsDAO @Autowired constructor(private val dataStoreFactory: Data
         }
     }
 
-    fun getSubscriptions(sort: Sort?, url: String?): List<Subscription> {
+    private fun getSubscriptions(sort: Sort?, url: String?): List<Subscription> {
         return try {
             var query = dataStoreFactory.get().find(Subscription::class.java)
             if (!Strings.isNullOrEmpty(url)) {

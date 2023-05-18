@@ -14,7 +14,7 @@ import org.springframework.stereotype.Component
 import uk.co.eelpieconsulting.feedlistener.rss.RssFeedItemBodyExtractor
 
 @Component
-class BodyHtmlImageExtractor @Autowired constructor(val rssFeedItemBodyExtractor: RssFeedItemBodyExtractor) {
+class BodyHtmlImageExtractor @Autowired constructor(private val rssFeedItemBodyExtractor: RssFeedItemBodyExtractor) {
 
     private val log = LogManager.getLogger(BodyHtmlImageExtractor::class.java)
 

@@ -11,7 +11,7 @@ import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 import java.util.*
 
-class HttpFetcher(val userAgent: String, val timeout: Int) {
+class HttpFetcher(private val userAgent: String, private val timeout: Int) {
 
     private val log = LogManager.getLogger(HttpFetcher::class.java)
 
@@ -42,7 +42,7 @@ class HttpFetcher(val userAgent: String, val timeout: Int) {
         })
     }
 
-    fun withCommonRequestProperties(request: Request): Request {
+    private fun withCommonRequestProperties(request: Request): Request {
         return request.timeout(timeout).timeoutRead(timeout).header("User-Agent", userAgent)
     }
 

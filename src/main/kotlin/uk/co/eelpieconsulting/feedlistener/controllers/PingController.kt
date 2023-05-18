@@ -7,7 +7,7 @@ import org.springframework.web.servlet.ModelAndView
 import uk.co.eelpieconsulting.common.views.ViewFactory
 
 @Controller
-class PingController @Autowired constructor(val viewFactory: ViewFactory){
+class PingController @Autowired constructor(private val viewFactory: ViewFactory){
 
     @GetMapping("/healthz")
     fun ping(): ModelAndView? {
