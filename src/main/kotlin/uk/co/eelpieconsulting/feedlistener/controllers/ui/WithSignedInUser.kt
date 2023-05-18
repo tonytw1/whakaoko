@@ -13,16 +13,16 @@ abstract class WithSignedInUser(val currentUserService: CurrentUserService, val 
 
     fun forCurrentUser(handler: (User) -> ModelAndView): ModelAndView {
         val user = currentUserService.getCurrentUserUser()
-        if (user != null) {
+        return if (user != null) {
             log.debug("Generating page for user: " + user.username)
-            return handler(user).addObject("user", user)
+            handler(user).addObject("user", user)
 
         } else {
             val path = request.requestURI
             log.info("No signed in user when requesting path $path; redirecting to sign in")
             // Push this path so the user can be redirected after successful auth
             request.session.setAttribute("redirect", path)
-            return ModelAndView(RedirectView("/signin"))
+            ModelAndView(RedirectView("/signin"))
         }
     }
 

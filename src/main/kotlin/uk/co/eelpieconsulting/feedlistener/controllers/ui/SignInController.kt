@@ -62,10 +62,10 @@ class SignInController @Autowired constructor(val request: HttpServletRequest,
     private fun redirectToSignedInUserUI(request: HttpServletRequest): ModelAndView {
         val redirectUrl = request.session.getAttribute("redirect")
         request.session.removeAttribute("redirect")
-        if (redirectUrl != null && redirectUrl is String ) {
-            return ModelAndView(RedirectView(redirectUrl))
+        return if (redirectUrl != null && redirectUrl is String ) {
+            ModelAndView(RedirectView(redirectUrl))
         } else {
-            return ModelAndView(RedirectView("/"))
+            ModelAndView(RedirectView("/"))
         }
     }
 

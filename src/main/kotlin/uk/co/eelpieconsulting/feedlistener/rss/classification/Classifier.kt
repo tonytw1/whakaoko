@@ -20,11 +20,10 @@ class Classifier {
         }
 
         if (badHttpCodes.contains(subscription.httpStatus)) {
-            if (subscription.latestItemDate == null) {
-                return FeedStatus.gone
-
+            return if (subscription.latestItemDate == null) {
+                FeedStatus.gone
             } else {
-                return if (DateTime(subscription.latestItemDate).plusDays(3).isAfterNow) FeedStatus.wobbling else FeedStatus.gone
+                if (DateTime(subscription.latestItemDate).plusDays(3).isAfterNow) FeedStatus.wobbling else FeedStatus.gone
             }
         }
 
