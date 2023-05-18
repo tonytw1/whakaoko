@@ -14,7 +14,7 @@ class UrlBuilder @Autowired constructor(@Value("\${base.url}") private val baseU
     }
 
     fun getSubscriptionUrl(subscriptionId: String): String {
-        return baseUrl + "/ui/subscriptions/" + subscriptionId
+        return "$baseUrl/ui/subscriptions/$subscriptionId"
     }
 
     fun getDeleteSubscriptionUrl(subscription: Subscription): String {
@@ -42,9 +42,9 @@ class UrlBuilder @Autowired constructor(@Value("\${base.url}") private val baseU
     }
 
     val userUrl: String
-        get() = baseUrl + "/"
+        get() = "$baseUrl/"
     val newChannelUrl: String
-        get() = baseUrl + "/ui/channels/new"
+        get() = "$baseUrl/ui/channels/new"
 
     private fun subscriptionUrl(subscription: Subscription): String {
         return baseUrl + "/subscriptions/" + subscription.id
