@@ -12,13 +12,7 @@ class User(
     @get:JsonIgnore var googleUserId: String? = null,
     @get:JsonIgnore var accessToken: String? = null
 ) {
-
     override fun toString(): String {
-        return "User{" +
-                "objectId=" + objectId +
-                ", username='" + username + '\'' +
-                ", googleUserId='" + googleUserId + '\'' +
-                ", accessToken='" + accessToken + '\'' +
-                '}'
+        return "User(objectId=$objectId, username='$username')"
     }
 }

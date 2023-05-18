@@ -28,7 +28,7 @@ class SignInController @Autowired constructor(val request: HttpServletRequest,
 
     @PostMapping("/signin")
     fun signin(username: String, password: String, session: HttpSession, request: HttpServletRequest): ModelAndView {
-        log.info("Signing in as: " + username)
+        log.info("Signing in as: $username")
         val user = usersDAO.getByUsername(username)
         if (user != null) {
             val userPassword = user.password
