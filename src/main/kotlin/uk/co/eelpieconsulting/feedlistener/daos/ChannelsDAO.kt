@@ -1,6 +1,7 @@
 package uk.co.eelpieconsulting.feedlistener.daos
 
 import com.mongodb.MongoException
+import com.mongodb.MongoWriteException
 import dev.morphia.query.FindOptions
 import dev.morphia.query.Sort
 import dev.morphia.query.experimental.filters.Filters
@@ -32,11 +33,12 @@ class ChannelsDAO @Autowired constructor(private val dataStoreFactory: DataStore
         return byUserAndName.first()
     }
 
-    fun save(channel: Channel) {
-        try {
+    fun save(channel: Channel): Boolean {
+        return try {
             dataStoreFactory.get().save(channel)
-        } catch (e: MongoException) {
-            throw RuntimeException(e)
+            true
+        } catch (e: MongoWriteException) {
+            false
         }
     }
 

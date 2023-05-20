@@ -44,6 +44,10 @@ class DataStoreFactory @Autowired constructor(
             // see subtype in LegacyQuery source code for hints
             datastore.mapper.map(TwitterTagSubscription::class.java)
             datastore.mapper.map(RssSubscription::class.java)
+            datastore.mapper.map(Channel::class.java)
+            datastore.mapper.map(FeedItem::class.java)
+
+            datastore.ensureIndexes()
             datastore
 
         } catch (e: MongoException) {

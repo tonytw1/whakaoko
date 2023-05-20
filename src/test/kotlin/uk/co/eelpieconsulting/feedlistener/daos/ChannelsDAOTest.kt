@@ -2,8 +2,10 @@ package uk.co.eelpieconsulting.feedlistener.daos
 
 import org.bson.types.ObjectId
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Test
 import uk.co.eelpieconsulting.feedlistener.model.Channel
+import uk.co.eelpieconsulting.feedlistener.model.User
 import java.util.*
 
 class ChannelsDAOTest {
@@ -30,5 +32,20 @@ class ChannelsDAOTest {
         val reloaded = channelsDAO.getById(channel.id)
         assertEquals(channel, reloaded)
     }
+
+    @Test
+    fun channelNamesShouldBeUniqueByUser() {
+        val user = User(objectId = ObjectId.get(), "a-user")
+        val channel = Channel(ObjectId.get(), UUID.randomUUID().toString(), "A channel", user.username)
+        val duplicateChannel = Channel(ObjectId.get(), UUID.randomUUID().toString(), "A channel", user.username)
+        channelsDAO.save(channel)
+
+        assertFalse(channelsDAO.save(duplicateChannel))
+
+        val channelsFor = channelsDAO.getChannelsFor(user)
+        assertEquals(1, channelsFor.size)
+        assertEquals(channel, channelsFor[0])
+    }
+
 
 }
