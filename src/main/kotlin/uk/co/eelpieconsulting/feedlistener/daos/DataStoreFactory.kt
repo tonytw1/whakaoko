@@ -45,6 +45,7 @@ class DataStoreFactory @Autowired constructor(
             datastore.mapper.map(RssSubscription::class.java)
             datastore.mapper.map(Channel::class.java)
             datastore.mapper.map(FeedItem::class.java)
+            datastore.mapper.map(User::class.java)
 
             datastore.ensureIndexes()
             datastore
