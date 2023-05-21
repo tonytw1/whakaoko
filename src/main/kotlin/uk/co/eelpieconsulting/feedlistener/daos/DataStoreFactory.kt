@@ -36,13 +36,12 @@ class DataStoreFactory @Autowired constructor(
         return try {
             val mapperOptions =
                 MapperOptions.builder().discriminatorKey("className").discriminator(DiscriminatorFunction.className())
-                    .enablePolymorphicQueries(true).build()
+                    .build()
             val mongoClient = MongoClients.create(mongoUri)
             val datastore = Morphia.createDatastore(mongoClient, database, mapperOptions)
 
             // These explicit mappings are needed to trigger subclass querying during finds;
             // see subtype in LegacyQuery source code for hints
-            datastore.mapper.map(TwitterTagSubscription::class.java)
             datastore.mapper.map(RssSubscription::class.java)
             datastore.mapper.map(Channel::class.java)
             datastore.mapper.map(FeedItem::class.java)
