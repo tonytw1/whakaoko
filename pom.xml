@@ -17,7 +17,7 @@
         <jackson.version>2.13.4</jackson.version>
         <spymemcached.version>2.12.3</spymemcached.version>
         <kotlin.version>1.8.21</kotlin.version>
-        <morphia.version>2.2.10</morphia.version>
+        <morphia.version>2.3.0</morphia.version>
         <maven.compiler.target>17</maven.compiler.target>
         <maven.compiler.source>17</maven.compiler.source>
     </properties>
