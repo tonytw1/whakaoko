@@ -13,7 +13,6 @@ import java.util.*
 
 @Entity("feeditems", useDiscriminator = false)
 @Indexes(
-    Index(fields = [Field(value = "ordering", type = IndexType.DESC), Field(value = "_id")]),
     Index(fields = [Field(value = "channelId"), Field(value = "ordering", type = IndexType.DESC), Field(value = "_id")]),
     Index(fields = [Field(value = "subscriptionId"), Field(value = "ordering", type = IndexType.DESC), Field(value = "_id")])
 )
