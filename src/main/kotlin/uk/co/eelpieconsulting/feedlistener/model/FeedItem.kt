@@ -11,7 +11,7 @@ import uk.co.eelpieconsulting.common.geo.model.LatLong
 import uk.co.eelpieconsulting.common.views.rss.RssFeedable
 import java.util.*
 
-@Entity("feeditems")
+@Entity("feeditems", useDiscriminator = false)
 @Indexes(
     Index(fields = [Field(value = "ordering", type = IndexType.DESC), Field(value = "_id")]),
     Index(fields = [Field(value = "subscriptionId"), Field(value = "ordering", type = IndexType.DESC), Field(value = "_id")])

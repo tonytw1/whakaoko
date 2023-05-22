@@ -95,11 +95,8 @@ class FeedItemDAO @Autowired constructor(private val dataStoreFactory: DataStore
     fun getChannelFeedItems(channelId: String, pageSize: Int, page: Int, subscriptions: List<String>? = null): FeedItemsResult {
         val query = channelFeedItemsQuery(channelId, subscriptions)
 
-        // TODO this produces a separate mongo agg call which is slow and unindexed query.count()
-        // ie. db.feeditems.aggregate([ { $match: { channelId: "twickenham", className: { $in: [ "uk.co.eelpieconsulting.feedlistener.model.FeedItem" ]}}}, { $group: { _id: 1, n: { $sum: 1 } } } ])
-        // if the discrimator clause is removed then the count examines keys and is 4 times faster.
+        // This produces a separate mongo agg call which is fairly slow even against indexes
         // ie. db.feeditems.aggregate([ { $match: { channelId: "twickenham"}}, { $group: { _id: 1, n: { $sum: 1 } } } ])
-        // Should Morphia really be adding the discriminator clause to the count query?
         val totalCount = query.count()
 
         return FeedItemsResult(query.iterator(withPaginationFor(pageSize, page).sort(*ORDER_DESCENDING_THEN_ID)).toList(), totalCount)
