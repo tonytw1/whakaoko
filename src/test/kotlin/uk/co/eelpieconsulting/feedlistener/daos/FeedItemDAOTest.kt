@@ -81,7 +81,6 @@ class FeedItemDAOTest {
         feedItemDAO.add(anotherFeedItem)
 
         val feedItems = feedItemDAO.getChannelFeedItems(channelId = channel.id, 10, 1)
-
         assertEquals(2, feedItems.totalCount)
     }
 
@@ -104,6 +103,7 @@ class FeedItemDAOTest {
         )
 
         assertEquals(1, feedItems.totalCount)
+        assertEquals(yetAnotherSubscription.id, feedItems.feedsItems[0].subscriptionId)
     }
 
     private fun testSubscription(channel: Channel): RssSubscription {

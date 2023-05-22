@@ -38,7 +38,7 @@ class SubscriptionsDAO @Autowired constructor(private val dataStoreFactory: Data
 
     private fun getSubscriptions(sort: Sort?, url: String?): List<Subscription> {
         return try {
-            var query = dataStoreFactory.get().find(Subscription::class.java)
+            var query = dataStoreFactory.get().find(RssSubscription::class.java)
             if (!Strings.isNullOrEmpty(url)) {
                 query = query.disableValidation()
                     .filter(Filters.eq("url", url)) // TODO subclasses to helping here Why is validation disabled?
@@ -50,7 +50,7 @@ class SubscriptionsDAO @Autowired constructor(private val dataStoreFactory: Data
     }
 
     fun getById(id: String?): Subscription? {
-        return dataStoreFactory.get().find(Subscription::class.java).filter(Filters.eq("id", id)).first()
+        return dataStoreFactory.get().find(RssSubscription::class.java).filter(Filters.eq("id", id)).first()
     }
 
     fun getByRssSubscriptionById(id: String?): RssSubscription? {
@@ -67,8 +67,8 @@ class SubscriptionsDAO @Autowired constructor(private val dataStoreFactory: Data
     }
 
     @Throws(MongoException::class)
-    fun getSubscriptionsForChannel(channelID: String, url: String?): List<Subscription> {
-        var query = dataStoreFactory.get().find(Subscription::class.java).filter(Filters.eq("channelId", channelID))
+    fun getSubscriptionsForChannel(channelID: String, url: String?): List<RssSubscription> {
+        var query = dataStoreFactory.get().find(RssSubscription::class.java).filter(Filters.eq("channelId", channelID))
         if (!Strings.isNullOrEmpty(url)) {
             query = query.disableValidation().filter(Filters.eq("url", url)) // TODO subclasses to helping here
         }
