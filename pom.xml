@@ -14,7 +14,7 @@
     </parent>
 
     <properties>
-        <jackson.version>2.13.4</jackson.version>
+        <jackson.version>2.15.1</jackson.version>
         <spymemcached.version>2.12.3</spymemcached.version>
         <kotlin.version>1.8.21</kotlin.version>
         <morphia.version>2.3.0</morphia.version>
