@@ -24,10 +24,6 @@
 
     <repositories>
         <repository>
-            <id>local-dependencies</id>
-            <url>file:${basedir}/lib/repository</url>
-        </repository>
-        <repository>
             <id>artifact-registry</id>
             <url>https://europe-maven.pkg.dev/eelpie-cloud-registry/eelpie</url>
             <releases>
