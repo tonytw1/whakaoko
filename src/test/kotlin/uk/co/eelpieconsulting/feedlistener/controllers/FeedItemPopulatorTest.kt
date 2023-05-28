@@ -1,5 +1,6 @@
 package uk.co.eelpieconsulting.feedlistener.controllers
 
+import org.bson.types.ObjectId
 import org.joda.time.DateTime
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
@@ -17,6 +18,7 @@ class FeedItemPopulatorTest {
     fun canCorrectForExcessivelyEscapedInputFeedItems() {
         val incorrectlyEscapedHeadline = "St John&#39;s Bar, 5 Cable Street, Te Aro, Wellington"
         val feedItem = FeedItem(
+            objectId = ObjectId.get(),
             title = incorrectlyEscapedHeadline, url = "http://localhost", date = DateTime.now().toDate(), body = null,
             subscriptionId = UUID.randomUUID().toString(), channelId = UUID.randomUUID().toString(), _categories = emptyList(), ordering = DateTime.now().toDate()
         )

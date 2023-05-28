@@ -116,6 +116,7 @@ class FeedItemDAOTest {
     private fun testFeedItemFor(subscription: RssSubscription, categories: List<Category>? = null): FeedItem {
         val url = "http://localhost/" + UUID.randomUUID().toString()
         return FeedItem(
+            ObjectId.get(),
             UUID.randomUUID().toString(),
             url,
             null,

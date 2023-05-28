@@ -18,6 +18,8 @@ import java.util.*
 )
 @JsonInclude(JsonInclude.Include.NON_NULL)
 data class FeedItem(
+    @Id
+    val objectId: ObjectId,
     val title: String?,
     @Indexed
     val url: String,
@@ -35,9 +37,6 @@ data class FeedItem(
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ssXXX") val ordering: Date?,
     @get:JsonIgnore val subscriptionName: String? = null // Display only field
 ) : RssFeedable {
-
-    @Id
-    var objectId: ObjectId? = null
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ssXXX")
     override fun getDate(): Date? {

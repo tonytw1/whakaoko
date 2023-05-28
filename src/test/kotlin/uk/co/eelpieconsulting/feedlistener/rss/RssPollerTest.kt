@@ -1,5 +1,6 @@
 package uk.co.eelpieconsulting.feedlistener.rss
 
+import org.bson.types.ObjectId
 import org.joda.time.DateTime
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNull
@@ -21,13 +22,16 @@ class RssPollerTest {
 
         val feedItemDates = listOf(recently, mostRecent, longAgo)
         val feedItems = feedItemDates.map { date ->
-            FeedItem(title = "title",
-                    url = "url", body = "body",
-                    date = date.toDate(),
-                    subscriptionId = UUID.randomUUID().toString(),
-                    channelId = UUID.randomUUID().toString(),
-                    _categories = null,
-                    ordering = date.toDate())
+            FeedItem(
+                ObjectId.get(),
+                title = "title",
+                url = "url", body = "body",
+                date = date.toDate(),
+                subscriptionId = UUID.randomUUID().toString(),
+                channelId = UUID.randomUUID().toString(),
+                _categories = null,
+                ordering = date.toDate()
+            )
         }
 
         val latestItemDate = feedItemLatestDateFinder.getLatestItemDate(feedItems)
@@ -36,7 +40,8 @@ class RssPollerTest {
 
     @Test
     fun canNameRootCauseOfFeedFetchingExceptions() {
-        val feedFetchingException = FeedFetchingException(message = "Something", rootCause = RuntimeException("Something went wrong"))
+        val feedFetchingException =
+            FeedFetchingException(message = "Something", rootCause = RuntimeException("Something went wrong"))
 
         assertEquals("Something", feedFetchingException.message)
         val rootCauseName = feedFetchingException.rootCause?.javaClass?.simpleName

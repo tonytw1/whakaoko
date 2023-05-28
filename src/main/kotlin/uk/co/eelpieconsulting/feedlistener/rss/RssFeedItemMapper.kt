@@ -5,6 +5,7 @@ import com.rometools.rome.feed.synd.SyndCategory
 import com.rometools.rome.feed.synd.SyndEntry
 import org.apache.commons.lang.StringEscapeUtils
 import org.apache.logging.log4j.LogManager
+import org.bson.types.ObjectId
 import org.joda.time.DateTime
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
@@ -41,6 +42,7 @@ class RssFeedItemMapper @Autowired constructor(private val rssFeedItemImageExtra
 
         if (url != null) {
             return FeedItem(
+                ObjectId.get(),
                 syndEntry.title,
                 url,
                 body,
