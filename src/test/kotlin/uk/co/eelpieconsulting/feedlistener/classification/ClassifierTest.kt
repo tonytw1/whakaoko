@@ -74,7 +74,7 @@ class ClassifierTest {
 
         val frequency = classifier.frequency(subscription)
 
-        assertEquals("108.0 / 50.91168824543142", frequency)
+        assertEquals("4.5 / 2.1213203435596424", frequency)
     }
 
     private fun testFeedItemFor(subscription: RssSubscription, categories: List<Category>? = null): FeedItem {

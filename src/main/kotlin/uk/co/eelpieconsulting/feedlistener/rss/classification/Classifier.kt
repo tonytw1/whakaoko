@@ -38,8 +38,8 @@ class Classifier  @Autowired constructor(private val feedItemDAO: FeedItemDAO)  
         val stats: DescriptiveStatistics = DescriptiveStatistics()
 
         for (i: Int in 0 until feedItems.size - 1) {
-            val gap =  Duration(DateTime(itemDates[i + 1]), DateTime(itemDates[i])).toStandardHours().hours.toDouble()
-            stats.addValue(gap)
+            val gapInDays =  Duration(DateTime(itemDates[i + 1]), DateTime(itemDates[i])).toStandardHours().hours.toDouble() / 24.0
+            stats.addValue(gapInDays)
         }
         
         log.info("Frequency stats for " + subscription.name + ": " + stats.mean + " " + stats.standardDeviation)
