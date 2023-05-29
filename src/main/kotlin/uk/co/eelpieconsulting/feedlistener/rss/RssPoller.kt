@@ -7,6 +7,7 @@ import io.micrometer.core.instrument.MeterRegistry
 import io.micrometer.core.instrument.Metrics
 import org.apache.logging.log4j.LogManager
 import org.joda.time.DateTime
+import org.joda.time.Duration
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.core.task.TaskExecutor
@@ -52,20 +53,28 @@ class RssPoller @Autowired constructor(val subscriptionsDAO: SubscriptionsDAO,
     }
 
     private fun shouldFetchNow(subscription: RssSubscription): Boolean {
-        val classifications = if (subscription.classifications != null) subscription.classifications!! else emptySet()
+        val lastRead = subscription.lastRead
+            ?: // If never read then read now
+            return true
 
+        val oneHour = Duration.standardHours(1)
+        val oneDay = Duration.standardDays(1)
         val okHttpStatuses = setOf(FeedStatus.ok, FeedStatus.wobbling)
-        if (classifications.intersect(okHttpStatuses).isNotEmpty()) {
-            return true
+
+        val classifications = if (subscription.classifications != null) subscription.classifications!! else emptySet()
+        val readInterval = if (classifications.intersect(okHttpStatuses).isNotEmpty()) {
+            if (classifications.contains(FeedStatus.frequent)) {
+                oneHour
+            } else {
+                // infrequent feeds are only read once a day.
+                oneDay
+            }
+        } else {
+            // broken and gone feeds are only read once a day to look for a potential resurrection.
+            oneDay
         }
 
-        if (classifications.contains(FeedStatus.frequent)) {
-            return true
-        }
-
-        // broken and gone feeds are only read once a day to look for a potential resurrection.
-        val lastRead = subscription.lastRead ?: return true
-        return lastRead.before(DateTime.now().minusDays(1).toDate())
+        return lastRead.before(DateTime.now().minus(readInterval).toDate())
     }
 
     private fun run(subscription: RssSubscription) {
