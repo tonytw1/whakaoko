@@ -1,21 +1,19 @@
 package uk.co.eelpieconsulting.feedlistener.classification
 
-import org.bson.types.ObjectId
 import org.joda.time.DateTime
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.mockito.Mockito
 import org.mockito.Mockito.`when`
+import uk.co.eelpieconsulting.feedlistener.TestData
 import uk.co.eelpieconsulting.feedlistener.daos.FeedItemDAO
-import uk.co.eelpieconsulting.feedlistener.model.Category
-import uk.co.eelpieconsulting.feedlistener.model.FeedItem
 import uk.co.eelpieconsulting.feedlistener.model.FeedItemsResult
 import uk.co.eelpieconsulting.feedlistener.model.RssSubscription
 import uk.co.eelpieconsulting.feedlistener.rss.classification.Classifier
 import uk.co.eelpieconsulting.feedlistener.rss.classification.FeedStatus
 import java.util.*
 
-class ClassifierTest {
+class ClassifierTest : TestData {
 
     private val feedItemDAO = Mockito.mock(FeedItemDAO::class.java)
 
@@ -30,7 +28,7 @@ class ClassifierTest {
 
         val result = classifier.classify(subscription)
 
-        assertEquals(FeedStatus.ok, result)
+        assertEquals(setOf(FeedStatus.ok), result)
     }
 
     @Test
@@ -41,7 +39,7 @@ class ClassifierTest {
 
         val result = classifier.classify(subscription)
 
-        assertEquals(FeedStatus.gone, result)
+        assertEquals(setOf(FeedStatus.gone), result)
     }
 
     @Test
@@ -54,7 +52,7 @@ class ClassifierTest {
 
         val result = classifier.classify(subscription)
 
-        assertEquals(FeedStatus.wobbling, result)
+        assertEquals(setOf(FeedStatus.wobbling), result)
     }
 
     @Test
@@ -74,25 +72,7 @@ class ClassifierTest {
 
         val frequency = classifier.frequency(subscription)
 
-        assertEquals("4.5 / 2.1213203435596424", frequency)
+        assertEquals(4.5, frequency!!, 0.1)
     }
 
-    private fun testFeedItemFor(subscription: RssSubscription, categories: List<Category>? = null): FeedItem {
-        val url = "http://localhost/" + UUID.randomUUID().toString()
-        return FeedItem(
-            ObjectId.get(),
-            UUID.randomUUID().toString(),
-            url,
-            null,
-            DateTime.now().toDate(),
-            DateTime.now().toDate(),
-            null,
-            null,
-            null,
-            subscription.id,
-            subscription.channelId,
-            categories,
-            DateTime.now().toDate()
-        )
-    }
 }

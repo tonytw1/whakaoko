@@ -6,7 +6,7 @@ import uk.co.eelpieconsulting.feedlistener.rss.classification.FeedStatus
 
 @Entity("subscriptions")
 class RssSubscription(
-    val url: String, channelId: String, username: String, var classification: FeedStatus? = null
+    val url: String, channelId: String, username: String, var classification: FeedStatus? = null, var classifications: Set<FeedStatus>? = emptySet()
 ) : Subscription() {
 
     init {

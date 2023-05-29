@@ -18,12 +18,20 @@ class Classifier  @Autowired constructor(private val feedItemDAO: FeedItemDAO)  
     private val goodHttpCodes = setOf(200, 304)
     private val badHttpCodes = setOf(404, 401, -1)
 
-    fun classify(subscription: RssSubscription): FeedStatus? {
-        val frequency = frequency(subscription)
-        return livenessStatus(subscription)
+    fun classify(subscription: RssSubscription): Set<FeedStatus> {
+        val frequencyStatus = frequency(subscription)?.let {
+            log.info("Frequency for " + subscription.name + ": " + it)
+            if (it < 7) {
+                FeedStatus.frequent
+            } else {
+                null
+            }
+        }
+
+        return setOf(frequencyStatus, livenessStatus(subscription)).mapNotNull { it }.toSet()
     }
 
-    fun frequency(subscription: Subscription): String? {
+    fun frequency(subscription: Subscription): Double? {
         // Given a subscription estimate the frequency of posts by look at the gaps between it's previous posts
 
         val subscriptionFeedItems = feedItemDAO.getSubscriptionFeedItems(subscription, 1, 20)
@@ -43,7 +51,7 @@ class Classifier  @Autowired constructor(private val feedItemDAO: FeedItemDAO)  
         }
         
         log.info("Frequency stats for " + subscription.name + ": " + stats.mean + " " + stats.standardDeviation)
-        return "${stats.mean} / ${stats.standardDeviation}"
+        return stats.mean
     }
 
     private fun livenessStatus(subscription: RssSubscription) =

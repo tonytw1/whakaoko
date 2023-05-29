@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Test
 import uk.co.eelpieconsulting.feedlistener.TestData
 import uk.co.eelpieconsulting.feedlistener.model.Channel
+import uk.co.eelpieconsulting.feedlistener.rss.classification.FeedStatus
 import java.util.*
 
 class SubscriptionsDAOTest : TestData {
@@ -26,13 +27,15 @@ class SubscriptionsDAOTest : TestData {
     @Test
     fun canFetchSubscriptionByChannel() {
         val channel = Channel(ObjectId.get(), UUID.randomUUID().toString(), "A channel", "a-user")
-        val subscription = testSubscription(channel)
+        val subscription = testSubscription(channel, classifications = setOf(FeedStatus.frequent, FeedStatus.ok))
         subscriptionsDAO.add(subscription)
 
         val channelSubscriptions = subscriptionsDAO.getSubscriptionsForChannel(channel.id, null)
 
         assertEquals(1, channelSubscriptions.size)
-        assertEquals(subscription.id, channelSubscriptions.first().id)
+        val first = channelSubscriptions.first()
+        assertEquals(subscription.id, first.id)
+        assertEquals(setOf(FeedStatus.frequent, FeedStatus.ok), first.classifications)
     }
 
     @Test
@@ -45,5 +48,7 @@ class SubscriptionsDAOTest : TestData {
 
         assertNull(subscriptionsDAO.getById(subscription.id))
     }
+
+
 
 }
