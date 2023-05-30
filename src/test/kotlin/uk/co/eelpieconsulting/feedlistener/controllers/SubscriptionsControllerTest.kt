@@ -4,7 +4,7 @@ import org.bson.types.ObjectId
 import org.junit.jupiter.api.Test
 import org.mockito.Mockito.*
 import org.springframework.mock.web.MockHttpServletRequest
-import uk.co.eelpieconsulting.common.views.ViewFactory
+
 import uk.co.eelpieconsulting.feedlistener.UrlBuilder
 import uk.co.eelpieconsulting.feedlistener.daos.ChannelsDAO
 import uk.co.eelpieconsulting.feedlistener.daos.FeedItemDAO
@@ -12,6 +12,7 @@ import uk.co.eelpieconsulting.feedlistener.daos.SubscriptionsDAO
 import uk.co.eelpieconsulting.feedlistener.model.RssSubscription
 import uk.co.eelpieconsulting.feedlistener.model.User
 import uk.co.eelpieconsulting.feedlistener.rss.RssPoller
+import uk.co.eelpieconsulting.feedlistener.views.ViewFactory
 
 class SubscriptionsControllerTest {
 

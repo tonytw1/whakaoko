@@ -9,7 +9,8 @@ import org.springframework.stereotype.Component
 import org.springframework.web.server.ResponseStatusException
 import org.springframework.web.servlet.HandlerExceptionResolver
 import org.springframework.web.servlet.ModelAndView
-import uk.co.eelpieconsulting.common.views.ViewFactory
+
+import uk.co.eelpieconsulting.feedlistener.views.ViewFactory
 
 @Component
 class ExceptionHandler @Autowired constructor(private val viewFactory: ViewFactory) : HandlerExceptionResolver,

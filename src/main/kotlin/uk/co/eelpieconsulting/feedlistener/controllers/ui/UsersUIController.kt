@@ -10,12 +10,13 @@ import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.servlet.ModelAndView
-import uk.co.eelpieconsulting.common.views.ViewFactory
+
 import uk.co.eelpieconsulting.feedlistener.controllers.CurrentUserService
 import uk.co.eelpieconsulting.feedlistener.daos.ChannelsDAO
 import uk.co.eelpieconsulting.feedlistener.daos.UsersDAO
 import uk.co.eelpieconsulting.feedlistener.model.User
 import uk.co.eelpieconsulting.feedlistener.passwords.PasswordHashing
+import uk.co.eelpieconsulting.feedlistener.views.ViewFactory
 
 @Controller
 class UsersUIController @Autowired constructor(

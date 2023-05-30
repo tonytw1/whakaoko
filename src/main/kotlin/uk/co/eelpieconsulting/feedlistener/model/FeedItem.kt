@@ -1,9 +1,6 @@
 package uk.co.eelpieconsulting.feedlistener.model
 
-import com.fasterxml.jackson.annotation.JsonFormat
-import com.fasterxml.jackson.annotation.JsonIgnore
-import com.fasterxml.jackson.annotation.JsonInclude
-import com.fasterxml.jackson.annotation.JsonProperty
+import com.fasterxml.jackson.annotation.*
 import dev.morphia.annotations.*
 import dev.morphia.utils.IndexType
 import org.bson.types.ObjectId
@@ -24,7 +21,8 @@ data class FeedItem(
     @Indexed
     val url: String,
     val body: String?,
-    private var date: Date?,
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ssXXX")
+    private val date: Date?,
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ssXXX") val accepted: Date? = null,
     val place: Place? = null,
     private val imageUrl: String? = null,
@@ -38,7 +36,6 @@ data class FeedItem(
     @get:JsonIgnore val subscriptionName: String? = null // Display only field
 ) : RssFeedable {
 
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ssXXX")
     override fun getDate(): Date? {
         return date
     }

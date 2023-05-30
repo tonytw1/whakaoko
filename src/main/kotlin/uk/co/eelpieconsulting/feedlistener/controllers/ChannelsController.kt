@@ -11,7 +11,7 @@ import org.springframework.stereotype.Controller
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.server.ResponseStatusException
 import org.springframework.web.servlet.ModelAndView
-import uk.co.eelpieconsulting.common.views.ViewFactory
+
 import uk.co.eelpieconsulting.feedlistener.IdBuilder
 import uk.co.eelpieconsulting.feedlistener.UrlBuilder
 import uk.co.eelpieconsulting.feedlistener.controllers.ui.WithSignedInUser
@@ -20,6 +20,7 @@ import uk.co.eelpieconsulting.feedlistener.daos.FeedItemDAO
 import uk.co.eelpieconsulting.feedlistener.daos.SubscriptionsDAO
 import uk.co.eelpieconsulting.feedlistener.model.Channel
 import uk.co.eelpieconsulting.feedlistener.model.User
+import uk.co.eelpieconsulting.feedlistener.views.ViewFactory
 
 @Controller
 class ChannelsController @Autowired constructor(private val channelsDAO: ChannelsDAO,
