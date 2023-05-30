@@ -95,6 +95,7 @@ class SubscriptionsUIController @Autowired constructor(
                         .addObject("channel", channel)
                         .addObject("subscription", subscription)
                         .addObject("frequency", classifier.frequency(subscription))
+                        .addObject("fetchInterval", rssPoller.fetchIntervalFor(subscription))
                     mv
                 }
             }

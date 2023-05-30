@@ -18,6 +18,7 @@ import uk.co.eelpieconsulting.feedlistener.daos.FeedItemDAO
 import uk.co.eelpieconsulting.feedlistener.daos.SubscriptionsDAO
 import uk.co.eelpieconsulting.feedlistener.model.FeedItem
 import uk.co.eelpieconsulting.feedlistener.model.RssSubscription
+import uk.co.eelpieconsulting.feedlistener.model.Subscription
 import uk.co.eelpieconsulting.feedlistener.rss.classification.Classifier
 import uk.co.eelpieconsulting.feedlistener.rss.classification.FeedStatus
 import java.time.ZonedDateTime
@@ -57,6 +58,12 @@ class RssPoller @Autowired constructor(val subscriptionsDAO: SubscriptionsDAO,
             ?: // If never read then read now
             return true
 
+        val readInterval = fetchIntervalFor(subscription)
+
+        return lastRead.before(DateTime.now().minus(readInterval).toDate())
+    }
+
+    fun fetchIntervalFor(subscription: Subscription): Duration? {
         val oneHour = Duration.standardHours(1)
         val oneDay = Duration.standardDays(1)
         val okHttpStatuses = setOf(FeedStatus.ok, FeedStatus.wobbling)
@@ -73,8 +80,7 @@ class RssPoller @Autowired constructor(val subscriptionsDAO: SubscriptionsDAO,
             // broken and gone feeds are only read once a day to look for a potential resurrection.
             oneDay
         }
-
-        return lastRead.before(DateTime.now().minus(readInterval).toDate())
+        return readInterval
     }
 
     private fun run(subscription: RssSubscription) {

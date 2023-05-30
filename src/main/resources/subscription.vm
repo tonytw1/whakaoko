@@ -43,7 +43,8 @@
                 #end
             #end
 
-            <p>$frequency</p>
+            <p>$!frequency</p>
+            <p>$!fetchInterval</p>
 
             #if($subscription.latestItemDate)
                 <p>Latest item date: $dateFormatter.timeSince($subscription.latestItemDate)</p>

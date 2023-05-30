@@ -6,13 +6,14 @@ import uk.co.eelpieconsulting.feedlistener.rss.classification.FeedStatus
 
 @Entity("subscriptions")
 class RssSubscription(
-    val url: String, channelId: String, username: String, var classification: FeedStatus? = null, var classifications: Set<FeedStatus>? = emptySet()
+    val url: String, channelId: String, username: String, var classification: FeedStatus? = null, classifications: Set<FeedStatus>? = emptySet()
 ) : Subscription() {
 
     init {
         id = channelId + "-" + "feed-" + DigestUtils.md5Hex(url)
         this.channelId = channelId
         this.username =username
+        this.classifications = classifications
     }
 
 }
