@@ -1,8 +1,10 @@
 package uk.co.eelpieconsulting.feedlistener.views
 
+import com.fasterxml.jackson.databind.ObjectMapper
 import org.bson.types.ObjectId
 import org.joda.time.DateTime
-import org.junit.jupiter.api.Assertions.assertTrue
+import org.joda.time.DateTimeZone
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.springframework.mock.web.MockHttpServletRequest
 import org.springframework.mock.web.MockHttpServletResponse
@@ -30,8 +32,9 @@ class JsonViewTest {
         view.render(mv.model, MockHttpServletRequest(), response)
 
         val responseBody = response.contentAsString
-        assertTrue(responseBody.contains("\"date\":\"2023-05-02T11:23:00Z\""))
-        assertTrue(responseBody.contains("\"accepted\":\"2023-05-02T11:23:00Z\""))
+        val responseFields = ObjectMapper().readValue(responseBody, Map::class.java)
+        assertEquals("2023-05-02T12:23:00Z", responseFields.get("date"))
+        assertEquals("2023-05-02T12:23:00Z", responseFields.get("accepted"))
     }
 
     private fun testSubscription(channel: Channel): RssSubscription {
@@ -43,7 +46,7 @@ class JsonViewTest {
 
     private fun testFeedItemFor(subscription: RssSubscription, categories: List<Category>? = null): FeedItem {
         val url = "http://localhost/" + UUID.randomUUID().toString()
-        val date = DateTime(2023, 5, 2, 12, 23)
+        val date = DateTime(2023, 5, 2, 12, 23, DateTimeZone.UTC)
         return FeedItem(
             ObjectId.get(),
             UUID.randomUUID().toString(),
