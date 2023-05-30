@@ -8,7 +8,6 @@ import org.springframework.mock.web.MockHttpServletRequest
 import org.springframework.mock.web.MockHttpServletResponse
 import org.springframework.web.servlet.ModelAndView
 import uk.co.eelpieconsulting.common.views.EtagGenerator
-import uk.co.eelpieconsulting.common.views.ViewFactory
 import uk.co.eelpieconsulting.feedlistener.model.Category
 import uk.co.eelpieconsulting.feedlistener.model.Channel
 import uk.co.eelpieconsulting.feedlistener.model.FeedItem
@@ -22,9 +21,9 @@ class JsonViewTest {
         val channel = Channel(ObjectId.get(), UUID.randomUUID().toString(), "A channel", "a-user")
         val subscription = testSubscription(channel)
 
-        val viewFactory = ViewFactory(EtagGenerator())
-        val view = viewFactory.jsonView
-        val mv = ModelAndView(viewFactory.jsonView)
+        val view = JsonView(JsonSerializer(), EtagGenerator())
+
+        val mv = ModelAndView(view)
         mv.addObject("data", testFeedItemFor(subscription))
         val response = MockHttpServletResponse()
 
