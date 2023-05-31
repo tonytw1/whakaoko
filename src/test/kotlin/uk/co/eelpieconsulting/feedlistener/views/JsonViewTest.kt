@@ -1,6 +1,7 @@
 package uk.co.eelpieconsulting.feedlistener.views
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.module.kotlin.registerKotlinModule
 import org.bson.types.ObjectId
 import org.joda.time.DateTime
 import org.joda.time.DateTimeZone
@@ -10,6 +11,8 @@ import org.springframework.mock.web.MockHttpServletRequest
 import org.springframework.mock.web.MockHttpServletResponse
 import org.springframework.web.servlet.ModelAndView
 import uk.co.eelpieconsulting.common.views.EtagGenerator
+import uk.co.eelpieconsulting.common.views.json.JsonSerializer
+import uk.co.eelpieconsulting.common.views.json.JsonView
 import uk.co.eelpieconsulting.feedlistener.model.Category
 import uk.co.eelpieconsulting.feedlistener.model.Channel
 import uk.co.eelpieconsulting.feedlistener.model.FeedItem
@@ -23,7 +26,7 @@ class JsonViewTest {
         val channel = Channel(ObjectId.get(), UUID.randomUUID().toString(), "A channel", "a-user")
         val subscription = testSubscription(channel)
 
-        val view = JsonView(JsonSerializer(), EtagGenerator())
+        val view = JsonView(JsonSerializer(ObjectMapper().registerKotlinModule()), EtagGenerator())
 
         val mv = ModelAndView(view)
         mv.addObject("data", testFeedItemFor(subscription))
