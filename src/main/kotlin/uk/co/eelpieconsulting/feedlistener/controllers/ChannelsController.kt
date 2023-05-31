@@ -64,7 +64,7 @@ class ChannelsController @Autowired constructor(private val channelsDAO: Channel
     @PostMapping("/channels")
     fun createSubscription(@RequestBody create: CreateChannelRequest): ModelAndView {
         fun createChannel(user: User): ModelAndView {
-            log.info("Got channel create request: " + create)
+            log.info("Got channel create request: $create")
             if (Strings.isNullOrEmpty(create.name)) {
                 throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Channel name is required")
             }
@@ -104,9 +104,10 @@ class ChannelsController @Autowired constructor(private val channelsDAO: Channel
                     response: HttpServletResponse): ModelAndView {
         return forCurrentUser { user ->
             conditionalLoads.withChannelForUser(id, user) { channel ->
-                var mv = ModelAndView(viewFactory.jsonView)
-                if (!Strings.isNullOrEmpty(format) && format == "rss") {    // TODO view factory could do this?
-                    mv = ModelAndView(viewFactory.getRssView(channel.name, urlBuilder.getChannelUrl(channel), ""))
+                val mv = if (!Strings.isNullOrEmpty(format) && format == "rss") {    // TODO view factory could do this?
+                    ModelAndView(viewFactory.getRssView(channel.name, urlBuilder.getChannelUrl(channel), ""))
+                } else {
+                    ModelAndView(viewFactory.jsonView)
                 }
                 val results = feedItemDAO.getChannelFeedItemsResult(channel, page, q, pageSize, subscriptions)
                 feedItemPopulator.populateFeedItems(results, mv, "data")
