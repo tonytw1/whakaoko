@@ -13,7 +13,11 @@
         <div class="col">
             <p>Adding a subscription to channel $channel.name</p>
             <form action="/ui/subscriptions/feeds" method="POST">
-                Rss feed URL <input name="url" />
+                #springBind("newSubscriptionForm.url")
+                Feed URL: <input name="$!{status.expression}" value="$!{status.value}"/>
+                #foreach($error in $status.errorMessages)
+                    <div class="alert">$error</div>
+                #end
                 <input name="channel" value="$channel.id" type="hidden"/>
                 <input type="submit" value="Add feed"/>
             </form>

@@ -1,10 +1,12 @@
 package uk.co.eelpieconsulting.feedlistener.controllers.ui
 
 import jakarta.servlet.http.HttpServletRequest
+import jakarta.validation.Valid
 import org.apache.logging.log4j.LogManager
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Controller
+import org.springframework.validation.BindingResult
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
@@ -16,6 +18,7 @@ import uk.co.eelpieconsulting.feedlistener.UrlBuilder
 import uk.co.eelpieconsulting.feedlistener.controllers.ConditionalLoads
 import uk.co.eelpieconsulting.feedlistener.controllers.CurrentUserService
 import uk.co.eelpieconsulting.feedlistener.controllers.FeedItemPopulator
+import uk.co.eelpieconsulting.feedlistener.controllers.ui.forms.NewSubscriptionForm
 import uk.co.eelpieconsulting.feedlistener.daos.FeedItemDAO
 import uk.co.eelpieconsulting.feedlistener.daos.SubscriptionsDAO
 import uk.co.eelpieconsulting.feedlistener.model.RssSubscription
@@ -39,7 +42,7 @@ class SubscriptionsUIController @Autowired constructor(
     private val log = LogManager.getLogger(SubscriptionsUIController::class.java)
 
     @GetMapping("/ui/subscriptions/{channelId}/new")
-    fun newSubscriptionForm(@PathVariable channelId: String): ModelAndView {
+    fun newSubscriptionForm(@PathVariable channelId: String, newSubscriptionForm: NewSubscriptionForm): ModelAndView {
         return forCurrentUser { user ->
             conditionalLoads.withChannelForUser(channelId, user) { channel ->
                 ModelAndView("newSubscription").addObject("username", user.username).addObject("channel", channel)
@@ -49,17 +52,22 @@ class SubscriptionsUIController @Autowired constructor(
 
     @PostMapping("/ui/subscriptions/feeds")
     fun addFeedSubscription(
-        @RequestParam url: String,
-        @RequestParam(name = "channel") channelId: String
+        @RequestParam(name = "channel") channelId: String,
+        @Valid newSubscriptionForm: NewSubscriptionForm,
+        bindingResult: BindingResult
     ): ModelAndView {
         return forCurrentUser { user ->
             conditionalLoads.withChannelForUser(channelId, user) { channel ->
-                // TODO form binding and validation
-                val subscription = rssSubscriptionManager.requestFeedSubscription(url, channel.id, user.username)
-                subscriptionsDAO.add(subscription)
-                log.info("Added subscription: $subscription")
-                rssPoller.requestRead(subscription)
-                ModelAndView(RedirectView(urlBuilder.getSubscriptionUrl(subscription)))
+                if (bindingResult.hasErrors()) {
+                    ModelAndView("newSubscription").addObject("username", user.username).addObject("channel", channel)
+
+                } else {
+                    val subscription = rssSubscriptionManager.requestFeedSubscription(newSubscriptionForm.url, channel.id, user.username)
+                    subscriptionsDAO.add(subscription)
+                    log.info("Added subscription: $subscription")
+                    rssPoller.requestRead(subscription)
+                    ModelAndView(RedirectView(urlBuilder.getSubscriptionUrl(subscription)))
+                }
             }
         }
     }
