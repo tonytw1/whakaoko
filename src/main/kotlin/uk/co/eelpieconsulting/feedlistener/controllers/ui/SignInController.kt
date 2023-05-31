@@ -31,9 +31,9 @@ class SignInController @Autowired constructor(val request: HttpServletRequest,
         log.info("Signing in as: $username")
         val user = usersDAO.getByUsername(username)
         if (user != null) {
-            val userPassword = user.password
-            if (userPassword != null) {
-                if (userPassword.isNotEmpty() && passwordHashing.matches(userPassword, password)) {
+            val userPersistedHashedPassword = user.password
+            if (userPersistedHashedPassword != null) {
+                if (userPersistedHashedPassword.isNotEmpty() && passwordHashing.matches(password, userPersistedHashedPassword)) {
                     currentUserService.setSignedInUser(user)
                     return redirectToSignedInUserUI(request)
                 } else {
