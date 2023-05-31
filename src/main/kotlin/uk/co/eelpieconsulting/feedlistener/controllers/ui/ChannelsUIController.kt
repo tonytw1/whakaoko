@@ -44,7 +44,7 @@ class ChannelsUIController @Autowired constructor(val subscriptionsDAO: Subscrip
     fun addChannel(@Valid newChannelForm: NewChannelForm, bindingResult: BindingResult): ModelAndView {
         fun executeAddChannel(user: User): ModelAndView {
             if (bindingResult.hasErrors()) {
-                return ModelAndView("newChannel").addObject("newChannelForm", newChannelForm)
+                return newChannelPrompt()
             }
 
             val proposedId = idBuilder.makeIdForChannel()
@@ -54,8 +54,8 @@ class ChannelsUIController @Autowired constructor(val subscriptionsDAO: Subscrip
                 return ModelAndView(RedirectView(urlBuilder.getChannelUrl(newChannel)))
 
             } else {
-                bindingResult.addError(org.springframework.validation.FieldError("newChannelForm", "name", "Channel name already exists"))
-                return ModelAndView("newChannel").addObject("newChannelForm", newChannelForm)
+                bindingResult.addError(org.springframework.validation.FieldError("newChannelForm", "name", newChannelForm.name, false, null, null, "Channel name already exists"))
+                return newChannelPrompt()
             }
         }
         return forCurrentUser(::executeAddChannel)
@@ -80,5 +80,7 @@ class ChannelsUIController @Autowired constructor(val subscriptionsDAO: Subscrip
             }
         }
     }
+
+    private fun newChannelPrompt() = ModelAndView("newChannel")
 
 }

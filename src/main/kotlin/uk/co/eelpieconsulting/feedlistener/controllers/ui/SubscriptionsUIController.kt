@@ -46,7 +46,7 @@ class SubscriptionsUIController @Autowired constructor(
     fun newSubscriptionForm(@PathVariable channelId: String, newSubscriptionForm: NewSubscriptionForm): ModelAndView {
         return forCurrentUser { user ->
             conditionalLoads.withChannelForUser(channelId, user) { channel ->
-                newSubscriptionPrompt(user, channel)
+                newSubscriptionPrompt(channel)
             }
         }
     }
@@ -60,7 +60,7 @@ class SubscriptionsUIController @Autowired constructor(
         return forCurrentUser { user ->
             conditionalLoads.withChannelForUser(channelId, user) { channel ->
                 if (bindingResult.hasErrors()) {
-                    newSubscriptionPrompt(user, channel)
+                    newSubscriptionPrompt(channel)
 
                 } else {
                     val subscription = rssSubscriptionManager.requestFeedSubscription(
@@ -110,10 +110,9 @@ class SubscriptionsUIController @Autowired constructor(
     }
 
     private fun newSubscriptionPrompt(
-        user: User,
         channel: Channel
     ): ModelAndView =
-        ModelAndView("newSubscription").addObject("username", user.username).addObject("channel", channel)
+        ModelAndView("newSubscription").addObject("channel", channel)
 
 
 }
