@@ -21,6 +21,7 @@ import uk.co.eelpieconsulting.feedlistener.controllers.FeedItemPopulator
 import uk.co.eelpieconsulting.feedlistener.controllers.ui.forms.NewSubscriptionForm
 import uk.co.eelpieconsulting.feedlistener.daos.FeedItemDAO
 import uk.co.eelpieconsulting.feedlistener.daos.SubscriptionsDAO
+import uk.co.eelpieconsulting.feedlistener.model.Channel
 import uk.co.eelpieconsulting.feedlistener.model.RssSubscription
 import uk.co.eelpieconsulting.feedlistener.model.User
 import uk.co.eelpieconsulting.feedlistener.rss.RssPoller
@@ -45,7 +46,7 @@ class SubscriptionsUIController @Autowired constructor(
     fun newSubscriptionForm(@PathVariable channelId: String, newSubscriptionForm: NewSubscriptionForm): ModelAndView {
         return forCurrentUser { user ->
             conditionalLoads.withChannelForUser(channelId, user) { channel ->
-                ModelAndView("newSubscription").addObject("username", user.username).addObject("channel", channel)
+                newSubscriptionPrompt(user, channel)
             }
         }
     }
@@ -59,10 +60,14 @@ class SubscriptionsUIController @Autowired constructor(
         return forCurrentUser { user ->
             conditionalLoads.withChannelForUser(channelId, user) { channel ->
                 if (bindingResult.hasErrors()) {
-                    ModelAndView("newSubscription").addObject("username", user.username).addObject("channel", channel)
+                    newSubscriptionPrompt(user, channel)
 
                 } else {
-                    val subscription = rssSubscriptionManager.requestFeedSubscription(newSubscriptionForm.url, channel.id, user.username)
+                    val subscription = rssSubscriptionManager.requestFeedSubscription(
+                        newSubscriptionForm.url,
+                        channel.id,
+                        user.username
+                    )
                     subscriptionsDAO.add(subscription)
                     log.info("Added subscription: $subscription")
                     rssPoller.requestRead(subscription)
@@ -103,5 +108,12 @@ class SubscriptionsUIController @Autowired constructor(
         }
         return forCurrentUser(::executeReload)
     }
+
+    private fun newSubscriptionPrompt(
+        user: User,
+        channel: Channel
+    ): ModelAndView =
+        ModelAndView("newSubscription").addObject("username", user.username).addObject("channel", channel)
+
 
 }
