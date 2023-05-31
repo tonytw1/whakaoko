@@ -2,6 +2,11 @@
 <div class="container">
     #parse('includes/heading.vm')
     <div class="row">
+        <div class="container">
+            <h5><a href="$urlBuilder.getUserUrl()">Channels</a> / New channel</h5>
+        </div>
+    </div>
+    <div class="row">
         <div class="col">
             <form action="/ui/channels/new" method="POST">
                 #springBind("newChannelForm.name")
