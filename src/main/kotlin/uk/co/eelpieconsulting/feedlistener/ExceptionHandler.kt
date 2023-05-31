@@ -24,10 +24,10 @@ class ExceptionHandler @Autowired constructor(private val viewFactory: ViewFacto
     ): ModelAndView {
         if (e is ResponseStatusException) {
             response.status = e.statusCode.value()
-            return ModelAndView(viewFactory.jsonView).addObject("data", e.reason)
+            return ModelAndView(viewFactory.jsonView()).addObject("data", e.reason)
         }
         log.error("Returning unexpected 500 error", e)
-        return ModelAndView(viewFactory.jsonView).addObject("data", "500")
+        return ModelAndView(viewFactory.jsonView()).addObject("data", "500")
     }
 
     override fun getOrder(): Int {

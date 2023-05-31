@@ -14,31 +14,16 @@ class ViewFactory @Autowired constructor(private val etagGenerator: EtagGenerato
 
     private val jsonSerializer = JsonSerializer(ObjectMapper().registerKotlinModule())
 
-    val jsonView: JsonView
-        get() {
-            return JsonView(
-                jsonSerializer,
-                etagGenerator
-            )
-        }
-
-    fun getJsonView(maxAge: Int): JsonView {
-        val view = JsonView(
+    fun jsonView(): JsonView {
+        return JsonView(
             jsonSerializer,
             etagGenerator
         )
-        view.setMaxAge(maxAge)
-        return view
     }
 
-    fun getRssView(title: String?, link: String?, description: String?): RssView {
+    fun rssView(title: String?, link: String?, description: String?): RssView {
         return RssView(etagGenerator, title, link, description)
     }
 
-    fun getRssView(maxAge: Int, title: String?, link: String?, description: String?): RssView {
-        val view = RssView(etagGenerator, title, link, description)
-        view.setMaxAge(maxAge)
-        return view
-    }
 }
 

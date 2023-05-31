@@ -50,9 +50,9 @@ class SubscriptionsController @Autowired constructor(
             return conditionalLoads.withSubscriptionForUser(id, user) { subscription ->
                 val mv = if (!Strings.isNullOrEmpty(format) && format == "rss") {
                     val title = if (!Strings.isNullOrEmpty(subscription.name)) subscription.name else subscription.id
-                    ModelAndView(viewFactory.getRssView(title, urlBuilder.getSubscriptionUrl(subscription), ""))
+                    ModelAndView(viewFactory.rssView(title, urlBuilder.getSubscriptionUrl(subscription), ""))
                 } else {
-                    ModelAndView(viewFactory.jsonView)
+                    ModelAndView(viewFactory.jsonView())
                 }
                 val feedItemsResult = feedItemDAO.getSubscriptionFeedItems(subscription, page, pageSize)
                 feedItemPopulator.populateFeedItems(feedItemsResult, mv, "data")
@@ -70,7 +70,7 @@ class SubscriptionsController @Autowired constructor(
             conditionalLoads.withSubscriptionForUser(id, user) { subscription ->
                 if (subscription is RssSubscription) {
                     rssPoller.requestRead(subscription)
-                    ModelAndView(viewFactory.jsonView).addObject("data", "ok")
+                    ModelAndView(viewFactory.jsonView()).addObject("data", "ok")
                 } else {
                     throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Subscription is not an RSS feed")
                 }
@@ -86,7 +86,7 @@ class SubscriptionsController @Autowired constructor(
     ): ModelAndView {
         fun renderSubscription(user: User): ModelAndView {
             return conditionalLoads.withSubscriptionForUser(id, user) { subscription ->
-                ModelAndView(viewFactory.jsonView).addObject("data", subscription)
+                ModelAndView(viewFactory.jsonView()).addObject("data", subscription)
             }
         }
         return forCurrentUser(::renderSubscription)
@@ -106,7 +106,7 @@ class SubscriptionsController @Autowired constructor(
                 subscriptionsDAO.add(subscription)
                 log.info("Added subscription: $subscription")
                 rssPoller.requestRead(subscription)
-                ModelAndView(viewFactory.jsonView).addObject("data", subscription)
+                ModelAndView(viewFactory.jsonView()).addObject("data", subscription)
             }
         }
 
@@ -126,7 +126,7 @@ class SubscriptionsController @Autowired constructor(
                     subscriptionsDAO.save(subscription)
                     log.info("Updated subscription: $subscription")
                 }
-                ModelAndView(viewFactory.jsonView).addObject("data", subscription)
+                ModelAndView(viewFactory.jsonView()).addObject("data", subscription)
             }
         }
         return forCurrentUser(::updateSubscription)
@@ -138,7 +138,7 @@ class SubscriptionsController @Autowired constructor(
             return conditionalLoads.withSubscriptionForUser(id, user) { subscription ->
                 feedItemDAO.deleteSubscriptionFeedItems(subscription)
                 subscriptionsDAO.delete(subscription)
-                ModelAndView(viewFactory.jsonView).addObject("data", "ok")
+                ModelAndView(viewFactory.jsonView()).addObject("data", "ok")
             }
         }
         return forCurrentUser(::performDelete)
