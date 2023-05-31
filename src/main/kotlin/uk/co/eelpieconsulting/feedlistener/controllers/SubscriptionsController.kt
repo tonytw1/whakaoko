@@ -12,7 +12,6 @@ import org.springframework.web.server.ResponseStatusException
 import org.springframework.web.servlet.ModelAndView
 import uk.co.eelpieconsulting.feedlistener.UrlBuilder
 import uk.co.eelpieconsulting.feedlistener.controllers.ui.WithSignedInUser
-import uk.co.eelpieconsulting.feedlistener.daos.ChannelsDAO
 import uk.co.eelpieconsulting.feedlistener.daos.FeedItemDAO
 import uk.co.eelpieconsulting.feedlistener.daos.SubscriptionsDAO
 import uk.co.eelpieconsulting.feedlistener.model.RssSubscription
@@ -21,16 +20,17 @@ import uk.co.eelpieconsulting.feedlistener.rss.RssPoller
 import uk.co.eelpieconsulting.feedlistener.views.ViewFactory
 
 @Controller
-class SubscriptionsController @Autowired constructor(private val subscriptionsDAO: SubscriptionsDAO,
-                                                     private val channelsDAO: ChannelsDAO,
-                                                     private val feedItemPopulator: FeedItemPopulator,
-                                                     private val feedItemDAO: FeedItemDAO,
-                                                     private val viewFactory: ViewFactory,
-                                                     private val urlBuilder: UrlBuilder,
-                                                     private val rssPoller: RssPoller,
-                                                     private val conditionalLoads: ConditionalLoads,
-                                                     currentUserService: CurrentUserService,
-                                                     request: HttpServletRequest) : WithSignedInUser(currentUserService, request) {
+class SubscriptionsController @Autowired constructor(
+    private val subscriptionsDAO: SubscriptionsDAO,
+    private val feedItemPopulator: FeedItemPopulator,
+    private val feedItemDAO: FeedItemDAO,
+    private val viewFactory: ViewFactory,
+    private val urlBuilder: UrlBuilder,
+    private val rssPoller: RssPoller,
+    private val conditionalLoads: ConditionalLoads,
+    currentUserService: CurrentUserService,
+    request: HttpServletRequest
+) : WithSignedInUser(currentUserService, request) {
 
     private val log = LogManager.getLogger(ChannelsController::class.java)
 
@@ -38,27 +38,26 @@ class SubscriptionsController @Autowired constructor(private val subscriptionsDA
 
     @CrossOrigin
     @GetMapping("/subscriptions/{id}/items")
-    fun subscriptionItems(@PathVariable id: String,
-                          @RequestParam(required = false) page: Int?,
-                          @RequestParam(required = false) pageSize: Int?,
-                          @RequestParam(required = false) format: String?,
-                          response: HttpServletResponse): ModelAndView {
+    fun subscriptionItems(
+        @PathVariable id: String,
+        @RequestParam(required = false) page: Int?,
+        @RequestParam(required = false) pageSize: Int?,
+        @RequestParam(required = false) format: String?,
+        response: HttpServletResponse
+    ): ModelAndView {
 
         fun renderSubscriptionItems(user: User): ModelAndView {
-            val subscription = subscriptionsDAO.getById(id)
-            if (subscription != null) {
-                var mv = ModelAndView(viewFactory.jsonView)
-                if (!Strings.isNullOrEmpty(format) && format == "rss") {
+            return conditionalLoads.withSubscriptionForUser(id, user) { subscription ->
+                val mv = if (!Strings.isNullOrEmpty(format) && format == "rss") {
                     val title = if (!Strings.isNullOrEmpty(subscription.name)) subscription.name else subscription.id
-                    mv = ModelAndView(viewFactory.getRssView(title, urlBuilder.getSubscriptionUrl(subscription), ""))
+                    ModelAndView(viewFactory.getRssView(title, urlBuilder.getSubscriptionUrl(subscription), ""))
+                } else {
+                    ModelAndView(viewFactory.jsonView)
                 }
                 val feedItemsResult = feedItemDAO.getSubscriptionFeedItems(subscription, page, pageSize)
                 feedItemPopulator.populateFeedItems(feedItemsResult, mv, "data")
                 response.addHeader(X_TOTAL_COUNT, feedItemsResult.totalCount.toString())
-                return mv
-
-            } else {
-                throw ResponseStatusException(HttpStatus.NOT_FOUND, "Subscription not found")
+                mv
             }
         }
 
@@ -81,17 +80,15 @@ class SubscriptionsController @Autowired constructor(private val subscriptionsDA
 
     @CrossOrigin
     @GetMapping("/subscriptions/{id}")
-    fun subscriptionJson(@PathVariable id: String,
-                         @RequestParam(required = false) page: Int?): ModelAndView {
+    fun subscriptionJson(
+        @PathVariable id: String,
+        @RequestParam(required = false) page: Int?
+    ): ModelAndView {
         fun renderSubscription(user: User): ModelAndView {
-            val subscription = subscriptionsDAO.getById(id)
-            if (subscription != null) {
-                return ModelAndView(viewFactory.jsonView).addObject("data", subscription)
-            } else {
-                throw ResponseStatusException(HttpStatus.NOT_FOUND, "Subscription not found")
+            return conditionalLoads.withSubscriptionForUser(id, user) { subscription ->
+                ModelAndView(viewFactory.jsonView).addObject("data", subscription)
             }
         }
-
         return forCurrentUser(::renderSubscription)
     }
 
@@ -99,46 +96,39 @@ class SubscriptionsController @Autowired constructor(private val subscriptionsDA
     fun createSubscription(@RequestBody create: SubscriptionCreateRequest): ModelAndView {
         fun createSubscription(user: User): ModelAndView {
             log.info("Got subscription create request: $create")
-
-            if (Strings.isNullOrEmpty(create.url) || Strings.isNullOrEmpty(create.channel)) {
+            val targetChannel = create.channel
+            if (Strings.isNullOrEmpty(create.url) || Strings.isNullOrEmpty(targetChannel)) {
                 throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Subscription url or channel missing")
             }
-
-            // TODO check for existing idempotent feed
-
-            val channel = channelsDAO.getById(create.channel)
-                ?: throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Channel not found")
-            // TODO validate channel user
-
-            val subscription = RssSubscription(url = create.url, channelId = channel.id, username = user.username)
-            subscriptionsDAO.add(subscription)
-            log.info("Added subscription: $subscription")
-            rssPoller.requestRead(subscription)
-
-            return ModelAndView(viewFactory.jsonView).addObject("data", subscription)
+            return conditionalLoads.withChannelForUser(targetChannel, user) { channel ->
+                val subscription = RssSubscription(url = create.url, channelId = channel.id, username = user.username)
+                // TODO check for existing idempotent feed
+                subscriptionsDAO.add(subscription)
+                log.info("Added subscription: $subscription")
+                rssPoller.requestRead(subscription)
+                ModelAndView(viewFactory.jsonView).addObject("data", subscription)
+            }
         }
 
         return forCurrentUser(::createSubscription)
     }
 
     @PutMapping("/subscriptions/{id}")
-    fun subscriptionUpdate(@PathVariable id: String,
-                           @RequestBody update: SubscriptionUpdateRequest): ModelAndView {
+    fun subscriptionUpdate(
+        @PathVariable id: String,
+        @RequestBody update: SubscriptionUpdateRequest
+    ): ModelAndView {
         fun updateSubscription(user: User): ModelAndView {
-            val subscription = subscriptionsDAO.getById(id)
-            if (subscription != null) {
+            return conditionalLoads.withSubscriptionForUser(id, user) { subscription ->
                 log.debug("Got subscription update request: {}", update)
                 if (update.name != null) {
                     subscription.name = update.name
                     subscriptionsDAO.save(subscription)
                     log.info("Updated subscription: $subscription")
                 }
-                return ModelAndView(viewFactory.jsonView).addObject("data", subscription)
-            } else {
-                throw ResponseStatusException(HttpStatus.NOT_FOUND, "Subscription not found")
+                ModelAndView(viewFactory.jsonView).addObject("data", subscription)
             }
         }
-
         return forCurrentUser(::updateSubscription)
     }
 

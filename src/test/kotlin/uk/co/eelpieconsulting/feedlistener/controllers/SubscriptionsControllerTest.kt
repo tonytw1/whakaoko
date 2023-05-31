@@ -26,7 +26,6 @@ class SubscriptionsControllerTest {
     private val currentUserService = mock(CurrentUserService::class.java)
 
     private val subscriptionsController = SubscriptionsController(subscriptionsDAO,
-            channelsDAO,
             feedItemPopulator,
             feedItemDAO,
             viewFactory,
