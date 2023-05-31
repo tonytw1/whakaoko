@@ -2,6 +2,7 @@ package uk.co.eelpieconsulting.feedlistener.daos
 
 import org.bson.types.ObjectId
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Test
 import uk.co.eelpieconsulting.feedlistener.model.Channel
 import uk.co.eelpieconsulting.feedlistener.model.RssSubscription
@@ -32,6 +33,17 @@ class SubscriptionsDAOTest {
 
         assertEquals(1, channelSubscriptions.size)
         assertEquals(subscription.id, channelSubscriptions.first().id)
+    }
+
+    @Test
+    fun canDeleteSubscription() {
+        val channel = Channel(ObjectId.get(), UUID.randomUUID().toString(), "A channel", "a-user")
+        val subscription = testSubscription(channel)
+        subscriptionsDAO.add(subscription)
+
+        subscriptionsDAO.delete(subscription)
+
+        assertNull(subscriptionsDAO.getById(subscription.id))
     }
 
     private fun testSubscription(channel: Channel): RssSubscription {

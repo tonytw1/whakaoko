@@ -2,6 +2,7 @@ package uk.co.eelpieconsulting.feedlistener.daos
 
 import com.google.common.base.Strings
 import com.mongodb.MongoException
+import dev.morphia.DeleteOptions
 import dev.morphia.query.FindOptions
 import dev.morphia.query.Sort
 import dev.morphia.query.filters.Filters
@@ -62,8 +63,12 @@ class SubscriptionsDAO @Autowired constructor(private val dataStoreFactory: Data
 
     @Throws(MongoException::class)
     fun delete(subscription: Subscription) {
-        log.info("Deleting subscription: $subscription")
-        dataStoreFactory.get().find(Subscription::class.java).filter(Filters.eq("id", subscription.id)).delete()
+        log.info("Deleting subscription: ${subscription.id}")
+        val deletedCount =
+            dataStoreFactory.get().find(RssSubscription::class.java).filter(Filters.eq("id", subscription.id)).delete(
+                DeleteOptions().multi(false)
+            ).deletedCount
+        log.info("Deleted $deletedCount subscriptions")
     }
 
     @Throws(MongoException::class)
