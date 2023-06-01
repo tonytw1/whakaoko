@@ -19,9 +19,8 @@ interface TestData {
         return subscription
     }
 
-    fun testFeedItemFor(subscription: RssSubscription, categories: List<Category>? = null): FeedItem {
+    fun testFeedItemFor(subscription: RssSubscription, categories: List<Category>? = null, date: DateTime = DateTime(2023, 5, 2, 12, 23, DateTimeZone.UTC)): FeedItem {
         val url = "http://localhost/" + UUID.randomUUID().toString()
-        val date = DateTime(2023, 5, 2, 12, 23, DateTimeZone.UTC)
         return FeedItem(
             ObjectId.get(),
             UUID.randomUUID().toString(),

@@ -63,9 +63,9 @@ class ClassifierTest : TestData {
         subscription.httpStatus = 200
 
         val feedsItems = listOf(
-            testFeedItemFor(subscription).copy(date = DateTime.now().minusDays(1).toDate()),
-            testFeedItemFor(subscription).copy(date = DateTime.now().minusDays(7).toDate()),
-            testFeedItemFor(subscription).copy(date = DateTime.now().minusDays(10).toDate())
+            testFeedItemFor(subscription, date = DateTime.now().minusDays(1)),
+            testFeedItemFor(subscription, date = DateTime.now().minusDays(7)),
+            testFeedItemFor(subscription, date = DateTime.now().minusDays(10))
         )
 
         `when`(feedItemDAO.getSubscriptionFeedItems(subscription, 1, 20)).thenReturn(FeedItemsResult(feedsItems, feedsItems.size.toLong()))
