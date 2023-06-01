@@ -36,8 +36,8 @@ class JsonViewTest {
 
         val responseBody = response.contentAsString
         val responseFields = ObjectMapper().readValue(responseBody, Map::class.java)
-        assertEquals("2023-05-02T12:23:00Z", responseFields.get("date"))
-        assertEquals("2023-05-02T12:23:00Z", responseFields.get("accepted"))
+        assertEquals("2023-05-02T12:23:00Z", responseFields["date"])
+        assertEquals("2023-05-02T12:23:00Z", responseFields["accepted"])
     }
 
     private fun testSubscription(channel: Channel): RssSubscription {
