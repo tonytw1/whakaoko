@@ -49,13 +49,13 @@ class ChannelsUIController @Autowired constructor(val subscriptionsDAO: Subscrip
 
             val proposedId = idBuilder.makeIdForChannel()
             val newChannel = Channel(ObjectId.get(), proposedId, newChannelForm.name, user.username)
-            if (channelsDAO.usersChannelByName(user, newChannelForm.name) == null) {
+            return if (channelsDAO.usersChannelByName(user, newChannelForm.name) == null) {
                 channelsDAO.save(newChannel)
-                return ModelAndView(RedirectView(urlBuilder.getChannelUrl(newChannel)))
+                ModelAndView(RedirectView(urlBuilder.getChannelUrl(newChannel)))
 
             } else {
                 bindingResult.addError(org.springframework.validation.FieldError("newChannelForm", "name", newChannelForm.name, false, null, null, "Channel name already exists"))
-                return newChannelPrompt()
+                newChannelPrompt()
             }
         }
         return forCurrentUser(::executeAddChannel)
