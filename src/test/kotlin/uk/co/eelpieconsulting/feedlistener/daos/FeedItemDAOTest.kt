@@ -1,17 +1,15 @@
 package uk.co.eelpieconsulting.feedlistener.daos
 
 import org.bson.types.ObjectId
-import org.joda.time.DateTime
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Test
+import uk.co.eelpieconsulting.feedlistener.TestData
 import uk.co.eelpieconsulting.feedlistener.model.Category
 import uk.co.eelpieconsulting.feedlistener.model.Channel
-import uk.co.eelpieconsulting.feedlistener.model.FeedItem
-import uk.co.eelpieconsulting.feedlistener.model.RssSubscription
 import java.util.*
 
-class FeedItemDAOTest {
+class FeedItemDAOTest: TestData {
 
     private val mongoDatabase = "whakaokotest${UUID.randomUUID()}"
 
@@ -106,29 +104,4 @@ class FeedItemDAOTest {
         assertEquals(yetAnotherSubscription.id, feedItems.feedsItems[0].subscriptionId)
     }
 
-    private fun testSubscription(channel: Channel): RssSubscription {
-        val subscription = RssSubscription(url = "http://localhost/rss", channelId = channel.id, username = "a-user")
-        subscription.id = UUID.randomUUID().toString()
-        subscription.channelId = channel.id
-        return subscription
-    }
-
-    private fun testFeedItemFor(subscription: RssSubscription, categories: List<Category>? = null): FeedItem {
-        val url = "http://localhost/" + UUID.randomUUID().toString()
-        return FeedItem(
-            ObjectId.get(),
-            UUID.randomUUID().toString(),
-            url,
-            null,
-            DateTime.now().toDate(),
-            DateTime.now().toDate(),
-            null,
-            null,
-            null,
-            subscription.id,
-            subscription.channelId,
-            categories,
-            DateTime.now().toDate()
-        )
-    }
 }

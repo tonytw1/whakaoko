@@ -3,8 +3,6 @@ package uk.co.eelpieconsulting.feedlistener.views
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.registerKotlinModule
 import org.bson.types.ObjectId
-import org.joda.time.DateTime
-import org.joda.time.DateTimeZone
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.springframework.mock.web.MockHttpServletRequest
@@ -13,13 +11,11 @@ import org.springframework.web.servlet.ModelAndView
 import uk.co.eelpieconsulting.common.views.EtagGenerator
 import uk.co.eelpieconsulting.common.views.json.JsonSerializer
 import uk.co.eelpieconsulting.common.views.json.JsonView
-import uk.co.eelpieconsulting.feedlistener.model.Category
+import uk.co.eelpieconsulting.feedlistener.TestData
 import uk.co.eelpieconsulting.feedlistener.model.Channel
-import uk.co.eelpieconsulting.feedlistener.model.FeedItem
-import uk.co.eelpieconsulting.feedlistener.model.RssSubscription
 import java.util.*
 
-class JsonViewTest {
+class JsonViewTest : TestData {
 
     @Test
     fun jsonDatesShouldBeInHumanReadableTimeZonedFormat() {
@@ -38,33 +34,6 @@ class JsonViewTest {
         val responseFields = ObjectMapper().readValue(responseBody, Map::class.java)
         assertEquals("2023-05-02T12:23:00Z", responseFields["date"])
         assertEquals("2023-05-02T12:23:00Z", responseFields["accepted"])
-    }
-
-    private fun testSubscription(channel: Channel): RssSubscription {
-        val subscription = RssSubscription(url = "http://localhost/rss", channelId = channel.id, username = "a-user")
-        subscription.id = UUID.randomUUID().toString()
-        subscription.channelId = channel.id
-        return subscription
-    }
-
-    private fun testFeedItemFor(subscription: RssSubscription, categories: List<Category>? = null): FeedItem {
-        val url = "http://localhost/" + UUID.randomUUID().toString()
-        val date = DateTime(2023, 5, 2, 12, 23, DateTimeZone.UTC)
-        return FeedItem(
-            ObjectId.get(),
-            UUID.randomUUID().toString(),
-            url,
-            null,
-            date.toDate(),
-            date.toDate(),
-            null,
-            null,
-            null,
-            subscription.id,
-            subscription.channelId,
-            categories,
-            date.toDate()
-        )
     }
 
 }

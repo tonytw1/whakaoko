@@ -4,11 +4,11 @@ import org.bson.types.ObjectId
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Test
+import uk.co.eelpieconsulting.feedlistener.TestData
 import uk.co.eelpieconsulting.feedlistener.model.Channel
-import uk.co.eelpieconsulting.feedlistener.model.RssSubscription
 import java.util.*
 
-class SubscriptionsDAOTest {
+class SubscriptionsDAOTest : TestData {
 
     private val mongoDatabase = "whakaokotest${UUID.randomUUID()}"
 
@@ -44,13 +44,6 @@ class SubscriptionsDAOTest {
         subscriptionsDAO.delete(subscription)
 
         assertNull(subscriptionsDAO.getById(subscription.id))
-    }
-
-    private fun testSubscription(channel: Channel): RssSubscription {
-        val subscription = RssSubscription(url = "http://localhost/rss", channelId = channel.id, username = "a-user")
-        subscription.id = UUID.randomUUID().toString()
-        subscription.channelId = channel.id
-        return subscription
     }
 
 }
