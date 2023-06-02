@@ -13,14 +13,22 @@
         <div class="col">
             <p>Adding a subscription to channel $channel.name</p>
             <form action="/ui/subscriptions/feeds" method="POST">
-                #springBind("newSubscriptionForm.url")
-                Feed URL: <input name="$!{status.expression}" value="$!{status.value}"/>
-                #foreach($error in $status.errorMessages)
-                    <div class="alert">$error</div>
-                #end
                 <input name="channel" value="$channel.id" type="hidden"/>
-                <input type="submit" value="Add feed"/>
+                <div class="form-group">
+                    #springBind("newSubscriptionForm.url")
+                    <label for="$!{status.expression}" class="control-label">URL</label>
+                    <input type="input" class="form-control" name="$!{status.expression}" placeholder="Feed URL" value="$!{status.value}">
+                    #foreach($error in $status.errorMessages)
+                        <div class="alert alert-warning">$error</div>
+                    #end
+                </div>
+                <div class="control-group">
+                    <div class="controls">
+                        <input type="submit" name="submit" value="Add feed" class="btn btn-primary" />
+                    </div>
+                </div>
             </form>
-            <hr/>
+        </div>
+    </div>
 </div>
 #parse('includes/footer.vm')

@@ -54,7 +54,7 @@ class ChannelsUIController @Autowired constructor(val subscriptionsDAO: Subscrip
                 ModelAndView(RedirectView(urlBuilder.getChannelUrl(newChannel)))
 
             } else {
-                bindingResult.addError(org.springframework.validation.FieldError("newChannelForm", "name", newChannelForm.name, false, null, null, "Channel name already exists"))
+                bindingResult.addError(org.springframework.validation.FieldError("newChannelForm", "name", newChannelForm.name, false, null, null, "A channel with this name already exists"))
                 newChannelPrompt()
             }
         }
