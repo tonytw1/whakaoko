@@ -11,6 +11,8 @@ import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.servlet.ModelAndView
+import org.springframework.web.servlet.mvc.support.RedirectAttributes
+import org.springframework.web.servlet.support.RequestContextUtils
 import org.springframework.web.servlet.view.RedirectView
 import uk.co.eelpieconsulting.feedlistener.IdBuilder
 import uk.co.eelpieconsulting.feedlistener.UrlBuilder
@@ -23,6 +25,7 @@ import uk.co.eelpieconsulting.feedlistener.daos.FeedItemDAO
 import uk.co.eelpieconsulting.feedlistener.daos.SubscriptionsDAO
 import uk.co.eelpieconsulting.feedlistener.model.Channel
 import uk.co.eelpieconsulting.feedlistener.model.User
+
 
 @Controller
 class ChannelsUIController @Autowired constructor(val subscriptionsDAO: SubscriptionsDAO,
@@ -41,7 +44,7 @@ class ChannelsUIController @Autowired constructor(val subscriptionsDAO: Subscrip
     }
 
     @PostMapping("/ui/channels/new")
-    fun addChannel(@Valid newChannelForm: NewChannelForm, bindingResult: BindingResult): ModelAndView {
+    fun addChannel(@Valid newChannelForm: NewChannelForm, bindingResult: BindingResult, redirectAttributes: RedirectAttributes): ModelAndView {
         fun executeAddChannel(user: User): ModelAndView {
             if (bindingResult.hasErrors()) {
                 return newChannelPrompt()
@@ -51,6 +54,8 @@ class ChannelsUIController @Autowired constructor(val subscriptionsDAO: Subscrip
             val newChannel = Channel(ObjectId.get(), proposedId, newChannelForm.name, user.username)
             return if (channelsDAO.usersChannelByName(user, newChannelForm.name) == null) {
                 channelsDAO.save(newChannel)
+
+                redirectAttributes.addFlashAttribute("message", "Channel created")
                 ModelAndView(RedirectView(urlBuilder.getChannelUrl(newChannel)))
 
             } else {
@@ -76,6 +81,12 @@ class ChannelsUIController @Autowired constructor(val subscriptionsDAO: Subscrip
                     val results = feedItemDAO.getChannelFeedItemsResult(channel, page, q, null)
                     feedItemPopulator.populateFeedItems(results, mv, "feedItems")
                 }
+
+                val inputFlashMap = RequestContextUtils.getInputFlashMap(request)
+                if (inputFlashMap != null) {
+                    mv.addObject("message", inputFlashMap["message"])
+                }
+
                 mv
             }
         }

@@ -15,7 +15,11 @@ abstract class WithSignedInUser(val currentUserService: CurrentUserService, val 
         val user = currentUserService.getCurrentUserUser()
         return if (user != null) {
             log.debug("Generating page for user: " + user.username)
-            handler(user).addObject("user", user)
+            val mv = handler(user)
+            if (mv.view !is RedirectView) {
+                mv.addObject("user", user)
+            }
+            mv
 
         } else {
             val path = request.requestURI

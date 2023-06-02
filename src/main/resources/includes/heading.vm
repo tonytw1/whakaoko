@@ -6,3 +6,9 @@
         <hr/>
     </div>
 </div>
+
+#if($message)
+    <div>
+        <div class="alert alert-warning">$message</div>
+    </div>
+#end
