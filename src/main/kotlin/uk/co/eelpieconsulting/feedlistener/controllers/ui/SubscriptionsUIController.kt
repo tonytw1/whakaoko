@@ -27,6 +27,7 @@ import uk.co.eelpieconsulting.feedlistener.model.RssSubscription
 import uk.co.eelpieconsulting.feedlistener.model.User
 import uk.co.eelpieconsulting.feedlistener.rss.RssPoller
 import uk.co.eelpieconsulting.feedlistener.rss.RssSubscriptionManager
+import uk.co.eelpieconsulting.feedlistener.rss.classification.Classifier
 
 @Controller
 class SubscriptionsUIController @Autowired constructor(
@@ -38,7 +39,8 @@ class SubscriptionsUIController @Autowired constructor(
     private val urlBuilder: UrlBuilder,
     private val conditionalLoads: ConditionalLoads,
     currentUserService: CurrentUserService,
-    request: HttpServletRequest
+    request: HttpServletRequest,
+    private val classifier: Classifier
 ) : WithSignedInUser(currentUserService, request) {
 
     private val log = LogManager.getLogger(SubscriptionsUIController::class.java)
@@ -92,6 +94,8 @@ class SubscriptionsUIController @Autowired constructor(
                     mv.addObject("user", it)
                         .addObject("channel", channel)
                         .addObject("subscription", subscription)
+                        .addObject("frequency", classifier.frequency(subscription))
+                        .addObject("fetchInterval", rssPoller.fetchIntervalFor(subscription))
                     mv
                 }
             }

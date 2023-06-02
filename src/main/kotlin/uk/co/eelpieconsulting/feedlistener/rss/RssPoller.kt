@@ -7,6 +7,7 @@ import io.micrometer.core.instrument.MeterRegistry
 import io.micrometer.core.instrument.Metrics
 import org.apache.logging.log4j.LogManager
 import org.joda.time.DateTime
+import org.joda.time.Duration
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.core.task.TaskExecutor
@@ -17,6 +18,7 @@ import uk.co.eelpieconsulting.feedlistener.daos.FeedItemDAO
 import uk.co.eelpieconsulting.feedlistener.daos.SubscriptionsDAO
 import uk.co.eelpieconsulting.feedlistener.model.FeedItem
 import uk.co.eelpieconsulting.feedlistener.model.RssSubscription
+import uk.co.eelpieconsulting.feedlistener.model.Subscription
 import uk.co.eelpieconsulting.feedlistener.rss.classification.Classifier
 import uk.co.eelpieconsulting.feedlistener.rss.classification.FeedStatus
 import java.time.ZonedDateTime
@@ -52,13 +54,33 @@ class RssPoller @Autowired constructor(val subscriptionsDAO: SubscriptionsDAO,
     }
 
     private fun shouldFetchNow(subscription: RssSubscription): Boolean {
-        val lastRead: Date = subscription.lastRead ?: return true
-
-        if (setOf(FeedStatus.ok, FeedStatus.wobbling).contains(subscription.classification)) {
+        val lastRead = subscription.lastRead
+            ?: // If never read then read now
             return true
+
+        val readInterval = fetchIntervalFor(subscription)
+
+        return lastRead.before(DateTime.now().minus(readInterval).toDate())
+    }
+
+    fun fetchIntervalFor(subscription: Subscription): Duration? {
+        val oneHour = Duration.standardHours(1)
+        val oneDay = Duration.standardDays(1)
+        val okHttpStatuses = setOf(FeedStatus.ok, FeedStatus.wobbling)
+
+        val classifications = if (subscription.classifications != null) subscription.classifications!! else emptySet()
+        val readInterval = if (classifications.intersect(okHttpStatuses).isNotEmpty()) {
+            if (classifications.contains(FeedStatus.frequent)) {
+                oneHour
+            } else {
+                // infrequent feeds are only read once a day.
+                oneDay
+            }
+        } else {
+            // broken and gone feeds are only read once a day to look for a potential resurrection.
+            oneDay
         }
-        // broken and gone feeds are only read once a day to look for a potential resurrection.
-        return lastRead.before(DateTime.now().minusDays(1).toDate())
+        return readInterval
     }
 
     private fun run(subscription: RssSubscription) {
@@ -173,7 +195,7 @@ class RssPoller @Autowired constructor(val subscriptionsDAO: SubscriptionsDAO,
                 }
             )
 
-            subscription.classification = classifier.classify(subscription)
+            subscription.classifications = classifier.classify(subscription)
             subscription.lastRead = DateTime.now().toDate()
             subscriptionsDAO.save(subscription)
         }

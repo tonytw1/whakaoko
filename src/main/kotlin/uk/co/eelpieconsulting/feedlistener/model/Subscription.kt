@@ -7,6 +7,7 @@ import dev.morphia.annotations.Entity
 import dev.morphia.annotations.Id
 import dev.morphia.annotations.Indexed
 import org.bson.types.ObjectId
+import uk.co.eelpieconsulting.feedlistener.rss.classification.FeedStatus
 import java.util.*
 
 @Entity("subscriptions")
@@ -28,6 +29,7 @@ abstract class Subscription {
     var httpStatus: Int? = null
     var itemCount= 0L
     var lastModified: Date? = null
+    var classifications: Set<FeedStatus>? = emptySet()
 
     @Indexed
     lateinit var channelId: String
