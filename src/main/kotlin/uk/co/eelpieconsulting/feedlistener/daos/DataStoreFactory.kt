@@ -38,6 +38,8 @@ class DataStoreFactory @Autowired constructor(
                 MapperOptions.builder().discriminatorKey("className").discriminator(DiscriminatorFunction.className())
                     .enablePolymorphicQueries(false)
                     .build()
+
+            log.info("Connecting to Mongo at: $mongoUri / $mongoDatabase")
             val mongoClient = MongoClients.create(mongoUri)
             val datastore = Morphia.createDatastore(mongoClient, database, mapperOptions)
 
