@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.server.ResponseStatusException
 import org.springframework.web.servlet.ModelAndView
+import org.springframework.web.servlet.mvc.support.RedirectAttributes
 import org.springframework.web.servlet.view.RedirectView
 import uk.co.eelpieconsulting.feedlistener.UrlBuilder
 import uk.co.eelpieconsulting.feedlistener.controllers.ConditionalLoads
@@ -55,7 +56,8 @@ class SubscriptionsUIController @Autowired constructor(
     fun addFeedSubscription(
         @RequestParam(name = "channel") channelId: String,
         @Valid newSubscriptionForm: NewSubscriptionForm,
-        bindingResult: BindingResult
+        bindingResult: BindingResult,
+        redirectAttributes: RedirectAttributes
     ): ModelAndView {
         return forCurrentUser { user ->
             conditionalLoads.withChannelForUser(channelId, user) { channel ->
@@ -71,6 +73,8 @@ class SubscriptionsUIController @Autowired constructor(
                     subscriptionsDAO.add(subscription)
                     log.info("Added subscription: $subscription")
                     rssPoller.requestRead(subscription)
+
+                    redirectAttributes.addFlashAttribute("message", "Subscription added")
                     ModelAndView(RedirectView(urlBuilder.getSubscriptionUrl(subscription)))
                 }
             }
@@ -95,11 +99,12 @@ class SubscriptionsUIController @Autowired constructor(
     }
 
     @GetMapping("/ui/subscriptions/{id}/read")
-    fun subscriptionRead(@PathVariable id: String): ModelAndView {
+    fun subscriptionRead(@PathVariable id: String, redirectAttributes: RedirectAttributes): ModelAndView {
         fun executeReload(user: User): ModelAndView {
             return conditionalLoads.withSubscriptionForUser(id, user) { subscription ->
                 if (subscription is RssSubscription) {
                     rssPoller.requestRead(subscription)
+                    redirectAttributes.addFlashAttribute("message", "Feed is been read")
                     ModelAndView(RedirectView(urlBuilder.getSubscriptionUrl(subscription.id)))
                 } else {
                     throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Subscription is not an RSS feed")

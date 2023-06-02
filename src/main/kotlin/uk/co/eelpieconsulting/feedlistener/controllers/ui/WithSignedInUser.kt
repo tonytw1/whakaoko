@@ -3,6 +3,7 @@ package uk.co.eelpieconsulting.feedlistener.controllers.ui
 import jakarta.servlet.http.HttpServletRequest
 import org.apache.logging.log4j.LogManager
 import org.springframework.web.servlet.ModelAndView
+import org.springframework.web.servlet.support.RequestContextUtils
 import org.springframework.web.servlet.view.RedirectView
 import uk.co.eelpieconsulting.feedlistener.controllers.CurrentUserService
 import uk.co.eelpieconsulting.feedlistener.model.User
@@ -18,6 +19,11 @@ abstract class WithSignedInUser(val currentUserService: CurrentUserService, val 
             val mv = handler(user)
             if (mv.view !is RedirectView) {
                 mv.addObject("user", user)
+            } else {
+                val inputFlashMap = RequestContextUtils.getInputFlashMap(request)
+                if (inputFlashMap != null) {
+                    mv.addObject("message", inputFlashMap["message"])
+                }
             }
             mv
 

@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.servlet.ModelAndView
 import org.springframework.web.servlet.mvc.support.RedirectAttributes
-import org.springframework.web.servlet.support.RequestContextUtils
 import org.springframework.web.servlet.view.RedirectView
 import uk.co.eelpieconsulting.feedlistener.IdBuilder
 import uk.co.eelpieconsulting.feedlistener.UrlBuilder
@@ -81,12 +80,6 @@ class ChannelsUIController @Autowired constructor(val subscriptionsDAO: Subscrip
                     val results = feedItemDAO.getChannelFeedItemsResult(channel, page, q, null)
                     feedItemPopulator.populateFeedItems(results, mv, "feedItems")
                 }
-
-                val inputFlashMap = RequestContextUtils.getInputFlashMap(request)
-                if (inputFlashMap != null) {
-                    mv.addObject("message", inputFlashMap["message"])
-                }
-
                 mv
             }
         }
