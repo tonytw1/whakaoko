@@ -62,29 +62,32 @@ class GoogleSigninController @Autowired constructor(
         log.info("Got Google token: $token")
         val tokenInfo = verifyGoogleAccessToken(token.accessToken)
         val googleUserEmail = tokenInfo?.email
-        if (!Strings.isNullOrEmpty(googleUserEmail)) {
+        if (googleUserEmail != null && !Strings.isNullOrEmpty(googleUserEmail)) {
             log.info("Google token verified to email: $googleUserEmail")
-            if (!Strings.isNullOrEmpty(allowedDomain) && googleUserEmail!!.endsWith(allowedDomain)) {
+            if (!Strings.isNullOrEmpty(allowedDomain) && googleUserEmail.endsWith(allowedDomain)) {
                 val currentUser = currentUserService.getCurrentUserUser()
-                if (currentUser != null) {
+
+
+                return if (currentUser != null) {
                     // If a current user is a signed in but has no Google id then attach to this user
                     if (currentUser.googleUserId == null) {
                         log.info("Attaching google id to current user: " + currentUser.username + " / " + googleUserEmail)
                         currentUser.googleUserId = tokenInfo.userId
                         usersDAO.save(currentUser)
                     }
-                    return redirectToSignedInUserUI()
+                    redirectToSignedInUserUI()
 
                 } else {
                     // If no user is already signed in we can try to sing in by google id
-                    val byGoogleId = usersDAO.getByGoogleId(tokenInfo.userId!!)
+                    val byGoogleId = usersDAO.getByGoogleId(tokenInfo.userId)
                     if (byGoogleId != null) {
                         currentUserService.setSignedInUser(byGoogleId)
-                        return redirectToSignedInUserUI()
+                        redirectToSignedInUserUI()
                     } else {
                         redirectToSigninPromptWithError("We could not find a user linked to your Google account", session)
                     }
                 }
+
             } else {
                 redirectToSigninPromptWithError("Your Google account is not from a domain which is allowed to use this copy of Whakaoko", session)
             }

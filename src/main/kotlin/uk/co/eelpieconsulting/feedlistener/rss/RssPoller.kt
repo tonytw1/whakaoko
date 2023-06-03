@@ -68,7 +68,7 @@ class RssPoller @Autowired constructor(val subscriptionsDAO: SubscriptionsDAO,
         val oneDay = Duration.standardDays(1)
         val okHttpStatuses = setOf(FeedStatus.ok, FeedStatus.wobbling)
 
-        val classifications = if (subscription.classifications != null) subscription.classifications!! else emptySet()
+        val classifications = subscription.classifications ?: emptySet()
         val readInterval = if (classifications.intersect(okHttpStatuses).isNotEmpty()) {
             if (classifications.contains(FeedStatus.frequent)) {
                 oneHour

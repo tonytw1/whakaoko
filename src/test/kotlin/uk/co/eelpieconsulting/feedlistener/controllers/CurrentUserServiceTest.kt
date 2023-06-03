@@ -3,8 +3,8 @@ package uk.co.eelpieconsulting.feedlistener.controllers
 import org.bson.types.ObjectId
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
-import org.mockito.Mockito.`when`
 import org.mockito.Mockito.mock
+import org.mockito.Mockito.`when`
 import org.springframework.mock.web.MockHttpServletRequest
 import uk.co.eelpieconsulting.feedlistener.daos.UsersDAO
 import uk.co.eelpieconsulting.feedlistener.model.User
@@ -18,7 +18,7 @@ class CurrentUserServiceTest {
     @Test
     fun currentUserCanBeSetAsSessionAttributeForTheUI() {
         val request = MockHttpServletRequest()
-        request.session!!.setAttribute("signedInUser", "an-oid")
+        request.session?.setAttribute("signedInUser", "an-oid")
         `when`(usersDAO.getByObjectId("an-oid")).thenReturn(user)
 
         val currentUser = CurrentUserService(request, usersDAO).getCurrentUserUser()
