@@ -121,7 +121,7 @@ class SubscriptionsController @Autowired constructor(
         fun updateSubscription(user: User): ModelAndView {
             return conditionalLoads.withSubscriptionForUser(id, user) { subscription ->
                 log.debug("Got subscription update request: {}", update)
-                if (update.name != null) {
+                update.name?.let {
                     subscription.name = update.name
                     subscriptionsDAO.save(subscription)
                     log.info("Updated subscription: $subscription")
