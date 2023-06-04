@@ -94,10 +94,33 @@ Show content for this channel.
 Contains all content items received from all of the subscriptions in this channel.
 
 
-#### GET /{userid}/subscriptions/{subscriptionid}
+#### GET //subscriptions/{subscriptionid}
 
 Details for a specific subscription.
 
+```
+{
+  "id": "wellynews-feed-78885da5bcdcde79d46c2cb5c6d936d0",
+  "name": "Coming Events – Friends of Te Papa",
+  "url": "https://www.friendsoftepapa.org.nz/events/feed/",
+  "channelId": "wellynews",
+  "username": "tonytw1",
+  "classifications": [
+    "ok"
+  ],
+  "lastRead": "2023-06-04T15:12:10Z",
+  "latestItemDate": "2023-10-09T22:00:00Z",
+  "etag": "W/\"da7aa1ec5b7aaf30fe2dce55c58a44fb\"",
+  "httpStatus": 200,
+  "itemCount": 64,
+  "lastModified": 1685671239000
+}
+```
+
+| Field          | Description                                                                                                                                                                                           |
+|----------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| lastRead       | When this subscription was last read                                                                                                                                                                  |
+| latestItemDate | The date of the latest item seen in the feeds response. <br/>This may be different from the date of the most recently persisted feed item if content on a given GUID has been updated or republished. |
 
 #### GET /{userid}/subscriptions/{subscriptionid}/items
 
