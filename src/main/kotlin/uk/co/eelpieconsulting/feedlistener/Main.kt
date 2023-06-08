@@ -39,6 +39,7 @@ open class Main : WebMvcConfigurer {
     @Bean
     open fun shortUrlResolverService(): CompositeUrlResolver {
         return CompositeUrlResolver(
+            SquizUrlResolver(),
             BitlyUrlResolver(),
             FeedBurnerRedirectResolver(),
             TinyUrlResolver(),
