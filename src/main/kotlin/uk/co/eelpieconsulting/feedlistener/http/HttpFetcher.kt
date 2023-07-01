@@ -43,7 +43,7 @@ class HttpFetcher(private val userAgent: String, private val timeout: Int) {
     }
 
     private fun withCommonRequestProperties(request: Request): Request {
-        return request.timeout(timeout).timeoutRead(timeout).header("User-Agent", userAgent)
+        return request.timeout(timeout).timeoutRead(timeout).header("user-agent", userAgent).header("accept", "*/*")
     }
 
 }
