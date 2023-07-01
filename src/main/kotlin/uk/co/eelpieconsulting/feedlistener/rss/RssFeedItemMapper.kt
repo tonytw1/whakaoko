@@ -7,9 +7,9 @@ import org.apache.commons.lang.StringEscapeUtils
 import org.apache.logging.log4j.LogManager
 import org.bson.types.ObjectId
 import org.joda.time.DateTime
+import org.jsoup.Jsoup
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
-import uk.co.eelpieconsulting.common.html.HtmlCleaner
 import uk.co.eelpieconsulting.feedlistener.model.*
 import uk.co.eelpieconsulting.feedlistener.rss.images.RssFeedItemImageExtractor
 
@@ -24,8 +24,8 @@ class RssFeedItemMapper @Autowired constructor(private val rssFeedItemImageExtra
     fun createFeedItemFrom(syndEntry: SyndEntry, subscription: Subscription): FeedItem? {
         val place = extractLocationFrom(syndEntry)
         val imageUrl = rssFeedItemImageExtractor.extractImageFrom(syndEntry)
-        val body =
-            HtmlCleaner().stripHtml(StringEscapeUtils.unescapeHtml(rssFeedItemBodyExtractor.extractBody(syndEntry)))
+        val rawBody = StringEscapeUtils.unescapeHtml(rssFeedItemBodyExtractor.extractBody(syndEntry))
+        val body = toPlainText(rawBody)
         val date = if (syndEntry.publishedDate != null) syndEntry.publishedDate else syndEntry.updatedDate
         val url = extractUrl(syndEntry)
 
@@ -61,6 +61,10 @@ class RssFeedItemMapper @Autowired constructor(private val rssFeedItemImageExtra
             log.warn("Saw and ignored a syndEntry with no url: $syndEntry")
             return null
         }
+    }
+
+    private fun toPlainText(rawBody: String): String {
+        return Jsoup.parse(rawBody).text()
     }
 
     private fun extractUrl(syndEntry: SyndEntry): String? {

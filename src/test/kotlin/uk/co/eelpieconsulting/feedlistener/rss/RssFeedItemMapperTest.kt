@@ -3,7 +3,7 @@ package uk.co.eelpieconsulting.feedlistener.rss
 import com.rometools.rome.feed.synd.SyndEntry
 import io.micrometer.core.instrument.simple.SimpleMeterRegistry
 import org.apache.commons.io.IOUtils
-import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.mock
@@ -55,6 +55,17 @@ class RssFeedItemMapperTest {
         val feedItem = feedItems.first()
         assertEquals(subscription.channelId, feedItem?.channelId)
         assertEquals(subscription.id, feedItem?.subscriptionId)
+    }
+
+    @Test
+    fun shouldStripFigureTags() {
+        `when`(urlResolverService.resolveUrl(any())).thenReturn("http://localhost/something")
+
+        val feedItems = testSyndEntries("blackcoffee-figures.xml").map { rssFeedItemMapper.createFeedItemFrom(it, subscription) }
+
+        val feedItem = feedItems.first()
+        assertTrue(feedItem?.body!!.startsWith("WHAKATAU MAI RĀ E NGĀ HAU E WHĀ Calling In The Four Winds I have been contemplating my life over the last few years,"))
+        assertFalse(feedItem?.body!!.contains("<figure>"))
     }
 
     @Test
