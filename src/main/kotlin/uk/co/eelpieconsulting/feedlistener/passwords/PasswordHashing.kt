@@ -6,7 +6,7 @@ import org.springframework.stereotype.Component
 @Component
 class PasswordHashing {
 
-    private val encoder = Argon2PasswordEncoder()
+    private val encoder = Argon2PasswordEncoder.defaultsForSpringSecurity_v5_8()
 
     fun hash(password: String): String {
         return encoder.encode(password)
