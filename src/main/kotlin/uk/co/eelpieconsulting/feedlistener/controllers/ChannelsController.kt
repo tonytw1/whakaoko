@@ -36,7 +36,7 @@ class ChannelsController @Autowired constructor(private val channelsDAO: Channel
 
     private val log = LogManager.getLogger(ChannelsController::class.java)
 
-    private val X_TOTAL_COUNT = "X-Total-Count"
+    private val xTotalCount = "X-Total-Count"
 
     @CrossOrigin
     @GetMapping("/{username}/channels")
@@ -112,7 +112,7 @@ class ChannelsController @Autowired constructor(private val channelsDAO: Channel
                 val results = feedItemDAO.getChannelFeedItemsResult(channel, page, q, pageSize, subscriptions)
                 feedItemPopulator.populateFeedItems(results, mv, "data")
                 val totalCount = results.totalCount
-                response.addHeader(X_TOTAL_COUNT, totalCount.toString())
+                response.addHeader(xTotalCount, totalCount.toString())
                 mv
             }
         }

@@ -19,28 +19,28 @@ class RssFeedItemImageExtractorTest {
 
     private val itemWithImageInHtmlBody = mock(SyndEntry::class.java)
 
-    private val FULLY_QUALIFIED_IMAGE_URL: String = "http://www.localhost/images/test.jpg"
-    private val IMAGE_PATH: String = "/images/test.jpg"
+    private val fullyQualifiedImageUrl = "http://www.localhost/images/test.jpg"
+    private val imagePath = "/images/test.jpg"
 
     @Test
     fun shouldExtractFirstImageFromHtmlItemBodyIfAvailable() {
         `when`(itemWithImageInHtmlBody.getModule(MediaModule.URI)).thenReturn(null)
-        `when`(bodyHtmlImageExtractor.extractImageFrom(itemWithImageInHtmlBody)).thenReturn(FULLY_QUALIFIED_IMAGE_URL)
+        `when`(bodyHtmlImageExtractor.extractImageFrom(itemWithImageInHtmlBody)).thenReturn(fullyQualifiedImageUrl)
 
         val imageUrl = extractor.extractImageFrom(itemWithImageInHtmlBody)
 
-        assertEquals(FULLY_QUALIFIED_IMAGE_URL, imageUrl)
+        assertEquals(fullyQualifiedImageUrl, imageUrl)
     }
 
     @Test
     fun shouldExtendReferencedFromTheRootImagesFoundInHtmlIntoFullyQualifiedUrlsBasedOnTheItemUrl() {
         `when`(itemWithImageInHtmlBody.link).thenReturn("http://www.localhost/posts/123")
         `when`(itemWithImageInHtmlBody.getModule(MediaModule.URI)).thenReturn(null)
-        `when`(bodyHtmlImageExtractor.extractImageFrom(itemWithImageInHtmlBody)).thenReturn(IMAGE_PATH)
+        `when`(bodyHtmlImageExtractor.extractImageFrom(itemWithImageInHtmlBody)).thenReturn(imagePath)
 
         val imageUrl = extractor.extractImageFrom(itemWithImageInHtmlBody)
 
-        assertEquals(FULLY_QUALIFIED_IMAGE_URL, imageUrl)
+        assertEquals(fullyQualifiedImageUrl, imageUrl)
     }
 
 }

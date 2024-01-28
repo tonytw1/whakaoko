@@ -22,16 +22,16 @@ class FeedItemDAO @Autowired constructor(private val dataStoreFactory: DataStore
 
     private val log = LogManager.getLogger(FeedItemDAO::class.java)
 
-    private val CHANNEL_ID = "channelId"
-    private val SUBSCRIPTION_ID = "subscriptionId"
-    private val ORDERING = "ordering"
-    private val ORDER_DESCENDING_THEN_ID = arrayOf(Sort.descending(ORDERING), Sort.ascending("_id"))
-    private val DEFAULT_FEED_ITEMS = 25
-    private val MAX_FEED_ITEMS = 100
+    private val channelId = "channelId"
+    private val subscriptionId = "subscriptionId"
+    private val ordering = "ordering"
+    private val orderDescendingThenIdAscending = arrayOf(Sort.descending(ordering), Sort.ascending("_id"))
+    private val defaultFeedItems = 25
+    private val maxFeedItems = 100
 
     fun before(date: Date): MutableList<FeedItem>? {
         val query = dataStoreFactory.get().find(FeedItem::class.java).filter(Filters.lt("date", date))
-        return query.iterator(FindOptions().limit(1000).sort(*ORDER_DESCENDING_THEN_ID)).toList()
+        return query.iterator(FindOptions().limit(1000).sort(*orderDescendingThenIdAscending)).toList()
     }
 
     fun add(feedItem: FeedItem): Boolean {
@@ -46,7 +46,7 @@ class FeedItemDAO @Autowired constructor(private val dataStoreFactory: DataStore
     }
     fun getExistingFeedItemByUrlAndSubscription(feedItem: FeedItem): Query<FeedItem> =
         dataStoreFactory.get().find(FeedItem::class.java)
-            .filter(Filters.eq("url", feedItem.url), Filters.eq(SUBSCRIPTION_ID, feedItem.subscriptionId))
+            .filter(Filters.eq("url", feedItem.url), Filters.eq(subscriptionId, feedItem.subscriptionId))
 
     fun getSubscriptionFeedItems(subscription: Subscription, page: Int?, pageSize: Int? = null): FeedItemsResult {
         val pageSizeToUse = pageSizeToUse(pageSize)
@@ -79,12 +79,12 @@ class FeedItemDAO @Autowired constructor(private val dataStoreFactory: DataStore
     private fun getSubscriptionFeedItems(subscriptionId: String, pageSize: Int, page: Int): FeedItemsResult {
         val query = subscriptionFeedItemsQuery(subscriptionId)
         val totalItems = query.count()
-        return FeedItemsResult(query.iterator(withPaginationFor(pageSize, page).sort(*ORDER_DESCENDING_THEN_ID)).toList(), totalItems)
+        return FeedItemsResult(query.iterator(withPaginationFor(pageSize, page).sort(*orderDescendingThenIdAscending)).toList(), totalItems)
     }
 
     @Throws(MongoException::class)
     fun deleteSubscriptionFeedItems(subscription: Subscription) {
-        dataStoreFactory.get().find(FeedItem::class.java).filter(Filters.eq(SUBSCRIPTION_ID, subscription.id)).delete(DeleteOptions().multi(true))
+        dataStoreFactory.get().find(FeedItem::class.java).filter(Filters.eq(subscriptionId, subscription.id)).delete(DeleteOptions().multi(true))
     }
 
     fun getSubscriptionFeedItemsCount(subscriptionId: String): Long {
@@ -102,7 +102,7 @@ class FeedItemDAO @Autowired constructor(private val dataStoreFactory: DataStore
         // Should Morphia really be adding the discriminator clause to the count query?
         val totalCount = query.count()
 
-        return FeedItemsResult(query.iterator(withPaginationFor(pageSize, page).sort(*ORDER_DESCENDING_THEN_ID)).toList(), totalCount)
+        return FeedItemsResult(query.iterator(withPaginationFor(pageSize, page).sort(*orderDescendingThenIdAscending)).toList(), totalCount)
     }
 
     private fun searchChannelFeedItems(channelId: String, pageSize: Int, page: Int, q: String): FeedItemsResult {
@@ -111,15 +111,15 @@ class FeedItemDAO @Autowired constructor(private val dataStoreFactory: DataStore
     }
 
     private fun channelFeedItemsQuery(channelId: String, subscriptions: List<String>? = null): Query<FeedItem> {
-        val channelFeedItems = dataStoreFactory.get().find(FeedItem::class.java).filter(Filters.eq(CHANNEL_ID, channelId))
+        val channelFeedItems = dataStoreFactory.get().find(FeedItem::class.java).filter(Filters.eq(this.channelId, channelId))
         if (subscriptions != null) {
-            return channelFeedItems.filter(Filters.`in`(SUBSCRIPTION_ID, subscriptions))
+            return channelFeedItems.filter(Filters.`in`(subscriptionId, subscriptions))
         }
         return channelFeedItems
     }
 
     private fun subscriptionFeedItemsQuery(subscriptionId: String): Query<FeedItem> {
-        return dataStoreFactory.get().find(FeedItem::class.java).filter(Filters.eq(SUBSCRIPTION_ID, subscriptionId))
+        return dataStoreFactory.get().find(FeedItem::class.java).filter(Filters.eq(this.subscriptionId, subscriptionId))
     }
 
     private fun withPaginationFor(pageSize: Int, page: Int): FindOptions {
@@ -133,8 +133,8 @@ class FeedItemDAO @Autowired constructor(private val dataStoreFactory: DataStore
     }
 
     private fun pageSizeToUse(pageSize: Int?): Int {
-        val pageSizeToUse = pageSize ?: DEFAULT_FEED_ITEMS
-        if (pageSizeToUse > MAX_FEED_ITEMS) {
+        val pageSizeToUse = pageSize ?: defaultFeedItems
+        if (pageSizeToUse > maxFeedItems) {
             throw RuntimeException("Too many records requested") // TODO use correct exception.
         }
         return pageSizeToUse

@@ -13,12 +13,12 @@ import uk.co.eelpieconsulting.feedlistener.model.User
 @Component
 class ChannelsDAO @Autowired constructor(private val dataStoreFactory: DataStoreFactory) {
 
-    private val NAME_ASCENDING = Sort.ascending("name")
+    private val nameAscending = Sort.ascending("name")
 
     fun getChannelsFor(user: User): List<Channel> {
         return try {
             val channelsByUser = queryForUsersChannels(user)
-            channelsByUser.iterator(FindOptions().sort(NAME_ASCENDING)).toList()
+            channelsByUser.iterator(FindOptions().sort(nameAscending)).toList()
         } catch (e: MongoException) {
             throw RuntimeException(e)
         }

@@ -15,17 +15,17 @@ class MediaModuleImageExtractorTest {
     private val mediaModuleWithImage = mock(MediaEntryModuleImpl::class.java)
     private val extractor = MediaModuleImageExtractor()
 
-    private val FULLY_QUALIFIED_IMAGE_URL: String = "http://www.localhost/images/test.jpg"
+    private val fullyQualifiedImageUrl: String = "http://www.localhost/images/test.jpg"
     @Test
     fun shouldExtractUrlOfFullyQualifiedMediaRssImageElements() {
-        val image = MediaContent(UrlReference(FULLY_QUALIFIED_IMAGE_URL))
+        val image = MediaContent(UrlReference(fullyQualifiedImageUrl))
         val mediaContents = arrayOf<MediaContent?>(image)
         `when`(itemWithImage.getModule(MediaModule.URI)).thenReturn(mediaModuleWithImage)
         `when`(mediaModuleWithImage.mediaContents).thenReturn(mediaContents)
 
         val imageUrl = extractor.extractImageFromMediaModule(itemWithImage)
 
-        assertEquals(FULLY_QUALIFIED_IMAGE_URL, imageUrl)
+        assertEquals(fullyQualifiedImageUrl, imageUrl)
     }
 
 }

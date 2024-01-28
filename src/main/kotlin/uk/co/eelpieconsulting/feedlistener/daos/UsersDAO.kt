@@ -11,10 +11,10 @@ import uk.co.eelpieconsulting.feedlistener.model.User
 @Component
 class UsersDAO @Autowired constructor(private val dataStoreFactory: DataStoreFactory){
 
-    private val USERNAME_ASCENDING = Sort.ascending("username")
+    private val usernameAscending = Sort.ascending("username")
 
     fun getUsers(): List<User?>? {
-        return dataStoreFactory.get().find(User::class.java).iterator(FindOptions().sort(USERNAME_ASCENDING)).toList()
+        return dataStoreFactory.get().find(User::class.java).iterator(FindOptions().sort(usernameAscending)).toList()
     }
 
     fun getByObjectId(objectId: String): User? {

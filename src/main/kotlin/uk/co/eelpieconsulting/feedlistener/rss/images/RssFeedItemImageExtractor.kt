@@ -15,7 +15,7 @@ class RssFeedItemImageExtractor @Autowired constructor(
     mediaModuleImageExtractor: MediaModuleImageExtractor,
     meterRegistry: MeterRegistry
 ) {
-    private val BLOCKED_URL_SNIPPETS = setOf("http://stats.wordpress.com", "gravatar.com/avatar", "share_save_171_16")
+    private val blockedUrlSnippets = setOf("http://stats.wordpress.com", "gravatar.com/avatar", "share_save_171_16")
     private val bodyHtmlImageExtractor: BodyHtmlImageExtractor
     private val mediaModuleImageExtractor: MediaModuleImageExtractor
 
@@ -80,7 +80,7 @@ class RssFeedItemImageExtractor @Autowired constructor(
     }
 
     private fun isBlockListedImageUrl(url: String): Boolean {
-        return BLOCKED_URL_SNIPPETS.stream().anyMatch(url::contains)
+        return blockedUrlSnippets.stream().anyMatch(url::contains)
     }
 
 }

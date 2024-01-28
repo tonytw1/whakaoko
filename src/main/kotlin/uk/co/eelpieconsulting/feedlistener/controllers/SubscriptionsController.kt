@@ -34,7 +34,7 @@ class SubscriptionsController @Autowired constructor(
 
     private val log = LogManager.getLogger(ChannelsController::class.java)
 
-    private val X_TOTAL_COUNT = "X-Total-Count"
+    private val xTotalCount = "X-Total-Count"
 
     @CrossOrigin
     @GetMapping("/subscriptions/{id}/items")
@@ -56,7 +56,7 @@ class SubscriptionsController @Autowired constructor(
                 }
                 val feedItemsResult = feedItemDAO.getSubscriptionFeedItems(subscription, page, pageSize)
                 feedItemPopulator.populateFeedItems(feedItemsResult, mv, "data")
-                response.addHeader(X_TOTAL_COUNT, feedItemsResult.totalCount.toString())
+                response.addHeader(xTotalCount, feedItemsResult.totalCount.toString())
                 mv
             }
         }

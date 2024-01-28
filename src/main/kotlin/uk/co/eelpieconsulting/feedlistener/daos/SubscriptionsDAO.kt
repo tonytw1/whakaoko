@@ -17,7 +17,7 @@ class SubscriptionsDAO @Autowired constructor(private val dataStoreFactory: Data
 
     private val log = LogManager.getLogger(SubscriptionsDAO::class.java)
 
-    private val LATEST_ITEM_DATE_DESCENDING = Sort.descending("latestItemDate")
+    private val latestItemDateDescending = Sort.descending("latestItemDate")
 
     @Synchronized
     fun add(subscription: Subscription) {
@@ -77,7 +77,7 @@ class SubscriptionsDAO @Autowired constructor(private val dataStoreFactory: Data
         if (!Strings.isNullOrEmpty(url)) {
             query = query.disableValidation().filter(Filters.eq("url", url)) // TODO subclasses to helping here
         }
-        return query.iterator(FindOptions().sort(LATEST_ITEM_DATE_DESCENDING)).toList()
+        return query.iterator(FindOptions().sort(latestItemDateDescending)).toList()
     }
 
     // TODO optimise for last read ordering
@@ -87,7 +87,7 @@ class SubscriptionsDAO @Autowired constructor(private val dataStoreFactory: Data
     }
 
     private fun subscriptionExists(subscription: Subscription): Boolean {
-        for (existingSubscription in getSubscriptions(LATEST_ITEM_DATE_DESCENDING, null)) {
+        for (existingSubscription in getSubscriptions(latestItemDateDescending, null)) {
             if (existingSubscription.id == subscription.id) {
                 log.debug("Subscription exists: $subscription")
                 return true
