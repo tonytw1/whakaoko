@@ -2,7 +2,6 @@ package uk.co.eelpieconsulting.feedlistener.controllers.ui
 
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.validation.Valid
-import org.apache.logging.log4j.LogManager
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Controller
@@ -21,7 +20,6 @@ import uk.co.eelpieconsulting.feedlistener.controllers.CurrentUserService
 import uk.co.eelpieconsulting.feedlistener.controllers.FeedItemPopulator
 import uk.co.eelpieconsulting.feedlistener.controllers.ui.forms.NewSubscriptionForm
 import uk.co.eelpieconsulting.feedlistener.daos.FeedItemDAO
-import uk.co.eelpieconsulting.feedlistener.daos.SubscriptionsDAO
 import uk.co.eelpieconsulting.feedlistener.model.Channel
 import uk.co.eelpieconsulting.feedlistener.model.RssSubscription
 import uk.co.eelpieconsulting.feedlistener.model.User
@@ -31,7 +29,6 @@ import uk.co.eelpieconsulting.feedlistener.rss.classification.Classifier
 
 @Controller
 class SubscriptionsUIController @Autowired constructor(
-    private val subscriptionsDAO: SubscriptionsDAO,
     private val feedItemDAO: FeedItemDAO,
     private val feedItemPopulator: FeedItemPopulator,
     private val rssSubscriptionManager: RssSubscriptionManager,
@@ -42,8 +39,6 @@ class SubscriptionsUIController @Autowired constructor(
     request: HttpServletRequest,
     private val classifier: Classifier
 ) : WithSignedInUser(currentUserService, request) {
-
-    private val log = LogManager.getLogger(SubscriptionsUIController::class.java)
 
     @GetMapping("/ui/subscriptions/{channelId}/new")
     fun newSubscriptionForm(@PathVariable channelId: String, newSubscriptionForm: NewSubscriptionForm): ModelAndView {
@@ -72,10 +67,6 @@ class SubscriptionsUIController @Autowired constructor(
                         channel.id,
                         user.username
                     )
-                    subscriptionsDAO.add(subscription)
-                    log.info("Added subscription: $subscription")
-                    rssPoller.requestRead(subscription)
-
                     redirectAttributes.addFlashAttribute("message", "Subscription added")
                     ModelAndView(RedirectView(urlBuilder.getSubscriptionUrl(subscription)))
                 }

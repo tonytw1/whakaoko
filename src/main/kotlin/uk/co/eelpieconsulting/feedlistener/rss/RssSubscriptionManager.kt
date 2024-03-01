@@ -7,7 +7,10 @@ import uk.co.eelpieconsulting.feedlistener.daos.SubscriptionsDAO
 import uk.co.eelpieconsulting.feedlistener.model.RssSubscription
 
 @Component
-class RssSubscriptionManager @Autowired constructor(private val subscriptionsDAO: SubscriptionsDAO) {
+class RssSubscriptionManager @Autowired constructor(
+    private val subscriptionsDAO: SubscriptionsDAO,
+    private val rssPoller: RssPoller
+) {
 
     private val log = LogManager.getLogger(RssSubscriptionManager::class.java)
 
@@ -20,7 +23,11 @@ class RssSubscriptionManager @Autowired constructor(private val subscriptionsDAO
                 return existingSubscription
             }
         }
-        // TODO who should save this
+
+        subscriptionsDAO.add(newSubscription)
+        log.info("Added subscription: $newSubscription")
+        rssPoller.requestRead(newSubscription)
+
         return newSubscription
     }
 
