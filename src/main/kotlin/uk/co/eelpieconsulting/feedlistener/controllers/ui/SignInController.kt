@@ -16,7 +16,6 @@ import uk.co.eelpieconsulting.feedlistener.passwords.PasswordHashing
 
 @Controller
 class SignInController @Autowired constructor(
-    private val request: HttpServletRequest,
     private val usersDAO: UsersDAO,
     private val currentUserService: CurrentUserService,
     private val passwordHashing: PasswordHashing
@@ -69,13 +68,7 @@ class SignInController @Autowired constructor(
     }
 
     private fun redirectToSignedInUserUI(request: HttpServletRequest): ModelAndView {
-        val redirectUrl = request.session.getAttribute("redirect")
-        request.session.removeAttribute("redirect")
-        return if (redirectUrl != null && redirectUrl is String) {
-            ModelAndView(RedirectView(redirectUrl))
-        } else {
-            ModelAndView(RedirectView("/"))
-        }
+        return ModelAndView(RedirectView("/"))
     }
 
 }

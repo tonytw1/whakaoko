@@ -56,8 +56,16 @@ class UsersUIController @Autowired constructor(
         val newUser = User(ObjectId.get(), username, passwordHashing.hash(password))
         usersDAO.save(newUser)
         log.info("Created user: $newUser")
+        currentUserService.setSignedInUser(newUser)
+        return redirectToSignedInUserUI(request)
+    }
 
-        return ModelAndView(viewFactory.jsonView).addObject("data", "ok")
+    @GetMapping("/")
+    fun userhome(): ModelAndView {
+        fun usersHomepage(user: User): ModelAndView {
+            return ModelAndView("userhome").addObject("channels", channelsDAO.getChannelsFor(user))
+        }
+        return forCurrentUser(::usersHomepage)
     }
 
     private fun redirectToCreateUserPromptWithError(
@@ -68,12 +76,14 @@ class UsersUIController @Autowired constructor(
         return ModelAndView(RedirectView("/ui/newuser"))
     }
 
-    @GetMapping("/")
-    fun userhome(): ModelAndView {
-        fun usersHomepage(user: User): ModelAndView {
-            return ModelAndView("userhome").addObject("channels", channelsDAO.getChannelsFor(user))
+    fun redirectToSignedInUserUI(request: HttpServletRequest): ModelAndView {
+        val redirectUrl = request.session.getAttribute("redirect")
+        request.session.removeAttribute("redirect")
+        return if (redirectUrl != null && redirectUrl is String) {
+            ModelAndView(RedirectView(redirectUrl))
+        } else {
+            ModelAndView(RedirectView("/"))
         }
-        return forCurrentUser(::usersHomepage)
     }
 
 }
