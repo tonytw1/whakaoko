@@ -63,8 +63,12 @@ class RssFeedItemMapper @Autowired constructor(private val rssFeedItemImageExtra
         }
     }
 
-    private fun toPlainText(rawBody: String): String {
-        return Jsoup.parse(rawBody).text()
+    private fun toPlainText(rawBody: String?): String? {
+        return if (rawBody != null) {
+            Jsoup.parse(rawBody).text()
+        } else {
+            null
+        }
     }
 
     private fun extractUrl(syndEntry: SyndEntry): String? {
