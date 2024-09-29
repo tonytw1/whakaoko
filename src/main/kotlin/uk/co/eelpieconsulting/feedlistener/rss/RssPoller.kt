@@ -14,8 +14,10 @@ import org.springframework.core.task.TaskExecutor
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor
 import org.springframework.stereotype.Component
+import uk.co.eelpieconsulting.common.views.json.JsonSerializer
 import uk.co.eelpieconsulting.feedlistener.daos.FeedItemDAO
 import uk.co.eelpieconsulting.feedlistener.daos.SubscriptionsDAO
+import uk.co.eelpieconsulting.feedlistener.kafka.Kafka
 import uk.co.eelpieconsulting.feedlistener.model.FeedItem
 import uk.co.eelpieconsulting.feedlistener.model.RssSubscription
 import uk.co.eelpieconsulting.feedlistener.model.Subscription
@@ -33,6 +35,7 @@ class RssPoller @Autowired constructor(val subscriptionsDAO: SubscriptionsDAO,
                                        private val feedFetcher: FeedFetcher, val feedfItemDAO : FeedItemDAO,
                                        val feedItemLatestDateFinder: FeedItemLatestDateFinder,
                                        val classifier: Classifier,
+                                       val kafka: Kafka,
                                        meterRegistry: MeterRegistry) {
 
     private val log = LogManager.getLogger(RssPoller::class.java)
@@ -202,13 +205,18 @@ class RssPoller @Autowired constructor(val subscriptionsDAO: SubscriptionsDAO,
 
         private fun persistFeedItems(feedItems: List<FeedItem>) {
             feedItems.forEach { feedItem ->
-                val withAccepted = feedItem.copy(accepted = DateTime.now().toDate())
-
                 val existingSubscriptionFeeditemsWithSameUrl = feedfItemDAO.getExistingFeedItemByUrlAndSubscription(feedItem)
                 val shouldAdd = existingSubscriptionFeeditemsWithSameUrl.first() == null
                 if (shouldAdd) {
+                    val withAccepted = feedItem.copy(accepted = DateTime.now().toDate())
+
+                    // Echo new feed items on to kafka
+                    val asJson = JsonSerializer().serialize(withAccepted)
+                    kafka.publish(asJson)
+
                     if (feedItemDAO.add(withAccepted)) {
                         rssAddedItems.increment()
+
                     } else {
                         log.warn("Failed to add feed item: " + feedItem.title)
                     }
