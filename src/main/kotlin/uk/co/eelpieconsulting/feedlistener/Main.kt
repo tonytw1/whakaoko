@@ -13,9 +13,7 @@ import org.springframework.boot.autoconfigure.mongo.MongoAutoConfiguration
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.ComponentScan
 import org.springframework.context.annotation.Configuration
-import org.springframework.core.task.TaskExecutor
 import org.springframework.scheduling.annotation.EnableScheduling
-import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor
 import org.springframework.web.servlet.config.annotation.CorsRegistry
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
 import uk.co.eelpieconsulting.common.dates.DateFormatter
@@ -50,15 +48,6 @@ open class Main : WebMvcConfigurer {
     @Bean
     open fun httpFetcher(): HttpFetcher {
         return HttpFetcher("Whakaoko/1.0", 20000)
-    }
-
-    @Bean("rssPollerTaskExecutor")
-    open fun taskExecutor(): TaskExecutor {
-        val taskExecutor = ThreadPoolTaskExecutor()
-        taskExecutor.corePoolSize = 5
-        taskExecutor.maxPoolSize = 10
-        taskExecutor.queueCapacity = 5000
-        return taskExecutor
     }
 
     @Bean
