@@ -5,10 +5,7 @@ import com.google.common.base.Strings
 import io.micrometer.core.instrument.Counter
 import io.micrometer.core.instrument.MeterRegistry
 import io.micrometer.core.instrument.Metrics
-import kotlinx.coroutines.async
-import kotlinx.coroutines.awaitAll
-import kotlinx.coroutines.newFixedThreadPoolContext
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.*
 import org.apache.logging.log4j.LogManager
 import org.joda.time.DateTime
 import org.joda.time.Duration
@@ -69,8 +66,10 @@ class RssPoller @Autowired constructor(
     }
 
     fun requestRead(subscription: RssSubscription) {
-        log.info("Requesting reload of RSS subscription: " + subscription.name + " / " + subscription.url)
-        run(subscription)
+        runBlocking {
+            log.info("Requesting reload of RSS subscription: " + subscription.name + " / " + subscription.url)
+            executeRssPoll(subscription)
+        }
     }
 
     private fun shouldFetchNow(subscription: RssSubscription): Boolean {
@@ -103,14 +102,7 @@ class RssPoller @Autowired constructor(
         return readInterval
     }
 
-    private fun run(subscription: RssSubscription) {
-        val currentThreadId = Thread.currentThread().id
-        log.info("Polling single subscription $subscription.id using thread $currentThreadId")
-        executeRssPoll(subscription)
-        log.info("Done")
-    }
-
-    private fun executeRssPoll(subscription: RssSubscription) {
+    suspend private fun executeRssPoll(subscription: RssSubscription) {
         log.info("Processing feed: " + subscription + " from thread " + Thread.currentThread().id)
         val start = DateTime.now()
 
@@ -122,8 +114,8 @@ class RssPoller @Autowired constructor(
                 return
             }
 
-            fun pollFeed(): Result<RssSubscription, FeedFetchingException> {
-                log.info("Fetching full feed: " + subscription.url)
+        suspend fun pollFeed(): Result<RssSubscription, FeedFetchingException> {
+            log.info("Fetching full feed: " + subscription.url)
 
             try {
                 return feedFetcher.fetchFeed(subscription).fold(
