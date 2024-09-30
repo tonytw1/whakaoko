@@ -23,6 +23,8 @@ import uk.co.eelpieconsulting.feedlistener.model.RssSubscription
 import uk.co.eelpieconsulting.feedlistener.model.Subscription
 import uk.co.eelpieconsulting.feedlistener.rss.classification.Classifier
 import uk.co.eelpieconsulting.feedlistener.rss.classification.FeedStatus
+import java.net.MalformedURLException
+import java.net.URL
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 import java.time.format.DateTimeParseException
@@ -103,6 +105,14 @@ class RssPoller @Autowired constructor(val subscriptionsDAO: SubscriptionsDAO,
 
         override fun run() {
             log.info("Processing feed: " + subscription + " from thread " + Thread.currentThread().id)
+
+            if (!hasValidUrl(subscription)) {
+                log.warn("Invalid URL: ${subscription.url}")
+                subscription.classifications = setOf(FeedStatus.invalid)
+                subscription.lastRead = DateTime.now().toDate()
+                subscriptionsDAO.save(subscription)
+                return
+            }
 
             fun pollFeed(): Result<RssSubscription, FeedFetchingException> {
                 log.info("Fetching full feed: " + subscription.url)
@@ -225,6 +235,15 @@ class RssPoller @Autowired constructor(val subscriptionsDAO: SubscriptionsDAO,
                     log.debug("Skipping previously added: " + feedItem.title)
                 }
             }
+        }
+    }
+
+    private fun hasValidUrl(subscription: RssSubscription): Boolean {
+        return try {
+            URL(subscription.url)
+            true
+        } catch (m: MalformedURLException) {
+            false
         }
     }
 }
