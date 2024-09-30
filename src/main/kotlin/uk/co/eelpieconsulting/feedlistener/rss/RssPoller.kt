@@ -240,8 +240,8 @@ class RssPoller @Autowired constructor(val subscriptionsDAO: SubscriptionsDAO,
 
     private fun hasValidUrl(subscription: RssSubscription): Boolean {
         return try {
-            URL(subscription.url)
-            true
+            val parsed = URL(subscription.url)
+            !parsed.host.contains(" ")
         } catch (m: MalformedURLException) {
             false
         }
