@@ -49,7 +49,7 @@ open class Main : WebMvcConfigurer {
 
     @Bean
     open fun httpFetcher(): HttpFetcher {
-        return HttpFetcher("Whakaoko/1.0", 90000)
+        return HttpFetcher("Whakaoko/1.0", 20000)
     }
 
     @Bean("rssPollerTaskExecutor")
