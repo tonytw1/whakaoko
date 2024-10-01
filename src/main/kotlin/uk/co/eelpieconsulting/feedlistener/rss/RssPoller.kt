@@ -12,6 +12,7 @@ import org.apache.logging.log4j.LogManager
 import org.joda.time.DateTime
 import org.joda.time.Duration
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Component
 import uk.co.eelpieconsulting.common.views.json.JsonSerializer
@@ -37,6 +38,7 @@ class RssPoller @Autowired constructor(
     val feedItemLatestDateFinder: FeedItemLatestDateFinder,
     val classifier: Classifier,
     val kafka: Kafka,
+    @Value("\${kafka.channels}") val kafkaChannels: Array<String>,
     meterRegistry: MeterRegistry
 ) {
 
@@ -225,11 +227,10 @@ class RssPoller @Autowired constructor(
                 val withAccepted = feedItem.copy(accepted = DateTime.now().toDate())
 
                 // Echo new feed items on to kafka
-                val channelId = feedItem.channelId
-                val channelHasKafkaTopic = channelId == "wellynews" // TODO push to config
+                val channelHasKafkaTopic = kafkaChannels.contains(feedItem.channelId)
                 if (channelHasKafkaTopic) {
                     val asJson = JsonSerializer().serialize(withAccepted)
-                    kafka.publish(channelId, asJson)
+                    kafka.publish(feedItem.channelId, asJson)
                 }
 
                 if (feedItemDAO.add(withAccepted)) {
