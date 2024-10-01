@@ -6,16 +6,19 @@ import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
 
 @Component
-class Kafka(@Value("\${kafka.bootStrapServers}") private val bootStrapServers: String, @Value("\${kafka.topic}") private val topic: String) {
+class Kafka(@Value("\${kafka.bootStrapServers}") private val bootStrapServers: String) {
 
     private val producer = buildProducer()
 
-    fun publish(message: String) {
-        producer?.send(ProducerRecord(topic, null, message.encodeToByteArray())) // Or asyncSend
+    fun publish(channelId: String, message: String) {
+        if (channelId.isNotEmpty()) {
+            val topic = "whakaoko.$channelId"
+            producer?.send(ProducerRecord(topic, null, message.encodeToByteArray())) // Or asyncSend
+        }
     }
 
     private fun buildProducer(): KafkaProducer<String, ByteArray>? {
-        return if (bootStrapServers.isNotEmpty() && topic.isNotEmpty()) { KafkaProducer(
+        return if (bootStrapServers.isNotEmpty()) { KafkaProducer(
             mapOf(
                 "bootstrap.servers" to bootStrapServers,
                 "key.serializer" to "org.apache.kafka.common.serialization.StringSerializer",
