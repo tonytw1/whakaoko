@@ -37,7 +37,7 @@ class Classifier  @Autowired constructor(private val feedItemDAO: FeedItemDAO)  
     }
 
     fun frequency(subscription: Subscription): Double? {
-        // Given a subscription estimate the frequency of posts by look at the gaps between it's previous posts
+        // Given a subscription estimate the frequency of posts by looking at the gaps between posts
 
         val subscriptionFeedItems = feedItemDAO.getSubscriptionFeedItems(subscription, 1, 20)
         val feedItems = subscriptionFeedItems.feedsItems
@@ -55,7 +55,7 @@ class Classifier  @Autowired constructor(private val feedItemDAO: FeedItemDAO)  
             stats.addValue(gapInDays)
         }
         
-        log.info("Frequency stats for " + subscription.name + ": " + stats.mean + " " + stats.standardDeviation)
+        log.info("Item frequency stats for ${subscription.name}: ${stats.mean} with ${stats.standardDeviation} standard deviation")
         return stats.mean
     }
 

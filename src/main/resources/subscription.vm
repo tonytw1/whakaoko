@@ -43,11 +43,15 @@
                 #end
             #end
 
-            <p>frequency: $!frequency</p>
-            <p>fetchInterval: $!fetchInterval</p>
-
             #if($subscription.latestItemDate)
                 <p>Latest item date: $dateFormatter.timeSince($subscription.latestItemDate)</p>
+                <p>frequency: $!frequency<br/>
+                    The average number of days between this feed's posts.
+                </p>
+            #end
+
+            #if($fetchInterval)
+                <p>fetchInterval: We fetch this feed every $!fetchInterval seconds.</p>
             #end
             <hr/>
         </div>
