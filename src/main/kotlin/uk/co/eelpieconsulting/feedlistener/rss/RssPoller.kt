@@ -5,7 +5,9 @@ import com.google.common.base.Strings
 import io.micrometer.core.instrument.Counter
 import io.micrometer.core.instrument.MeterRegistry
 import io.micrometer.core.instrument.Metrics
-import kotlinx.coroutines.*
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.newFixedThreadPoolContext
+import kotlinx.coroutines.runBlocking
 import org.apache.logging.log4j.LogManager
 import org.joda.time.DateTime
 import org.joda.time.Duration
@@ -49,20 +51,20 @@ class RssPoller @Autowired constructor(
 
     @Scheduled(fixedRate = 3600000, initialDelay = 300000)
     fun run() {
+        log.info("Polling subscriptions")
+        val start = DateTime.now()
         runBlocking {
-            log.info("Polling subscriptions")
-            val start = DateTime.now()
             subscriptionsDAO.allRssSubscriptions()
                 .filter { shouldFetchNow(it) }
                 .map { subscription ->
-                    async(limitedDispatcher) {
+                    launch(limitedDispatcher) {
                         executeRssPoll(subscription)
                     }
-                }.awaitAll()
-
-            val duration = Duration(start, DateTime.now())
-            log.info("Done polling subscriptions in ${duration.millis}ms")
+                }
         }
+
+        val duration = Duration(start, DateTime.now())
+        log.info("Done polling subscriptions in ${duration.millis}ms")
     }
 
     fun requestRead(subscription: RssSubscription) {
