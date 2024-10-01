@@ -3,8 +3,7 @@ package uk.co.eelpieconsulting.feedlistener.http
 import com.github.kittinunf.fuel.core.FuelError
 import com.github.kittinunf.fuel.core.Headers
 import com.github.kittinunf.fuel.core.Request
-import com.github.kittinunf.fuel.core.awaitResponseResult
-import com.github.kittinunf.fuel.core.deserializers.ByteArrayDeserializer
+import com.github.kittinunf.fuel.coroutines.awaitByteArrayResponseResult
 import com.github.kittinunf.fuel.httpGet
 import com.github.kittinunf.result.Result
 import org.apache.logging.log4j.LogManager
@@ -30,7 +29,7 @@ class HttpFetcher(private val userAgent: String, private val timeout: Int) {
             request.header("If-Modified-Since", ifModifiedSince)
         }
 
-        val (_, response, result) = request.awaitResponseResult(ByteArrayDeserializer())
+        val (_, response, result) = request.awaitByteArrayResponseResult()
         return result.fold({ bytes ->
             val httpResult = HttpResult(bytes = bytes, status = response.statusCode, headers = response.headers)
             Result.success(httpResult)

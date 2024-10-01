@@ -199,6 +199,11 @@
             <version>2.3.1</version>
         </dependency>
         <dependency>
+            <groupId>com.github.kittinunf.fuel</groupId>
+            <artifactId>fuel-coroutines</artifactId>
+            <version>2.3.1</version>
+        </dependency>
+        <dependency>
             <groupId>com.github.kittinunf.result</groupId>
             <artifactId>result</artifactId>
             <version>3.1.0</version>
