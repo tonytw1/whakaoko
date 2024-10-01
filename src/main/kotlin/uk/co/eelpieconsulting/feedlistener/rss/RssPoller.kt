@@ -225,8 +225,12 @@ class RssPoller @Autowired constructor(
                 val withAccepted = feedItem.copy(accepted = DateTime.now().toDate())
 
                 // Echo new feed items on to kafka
-                val asJson = JsonSerializer().serialize(withAccepted)
-                kafka.publish(asJson)
+                val channelId = feedItem.channelId
+                val channelHasKafkaTopic = channelId == "wellynews" // TODO push to config
+                if (channelHasKafkaTopic) {
+                    val asJson = JsonSerializer().serialize(withAccepted)
+                    kafka.publish(channelId, asJson)
+                }
 
                 if (feedItemDAO.add(withAccepted)) {
                     rssAddedItems.increment()
