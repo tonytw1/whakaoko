@@ -59,7 +59,7 @@ class Classifier  @Autowired constructor(private val feedItemDAO: FeedItemDAO)  
 
         val meanDurationBetweenPosts = Duration(stats.mean.roundToLong())
         val standardDeviation = Duration(stats.standardDeviation.roundToLong())
-        log.info("Item frequency stats for ${subscription.name}: ${meanDurationBetweenPosts} with ${standardDeviation} standard deviation")
+        log.info("Frequency stats for ${subscription.name}: ${meanDurationBetweenPosts} with ${standardDeviation} standard deviation")
         return meanDurationBetweenPosts
     }
 
