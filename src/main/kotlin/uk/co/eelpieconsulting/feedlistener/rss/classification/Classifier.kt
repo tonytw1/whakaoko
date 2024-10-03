@@ -19,11 +19,11 @@ class Classifier  @Autowired constructor(private val feedItemDAO: FeedItemDAO)  
 
     private val goodHttpCodes = setOf(200, 304)
     private val badHttpCodes = setOf(404, 401, -1)
+    private val sevenDays = Days.SEVEN.toStandardDuration()
 
     fun classify(subscription: Subscription): Set<FeedStatus> {
         val frequencyStatus = frequency(subscription)?.let {
-            log.info("Frequency for " + subscription.name + ": " + it)
-            if (it < Days.SEVEN.toStandardDuration()) {
+            if (it < sevenDays) {
                 FeedStatus.frequent
             } else {
                 null
