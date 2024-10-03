@@ -1,6 +1,8 @@
 package uk.co.eelpieconsulting.feedlistener.classification
 
 import org.joda.time.DateTime
+import org.joda.time.Days
+import org.joda.time.Hours
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.mockito.Mockito
@@ -72,7 +74,8 @@ class ClassifierTest : TestData {
 
         val frequency = classifier.frequency(subscription)
 
-        assertEquals(4.5, frequency!!, 0.1)
+        val fourAndAHalfDays = Days.days(4).toStandardDuration().plus(Hours.hours(12).toStandardDuration())
+        assertEquals(fourAndAHalfDays, frequency!!)
     }
 
 }

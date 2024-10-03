@@ -3,12 +3,14 @@ package uk.co.eelpieconsulting.feedlistener.rss.classification
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics
 import org.apache.logging.log4j.LogManager
 import org.joda.time.DateTime
+import org.joda.time.Days
 import org.joda.time.Duration
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
 import uk.co.eelpieconsulting.feedlistener.daos.FeedItemDAO
 import uk.co.eelpieconsulting.feedlistener.model.RssSubscription
 import uk.co.eelpieconsulting.feedlistener.model.Subscription
+import kotlin.math.roundToLong
 
 @Component
 class Classifier  @Autowired constructor(private val feedItemDAO: FeedItemDAO)  {
@@ -21,7 +23,7 @@ class Classifier  @Autowired constructor(private val feedItemDAO: FeedItemDAO)  
     fun classify(subscription: Subscription): Set<FeedStatus> {
         val frequencyStatus = frequency(subscription)?.let {
             log.info("Frequency for " + subscription.name + ": " + it)
-            if (it < 7) {
+            if (it < Days.SEVEN.toStandardDuration()) {
                 FeedStatus.frequent
             } else {
                 null
@@ -36,7 +38,7 @@ class Classifier  @Autowired constructor(private val feedItemDAO: FeedItemDAO)  
         return setOf(frequencyStatus, livenessStatus).mapNotNull { it }.toSet()
     }
 
-    fun frequency(subscription: Subscription): Double? {
+    fun frequency(subscription: Subscription): Duration? {
         // Given a subscription estimate the frequency of posts by looking at the gaps between posts
 
         val subscriptionFeedItems = feedItemDAO.getSubscriptionFeedItems(subscription, 1, 20)
@@ -51,12 +53,14 @@ class Classifier  @Autowired constructor(private val feedItemDAO: FeedItemDAO)  
 
         val stats = DescriptiveStatistics()
         for (i: Int in 0 until feedItems.size - 1) {
-            val gapInDays =  Duration(DateTime(itemDates[i + 1]), DateTime(itemDates[i])).toStandardHours().hours.toDouble() / 24.0
-            stats.addValue(gapInDays)
+            val duration = Duration(DateTime(itemDates[i + 1]), DateTime(itemDates[i]))
+            stats.addValue(duration.millis.toDouble())
         }
-        
-        log.info("Item frequency stats for ${subscription.name}: ${stats.mean} with ${stats.standardDeviation} standard deviation")
-        return stats.mean
+
+        val meanDurationBetweenPosts = Duration(stats.mean.roundToLong())
+        val standardDeviation = Duration(stats.standardDeviation.roundToLong())
+        log.info("Item frequency stats for ${subscription.name}: ${meanDurationBetweenPosts} with ${standardDeviation} standard deviation")
+        return meanDurationBetweenPosts
     }
 
     private fun livenessStatus(subscription: RssSubscription) =
