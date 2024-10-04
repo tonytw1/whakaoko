@@ -5,6 +5,7 @@ import com.google.common.base.Strings
 import io.micrometer.core.instrument.Counter
 import io.micrometer.core.instrument.MeterRegistry
 import io.micrometer.core.instrument.Metrics
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.newFixedThreadPoolContext
 import kotlinx.coroutines.runBlocking
@@ -70,10 +71,11 @@ class RssPoller @Autowired constructor(
     }
 
     fun requestRead(subscription: RssSubscription) {
-        runBlocking {
-            log.info("Requesting reload of RSS subscription: " + subscription.name + " / " + subscription.url)
+        log.info("Requesting background read of RSS subscription: " + subscription.name + " / " + subscription.url)
+        CoroutineScope(limitedDispatcher).launch {
             executeRssPoll(subscription)
         }
+        log.info("Read requested; returning")
     }
 
     private fun shouldFetchNow(subscription: RssSubscription): Boolean {
