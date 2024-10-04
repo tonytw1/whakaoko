@@ -55,18 +55,18 @@ class RssPoller @Autowired constructor(
     fun run() {
         log.info("Polling subscriptions")
         val start = DateTime.now()
+        val all = subscriptionsDAO.allRssSubscriptions()
+        val toFetch = all.filter { shouldFetchNow(it) }
         runBlocking {
-            subscriptionsDAO.allRssSubscriptions()
-                .filter { shouldFetchNow(it) }
-                .map { subscription ->
-                    launch(limitedDispatcher) {
-                        executeRssPoll(subscription)
-                    }
+            toFetch.map { subscription ->
+                launch(limitedDispatcher) {
+                    executeRssPoll(subscription)
                 }
+            }
         }
 
         val duration = Duration(start, DateTime.now())
-        log.info("Done polling subscriptions in ${duration.millis}ms")
+        log.info("Done polling ${toFetch.size} of ${all.size} subscriptions in ${duration.millis}ms")
     }
 
     fun requestRead(subscription: RssSubscription) {
