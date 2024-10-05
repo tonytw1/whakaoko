@@ -63,7 +63,7 @@ class SubscriptionsUIController @Autowired constructor(
 
                 } else {
                     val subscription = rssSubscriptionManager.requestFeedSubscription(
-                        newSubscriptionForm.url,
+                        newSubscriptionForm.url.trim(), // TODO validation
                         channel.id,
                         user.username
                     )

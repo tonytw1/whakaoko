@@ -10,7 +10,8 @@ class RssSubscription(
 ) : Subscription() {
 
     init {
-        id = channelId + "-" + "feed-" + DigestUtils.md5Hex(url)
+        val idempotencyId = channelId + "-" + "feed-" + DigestUtils.md5Hex(url)
+        this.id = idempotencyId
         this.channelId = channelId
         this.username =username
         this.classifications = classifications

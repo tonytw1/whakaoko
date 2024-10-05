@@ -20,18 +20,22 @@ class SubscriptionsDAO @Autowired constructor(private val dataStoreFactory: Data
     private val latestItemDateDescending = Sort.descending("latestItemDate")
 
     @Synchronized
-    fun add(subscription: Subscription) {
-        if (!subscriptionExists(subscription)) {
-            log.debug("Saving subscription")
-            save(subscription)
+    fun add(subscription: Subscription): Subscription {
+        log.info("Adding subscription with id: ${subscription.id}")
+        // Look up existing by idempotency id
+        val existing = getById(subscription.id)
+        if (existing == null) {
+            log.info("Saving new subscription")
+            return save(subscription)
         } else {
-            log.debug("Not saving duplication subscription")
+            log.warn("Not saving duplication subscription")
+            return existing
         }
     }
 
-    fun save(subscription: Subscription) {
+    fun save(subscription: Subscription): Subscription {
         try {
-            dataStoreFactory.get().save(subscription)
+            return dataStoreFactory.get().save(subscription)
         } catch (e: MongoException) {
             throw RuntimeException(e)
         }
@@ -50,14 +54,15 @@ class SubscriptionsDAO @Autowired constructor(private val dataStoreFactory: Data
         }
     }
 
-    fun getById(id: String?): Subscription? {
+    fun getById(id: String): Subscription? {
+        log.info("Getting subscription by id: $id")
         return dataStoreFactory.get().find(RssSubscription::class.java).filter(Filters.eq("id", id)).first()
     }
 
-    fun getByRssSubscriptionById(id: String?): RssSubscription? {
+    fun getByRssSubscriptionById(id: String): RssSubscription? {
         return dataStoreFactory.get().find(RssSubscription::class.java).filter(Filters.eq("id", id)).first()
     }
-    fun subscriptionExists(id: String?): Boolean {
+    fun subscriptionExists(id: String): Boolean {
         return getById(id) != null
     }
 
@@ -84,16 +89,6 @@ class SubscriptionsDAO @Autowired constructor(private val dataStoreFactory: Data
     fun allRssSubscriptions(): List<RssSubscription> {
         val allRssSubscriptions = dataStoreFactory.get().find(RssSubscription::class.java)
         return allRssSubscriptions.iterator().toList() // TODO optimise for last read ordering
-    }
-
-    private fun subscriptionExists(subscription: Subscription): Boolean {
-        for (existingSubscription in getSubscriptions(latestItemDateDescending, null)) {
-            if (existingSubscription.id == subscription.id) {
-                log.debug("Subscription exists: $subscription")
-                return true
-            }
-        }
-        return false
     }
 
 }

@@ -17,9 +17,11 @@ class RssSubscriptionManager @Autowired constructor(
     fun requestFeedSubscription(url: String, channel: String, username: String): RssSubscription {
         log.info("Requesting subscription to feed: $url")
         val newSubscription = RssSubscription(url, channel, username)
+        log.info("New subscription has idempotency id: ${newSubscription.id}")
         if (subscriptionsDAO.subscriptionExists(newSubscription.id)) {
             val existingSubscription = subscriptionsDAO.getByRssSubscriptionById(newSubscription.id)
             if (existingSubscription != null) {
+                log.info("Found existing subscription: ${existingSubscription.id}")
                 return existingSubscription
             }
         }

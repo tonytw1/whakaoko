@@ -94,7 +94,7 @@ class SubscriptionsController @Autowired constructor(
 
     @PostMapping("/subscriptions")
     fun createSubscription(@RequestBody create: SubscriptionCreateRequest): ModelAndView {
-        fun createSubscription(user: User): ModelAndView {
+        fun createSubscription(user: User): ModelAndView {  // TODO duplication with RssSubscriptionManager?
             log.info("Got subscription create request: $create")
             val targetChannel = create.channel
             if (Strings.isNullOrEmpty(create.url) || Strings.isNullOrEmpty(targetChannel)) {
@@ -102,11 +102,12 @@ class SubscriptionsController @Autowired constructor(
             }
             return conditionalLoads.withChannelForUser(targetChannel, user) { channel ->
                 val subscription = RssSubscription(url = create.url, channelId = channel.id, username = user.username)
-                // TODO check for existing idempotent feed
-                subscriptionsDAO.add(subscription)
-                log.info("Added subscription: $subscription")
-                rssPoller.requestRead(subscription)
-                ModelAndView(viewFactory.jsonView()).addObject("data", subscription)
+                val persisted = subscriptionsDAO.add(subscription)
+                log.info("Persisted subscription is: $persisted")
+                when (persisted) {
+                    is RssSubscription -> rssPoller.requestRead(persisted)
+                }
+                ModelAndView(viewFactory.jsonView()).addObject("data", persisted)
             }
         }
 
