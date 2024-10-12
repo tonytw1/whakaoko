@@ -105,11 +105,7 @@ class SubscriptionsController @Autowired constructor(
                 throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Subscription url is not valid")
             }
 
-            val targetChannel = create.channel
-            if (Strings.isNullOrEmpty(targetChannel)) {
-                throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Subscription channel missing")
-            }
-            return conditionalLoads.withChannelForUser(targetChannel, user) { channel ->
+            return conditionalLoads.withChannelForUser(create.channel, user) { channel ->
                 val subscription = RssSubscription(
                     url = validatedUrl.toExternalForm(),
                     channelId = channel.id,
@@ -122,7 +118,6 @@ class SubscriptionsController @Autowired constructor(
                 }
                 ModelAndView(viewFactory.jsonView()).addObject("data", persisted)
             }
-
         }
 
         return forCurrentUser(::createSubscription)

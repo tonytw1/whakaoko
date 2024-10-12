@@ -1,5 +1,6 @@
 package uk.co.eelpieconsulting.feedlistener.controllers
 
+import com.google.common.base.Strings
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Component
@@ -15,6 +16,9 @@ import uk.co.eelpieconsulting.feedlistener.model.User
 class ConditionalLoads @Autowired constructor(private val channelsDAO: ChannelsDAO, val subscriptionsDAO: SubscriptionsDAO) {
 
     fun withChannelForUser(channelId: String, user: User, handler: (Channel) -> ModelAndView): ModelAndView {
+        if (Strings.isNullOrEmpty(channelId)) {
+            throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Subscription channel missing")
+        }
         val channel = channelsDAO.getById(channelId)
             ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Channel not found")
 
