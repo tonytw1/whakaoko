@@ -18,6 +18,8 @@ import uk.co.eelpieconsulting.feedlistener.model.RssSubscription
 import uk.co.eelpieconsulting.feedlistener.model.User
 import uk.co.eelpieconsulting.feedlistener.rss.RssPoller
 import uk.co.eelpieconsulting.feedlistener.views.ViewFactory
+import java.net.MalformedURLException
+import java.net.URL
 
 @Controller
 class SubscriptionsController @Autowired constructor(
@@ -96,12 +98,23 @@ class SubscriptionsController @Autowired constructor(
     fun createSubscription(@RequestBody create: SubscriptionCreateRequest): ModelAndView {
         fun createSubscription(user: User): ModelAndView {  // TODO duplication with RssSubscriptionManager?
             log.info("Got subscription create request: $create")
+
+            val validatedUrl = try {
+                URL(create.url)
+            } catch (e: MalformedURLException) {
+                throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Subscription url is not valid")
+            }
+
             val targetChannel = create.channel
-            if (Strings.isNullOrEmpty(create.url) || Strings.isNullOrEmpty(targetChannel)) {
-                throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Subscription url or channel missing")
+            if (Strings.isNullOrEmpty(targetChannel)) {
+                throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Subscription channel missing")
             }
             return conditionalLoads.withChannelForUser(targetChannel, user) { channel ->
-                val subscription = RssSubscription(url = create.url, channelId = channel.id, username = user.username)
+                val subscription = RssSubscription(
+                    url = validatedUrl.toExternalForm(),
+                    channelId = channel.id,
+                    username = user.username
+                )
                 val persisted = subscriptionsDAO.add(subscription)
                 log.info("Persisted subscription is: $persisted")
                 when (persisted) {
@@ -109,6 +122,7 @@ class SubscriptionsController @Autowired constructor(
                 }
                 ModelAndView(viewFactory.jsonView()).addObject("data", persisted)
             }
+
         }
 
         return forCurrentUser(::createSubscription)
